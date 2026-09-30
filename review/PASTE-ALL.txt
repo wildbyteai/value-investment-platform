@@ -5,13 +5,13 @@
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读PROJECT.md、README.md与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，若发起消息指定commit，必须使用该完整SHA；否则先解析main的实际commit SHA并固定。先读PROJECT.md、README.md、review/ROUND-2-REQUEST.md、review/ROUND-2-REVIEW.md、review/ROUND-2-PROBES.json与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
 
 ### 独立项目与本轮顺序
 
-项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。
+项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。迁移冻结基线为1b16f381a8742b910cdaa8ba5b928a32857a5b69；本轮Codex报告对该基线提出F01…05，属于提案，未改业务合同。请独立核查每项，允许用原文反驳，给accepted/rejected/modified/deferred与理由；F05已有cutoff≤generated_at，不要误报当前允许提前封存。新问题另编号，不能只审查这五项。
 
 ### 我的目标与已确认范围
 
@@ -133,6 +133,7 @@ H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候�
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
+| [迁移后二轮评审](./review/ROUND-2-REVIEW.md) / [二轮请求](./review/ROUND-2-REQUEST.md) | 固定迁移基线复审，提案与已确认合同分开 |
 | [GPT Pro 提示词](./review/GPT-PRO-PROMPT.md) | 独立审查和生成改进版的完整指令 |
 | [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
 | [开源初步候选](./research/open-source-shortlist.md) / [第二轮核查](./research/second-review.md) | 固定源码核查、候选取舍与边界，尚未集成 |
@@ -172,7 +173,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.2设计基线的第二轮业务与工程评审；产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.2迁移后第二轮Codex业务/工程复审已完成，GPT Pro独立复审材料已准备；产品尚未实施。评审发现与提案见review/ROUND-2-REVIEW.md，未自动改合同。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -3848,6 +3849,7 @@ paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "A
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
     paths.extend(sorted(ROOT.glob(pattern)))
 paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])
+paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
 parts = ["# 价值投资策略管理系统 v0.2 · GPT Pro 整包评审材料\n\n日期：2026-09-30。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
@@ -4208,7 +4210,7 @@ for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.m
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
 report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'77524649dae91a1d38df5fb93d5b47884e5c86a7','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
@@ -4265,6 +4267,269 @@ print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes
 R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04。首版通知范围按用户决定调整，T-16实际发送部分后续执行，不降低状态变化与去重验收。策略/评分文件名v1保持第一套标准配置名称，Schema/指标定义独立升版本，尚无生产配置被替换。
 
 材料检查结果见validation-result.json：JSON、有限Schema形状、引用/hash、模板/规则一致性、合成黄金算术/负例等；不能替代完整JSON Schema库验证或产品运行验收。未执行数据库迁移/并发、真实源/模型、检索标注、UI/设备/UAT、性能和备份恢复；没有收益验证。GitHub提交与回读证据留在当前Matter，不把本机路径、原始网页或凭证上传。
+
+
+===== SOURCE: review/ROUND-2-PROBES.json =====
+
+{
+  "baseline_commit": "1b16f381a8742b910cdaa8ba5b928a32857a5b69",
+  "executed_at": "2026-09-30T15:09:44.364840+00:00",
+  "method": "Existing conservative material_schema.validate; eight synthetic shape observations, NOT full draft-2020-12 validation or product tests",
+  "source_sha256": {
+    "contracts/review-decision.schema.json": "04768e3b8d4f123dfe88afa1ef4e6a86343394ccf6370f7b905df20848879b0b",
+    "contracts/analysis-result.schema.json": "def05c6c2a563b82f98d0713f7172d53e2ba6fcc42146f474957cea2e893a7df",
+    "contracts/scoring-template.schema.json": "40f936015179660f6ffe3e189d92f7116b6ee7a38e71238756a9426bc6799bf2",
+    "contracts/scoring.schema.json": "121be579c10aec6c8981488edb44b5f8188b22c034bd4323c51e78ba76eee60b",
+    "examples/human-override.json": "5beb97d90389975d083f8db587e80281458d0010a39edc32ed667147340a3590",
+    "examples/analysis-proposal.json": "43d0e83ce5a4d9b4e3c854c09e91d3c08109ef2215f54d502085738fd77d02b3",
+    "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a"
+  },
+  "status": "expected_observations_matched",
+  "case_count": 8,
+  "cases": [
+    {
+      "case": "F01 existing human rejection",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ]
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F01 decision with replacement value",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "replacement_value": {
+          "signed_impact": "-0.2"
+        }
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F02 company-only delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F02 security-targeted delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting",
+        "security_id": "00000000-0000-4000-8000-000000000002"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F03 existing template weight patch",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F03 template freshness policy",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25",
+        "freshness_policy_ref": "synthetic-freshness-90d"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F04 existing impact dimension",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "growth_sustainability",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F04 custom dimension impact",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "x_customer_retention",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "rejected: enum mismatch",
+      "expected_observation": "rejected: enum mismatch"
+    }
+  ]
+}
+
+
+===== SOURCE: review/ROUND-2-REQUEST.md =====
+
+# 第二轮GPT Pro评审请求
+
+项目已独立管理，迁移前后v0.2业务合同未变。迁移后的冻结基线是`1b16f381a8742b910cdaa8ba5b928a32857a5b69`。当前review目录包含本轮Codex报告和探针，报告不是已采纳的新合同。
+
+实际输入请以发起消息指定的完整commit为准；未指定则先读取main一次并解析完整SHA，随后所有文件固定该SHA，不混版本。无需附件或本机路径。
+
+1. 读取PROJECT/README、[ROUND-2-REVIEW.md](./ROUND-2-REVIEW.md)、[ROUND-2-PROBES.json](./ROUND-2-PROBES.json)，再按[GPT-PRO-PROMPT.md](./GPT-PRO-PROMPT.md)完整读取设计原文。
+2. 独立判断F01/F02是否真实影响人工编辑与风险传播；F03/F04是否需要policy/dimension注册合同；F05要尊重docs/04已有cutoff≤generated_at，不能误报当前允许提前封存。
+3. 对每项给accepted/rejected/modified/deferred及证据、理由和修订内容；新发现另编号。继续完整检查金融口径、状态、权限、恢复、UX与开源复用，不限于五项。
+4. 保留docs/11已确认需求。输出完整v0.3主文、改动合同/配置/示例、实施任务书和追踪账本，全部在对话正文交付。不得只提供附件、虚构下载链接或声称文件已入仓库。
+5. 评审可给具体方案，不修改GitHub、不运行真实模型/来源、不部署或通知。不可读私有仓库时诚实说明缺失读取范围，不要求公开仓库或传Token。
+
+本请求准备完成不代表GPT Pro已运行。外部评审完成后由本项目归档其实际正文/来源，先复核再采纳设计，不把建议当用户确认或产品验收。
+
+
+===== SOURCE: review/ROUND-2-REVIEW.md =====
+
+# 迁移后第二轮业务与工程评审
+
+日期：2026-09-30。评审执行：当前Codex主会话；没有第二Agent或GPT Pro实际运行。本轮为设计原文与跨模块合同复审，尚未实施产品。
+
+固定基线：[1b16f381a8742b910cdaa8ba5b928a32857a5b69](https://github.com/wildbyteai/value-investment-platform/tree/1b16f381a8742b910cdaa8ba5b928a32857a5b69)。这是迁移完成后的独立项目版本；v0.2业务/配置/Schema与7752464相同。本报告及建议不改变该基线的已确认合同。
+
+## 1. 结论和实施影响
+
+独立目录、Git历史、管理入口、执行规则、原事项指向和历史保留已完成。可以继续做工程准备、页面原型及有界适配验证；若另行授权W-08产品开发，先补齐F01/F02涉及的判断编辑和风险作用域合同，再实施对应路径。两项是局部设计阻断，不要求重建架构或等待真实供应商。F03/F04属于模板扩展的重要一致性问题；F05是封存协议需明确的实现约束，未证实当前设计允许提前封存。不能把尚无运行测试当作设计失败，也不能以材料检查通过当产品验收。
+
+保留多人五角色、三层模板、自动审核生效/人工有效覆盖优先、外部模型、通知后置、A/H和共享设计系统。保留模块化单体、PG事实真源、版本manifest、确定性计算、ledger/fencing/outbox和历史纠错。成熟技术足以实现这些机制，缺口集中在跨模块语义与机器合同的一致性。
+
+## 2. 评审覆盖与证据等级
+
+本轮阅读PROJECT/README/AGENTS、docs/01…13的业务/工程/UX/验收主体，重点逐行核对02/04/05/06/11/12/13及判断、分析、模板、评分Schema；检查标准评分/策略/模板/自动审核/角色配置和人工覆盖/分析示例。读取既有第二轮研究以区分旧发现和本轮发现。材料工具另对配置、全部Schema/示例、链接与hash执行314项离线检查；两者覆盖不可混称为“逐行审计所有文件”。
+
+本轮没有重新访问第三方源码、验证全部开源传递许可或确认最新发行版，开源结论仅沿用research中固定提交核查作为候选依据。没有取得Pro之前声称的60文件包。GPT Pro下一轮仍应独立完整阅读，尤其金融指标/开源选型/UX细节；不要把本报告当唯一输入。
+
+[ROUND-2-PROBES.json](./ROUND-2-PROBES.json)记录8个已执行合成形状观察、输入hash和结果：现有拒绝/风险/patch/影响形状可通过，分别加替换值、证券身份、新鲜度policy或自定义影响维度后被当前合同拒绝。使用现有保守Schema子集工具，结论仅限这些字段约束；不是正式draft-2020-12或运行功能测试。发现缺口仍需结合API/数据/UX原文，单个Schema拒绝不独自证明整体系统无法实现。
+
+## 3. 发现与修订提案
+
+### F01 / P1：人工修改判断缺少新值与修订创建合同
+
+依据：docs/11第45–47、67行规定可改关联/影响/rubric及覆盖端点；docs/05第38行输入只列subject_revision、decision、reason、evidence；docs/06第30、53行和docs/13第20、30行要求完成修改/覆盖。review-decision.schema第14–27、65–93行记录被判断修订和结论，没有新值；examples/human-override仅演示rejected。
+
+反例：研究员将已accepted的signed_impact从+0.8改为−0.2，保留证据；或把rubric档位3改为1。当前decision形状可拒绝旧值，但不能携带替换值；另一种合法方案是先创建人工subject_revision，再accepted它，然而创建命令、payload与原子性尚未定义。不能把replacement藏进reason文本由下游解析。
+
+后果：前端有“修改”按钮，后端只实现接受/拒绝；或者各模块自行创造更新方式，覆盖优先级存在但值无法可靠追溯。此项阻断W-08的人工编辑主路径。
+
+提案：定义OverrideCommand，区分accept/reject/pending与replace/release；replace按subject_kind提供类型化完整新判断、证据、适用期和expected revision。领域服务同事务创建不可变HumanJudgmentRevision、review_decision、有效指针、audit/outbox；Decision对象只引用修订也完全可以，不必重复保存数值。slot身份在API中使用稳定opaque ID而非任意字符串拼接。并发409保留新输入，重试相同幂等键返回同一修订/决策，后续AUTO不替换有效HUMAN。
+
+追踪：R-03/05/09/16，W-03/04/08，T-27/28/T-UX-01。修订出口：提供+0.8→−0.2和grade3→1的请求/响应/数据库修订链例子，说明重算A/H和覆盖到期行为；运行通过状态留待实施。
+
+### F02 / P1：硬风险缺少公司、证券与挂牌作用域
+
+依据：analysis-result.schema第188–230行risk_proposals只有company_id、risk_code、confidence、evidence和rationale，其中包含delisting_decision；标准strategy配置hard_risk_policy即刻OUT。docs/02第95–99行描述硬风险优先，docs/04第26–27行和docs/12第17行却明确company/security/listing分离。
+
+反例：同一公司有A与H，原始监管披露仅H股挂牌退市，A股仍正常。当前机器风险不能指定H security/listing；若按company-wide消费会使A也OUT，若按来源市场推测则身份映射与传播规则散落各消费者。公司级债务违约又可能确实影响A/H，二者不能共用隐式传播。
+
+后果：错误风险作用范围直接改变候选池；撤销某挂牌风险也可能误解除其他公司风险。此项阻断W-08风险接受→membership主路径的通用合同。
+
+提案：RiskJudgment增加受限target_kind(company/security/listing)、target_id、risk_code、有效时间与证据；DecisionService验证候选身份和上下级一致性，模型不能任意扩大传播。持久化risk_revision与resolution manifest；公司级传播到适用证券，security/listing级只作用目标与release固定primary listing。风险解除引用确切风险修订/slot并CAS generation，不以risk_code一键全公司解除。传播由明确规则决定，不自动沿母子关系无限扩散。
+
+追踪：R-06/08/16，W-03/05/08，T-10/28/31。修订出口：仅H退市→H风险OUT且A不因该风险变动；公司级违约→A/H各自生成适用RISK；撤销H风险不删除独立公司违约。均为拟补充预期。
+
+### F03 / P2：模板宣称可配置证据/新鲜度，patch合同未覆盖
+
+依据：docs/11第25行patch仅weight/baseline/disabled，第27行又声明可配置证据与新鲜度；scoring-template.schema第116–224行baseline仅metrics或rubric_ref。标准策略quality_gates设置统一baseline_max_age_days=180。
+
+反例：某行业把治理证据的有效龄期改为90天，企业定制要求某项必须有发行人正文。没有对应patch或固定policy引用入口，现有合同拒绝freshness_policy_ref；不能靠UI保存但解析器忽略它。
+
+提案：可选择类型化quality/evidence policy patches，或固定引用受控policy版本；定义base→industry→company的继承、发布hash和策略绑定。若设计本意是通过rubric目录实现部分证据口径，则明确哪些条件在rubric、哪些是strategy质量门，以及如何冻结和升级；全局180日上限与更严格行业要求如何合成。不得无声删除模板可配置能力。
+
+追踪：R-05/15/16，W-04/08，T-25/26/37。出口：90日/180日同输入的解析差异、字段来源、旧release不变、过期变UNKNOWN的固定例子。此项不阻断当前仅改权重的合成子路径，但在实现完整模板功能前须统一合同。
+
+### F04 / P2：自定义维度允许发布，但事件影响只支持五个固定维度
+
+依据：docs/11第25行允许新增x_自定义维度；模板Schema第122–124行允许x_。analysis-result.schema第78–85行影响dimension仅五项；当前评分Schema允许动态权重/baseline，不能误称它也拒绝所有x_配置。模板patch没有自定义维度的事件半衰期/是否接收影响的配置，docs/07第5步要求模板限定半衰期。
+
+反例：企业新增x_customer_retention，以rubric为基准，希望客户流失事件贡献到此维度。模板形状允许自定义维度，但analysis影响拒绝它；若只支持baseline，前端必须明确“该维度不接受事件贡献”，否则框架扩展能力含糊。仅有weight和baseline也不能得出该维度H。
+
+提案：建立版本化dimension registry，包含适用模板、baseline与event policy/半衰期。proposal维度采用受限ID+服务端manifest allowlist，而非模型任意字段；或明确某维度event_enabled=false并解释baseline-only含义。注册/策略字段扩展经受控发布，不允许任意代码；保留既有必需维度与总权重约束。
+
+追踪：R-05/15/16，W-03/04，T-25/26/08。出口：自定义维度合法提案能落到解析配置，未注册/不适用维度拒绝；baseline-only不产生虚构贡献。标准五维W-08路径可先实现，无需为此增加新服务。
+
+### F05 / P2：显式区分最终价格与评估封存协议
+
+依据：docs/12第19–28行正确区分price_kind/is_final并固定收盘+60min的cutoff；docs/04第63行已经要求cutoff≤生成时点，本轮未发现可据此断言“提前FINAL被允许”的证据。尚需明确不同worker的价格FINAL、输入冻结与evaluation封存的状态/原子边界；docs/10 T-31/T-38主要覆盖价格与输入合法性。
+
+反例推演：最终收盘后15min价格已FINAL；一则收盘前已公开的合法公告40min才observed、50min决策生效。按现有时间约束，15min的计算只能是provisional，不能推进membership；60min后封存需要在同一cutoff选择40/50min输入。两个worker若用不同manifest却宣称同一session FINAL，会违反既有合同；这是假设实现反例，不是已观察运行缺陷。
+
+提案：定义evaluation sealing状态/命令：session_due→provisional→ready_to_seal→sealed；clock≥cutoff才封存，冻结全部输入类别的选择规则与质量缺口，持久化manifest/hash、seal_at/token，CAS generation一次应用。60min后晚知悉输入走新判断/下一session；原错误走CORRECTION。保留实时硬风险独立生效。无需新增基础设施，也不允许将当前cutoff改成worker now。
+
+追踪：R-06/08/12，W-05/08，T-31/38/14。出口：+15/+40/+50/+60时点的固定测试、双worker封存唯一token、cutoff后完成计算generated_at真实。此项是实现前细化，不另列重大业务决定。
+
+## 4. UX与开源实施建议
+
+现有UX方向已覆盖共享组件、证据路径、A/H切换、质量状态和409恢复，应进入具体交互原型。F01覆盖页需展示旧值/新值/理由/有效期/受影响证券；F02风险卡明确“作用于公司全部适用证券”或“仅此挂牌”，可读名称放前面；F03/F04模板页展示继承/覆盖/最终值与事件是否参与。工程hash、队列与policy ID收进管理诊断。保留四项真实用户任务与现有测量方法，不用漂亮静态截图替代任务完成验证。
+
+技术推荐沿用选择性FastAPI工程基座+统一React设计系统；Refine仅有界管理适配、Prefect作为一套编排的替代候选。Qlib/FinanceToolkit作为隔离研究/公式参考，不成为实时Decimal规则/状态真源。M0锁版本并验证最小事务、客户端与组件；本轮不声称重新证实开源当前能力，也不安装依赖。GPT Pro须继续核查必要官方源码、LICENSE、数据权利与A/H时点适配，把推荐融入v0.3。
+
+## 5. 下一轮交接与收口
+
+本轮未修改已确认业务合同；F01…05为修订提案。按[二轮请求](./ROUND-2-REQUEST.md)与[完整提示词](./GPT-PRO-PROMPT.md)让GPT Pro独立复核，允许反驳本报告，给出完整v0.3正文和逐项disposition。已解决旧B/S问题不重新记为新问题。若认可提案，在新设计版同步docs、Schema、配置、示例、R/W/T和页面，不只给一份文字建议。
+
+已运行：独立迁移完整性核对、314项迁移基线材料检查、8个合同形状观察。未运行：正式Schema库、任何产品/DB/API/模型/真实源/UI/UAT/性能/恢复测试。本报告属于已完成设计评审，外部GPT Pro评审尚未执行，产品开发需独立实施授权。
 
 [REVIEW_MATERIALS_END]
 请现在开始完整评审并输出 v0.3。

@@ -1,5 +1,5 @@
 
-[PART 8/14]
+[PART 8/15]
 
 
 ===== SOURCE: config/auto-review-policy-v1.json =====
@@ -553,6 +553,6 @@
   "scoring_binding_policy": "published_per_company_resolution_manifest"
 }
 
-[END PART 8/14]
+[END PART 8/15]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

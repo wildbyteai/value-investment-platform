@@ -1,5 +1,5 @@
 
-[PART 3/14]
+[PART 3/15]
 
 
 ===== SOURCE: docs/04-data-design.md =====
@@ -171,6 +171,6 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 
 模板解析/模拟/发布、企业评分绑定、人工覆盖/解除、研究笔记/保存视图、用户角色端点详见11 §6。API返回有效父链与字段来源；发布固定binding manifest。POST /correction-previews与POST /corrections采用12 §4的窗口/锚点、If-Match和scope，返回固定历史解释和当前影响；禁止通过普通job retry回写封存session。
 
-[END PART 3/14]
+[END PART 3/15]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

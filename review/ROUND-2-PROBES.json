@@ -1,0 +1,151 @@
+{
+  "baseline_commit": "1b16f381a8742b910cdaa8ba5b928a32857a5b69",
+  "executed_at": "2026-09-30T15:09:44.364840+00:00",
+  "method": "Existing conservative material_schema.validate; eight synthetic shape observations, NOT full draft-2020-12 validation or product tests",
+  "source_sha256": {
+    "contracts/review-decision.schema.json": "04768e3b8d4f123dfe88afa1ef4e6a86343394ccf6370f7b905df20848879b0b",
+    "contracts/analysis-result.schema.json": "def05c6c2a563b82f98d0713f7172d53e2ba6fcc42146f474957cea2e893a7df",
+    "contracts/scoring-template.schema.json": "40f936015179660f6ffe3e189d92f7116b6ee7a38e71238756a9426bc6799bf2",
+    "contracts/scoring.schema.json": "121be579c10aec6c8981488edb44b5f8188b22c034bd4323c51e78ba76eee60b",
+    "examples/human-override.json": "5beb97d90389975d083f8db587e80281458d0010a39edc32ed667147340a3590",
+    "examples/analysis-proposal.json": "43d0e83ce5a4d9b4e3c854c09e91d3c08109ef2215f54d502085738fd77d02b3",
+    "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a"
+  },
+  "status": "expected_observations_matched",
+  "case_count": 8,
+  "cases": [
+    {
+      "case": "F01 existing human rejection",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ]
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F01 decision with replacement value",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "replacement_value": {
+          "signed_impact": "-0.2"
+        }
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F02 company-only delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F02 security-targeted delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting",
+        "security_id": "00000000-0000-4000-8000-000000000002"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F03 existing template weight patch",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F03 template freshness policy",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25",
+        "freshness_policy_ref": "synthetic-freshness-90d"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F04 existing impact dimension",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "growth_sustainability",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F04 custom dimension impact",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "x_customer_retention",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "rejected: enum mismatch",
+      "expected_observation": "rejected: enum mismatch"
+    }
+  ]
+}

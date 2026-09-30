@@ -1,5 +1,5 @@
 
-[PART 5/14]
+[PART 5/15]
 
 
 ===== SOURCE: docs/09-delivery-plan.md =====
@@ -234,6 +234,6 @@ GET /decisions?company_id&status&actor_kind；POST /decisions/{slot}/overrides�
 
 GET /admin/roles；PUT /admin/users/{id}/roles。响应包含可授予权限和版本，写入采用If-Match、明确差异、审计；403无权、409并发冲突、422不合法角色组合或模板配置。模板Schema校验形状；父链、权重、scope、引用和人工覆盖优先级由语义校验补充。
 
-[END PART 5/14]
+[END PART 5/15]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

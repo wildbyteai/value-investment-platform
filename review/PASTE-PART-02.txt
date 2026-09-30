@@ -1,5 +1,5 @@
 
-[PART 2/14]
+[PART 2/15]
 
 
 ===== SOURCE: docs/02-business-design.md =====
@@ -214,6 +214,6 @@ qa/                      # 合成场景、E2E、负载与演练
 
 开源复用以第二轮research/second-review.md的固定源码核查为依据。优先选择性复用FastAPI Full Stack Template工程基座；Refine可与TanStack共享QueryClient/路由/设计系统，不能以重复依赖为由排除；Prefect是Celery编排层替代候选，PG业务事务不由框架保证。实际采用在W-08做最小验证；不用两套活跃调度器。所有候选均未安装/集成。
 
-[END PART 2/14]
+[END PART 2/15]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。
