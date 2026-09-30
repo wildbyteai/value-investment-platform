@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "item_revision_id": "00000000-0000-4000-8000-000000000002",
+  "no_link": false,
+  "links": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "relation_type": "direct",
+      "relevance": "0.95",
+      "confidence": "0.93",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成材料明确描述示例制造订单，不代表真实公司判断。"
+    }
+  ],
+  "impact_proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "dimension": "growth_sustainability",
+      "signed_impact": "0.4",
+      "confidence": "0.8",
+      "half_life_days": 30,
+      "valid_until": "2026-12-31T00:00:00Z",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+    }
+  ]
+}

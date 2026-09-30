@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "strategy_key": "value-standard",
+  "version": 1,
+  "name": "标准价投候选 v1（非金融行业）",
+  "description": "人维护的示范筛选规则；研究提醒，不下单，不验证收益。",
+  "scoring_model_ref": "scoring-standard-v1",
+  "universe": {
+    "markets": [
+      "CN_A",
+      "HK"
+    ],
+    "exclude_sector_groups": [
+      "financials",
+      "real_estate",
+      "commodity_cyclicals"
+    ],
+    "common_equity_only": true
+  },
+  "quality_gates": {
+    "minimum_coverage": "0.80",
+    "required_dimensions": [
+      "profit_quality",
+      "financial_resilience",
+      "business_model"
+    ],
+    "baseline_max_age_days": 180,
+    "financial_max_announced_age_days": 180,
+    "price_max_lag_sessions": 1,
+    "currency_and_share_basis_required": true,
+    "only_approved_inputs": true
+  },
+  "hard_risk_policy": {
+    "confirmed_only": true,
+    "action": "immediate_out_risk",
+    "risk_codes": [
+      "confirmed_fraud",
+      "going_concern_material",
+      "confirmed_debt_default",
+      "delisting_decision"
+    ]
+  },
+  "state_policy": {
+    "initial_baseline_notify": false,
+    "enter_distinct_sessions": 2,
+    "exit_distinct_sessions": 2,
+    "session_clock": "security_exchange_close",
+    "unknown_action": "hold_last_confirmed_reset_pending",
+    "config_change_notify": "summary_only",
+    "historical_notify": false
+  },
+  "enter": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "70"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "60"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  },
+  "retain": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "65"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "50"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  }
+}

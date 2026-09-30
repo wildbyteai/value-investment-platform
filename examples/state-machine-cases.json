@@ -1,0 +1,82 @@
+{
+  "synthetic": true,
+  "cases": [
+    {
+      "session": "s0",
+      "input": "enter_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": null
+    },
+    {
+      "session": "s1",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s1",
+      "input": "enter_true_recompute",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s2",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": "ENTER"
+    },
+    {
+      "session": "s3",
+      "input": "missing",
+      "confirmed": "IN",
+      "display": "UNKNOWN",
+      "notification": null
+    },
+    {
+      "session": "s4",
+      "input": "retain_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": null
+    },
+    {
+      "session": "s5",
+      "input": "retain_false",
+      "confirmed": "IN",
+      "display": "EXIT_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s6",
+      "input": "retain_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": "EXIT"
+    },
+    {
+      "session": "s7",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s8",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": "ENTER"
+    },
+    {
+      "session": "s9",
+      "input": "approved_hard_risk",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": "RISK"
+    }
+  ]
+}

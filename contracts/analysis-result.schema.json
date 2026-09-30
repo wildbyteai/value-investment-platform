@@ -1,0 +1,169 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "item_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "no_link": {
+      "type": "boolean"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relation_type": {
+            "enum": [
+              "direct",
+              "subsidiary",
+              "customer_supplier",
+              "competitor",
+              "industry_policy",
+              "indirect_theme"
+            ]
+          },
+          "relevance": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "relation_type",
+          "relevance",
+          "confidence",
+          "evidence_ids",
+          "rationale"
+        ]
+      },
+      "maxItems": 20
+    },
+    "impact_proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dimension": {
+            "enum": [
+              "profit_quality",
+              "financial_resilience",
+              "business_model",
+              "governance",
+              "growth_sustainability"
+            ]
+          },
+          "signed_impact": {
+            "type": "string",
+            "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "half_life_days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 730
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "dimension",
+          "signed_impact",
+          "confidence",
+          "half_life_days",
+          "valid_until",
+          "evidence_ids",
+          "rationale"
+        ]
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "schema_version",
+    "item_revision_id",
+    "no_link",
+    "links",
+    "impact_proposals"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unapproved analysis proposal",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "no_link": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "links": {
+            "maxItems": 0
+          },
+          "impact_proposals": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "links": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "ItemCaptured",
+        "ItemNormalized",
+        "AnalysisProposed",
+        "ReviewApproved",
+        "EventChanged",
+        "FundamentalChanged",
+        "ScoreCompleted",
+        "StrategyEvaluated",
+        "MembershipChanged",
+        "NotificationRequested",
+        "IndexRequested"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "backfill",
+        "replay",
+        "shadow",
+        "research_reconstruction"
+      ]
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_manifest_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "input_manifest_id",
+        "job_id"
+      ]
+    }
+  },
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "workspace_id",
+    "entity_id",
+    "entity_revision",
+    "occurred_at",
+    "trace_id",
+    "mode",
+    "generation",
+    "payload"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Durable job reference event"
+}
