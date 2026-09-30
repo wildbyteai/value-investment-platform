@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import re
+import subprocess
 from datetime import datetime, timezone
 from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 from pathlib import Path
@@ -18,6 +19,11 @@ def check(ok,name):
 def read(path):return json.loads((ROOT/path).read_text())
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def canonical_hash(value):return hashlib.sha256((json.dumps(value,ensure_ascii=False,indent=2)+'\n').encode()).hexdigest()
+def current_revision():
+    try:
+        return subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,check=True,capture_output=True,text=True).stdout.strip()
+    except (OSError,subprocess.CalledProcessError):
+        return None
 def reject(fn,name):
     try:fn()
     except (MaterialError,ValueError,AssertionError,KeyError):checks.append('Negative: '+name)
@@ -204,6 +210,10 @@ sources=[]
 for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
-report={'design_version':'0.3','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_binding':'source_sha256 binds the exact working-tree inputs; uncommitted design working tree on main; no new commit or remote delivery claimed','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+revision=current_revision()
+binding=(f'source_sha256 binds the exact inputs used by this run; Git HEAD at run was {revision}; no remote delivery claimed'
+         if revision else
+         'source_sha256 binds the exact working-tree inputs; Git revision unavailable; no remote delivery claimed')
+report={'design_version':'0.3','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_at_run':revision,'revision_binding':binding,'status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')

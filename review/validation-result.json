@@ -1,9 +1,10 @@
 {
   "design_version": "0.3",
   "design_date": "2026-09-30",
-  "executed_at": "2026-09-30T20:09:45.457908+00:00",
+  "executed_at": "2026-09-30T20:13:49.242828+00:00",
   "base_commit": "00ac20433c33a0a6296797c94d81136e0499e13f",
-  "revision_binding": "source_sha256 binds the exact working-tree inputs; uncommitted design working tree on main; no new commit or remote delivery claimed",
+  "revision_at_run": "2f81e2802987d2e832e05ddc1136a1aceb09741b",
+  "revision_binding": "source_sha256 binds the exact inputs used by this run; Git HEAD at run was 2f81e2802987d2e832e05ddc1136a1aceb09741b; no remote delivery claimed",
   "status": "passed",
   "scope": "Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance",
   "check_count": 466,
@@ -542,7 +543,7 @@
     "tools/build_review_pack.py": "3219b1452a6afca240971c6d427401624c0c67b04c0f0b76df66d2f3df46942b",
     "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a",
     "tools/v03_material_checks.py": "c547b5ebfbe35a73f320f0f3d7af0fcd374cb5a5d1ed4792419e7a21a017def5",
-    "tools/validate_design.py": "74060401f4779ae7651ab389adc574949c847b1b5079dfdcae2a718eee8ad05f"
+    "tools/validate_design.py": "3e7af0ea4c00cb49f1ad00cba1d099649f74ac7c561a036432ecf6fd9ed2e6e8"
   },
   "not_run": [
     "Full draft-2020-12 validation with a standards implementation",
