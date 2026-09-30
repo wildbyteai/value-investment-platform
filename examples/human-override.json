@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "decision_id": "00000000-0000-4000-8000-000000000011",
+  "subject_slot": "synthetic-company:fact-01:profit_quality",
+  "subject_revision": "synthetic-impact-r2",
+  "status": "rejected",
+  "actor_kind": "HUMAN",
+  "actor_id": "synthetic-researcher",
+  "policy_ref": "auto-review-standard-v1",
+  "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+  "known_at": "2026-09-30T02:00:00Z",
+  "valid_until": "2026-10-30T00:00:00Z",
+  "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+  "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000003"
+  ]
+}

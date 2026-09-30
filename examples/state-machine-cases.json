@@ -6,77 +6,89 @@
       "input": "enter_false",
       "confirmed": "OUT",
       "display": "OUT",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s1",
       "input": "enter_true",
       "confirmed": "OUT",
       "display": "ENTER_PENDING",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s1",
       "input": "enter_true_recompute",
       "confirmed": "OUT",
       "display": "ENTER_PENDING",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s2",
       "input": "enter_true",
       "confirmed": "IN",
       "display": "IN",
-      "notification": "ENTER"
+      "change_event": "ENTER",
+      "delivery_expected": false
     },
     {
       "session": "s3",
       "input": "missing",
       "confirmed": "IN",
       "display": "UNKNOWN",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s4",
       "input": "retain_true",
       "confirmed": "IN",
       "display": "IN",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s5",
       "input": "retain_false",
       "confirmed": "IN",
       "display": "EXIT_PENDING",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s6",
       "input": "retain_false",
       "confirmed": "OUT",
       "display": "OUT",
-      "notification": "EXIT"
+      "change_event": "EXIT",
+      "delivery_expected": false
     },
     {
       "session": "s7",
       "input": "enter_true",
       "confirmed": "OUT",
       "display": "ENTER_PENDING",
-      "notification": null
+      "change_event": null,
+      "delivery_expected": false
     },
     {
       "session": "s8",
       "input": "enter_true",
       "confirmed": "IN",
       "display": "IN",
-      "notification": "ENTER"
+      "change_event": "ENTER",
+      "delivery_expected": false
     },
     {
       "session": "s9",
-      "input": "approved_hard_risk",
+      "input": "auto_accepted_hard_risk",
       "confirmed": "OUT",
       "display": "OUT",
-      "notification": "RISK"
+      "change_event": "RISK",
+      "delivery_expected": false
     }
-  ]
+  ],
+  "notification_phase": "deferred"
 }

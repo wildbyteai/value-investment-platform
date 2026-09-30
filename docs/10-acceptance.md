@@ -1,6 +1,6 @@
 # 10 验收矩阵与证据要求
 
-本文件列未来系统测试，本阶段均未运行。材料检查报告只说明文档、合成合同和示例一致，不说明功能通过。验收固定真实输入 manifest、策略版本、clock 与市场 calendar。
+本文件列未来系统测试，本阶段产品运行均未运行。材料检查报告只说明文档、合成合同和示例一致，不说明功能通过。验收固定真实输入 manifest、策略版本、clock 与市场 calendar。
 
 ## 1. 需求—设计—任务追踪
 
@@ -19,7 +19,10 @@
 | R-11 | 04 §2/5、08 §1–3 | W-01/W-06 | T-15/T-17/T-20/T-21 |
 | R-12 | 03 §5/6、05 §5、08 §6 | W-02/W-05/W-06 | T-14/T-16/T-18/T-19 |
 | R-13 | 09 §3/4 | W-01/W-06 | T-23/T-24 |
-| R-14 | 06 §5–7 | W-01/W-05 | T-UX-01…03/T-22 |
+| R-14 | 06 §5–7 | W-01/W-05/W-08 | T-UX-01…04/T-22 |
+| R-15 | 11 §2/3、04 | W-04/W-08 | T-25/T-26/T-UX-02 |
+| R-16 | 11 §4、07 | W-03/W-04/W-08 | T-27/T-28 |
+| R-17 | 11 §5/6、08 | W-01/W-08 | T-20/T-29 |
 
 ## 2. 场景与明确预期
 
@@ -37,29 +40,50 @@
 | T-10 | A/H 同公司、不同币种/价格、同权与不同权、拆股 | 经营分相同，估值独立且分母/FX一致；不支持权利模型时 invalid |
 | T-11 | 港股开放A股休市、停牌、行情失效、恢复 | 依各市场 calendar；UNKNOWN/SUSPENDED 保留基线，不误发退出 |
 | T-12 | 无权发布、草稿非法 AST、预览后输入改变、双人编辑 | 403/422/409、保留草稿，不执行 arbitrary code、不静默覆盖 |
-| T-13 | 初始基线、两次不同 session 入选、同 session 重算、退出、再入选、改策略 | 基线静默；各真实转移一条；重算不计两次；配置变化分类独立 |
-| T-14 | 两 Worker 同证券提交、commit 后崩溃、旧 generation 迟到 | membership/transition/outbox 原子且唯一；迟到不能覆盖最新 |
+| T-13 | 初始基线、两次相邻expected FINAL sessions入选、同 session 重算、退出、再入选、改策略 | 基线静默；各真实转移一条；重算不计两次；配置变化分类独立 |
+| T-14 | 两 Worker 同证券提交、commit 后崩溃、旧 generation 迟到 | membership/transition/explanation/outbox原子且唯一（首版无notification）；迟到不能覆盖最新 |
 | T-15 | 跨 workspace 查询/计数/搜索/向量/下载、缓存复用、source 撤权 | 全路径无内容与存在性泄漏；撤权即禁读并清投影 |
 | T-16 | 补采、replay、shadow、发送超时且 provider 无幂等 | 不外发历史；UNKNOWN_DELIVERY 不盲重发；delivery 不重新改状态 |
 | T-17 | prompt 注入、假公司 ID、伪证据、巨大附件、SSRF | 无工具/无密钥外传，输出拒绝；隔离解析和网络范围拦截 |
 | T-18 | Redis 清空、任务 lease 过期、索引宕机/重建 | 从 ledger 恢复，fencing 拒旧提交；PG 时间线可用且标降级 |
-| T-19 | PG 隔离备份恢复、撤权后恢复旧备份 | 实测 RPO/RTO；重新 tombstone 后开放，静默重放、审计可回查 |
-| T-20 | 管理员无业务 publish/review capability、失效 OIDC、连接池 scope 切换 | 拒绝权限，不能继承前用户 workspace；生产无开发身份后门 |
+| T-19 | PG 隔离备份恢复、撤权后恢复旧备份 | 实测 RPO/RTO；验证独立journal最新watermark、施加撤权后开放，静默重放、审计可回查 |
+| T-20 | 管理员无业务 publish/override capability、失效 OIDC、连接池 scope 切换 | 拒绝权限，不能继承前用户 workspace；生产无开发身份后门 |
 | T-21 | 源无 fetch/store/analyze 权、凭证过期、429 | 对应阶段停并解释；不绕过限制；日志无 secret |
 | T-22 | 核心页面全状态、指定视口、键盘、200%缩放、断线冲突 | 无遮挡溢出、能恢复输入；数值未知不为0；同语义同组件 |
-| T-23 | 20并发列表/搜索、10万到1000万阶梯、成本上限 | 记录分位、索引容量及 backlog；超预算排队可解释，按01目标判定 |
+| T-23 | 20并发列表/搜索、10万到1000万阶梯、运行期可选成本上限（开发不设固定预算门） | 记录分位、索引容量及 backlog；超预算排队可解释，按01目标判定 |
 | T-24 | 迁移前后与应用回滚、事件前一版本、失败 release | 数据不损坏、兼容读写、必要恢复；新失败不替换成功 snapshot |
 
-T-UX-01、02、03 的用户任务与指标以 06 §7 为唯一详细定义。模型与检索 gold-set 指标以 07 §5 为唯一详细定义；不写第二份可能漂移的阈值。
+T-UX-01、02、03、04 的用户任务与指标以 06 §7 为唯一详细定义。模型与检索 gold-set 指标以 07 §5 为唯一详细定义；不写第二份可能漂移的阈值。
 
 ## 3. 标准状态机序列（合成）
 
-固定合成 security，连续 session：s0 有效 false→静默 OUT；s1 true→ENTER_PENDING；s1 新评估 true→不递增；s2 true→IN/一条 ENTER；s3 missing→UNKNOWN,last=IN,计数清零；s4 retain true→IN/不新 ENTER；s5 retain false→EXIT_PENDING；s6 false→OUT/一条 EXIT；s7 true、s8 true→IN/第二条 ENTER；s9 已批准硬风险→OUT/一条 RISK。
+固定合成 security，连续 session：s0 有效 false→静默 OUT；s1 true→ENTER_PENDING；s1 新评估 true→不递增；s2 true→IN/一条ENTER变化记录；s3 missing→UNKNOWN,last=IN,计数清零；s4 retain true→IN/不新 ENTER；s5 retain false→EXIT_PENDING；s6 false→OUT/一条EXIT变化记录；s7 true、s8 true→IN/第二条 ENTER；s9 AUTO accepted硬风险→OUT/一条RISK变化记录。
 
-未知→恢复后 pending 重新计数；恰好阈值值按 >=/<=；不把浮点误差当跨线。另一策略新 release 建基线，live 第一次有效结果也不冒充市场变化。所有重放 sequence 的 transition 数、类型、evidence hash 有精确预期。
+未知→恢复后 pending 重新计数；恰好阈值值按 >=/<=；不把浮点误差当跨线。另一策略新 release 建基线，live 第一次有效结果也不冒充市场变化。所有重放 sequence 的 transition数、类型、evidence hash与delivery=0（通知后置） 有精确预期。
 
 ## 4. 证据模板与签收
 
 每项记录 {requirement_id,test_id,commit,environment,manifest_hash,strategy_release,scenario,expected,actual,status,executed_at,owner,evidence_refs}。status=passed/failed/blocked/not_run；只有实际执行且 expected 匹配才能 passed。失败修复后保留失败证据并新增记录；不得改预期掩盖失败。
 
 数据库前确认服务器位置、环境、数据性质和作用域；真实源／通知只运行获授权最小验证并回读真实结构；UI 标明模拟或真机，性能标明数据量。正式签收至少产品/研究负责人、工程负责人共同确认本 slice 的 mandatory 项；可选增强不作为额外强制审查轮次。
+
+## 5. v0.2追加边界（均为未来产品验收预期）
+
+| ID | 输入/动作 | 必须观察的结果 |
+|---|---|---|
+| T-25 | base→industry→company解析；循环/跳级/重复patch/错误hash/权重和不为1 | 合法链完整配置+逐字段来源；非法拒绝，不静默修权重 |
+| T-26 | 发布父模板新版本；旧release、企业定制与不同口径对比 | 旧解析hash和评分不变；显式升级模拟新绑定；不同口径有标识 |
+| T-27 | 同slot AUTO accepted→HUMAN rejected→新AUTO | 新建议可存，有效指针仍HUMAN；依赖贡献/风险解除和评分重算 |
+| T-28 | 双人覆盖、过期/解除覆盖、无证据硬风险与合法AUTO硬风险 | 409保留输入；到期重新合法评估；非法pending；合法AUTO可RISK |
+| T-29 | 五角色各自操作、角色兼任、撤权、最后管理员移除 | 正常路径有权可完成；viewer不能覆盖等越权403；不无意移除最后管理员 |
+| T-30 | s1 true、s2应有但漏评估、s3 true；休市；旧s2迟到 | s3只1/2；休市非缺口；旧s2不改变当前或补发历史事件 |
+| T-31 | 港股16:00 provisional→CAS final；半日；日历越界/深市映射缺失 | provisional不推进，final仅一次；未知日历显式UNKNOWN |
+| T-32 | s2 ENTER、s4 EXIT、独立s6 ENTER后纠正s2；并行新release | 历史CORRECTION保留实际转移；独立s6仍IN；旧generation不覆盖新release |
+| T-33 | 原文A→B→A；对象未标committed但有DB引用 | 三次observation保留；活跃引用不删，重试可恢复 |
+| T-34 | 同fact多event转载；新baseline吸收时故障；派生证据撤权 | 单slot贡献；baseline/吸收原子不双计；无权派生总分失效/重算 |
+| T-35 | 精确/贴近阈值、非整数半衰期、UTC/时区、显示舍入 | 按numeric policy固定12位黄金结果，显示值不改变比较；重复重放一致 |
+| T-36 | 合并CFO75、合并利润100、归母利润50 | cfo_profit_3y=0.75，不满足0.8；不能得出混口径1.5 |
+| T-37 | 三年旧年度、TTM缺季、旧报告更正、下一报告义务到期 | 历史期间可用；TTM合法推导或missing；更正不能满足新期间；逾期stale |
+| T-38 | 正式收盘价收盘后到达；收盘后新公告；cutoff后新判断 | 价可在宽限内用；公告不入本收盘评估；判断不回填；计算generated_at真实 |
+
+W-08覆盖各模块的最小代表场景，完整需求追踪仍由对应W-01…06实施验证。W-07及T-16的渠道发送部分为后续，不阻塞当前变化记录。B/S发现→当前修复→T场景的映射见review/V02-CHANGELOG.md；本地材料工具演示/检查不冒充上表产品测试通过。

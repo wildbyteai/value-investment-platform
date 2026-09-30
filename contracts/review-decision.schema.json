@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionService decision; model proposal cannot approve itself",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "decision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_slot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "pending"
+      ]
+    },
+    "actor_kind": {
+      "enum": [
+        "AUTO",
+        "HUMAN"
+      ]
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "known_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "supersedes_decision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "decision_id",
+    "subject_slot",
+    "subject_revision",
+    "status",
+    "actor_kind",
+    "actor_id",
+    "policy_ref",
+    "input_manifest_id",
+    "known_at",
+    "valid_until",
+    "supersedes_decision_id",
+    "reason",
+    "evidence_ids"
+  ]
+}

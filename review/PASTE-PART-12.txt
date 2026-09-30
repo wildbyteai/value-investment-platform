@@ -1,0 +1,199 @@
+
+[PART 12/14]
+
+
+===== SOURCE: tools/build_review_pack.py =====
+
+#!/usr/bin/env python3
+"""Build local review pack and copy/paste messages; no network calls."""
+import hashlib
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+paths = [ROOT / "README.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
+for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
+    paths.extend(sorted(ROOT.glob(pattern)))
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])
+if (ROOT / "review/validation-result.json").exists():
+    paths.append(ROOT / "review/validation-result.json")
+parts = ["# 价值投资策略管理系统 v0.2 · GPT Pro 整包评审材料\n\n日期：2026-09-30。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
+for p in paths:
+    parts.append(f"| `{p.relative_to(ROOT)}` | `{hashlib.sha256(p.read_bytes()).hexdigest()}` |\n")
+for p in paths:
+    rel = p.relative_to(ROOT)
+    parts.append(f"\n\n---\n\n# 文件：{rel}\n\n")
+    text = p.read_text(encoding="utf-8")
+    if p.suffix == ".json":
+        parts.append("```json\n" + text + "```\n")
+    else:
+        parts.append(text)
+output = ROOT / "review/REVIEW-PACK.md"
+output.write_text("".join(parts), encoding="utf-8")
+print(f"Built {len(paths)} source sections; {output.stat().st_size} bytes; SHA256={hashlib.sha256(output.read_bytes()).hexdigest()}")
+
+# Plain-text alternatives: no attachment and no repository access are required.
+source_paths = [p for p in paths if str(p.relative_to(ROOT)) not in {"review/GPT-PRO-PROMPT.md", "review/validation-result.json"}]
+sections = []
+for p in source_paths:
+    sections.append(f"\n\n===== SOURCE: {p.relative_to(ROOT)} =====\n\n" + p.read_text(encoding="utf-8"))
+instruction = (ROOT / "review/GPT-PRO-PROMPT.md").read_text(encoding="utf-8").split("## 完整提示词\n", 1)[1].strip()
+all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.3。\n"
+(ROOT / "review/PASTE-ALL.txt").write_text(all_text, encoding="utf-8")
+groups, group = [], ""
+for section in sections:
+    if group and len(group) + len(section) > 14000:
+        groups.append(group)
+        group = ""
+    group += section
+if group:
+    groups.append(group)
+links = []
+for index, group in enumerate(groups, 1):
+    start = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" if index == 1 else ""
+    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.3。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
+    name = f"PASTE-PART-{index:02}.txt"
+    body = start + f"\n[PART {index}/{len(groups)}]\n" + group + f"\n[END PART {index}/{len(groups)}]\n" + end
+    (ROOT / "review" / name).write_text(body, encoding="utf-8")
+    links.append(f"{index}. [{name}](./{name})：{len(body):,} 字符；直接复制全文作为一条消息。")
+help_text = """# 不附文件的 GPT Pro 评审方式
+
+## 优先：读取 GitHub
+
+复制 [完整提示词](./GPT-PRO-PROMPT.md)中“完整提示词”下的全部内容，直接发给 GPT Pro。提示词已经指定仓库与材料路径，不要求上传附件。该方式要求当前 GPT Pro 会话有权限读取这个私有仓库；链接本身不赋予权限。
+
+## 备用：正文粘贴
+
+没有 GitHub 读取能力时，打开 [PASTE-ALL.txt](./PASTE-ALL.txt)，复制全部正文发给 GPT Pro，里面已有提示词和完整业务／工程／合同／合成示例，无需另发提示词或附件。无需 GitHub 权限也可在本地打开同名文本。
+
+若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
+
+""" + "\n".join(links) + "\n\n这些是当前v0.2的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+(ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
+print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")
+
+
+===== SOURCE: tools/material_schema.py =====
+
+"""Conservative checker for the Schema keywords used by these design fixtures.
+
+Not a complete draft-2020-12 implementation. Unknown assertion keywords fail,
+and external refs are forbidden. Product implementation must use a standard
+validator plus business semantic validation.
+"""
+import re
+import uuid
+from datetime import datetime
+
+
+class MaterialError(ValueError):
+    pass
+
+
+def validate(value, schema, root=None):
+    root = root or schema
+    allowed = {"$schema", "$defs", "$ref", "title", "description", "type", "enum",
+               "const", "properties", "required", "additionalProperties", "items",
+               "minLength", "maxLength", "minItems", "maxItems", "minProperties",
+               "minimum", "maximum", "pattern", "format", "uniqueItems", "oneOf", "anyOf",
+               "allOf", "not", "if", "then", "else"}
+    if set(schema) - allowed:
+        raise MaterialError(f"Unsupported keywords: {set(schema) - allowed}")
+    if "$ref" in schema:
+        ref = schema["$ref"]
+        if not ref.startswith("#/"):
+            raise MaterialError("External refs are not supported")
+        target = root
+        for part in ref[2:].split("/"):
+            target = target[part.replace("~1", "/").replace("~0", "~")]
+        validate(value, target, root)
+    if "const" in schema and (value != schema["const"] or
+                               isinstance(value, bool) != isinstance(schema["const"], bool)):
+        raise MaterialError("const mismatch")
+    if "enum" in schema and value not in schema["enum"]:
+        raise MaterialError("enum mismatch")
+    if "type" in schema:
+        types = schema["type"] if isinstance(schema["type"], list) else [schema["type"]]
+        predicates = {"object": lambda: isinstance(value, dict),
+                      "array": lambda: isinstance(value, list),
+                      "string": lambda: isinstance(value, str),
+                      "boolean": lambda: isinstance(value, bool),
+                      "null": lambda: value is None,
+                      "integer": lambda: isinstance(value, int) and not isinstance(value, bool),
+                      "number": lambda: isinstance(value, (int, float)) and not isinstance(value, bool)}
+        if not any(predicates[t]() for t in types):
+            raise MaterialError("type mismatch")
+    for keyword in ["oneOf", "anyOf", "allOf"]:
+        if keyword in schema:
+            matches = 0
+            for option in schema[keyword]:
+                try:
+                    validate(value, option, root)
+                    matches += 1
+                except MaterialError:
+                    pass
+            wanted = matches == 1 if keyword == "oneOf" else (matches >= 1 if keyword == "anyOf" else matches == len(schema[keyword]))
+            if not wanted:
+                raise MaterialError(f"{keyword} mismatch")
+    if "not" in schema:
+        try:
+            validate(value, schema["not"], root)
+        except MaterialError:
+            pass
+        else:
+            raise MaterialError("not mismatch")
+    if "if" in schema:
+        try:
+            validate(value, schema["if"], root)
+            branch = "then"
+        except MaterialError:
+            branch = "else"
+        if branch in schema:
+            validate(value, schema[branch], root)
+    if isinstance(value, dict):
+        if not set(schema.get("required", [])) <= value.keys():
+            raise MaterialError("missing required property")
+        if len(value) < schema.get("minProperties", 0):
+            raise MaterialError("minProperties")
+        props = schema.get("properties", {})
+        for key, item in value.items():
+            if key in props:
+                validate(item, props[key], root)
+            elif schema.get("additionalProperties") is False:
+                raise MaterialError("extra property")
+            elif isinstance(schema.get("additionalProperties"), dict):
+                validate(item, schema["additionalProperties"], root)
+    if isinstance(value, list):
+        if not schema.get("minItems", 0) <= len(value) <= schema.get("maxItems", float("inf")):
+            raise MaterialError("array length")
+        if schema.get("uniqueItems"):
+            if any(item in value[:i] for i, item in enumerate(value)):
+                raise MaterialError("duplicate array item")
+        for item in value:
+            if "items" in schema:
+                validate(item, schema["items"], root)
+    if isinstance(value, str):
+        if not schema.get("minLength", 0) <= len(value) <= schema.get("maxLength", float("inf")):
+            raise MaterialError("string length")
+        if "pattern" in schema and not re.search(schema["pattern"], value):
+            raise MaterialError("pattern mismatch")
+        if schema.get("format") == "uuid":
+            try:
+                if str(uuid.UUID(value)) != value.lower():
+                    raise ValueError("not canonical")
+            except ValueError as exc:
+                raise MaterialError("uuid format") from exc
+        elif schema.get("format") == "date-time":
+            try:
+                parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                if "T" not in value or parsed.tzinfo is None:
+                    raise ValueError("offset required")
+            except ValueError as exc:
+                raise MaterialError("date-time format") from exc
+        elif "format" in schema:
+            raise MaterialError("unsupported format")
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if not schema.get("minimum", -float("inf")) <= value <= schema.get("maximum", float("inf")):
+            raise MaterialError("numeric bounds")
+
+[END PART 12/14]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

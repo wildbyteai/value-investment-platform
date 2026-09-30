@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "strategy_key": "value-standard",
   "version": 1,
   "name": "标准价投候选 v1（非金融行业）",
@@ -25,10 +25,10 @@
       "business_model"
     ],
     "baseline_max_age_days": 180,
-    "financial_max_announced_age_days": 180,
-    "price_max_lag_sessions": 1,
+    "price_max_lag_sessions": 0,
     "currency_and_share_basis_required": true,
-    "only_approved_inputs": true
+    "only_approved_inputs": true,
+    "financial_freshness_policy": "report_obligation_and_required_periods"
   },
   "hard_risk_policy": {
     "confirmed_only": true,
@@ -46,8 +46,12 @@
     "exit_distinct_sessions": 2,
     "session_clock": "security_exchange_close",
     "unknown_action": "hold_last_confirmed_reset_pending",
-    "config_change_notify": "summary_only",
-    "historical_notify": false
+    "config_change_notify": "deferred_change_record_only",
+    "historical_notify": false,
+    "require_adjacent_expected_sessions": true,
+    "final_price_required": true,
+    "cutoff_grace_minutes": 60,
+    "notification_phase": "deferred"
   },
   "enter": {
     "all": [
@@ -116,5 +120,6 @@
         "value": "2.0"
       }
     ]
-  }
+  },
+  "scoring_binding_policy": "published_per_company_resolution_manifest"
 }

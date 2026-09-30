@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "synthetic_company_customization": true,
+  "templates": [
+    {
+      "schema_version": "1.0",
+      "template_key": "base-standard",
+      "version": 1,
+      "level": "base",
+      "scope": {
+        "kind": "all"
+      },
+      "base_config_ref": {
+        "path": "config/scoring-standard-v1.json",
+        "sha256": "e62aeb17948d03374a0a4bff46d6a80b8a5efc2afa4aead5153fefc6a42eb12d"
+      },
+      "patches": []
+    },
+    {
+      "schema_version": "1.0",
+      "template_key": "industry-manufacturing",
+      "version": 1,
+      "level": "industry",
+      "scope": {
+        "kind": "industry",
+        "industry_key": "manufacturing"
+      },
+      "parent_ref": {
+        "key": "base-standard",
+        "version": 1,
+        "sha256": "242e44337476e4b8a399058f6bc298dc22759f43e7bf2d89d968306d2f98e185"
+      },
+      "patches": [
+        {
+          "dimension": "profit_quality",
+          "weight": "0.30",
+          "reason": "制造业示范：提高盈利质量权重"
+        },
+        {
+          "dimension": "financial_resilience",
+          "weight": "0.20",
+          "reason": "保持总权重1"
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "template_key": "company-synthetic-manufacturer",
+      "version": 1,
+      "level": "company",
+      "scope": {
+        "kind": "company",
+        "company_id": "00000000-0000-4000-8000-000000000001"
+      },
+      "parent_ref": {
+        "key": "industry-manufacturing",
+        "version": 1,
+        "sha256": "bce3cd3ac718ac0b44d1ddaefc354faa169a96352244a56ce43946c7aeb9b306"
+      },
+      "patches": [
+        {
+          "dimension": "profit_quality",
+          "weight": "0.35",
+          "reason": "合成企业定制示范，无真实投资含义"
+        },
+        {
+          "dimension": "growth_sustainability",
+          "weight": "0.05",
+          "reason": "保持总权重1"
+        }
+      ]
+    }
+  ]
+}

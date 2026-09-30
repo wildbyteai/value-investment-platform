@@ -1,0 +1,27 @@
+{
+  "policy_key": "auto-review-standard-v1",
+  "schema_version": "1.0",
+  "default_mode": "auto_accept_when_valid",
+  "calibrated_confidence_required": true,
+  "link": {
+    "minimum_relevance": "0.50",
+    "minimum_confidence": "0.90"
+  },
+  "impact": {
+    "minimum_confidence": "0.90",
+    "accepted_link_required": true
+  },
+  "rubric": {
+    "minimum_confidence": "0.90",
+    "anchored_evidence_required": true
+  },
+  "hard_risk": {
+    "minimum_confidence": "0.98",
+    "primary_regulator_or_issuer_evidence_required": true,
+    "allow_auto_accept": true
+  },
+  "invalid_or_conflicting": "pending",
+  "human_override_precedence": "until_released_or_expired",
+  "on_override_expiry": "reevaluate_current_legal_inputs",
+  "template_and_strategy_auto_publish": false
+}

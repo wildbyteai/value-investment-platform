@@ -1,411 +1,203 @@
 
-[PART 6/6]
+[PART 6/14]
 
 
-===== SOURCE: contracts/strategy.schema.json =====
+===== SOURCE: docs/12-time-numerics-and-corrections.md =====
 
-{
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "schema_version": {
-      "const": "1.0"
-    },
-    "strategy_key": {
-      "type": "string",
-      "minLength": 1
-    },
-    "version": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "name": {
-      "type": "string",
-      "minLength": 1
-    },
-    "description": {
-      "type": "string",
-      "minLength": 1
-    },
-    "scoring_model_ref": {
-      "type": "string",
-      "minLength": 1
-    },
-    "universe": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "markets": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "CN_A",
-              "HK"
-            ]
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        },
-        "exclude_sector_groups": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "uniqueItems": true
-        },
-        "common_equity_only": {
-          "const": true
-        }
-      },
-      "required": [
-        "markets",
-        "exclude_sector_groups",
-        "common_equity_only"
-      ]
-    },
-    "quality_gates": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "minimum_coverage": {
-          "type": "string",
-          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-        },
-        "required_dimensions": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "profit_quality",
-              "financial_resilience",
-              "business_model",
-              "governance",
-              "growth_sustainability"
-            ]
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        },
-        "baseline_max_age_days": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "financial_max_announced_age_days": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "price_max_lag_sessions": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "currency_and_share_basis_required": {
-          "const": true
-        },
-        "only_approved_inputs": {
-          "const": true
-        }
-      },
-      "required": [
-        "minimum_coverage",
-        "required_dimensions",
-        "baseline_max_age_days",
-        "financial_max_announced_age_days",
-        "price_max_lag_sessions",
-        "currency_and_share_basis_required",
-        "only_approved_inputs"
-      ]
-    },
-    "hard_risk_policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "confirmed_only": {
-          "const": true
-        },
-        "action": {
-          "const": "immediate_out_risk"
-        },
-        "risk_codes": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "confirmed_fraud",
-              "going_concern_material",
-              "confirmed_debt_default",
-              "delisting_decision"
-            ]
-          },
-          "minItems": 1,
-          "uniqueItems": true
-        }
-      },
-      "required": [
-        "confirmed_only",
-        "action",
-        "risk_codes"
-      ]
-    },
-    "enter": {
-      "$ref": "#/$defs/expression"
-    },
-    "retain": {
-      "$ref": "#/$defs/expression"
-    },
-    "state_policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "initial_baseline_notify": {
-          "const": false
-        },
-        "enter_distinct_sessions": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 10
-        },
-        "exit_distinct_sessions": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 10
-        },
-        "session_clock": {
-          "const": "security_exchange_close"
-        },
-        "unknown_action": {
-          "const": "hold_last_confirmed_reset_pending"
-        },
-        "config_change_notify": {
-          "const": "summary_only"
-        },
-        "historical_notify": {
-          "const": false
-        }
-      },
-      "required": [
-        "initial_baseline_notify",
-        "enter_distinct_sessions",
-        "exit_distinct_sessions",
-        "session_clock",
-        "unknown_action",
-        "config_change_notify",
-        "historical_notify"
-      ]
-    }
-  },
-  "required": [
-    "schema_version",
-    "strategy_key",
-    "version",
-    "name",
-    "description",
-    "scoring_model_ref",
-    "universe",
-    "quality_gates",
-    "hard_risk_policy",
-    "enter",
-    "retain",
-    "state_policy"
-  ],
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Restricted standard strategy configuration",
-  "$defs": {
-    "expression": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "all": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 30,
-              "items": {
-                "$ref": "#/$defs/expression"
-              }
-            }
-          },
-          "required": [
-            "all"
-          ]
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "field": {
-              "enum": [
-                "company.quality_score",
-                "company.coverage",
-                "security.valuation_score",
-                "metrics.roe_ttm",
-                "metrics.cfo_profit_3y",
-                "metrics.net_debt_ebitda"
-              ]
-            },
-            "op": {
-              "enum": [
-                "gte",
-                "lte"
-              ]
-            },
-            "value": {
-              "type": "string",
-              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-            }
-          },
-          "required": [
-            "field",
-            "op",
-            "value"
-          ]
-        }
-      ]
-    }
-  }
-}
+# 12 时点、数值与纠错合同
+
+v0.2设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
+
+## 1. 财务指标与rubric
+
+指标定义数字真源为[metric-definitions-v2.json](../config/metric-definitions-v2.json)。CFO现金转换率=最近三个完整财政年度合并CFO合计/同三个年度合并净利润合计；不能用集团CFO除归母利润。ROE采用归属普通股股东的TTM利润/匹配范围平均普通股权益；证券PE另用同权普通股每股归属盈利。合并净利润、归母利润、普通股利润分别存储，不互相代填。无法匹配合并范围、会计期、单位/币种则invalid。
+
+TTM按合法已知期间计算；市场未提供季度资料时可使用“最近年度+本期累计−去年同期累计”，仍缺必要期间则missing，不拼造季度。3年历史本来需要旧年度，不按公告年龄一刀切。财务新鲜度由report_obligation记录发行人、市场/板块、财年末、报告类型、所需期、到期日、正式例外及来源。旧报告更正不能当新期间。到期前用最新合法可用期，超过批准宽限仍缺应有报告则stale；三年指标同时检查三个完整年度及最新应有年度。
+
+HK主板通常全年业绩≤年结后3个月、半年业绩≤期末后2个月，仅是第二轮已核查的常规例子，不涵盖所有例外或报告派发期限。A股、其他板块、发行人例外必须在真实适配器接入前固定义务映射；未配置不能自称新鲜。合成切片直接提供冻结义务表，不阻碍开发。
+
+[rubrics-standard-v1.json](../config/rubrics-standard-v1.json)提供11项0–4档锚点。每项判断记录period、档位、支持/反驳证据、confidence、effective/known时间、有效期和AUTO/HUMAN决策。无证据或未调查用null；冲突不能取中位数。rubric不是统计概率或投资收益。
+
+## 2. 最终收盘与知识边界
+
+每证券首版绑定一个primary Listing，保存exchange、currency、calendar_ref与close_policy。A/H为不同security、共享company；报价/FX来源属于listing。多币种柜台若未配置独立估值口径则unsupported，不能共享一个不标币种的V。首版membership仍为workspace+release+security，其release固定primary_listing_id。
+
+日历只给expected sessions及市场时段，不能证明价格FINAL。港股适用CAS证券的最终收盘不能用16:00连续交易末值替代；半日和非CAS按获许可源的价格类型处理。适配器必须输出session、price_kind、is_final、source_revision、observed_at。日历固定版本、年份范围、临时休市和深市映射；覆盖不足显式UNKNOWN，不用工作日猜测。
+
+标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。FINAL判定需要全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
+
+| 输入类别 | 收盘评估的可用条件 |
+|---|---|
+| 日收盘行情 | 正确session和最终价格类型；在固定cutoff前observed，允许供应商收盘后发布 |
+| 公告/经营事实 | 首次published≤evaluation_as_of且observed≤cutoff，有效期适用；收盘后新公告进入下一session，日内硬风险走独立即时判断 |
+| AUTO/HUMAN判断 | decision.known_at≤cutoff，引用输入也满足对应类别条件；晚批准不能回填 |
+| 确定性计算 | 可以cutoff后完成，但只能消费已冻结合法manifest；generated_at记录真实完成时间 |
+
+实时硬风险在其决策实际生效时更新风险状态，不把当晚新信息伪装为收盘前信息。research_reconstruction、reanalysis和历史纠错与live分开，不混算性能或补发过去信号。
+
+## 3. 相邻session、单调应用与暂停
+
+enter/exit均需两个相邻expected FINAL sessions。同session provisional更新不计数；FINAL只应用一次；UNKNOWN、应有session漏评估、停牌、范围级暂停打断pending。周末或日历批准休市不算漏评估。s1 true、s2缺口、s3 true只能1/2。迟到s2不能倒灌当前membership，也不能把s1与s3重新拼成连续满足。
+
+membership记录last_applied_session、generation、finalization_token及pending session IDs。提交检查release/binding/input generation、当前session单调性、唯一finalization_token和行锁/CAS。更早session保留历史结果，不能改当前指针；同session封存后更正走下节。硬风险独立revision/generation同样检查，不能由旧风险解除覆盖新风险。
+
+个人静默/订阅暂停只影响后续notification delivery；不属于共同membership的SUSPENDED条件。范围级暂停需strategy.manage权限并明确影响全部订阅者；首版没有个人通知开关。市场停牌仍SUSPENDED并保留last_confirmed。
+
+## 4. 历史纠错与当前状态
+
+FINAL后的输入修订建立correction_run，不覆写原evaluation、finalization_token或transition。correction记录原对象、错误类别、合法替换manifest、影响范围、算法/模板版本、截止和新解释。只有原数据/映射/计算错误属于纠错；现在新出现的知识是新判断，不能回填过去。
+
+从受影响窗口之前的未受影响FINAL锚点，沿冻结后续sessions重放原发布策略及对应模板，逐项标记哪些evaluation/transition失效或保持成立。历史视图保留“当时记录”和“更正说明”；不删除实际发生过的ENTER/EXIT。纠错结果产生CORRECTION记录。若重放影响当前状态，使用最新合法输入完成当前reconciliation；提交前CAS最新release、generation、last_applied_session，过时则重新预览而不覆盖。
+
+若s2 ENTER、s4 EXIT、s6 ENTER，后来纠正s2，不能直接把当前IN改为OUT；必须检查s4/s6依据和相邻确认。后续s6独立成立则当前仍IN，只追加历史说明。若确需改变当前状态，产生一条CORRECTION状态调整而非伪造今天的市场EXIT。首次基线/CONFIG_CHANGE/CORRECTION/RISK/MARKET分别分类。
+
+## 5. 经济事实去重与吸收
+
+event容纳多个claims；economic_fact_id定义公司/对象+动作+财务期间/合同批次等同一经济事实。贡献slot=(company,economic_fact_id,dimension)。多event或转载指向同一事实也只允许一个有效贡献。事实矛盾保留support/refute，不通过“更高来源权重”无条件消灭冲突。
+
+新baseline吸收事实时，baseline revision、吸收的fact/slot版本、有效贡献指针和outbox同事务提交；不能先加新baseline再异步减旧贡献。跨workspace/不可访问来源的贡献不会偷偷进入可见总分。派生snapshot继承required_source_ids/visibility；证据撤权导致当前结果重新检查、降覆盖或失效，而非仅隐藏证据链接。
+
+讯息的content revision与observation分开：A→B→A可以复用A内容blob，但必须有三次不可变observation(sequence,observed_at,revision_ref)，当前指针由最新observation确定，不因内容hash重复丢失回退历史。对象清理必须同时检查DB活跃引用及保留期限，不能仅凭对象tag删除。
+
+## 6. 确定性数值与任务身份
+
+[numeric-policy-v1.json](../config/numeric-policy-v1.json)是算法数值规范。金额和比率十进制字符串；后端Python Decimal作为唯一规则计算路径。precision=50、ROUND_HALF_EVEN；每个持久化计算节点quantize到小数点后12位（系数输入保留原有效精度），按metric→baseline→单事实贡献→按fact ID排序求和→贡献cap→维度clip→Q/V顺序处理。策略比较使用持久化12位值，显示1位小数不参与比较。
+
+age是UTC有效事件时间到as_of的完整秒数除86400，不按本地午夜跳日；日期粒度事件采用来源时区当日00:00并标precision，不精确宣称秒级时间。衰减通过precision=70的guard上下文计算Decimal(2)**(-age/H)，然后ROUND_HALF_EVEN量化12位；实现锁定Python/decimal运行版本、算法hash，并提供非整数幂黄金向量。不同语言仅离线误差对照，不能另做membership判断。时间到valid_until采用半开区间，t≥valid_until贡献0。
+
+解析/索引等静态job身份=workspace+stage+entity_revision+algorithm_version+mode+input_hash。评分/到期/收盘/覆盖解除等时间相关job再包括as_of、knowledge_cutoff、time_bucket/session、calendar、template_resolution、numeric_policy和decision_policy版本。重试沿用完整逻辑键；时点不同必须是不同job。新job不意味着允许旧输入覆盖当前，generation/fencing仍必要。
+
+## 7. 旧备份恢复后的撤权
+
+恢复安全合同保留，但实现不要求新微服务。正常权利撤销先向独立于应用备份的耐久revocation_journal追加序号、scope和hash链，取得durable receipt后再撤销DB权限和投影；拒绝读取可以先发生，撤销操作未完整耐久则状态pending禁止恢复开放。journal使用独立保留的对象存储/介质，latest watermark不能来自同一份旧DB备份。
+
+恢复始终在隔离环境、无发送；验证journal完整性和最新watermark，施加自备份cutoff之后全部撤权，重建ACL/索引并测试，再开放受影响读路径。不能验证最新依据时fail closed相关范围。首版合成场景用独立本地journal fixture验证合同；真实资料接入/生产恢复前才选择实际独立耐久存储并演练，不把尚未配置的灾备说成已实现。
 
 
-===== SOURCE: examples/analysis-proposal.json =====
+===== SOURCE: docs/13-first-slice.md =====
 
-{
-  "schema_version": "1.0",
-  "item_revision_id": "00000000-0000-4000-8000-000000000002",
-  "no_link": false,
-  "links": [
-    {
-      "company_id": "00000000-0000-4000-8000-000000000001",
-      "relation_type": "direct",
-      "relevance": "0.95",
-      "confidence": "0.93",
-      "evidence_ids": [
-        "00000000-0000-4000-8000-000000000003"
-      ],
-      "rationale": "合成材料明确描述示例制造订单，不代表真实公司判断。"
-    }
-  ],
-  "impact_proposals": [
-    {
-      "company_id": "00000000-0000-4000-8000-000000000001",
-      "dimension": "growth_sustainability",
-      "signed_impact": "0.4",
-      "confidence": "0.8",
-      "half_life_days": 30,
-      "valid_until": "2026-12-31T00:00:00Z",
-      "evidence_ids": [
-        "00000000-0000-4000-8000-000000000003"
-      ],
-      "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
-    }
-  ]
-}
+# 13 首个开发切片任务书
 
+W-08：合成端到端切片。设计任务书，尚未实施；批准设计不等于启动开发或真实接入。目标验证全流程和关键架构，不能用技术复杂性削减目标系统能力。
 
-===== SOURCE: examples/job-event.json =====
+## 1. 固定范围与输入
 
-{
-  "event_id": "00000000-0000-4000-8000-000000000004",
-  "event_type": "AnalysisProposed",
-  "schema_version": "1.0",
-  "workspace_id": "00000000-0000-4000-8000-000000000005",
-  "entity_id": "00000000-0000-4000-8000-000000000002",
-  "entity_revision": "synthetic-r1",
-  "occurred_at": "2026-09-30T00:00:00Z",
-  "trace_id": "synthetic-trace-01",
-  "mode": "shadow",
-  "generation": 1,
-  "payload": {
-    "input_manifest_id": "00000000-0000-4000-8000-000000000006",
-    "job_id": "00000000-0000-4000-8000-000000000007"
-  }
-}
+两家合成公司、三只证券（其中一家A/H两只同权证券）；一个local-fixture source，mock外部模型adapter，冻结财务/FX/股本/义务日历与FINAL/provisional报价。50–100家公司为以后试运行范围，当前fixture不假装全市场接入。五个角色至少各一名合成用户，同一人可兼任；一个研究组织和第二个隔离测试组织。
+
+公司A使用base→manufacturing→company override，B使用base→manufacturing；提供11项rubric证据、重复转载、no_link、歧义、已接受影响、硬风险、人工覆盖、A→B→A原文观察和迟到财报。默认数字来自config；不为使fixture通过改变阈值。
+
+## 2. 依赖与实现合同
+
+- 项目隔离且无真实业务数据的本机PostgreSQL、Redis及本地对象存储；启动前核验实际服务器、用途和数据分类。远程/共享/未知DB保持只读。
+- 从固定开源脚手架选择性复用认证接口、生成客户端、基础UI、CI；mock身份和外部模型，无真实外发。Refine/Prefect仅各做有界适配验证，选一套运行编排，不叠加调度器。
+- 首个slice实现身份/RBAC、ingestion、analysis/decision、scoring/templates、strategy、ledger/outbox和必要审计。PG提供结构化检索，OpenSearch全文/语义在W-03；不得把结构化查询冒充完成R-02全部检索。
+- Schema/Pydantic/OpenAPI和生成TypeScript客户端同源。04逻辑表落实本slice物理迁移，数据库变更与outbox同事务；clock/calendar显式注入。
+
+## 3. 连续用户路径
+
+管理员分配角色→数据管理员导入合成源→研究员查看公司时间线与自动接受判断→人工覆盖一项影响→策略管理员查看三层配置及差异、模拟并发布→跨两个相邻FINAL sessions生成ENTER→查看当时规则/证据→UNKNOWN缺口→恢复→EXIT→历史纠错说明。
+
+页面：今日变化、公司研究工作区（时间线/评分/证券估值）、判断详情与覆盖、模板编辑/解析预览、策略编辑/模拟、来源与任务恢复、用户角色管理。采用共享组件完整覆盖加载、空、部分失败、无权、冲突、UNKNOWN和更新提示。首版没有提醒中心或投递任务；策略变化是业务记录，从列表跳固定历史snapshot再跳当前状态。
+
+## 4. 验证与通过条件
+
+| 场景 | 精确预期 | 追踪 |
+|---|---|---|
+| 正常合成链路 | 原文→证据→AUTO accepted→Q/V→两相邻FINAL→ENTER，全链引用一致 | R-01…08，T-01/03/05/08/10/13 |
+| 模板解析 | A与B各有解析hash/来源；企业差异只影响A，父升级不热改旧release | R-15，T-25/26 |
+| 覆盖与并发 | 人工有效覆盖不被新AUTO替换；冲突409保留输入；依赖影响一并重算 | R-16，T-27/28 |
+| 权限 | viewer不能覆盖；researcher不能发布；data_admin不能分角色；system_admin不隐式发布；跨组织不可读 | R-11/17，T-15/20/29 |
+| 时间与数值 | FINAL前不计数，s1/s3缺口不入选，12位阈值和半衰期golden一致 | R-05/06/08，T-30/31/35 |
+| 错误与恢复 | Redis清空能恢复；commit后崩溃不重复；旧generation不覆盖；s2纠正不抹独立s6 | R-12，T-14/18/32 |
+| 证据生命周期 | observation回退历史保留；吸收原子；独立journal恢复后撤权不可读 | R-02/11/12，T-19/33/34 |
+| UX | 四项用户任务可完成，页面与代表视口完整状态；导航不暴露工程内部参数 | R-09/14，T-UX-01…04/T-22 |
+
+每项运行证据绑定commit、fixture hash、实际DB分类/环境、场景、expected/actual、命令和执行时间。产品运行测试、UI可用性、材料Schema检查分别记录。正常链路与故障/权限主路径通过且无未解决本slice阻断项，才推进单个获许可真实源；不以新增可选平台、全机型或更多审查阻碍收口。
+
+## 5. 交付物与停止条件
+
+目标交付：可运行web/API/worker、项目隔离Compose、迁移、生成客户端、合成fixtures、领域/集成/关键UI测试、slice验证报告与启动/恢复说明。成本记录简单可查看，没有开发预算审批。实测后更新工期和后续任务，不预填“已验证节省多少工作”。
+
+停止受影响步骤：DB分类未知；需要真实凭证、采集、外部模型调用、购买、部署或修改远程业务数据而未获授权；发现跨角色/组织泄漏、错误历史前视或重复状态生效。保留完成的合成链路和证据，报告最小必要输入；不绕过限制。
 
 
-===== SOURCE: examples/state-machine-cases.json =====
+===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
 
-{
-  "synthetic": true,
-  "cases": [
-    {
-      "session": "s0",
-      "input": "enter_false",
-      "confirmed": "OUT",
-      "display": "OUT",
-      "notification": null
-    },
-    {
-      "session": "s1",
-      "input": "enter_true",
-      "confirmed": "OUT",
-      "display": "ENTER_PENDING",
-      "notification": null
-    },
-    {
-      "session": "s1",
-      "input": "enter_true_recompute",
-      "confirmed": "OUT",
-      "display": "ENTER_PENDING",
-      "notification": null
-    },
-    {
-      "session": "s2",
-      "input": "enter_true",
-      "confirmed": "IN",
-      "display": "IN",
-      "notification": "ENTER"
-    },
-    {
-      "session": "s3",
-      "input": "missing",
-      "confirmed": "IN",
-      "display": "UNKNOWN",
-      "notification": null
-    },
-    {
-      "session": "s4",
-      "input": "retain_true",
-      "confirmed": "IN",
-      "display": "IN",
-      "notification": null
-    },
-    {
-      "session": "s5",
-      "input": "retain_false",
-      "confirmed": "IN",
-      "display": "EXIT_PENDING",
-      "notification": null
-    },
-    {
-      "session": "s6",
-      "input": "retain_false",
-      "confirmed": "OUT",
-      "display": "OUT",
-      "notification": "EXIT"
-    },
-    {
-      "session": "s7",
-      "input": "enter_true",
-      "confirmed": "OUT",
-      "display": "ENTER_PENDING",
-      "notification": null
-    },
-    {
-      "session": "s8",
-      "input": "enter_true",
-      "confirmed": "IN",
-      "display": "IN",
-      "notification": "ENTER"
-    },
-    {
-      "session": "s9",
-      "input": "approved_hard_risk",
-      "confirmed": "OUT",
-      "display": "OUT",
-      "notification": "RISK"
-    }
-  ]
-}
+# 模块化单体与可重建检索投影
 
-[END PART 6/6]
+状态：proposed，待评审与实施授权。
 
-[REVIEW_MATERIALS_END]
-全部材料已发完，请现在开始完整评审并输出 v0.2。
+采用模块化单体配独立 Worker，PostgreSQL 保存事实、版本、策略状态和 outbox；OpenSearch 与热语义索引仅为投影。相比微服务和“所有资料直接放向量库”，此方案牺牲一些独立扩展能力，换取小团队可维护的事务、权限、追溯与恢复，且保留按实际瓶颈拆分的接口。
+
+公司经营评分属于 company，价格与估值属于 security；A/H 共用经营事实并分开策略评估。历史记录采用业务有效时间与系统知悉时间，避免重放使用后来才公布的事实。初期不是完整 event sourcing；保存不可变业务修订和必要审计即可。
+
+OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
+
+
+===== SOURCE: docs/adr/0002-v02-confirmed-scope.md =====
+
+# v0.2 已确认范围与设计修订
+
+2026-09-30；用户完成grilling访谈并明确“按这版定”。产品范围已确认；技术机制为本次交付设计、尚未实施。继承[0001](./0001-architecture-and-truth.md)的模块化单体和投影原则。
+
+采纳多人RBAC、base/industry/company模板、自动审核按政策生效及人工覆盖、外部模型接入、开发成本不设固定门槛。通知后置，先记录策略变化；保留完整业务与管理端能力，不因技术实现难度删减范围。模板/策略由人维护发布，模型不会自动发布规则。
+
+修复B-01…04、S-01…09：财务范围与rubric锚点、时间相关job身份、FINAL/相邻session、输入分类cutoff、历史纠错/当前状态分离、订阅不改共享状态、义务新鲜度、数值规范、Listing边界、独立撤权依据。详见11/12/10。
+
+开源复用：优先FastAPI全栈模板的工程基座；Refine保留管理端薄适配候选，Prefect保留替换Celery的候选，二者不能凭“已有TanStack/Celery”排除。实际采用须通过W-08的最小验证；不叠加两套同职能调度器。Qlib/LEAN仅隔离研究，FinanceToolkit公式对照，Scrapy只用于获许可HTML来源。许可核查不能替代数据权利。没有安装这些项目。
+
+本次独立编写v0.2，输入为旧仓库、Pro共享页可见正文与第二轮研究。未获取Pro声称的完整60文件包，不能说已合并其完整版本。设计修订不授权开发、真实接入或部署；已有GitHub授权仅覆盖新生成设计/合成材料。
+
+
+===== SOURCE: research/open-source-shortlist.md =====
+
+# 开源框架初步候选与复用方向
+
+核查日期：2026-09-30。此页为本次只读调研的派生判断与导航，不保存第三方原文／代码；各来源以官方链接回查。已读官方GitHub仓库元数据和README；RQAlpha另外读取当前LICENSE。不是生产选型、兼容测试或法律结论，没有安装或运行候选项目。
+
+用户新增偏好：尽量寻找并复用成熟开源系统框架与策略框架。首期仍以完整研究流程、管理／业务两端、可维护规则和工程质量为目标，维持A股与港股范围，不新增交易执行需求。
+
+## 1. 系统侧
+
+| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
+|---|---|---|---|
+| [FastAPI Full Stack Template](https://github.com/fastapi/full-stack-fastapi-template) · [README](https://github.com/fastapi/full-stack-fastapi-template/blob/master/README.md) | MIT | FastAPI、React、PostgreSQL、生成客户端、Playwright、pytest、Compose与CI脚手架 | 优先评估工程起点；SQLModel vs 现有SQLAlchemy、JWT vs OIDC、部署与同域结构须作显式取舍，不直接继承未经审查的权限模型 |
+| [Refine Core](https://github.com/refinedev/refine) · [README](https://github.com/refinedev/refine/blob/main/README.md) | MIT（核心） | headless React CRUD、认证／权限provider、路由、网络与状态接口 | 优先评估管理端能力与复用hooks；研究业务端保持自己的任务流程与设计系统，避免和模板已有路由／数据状态体系重复 |
+| [Scrapy](https://github.com/scrapy/scrapy) · [README](https://github.com/scrapy/scrapy/blob/master/README.rst) | BSD-3-Clause | 网站结构化数据提取框架 | 有采集许可时作为SourceAdapter；API源不强行走网页爬虫；系统ledger、快照与outbox仍由应用维护 |
+| [Prefect](https://github.com/PrefectHQ/prefect) · [README](https://github.com/PrefectHQ/prefect/blob/main/README.md) | Apache-2.0（核心） | Python数据pipeline与工作流编排；另有Cloud服务 | 和Celery基线对照，按实际长流程/恢复需求择一；评估自托管与付费能力边界，不以编排替代领域事务和通知幂等 |
+
+## 2. 策略、研究与数据侧
+
+| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
+|---|---|---|---|
+| [Qlib](https://github.com/microsoft/qlib) · [README](https://github.com/microsoft/qlib/blob/main/README.md) | MIT | 数据处理、研究workflow、模型、回测与评价工具 | 比较基础因子/研究接口与离线评估；机器学习、RL、自动研发不是本项目首期要求；A/H及point-in-time财务口径尚未核实 |
+| [LEAN](https://github.com/QuantConnect/Lean) · [README](https://github.com/QuantConnect/Lean/blob/master/readme.md) | Apache-2.0 | 事件驱动算法研究／交易引擎 | 比较证券/基本面/筛选与回放接口，不启用实盘交易；C#核心与Python服务集成、数据成本和A/H适配待验证 |
+| [RQAlpha](https://github.com/ricequant/rqalpha) · [LICENSE](https://github.com/ricequant/rqalpha/blob/master/LICENSE) · [README](https://github.com/ricequant/rqalpha/blob/master/README.rst) | 自定义限制，API为NOASSERTION | 可扩展Python回测／算法交易框架；README明确限非商业使用 | **许可未解决前不列为生产可直接复用候选**。当前LICENSE对非商业使用采用Apache2.0条件，商业使用须授权，法人／组织使用定义也受限制；不能简写为Apache2.0无限制。不会替用户联系授权方 |
+| [AKShare](https://github.com/akfamily/akshare) · [README/Statement](https://github.com/akfamily/akshare/blob/main/README.md) | MIT（代码） | 财经数据接口库，README说明接口可能撤销 | 作为接口与数据结构调研候选；README声明数据仅用于学术研究，代码许可不代表上游数据商用/存储/再分发权。生产先核实具体数据来源和权利，不能承诺数据可用性 |
+
+\*除RQAlpha读取LICENSE全文外，其余此处为GitHubAPI识别许可证及已读README，未审查完整依赖、插件、数据许可或商标；GPT Pro需回查精确tag/commit的许可文件，实施前做SBOM和许可核查。
+
+## 3. 维护观察及证据限度
+
+| 仓库 | 查询时默认分支 | 查询时pushed_at（UTC） | archived |
+|---|---|---|---|
+| fastapi/full-stack-fastapi-template | master | 2026-09-18T17:40:40Z | false |
+| refinedev/refine | main | 2026-09-10T12:56:35Z | false |
+| scrapy/scrapy | master | 2026-09-28T15:30:00Z | false |
+| PrefectHQ/prefect | main | 2026-09-30T03:12:13Z | false |
+| microsoft/qlib | main | 2026-09-22T05:57:23Z | false |
+| QuantConnect/Lean | master | 2026-09-29T21:10:46Z | false |
+| ricequant/rqalpha | master | 2026-09-28T03:17:24Z | false |
+| akfamily/akshare | main | 2026-09-30T06:31:13Z | false |
+
+以上仅证明当时未归档和有push记录，不能证明发布稳定、问题响应及时、安全或符合本项目SLO。未审查完整release/issue/security历史、代码接口、真实市场数据、point-in-time输入或端到端集成。候选发现不是PoC通过。
+
+## 4. 下一步选型合同
+
+先以v0.1最少依赖方案为对照，比较“直接复用/适配器复用/只参考/不采用”。系统优先评估全栈模板与管理端hooks，策略框架优先评估离线研究或基础指标适配，不成为实时状态第二真源。核心公司身份、双时间、事件去重、证据、人工版本、质量门、策略状态和通知事务仍需明确领域设计；框架不能自动提供这些正确性。
+
+最终矩阵必须记录revision、来源、许可证、维护证据、自托管/收费边界、A/H与单位/币种/股本/TTM/修订语义、集成与替换成本、最小验证以及R/W/T影响。推荐后由用户确定实施范围；本次不fork、安装、导入第三方代码或切换运行架构。
+
+[END PART 6/14]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

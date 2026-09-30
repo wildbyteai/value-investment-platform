@@ -1,0 +1,41 @@
+{
+  "definition_version": "metric-definitions-v2",
+  "metrics": {
+    "roe_ttm": {
+      "unit": "ratio",
+      "formula": "ordinary_attributable_profit_ttm / average_ordinary_attributable_equity",
+      "scope": "matching_ordinary_equity",
+      "invalid": "denominator_nonpositive_or_unmatched_scope"
+    },
+    "cfo_profit_3y": {
+      "unit": "ratio",
+      "formula": "sum(consolidated_cfo_last_3_full_years) / sum(consolidated_net_profit_same_3_years)",
+      "scope": "matching_consolidated_group",
+      "invalid": "profit_sum_nonpositive_or_missing_period_or_unmatched_scope"
+    },
+    "positive_cfo_year_share_3y": {
+      "unit": "ratio",
+      "formula": "positive_cfo_year_count / 3",
+      "scope": "last_3_full_fiscal_years",
+      "invalid": "missing_required_year"
+    },
+    "net_debt_ebitda": {
+      "unit": "ratio",
+      "formula": "(interest_bearing_debt - cash_and_cash_equivalents) / ebitda_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "ebitda_nonpositive_or_unmatched_scope"
+    },
+    "interest_coverage": {
+      "unit": "ratio",
+      "formula": "ebit_ttm / interest_expense_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "interest_nonpositive_or_unmatched_scope"
+    },
+    "pe_ttm": {
+      "unit": "multiple",
+      "formula": "primary_listing_raw_final_close / fx_converted_ordinary_eps_ttm",
+      "scope": "matching_equivalent_ordinary_shares",
+      "invalid": "earnings_nonpositive_or_unmatched_share_rights"
+    }
+  }
+}

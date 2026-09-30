@@ -1,0 +1,49 @@
+{
+  "synthetic": true,
+  "material_expectations_only": true,
+  "cases": [
+    {
+      "id": "T-30",
+      "input": "s1 true; s2 expected but absent; s3 true",
+      "expected_display": "ENTER_PENDING",
+      "expected_count": 1,
+      "expected_change_events": []
+    },
+    {
+      "id": "T-31",
+      "input": "XHKG 16:00 provisional; later final CAS close",
+      "expected_provisional_count": 0,
+      "expected_final_count": 1
+    },
+    {
+      "id": "T-32",
+      "input": "s2 ENTER; s4 EXIT; independent s6 ENTER; correction s2",
+      "expected_current_state": "IN",
+      "expected_new_record": "CORRECTION",
+      "expected_new_market_event": null
+    },
+    {
+      "id": "T-35",
+      "input": "10*0.8*0.5*0.95*0.8; H=30 days; age=30 days",
+      "expected_before_decay": "3.040000000000",
+      "expected_after_decay": "1.520000000000"
+    },
+    {
+      "id": "T-36",
+      "input": "3y group CFO=75; group profit=100; attributable profit=50",
+      "expected_cfo_profit": "0.750000000000",
+      "expected_rule_gte_0_8": false
+    },
+    {
+      "id": "T-37",
+      "input": "old annual report correction without new fiscal period",
+      "expected_satisfies_new_obligation": false
+    },
+    {
+      "id": "T-38",
+      "input": "final close observed before grace cutoff; new announcement first published after close",
+      "expected_close_usable": true,
+      "expected_announcement_usable_in_close_evaluation": false
+    }
+  ]
+}

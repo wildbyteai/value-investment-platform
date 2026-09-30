@@ -1,0 +1,558 @@
+
+[PART 8/14]
+
+
+===== SOURCE: config/auto-review-policy-v1.json =====
+
+{
+  "policy_key": "auto-review-standard-v1",
+  "schema_version": "1.0",
+  "default_mode": "auto_accept_when_valid",
+  "calibrated_confidence_required": true,
+  "link": {
+    "minimum_relevance": "0.50",
+    "minimum_confidence": "0.90"
+  },
+  "impact": {
+    "minimum_confidence": "0.90",
+    "accepted_link_required": true
+  },
+  "rubric": {
+    "minimum_confidence": "0.90",
+    "anchored_evidence_required": true
+  },
+  "hard_risk": {
+    "minimum_confidence": "0.98",
+    "primary_regulator_or_issuer_evidence_required": true,
+    "allow_auto_accept": true
+  },
+  "invalid_or_conflicting": "pending",
+  "human_override_precedence": "until_released_or_expired",
+  "on_override_expiry": "reevaluate_current_legal_inputs",
+  "template_and_strategy_auto_publish": false
+}
+
+
+===== SOURCE: config/metric-definitions-v2.json =====
+
+{
+  "definition_version": "metric-definitions-v2",
+  "metrics": {
+    "roe_ttm": {
+      "unit": "ratio",
+      "formula": "ordinary_attributable_profit_ttm / average_ordinary_attributable_equity",
+      "scope": "matching_ordinary_equity",
+      "invalid": "denominator_nonpositive_or_unmatched_scope"
+    },
+    "cfo_profit_3y": {
+      "unit": "ratio",
+      "formula": "sum(consolidated_cfo_last_3_full_years) / sum(consolidated_net_profit_same_3_years)",
+      "scope": "matching_consolidated_group",
+      "invalid": "profit_sum_nonpositive_or_missing_period_or_unmatched_scope"
+    },
+    "positive_cfo_year_share_3y": {
+      "unit": "ratio",
+      "formula": "positive_cfo_year_count / 3",
+      "scope": "last_3_full_fiscal_years",
+      "invalid": "missing_required_year"
+    },
+    "net_debt_ebitda": {
+      "unit": "ratio",
+      "formula": "(interest_bearing_debt - cash_and_cash_equivalents) / ebitda_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "ebitda_nonpositive_or_unmatched_scope"
+    },
+    "interest_coverage": {
+      "unit": "ratio",
+      "formula": "ebit_ttm / interest_expense_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "interest_nonpositive_or_unmatched_scope"
+    },
+    "pe_ttm": {
+      "unit": "multiple",
+      "formula": "primary_listing_raw_final_close / fx_converted_ordinary_eps_ttm",
+      "scope": "matching_equivalent_ordinary_shares",
+      "invalid": "earnings_nonpositive_or_unmatched_share_rights"
+    }
+  }
+}
+
+
+===== SOURCE: config/numeric-policy-v1.json =====
+
+{
+  "policy_key": "decimal-python-v1",
+  "precision": 50,
+  "guard_precision": 70,
+  "rounding": "ROUND_HALF_EVEN",
+  "storage_decimal_places": 12,
+  "display_decimal_places": 1,
+  "age_unit": "utc_elapsed_seconds_div_86400",
+  "decay_method": "decimal_power_two",
+  "operation_order": [
+    "metrics",
+    "baseline",
+    "fact_contributions",
+    "fact_id_sorted_sum",
+    "contribution_cap",
+    "dimension_clip",
+    "company_quality_and_security_valuation"
+  ],
+  "comparison": "persisted_12_decimal_values",
+  "runtime_pin_required": true
+}
+
+
+===== SOURCE: config/roles-standard-v1.json =====
+
+{
+  "policy_key": "rbac-standard-v1",
+  "workspace_shared_research_default": true,
+  "private_owner_objects": [
+    "note",
+    "strategy"
+  ],
+  "multiple_roles_allowed": true,
+  "roles": {
+    "viewer": [
+      "research.read",
+      "watchlist.own",
+      "notes.own"
+    ],
+    "researcher": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "notes.shared.edit",
+      "analysis.override",
+      "template.edit"
+    ],
+    "strategy_manager": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "template.edit",
+      "template.publish",
+      "strategy.edit",
+      "strategy.simulate",
+      "strategy.publish",
+      "strategy.rollback",
+      "scoring.binding.publish"
+    ],
+    "data_admin": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "source.manage",
+      "job.retry",
+      "identity.manage",
+      "quality.correct"
+    ],
+    "system_admin": [
+      "user.manage",
+      "role.assign",
+      "system.configure",
+      "model.configure",
+      "audit.read",
+      "ops.read"
+    ]
+  }
+}
+
+
+===== SOURCE: config/rubrics-standard-v1.json =====
+
+{
+  "rubric_catalog_version": "rubrics-standard-v1",
+  "unknown_value": null,
+  "scale": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rubrics": {
+    "business-model-v1": {
+      "criteria": [
+        {
+          "key": "repeat_demand",
+          "anchors": [
+            "需求一次性且无续购依据",
+            "偶发续购、主要依赖新增客户",
+            "有稳定续购但受可选消费影响",
+            "重要需求且续购/留存有多期支持",
+            "关键持续需求，续购与留存长期稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "pricing_power",
+          "anchors": [
+            "降价才能维持销量且利润明显恶化",
+            "主要被动跟随价格，传导成本困难",
+            "成本可部分传导，证据显示利润相对稳定",
+            "多期提价/产品组合改善而留存稳定",
+            "持续提价/成本传导与客户价值证据均充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "competitive_barrier",
+          "anchors": [
+            "无差异且替代容易",
+            "差异有限、竞争者容易复制",
+            "有品牌/渠道/技术优势但可被替代",
+            "切换成本或规模优势持续且有证据",
+            "多重壁垒长期维持，竞争检验与投入证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "concentration",
+          "anchors": [
+            "单一客户/供应商依赖且无替代，已产生重大损害",
+            "高度集中，替代措施弱",
+            "存在集中但合同/备选支持缓解",
+            "客户与供应商较分散或替代经验证",
+            "分散、可替换且多期压力下稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_intensity",
+          "anchors": [
+            "持续大额投入且回报不足、维护支出不清",
+            "投入重且效率低、回收期持续拉长",
+            "投入与回报大致匹配、周期风险可解释",
+            "投入效率较好且维护/增长资本可区分",
+            "较低增量资本需求或持续高回报，有跨期依据"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "governance-v1": {
+      "criteria": [
+        {
+          "key": "related_party_transparency",
+          "anchors": [
+            "重大关联交易未解释或被正式认定损害",
+            "披露缺口显著、定价依据弱",
+            "基本披露齐全但公平性证据有限",
+            "范围/定价/审批清晰且可核对",
+            "长期透明、独立核验充分且利益冲突处理有效"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_allocation",
+          "anchors": [
+            "重大配置失误反复且未解释",
+            "资本回报差、融资/投资逻辑薄弱",
+            "配置规则明确，结果与解释基本一致",
+            "回报纪律好，投资/回购/分红与机会匹配",
+            "跨周期配置结果与纪律持续，失败复盘透明"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "disclosure",
+          "anchors": [
+            "重大失实/反复违规有正式依据",
+            "反复迟延或关键口径不清",
+            "基本及时完整，偶有解释不足",
+            "及时一致，关键估计/变化有解释",
+            "长期可核对，主动解释风险与更正且口径稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "growth-v1": {
+      "criteria": [
+        {
+          "key": "revenue_stability",
+          "anchors": [
+            "三年连续显著恶化且原因未解决",
+            "明显波动/萎缩，恢复依据弱",
+            "三年总体稳定但增长不连续",
+            "三年稳定增长，有分部/订单依据",
+            "跨期增长稳定且客户/产品基础可核验"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "incremental_sources",
+          "anchors": [
+            "没有可验证增量或只有宣传",
+            "依赖单一未验证项目",
+            "增量来源明确但转化证据不足",
+            "产品/客户增量已有兑现与持续依据",
+            "多个增量来源兑现且经济性与容量证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "reinvestment_return",
+          "anchors": [
+            "增量投入无回报/持续亏损",
+            "回报低于合理资金成本且改善依据弱",
+            "回报接近合理成本或仍需验证",
+            "增量回报优于成本且可解释",
+            "跨期增量回报持续较高、口径可核对"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    }
+  }
+}
+
+
+===== SOURCE: config/scoring-standard-v1.json =====
+
+{
+  "schema_version": "2.0",
+  "model_key": "scoring-standard-v1",
+  "version": 1,
+  "dimension_weights": {
+    "profit_quality": "0.25",
+    "financial_resilience": "0.25",
+    "business_model": "0.25",
+    "governance": "0.15",
+    "growth_sustainability": "0.10"
+  },
+  "event_contribution": {
+    "scale": "10",
+    "cap_per_dimension": "15",
+    "half_life_calendar_days": {
+      "profit_quality": 90,
+      "financial_resilience": 90,
+      "business_model": 180,
+      "governance": 180,
+      "growth_sustainability": 30
+    },
+    "accepted_evidence_only": true,
+    "absorbed_events_excluded": true
+  },
+  "valuation": {
+    "metric": "pe_ttm",
+    "full_score_at": "10",
+    "zero_score_at": "25",
+    "invalid_if_nonpositive": true
+  },
+  "baselines": {
+    "profit_quality": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "roe_ttm",
+          "weight": "0.4",
+          "zero_at": "0.05",
+          "full_at": "0.20"
+        },
+        {
+          "key": "cfo_profit_3y",
+          "weight": "0.4",
+          "zero_at": "0.5",
+          "full_at": "1.2"
+        },
+        {
+          "key": "positive_cfo_year_share_3y",
+          "weight": "0.2",
+          "zero_at": "0",
+          "full_at": "1"
+        }
+      ]
+    },
+    "financial_resilience": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "net_debt_ebitda",
+          "weight": "0.6",
+          "zero_at": "4",
+          "full_at": "0"
+        },
+        {
+          "key": "interest_coverage",
+          "weight": "0.4",
+          "zero_at": "1",
+          "full_at": "8"
+        }
+      ]
+    },
+    "business_model": {
+      "method": "accepted_evidence_rubric",
+      "rubric_ref": "business-model-v1"
+    },
+    "governance": {
+      "method": "accepted_evidence_rubric",
+      "rubric_ref": "governance-v1"
+    },
+    "growth_sustainability": {
+      "method": "accepted_evidence_rubric",
+      "rubric_ref": "growth-v1"
+    }
+  },
+  "missing_submetric_policy": "renormalize_valid_weights_and_report_subcoverage",
+  "minimum_submetric_coverage": "0.80",
+  "minimum_company_coverage": "0.80",
+  "metric_definition_ref": "metric-definitions-v2",
+  "numeric_policy_ref": "decimal-python-v1",
+  "rubric_catalog_ref": "rubrics-standard-v1"
+}
+
+
+===== SOURCE: config/strategy-standard-v1.json =====
+
+{
+  "schema_version": "2.0",
+  "strategy_key": "value-standard",
+  "version": 1,
+  "name": "标准价投候选 v1（非金融行业）",
+  "description": "人维护的示范筛选规则；研究提醒，不下单，不验证收益。",
+  "scoring_model_ref": "scoring-standard-v1",
+  "universe": {
+    "markets": [
+      "CN_A",
+      "HK"
+    ],
+    "exclude_sector_groups": [
+      "financials",
+      "real_estate",
+      "commodity_cyclicals"
+    ],
+    "common_equity_only": true
+  },
+  "quality_gates": {
+    "minimum_coverage": "0.80",
+    "required_dimensions": [
+      "profit_quality",
+      "financial_resilience",
+      "business_model"
+    ],
+    "baseline_max_age_days": 180,
+    "price_max_lag_sessions": 0,
+    "currency_and_share_basis_required": true,
+    "only_approved_inputs": true,
+    "financial_freshness_policy": "report_obligation_and_required_periods"
+  },
+  "hard_risk_policy": {
+    "confirmed_only": true,
+    "action": "immediate_out_risk",
+    "risk_codes": [
+      "confirmed_fraud",
+      "going_concern_material",
+      "confirmed_debt_default",
+      "delisting_decision"
+    ]
+  },
+  "state_policy": {
+    "initial_baseline_notify": false,
+    "enter_distinct_sessions": 2,
+    "exit_distinct_sessions": 2,
+    "session_clock": "security_exchange_close",
+    "unknown_action": "hold_last_confirmed_reset_pending",
+    "config_change_notify": "deferred_change_record_only",
+    "historical_notify": false,
+    "require_adjacent_expected_sessions": true,
+    "final_price_required": true,
+    "cutoff_grace_minutes": 60,
+    "notification_phase": "deferred"
+  },
+  "enter": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "70"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "60"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  },
+  "retain": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "65"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "50"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  },
+  "scoring_binding_policy": "published_per_company_resolution_manifest"
+}
+
+[END PART 8/14]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

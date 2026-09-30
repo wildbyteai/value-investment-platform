@@ -1,0 +1,21 @@
+{
+  "policy_key": "decimal-python-v1",
+  "precision": 50,
+  "guard_precision": 70,
+  "rounding": "ROUND_HALF_EVEN",
+  "storage_decimal_places": 12,
+  "display_decimal_places": 1,
+  "age_unit": "utc_elapsed_seconds_div_86400",
+  "decay_method": "decimal_power_two",
+  "operation_order": [
+    "metrics",
+    "baseline",
+    "fact_contributions",
+    "fact_id_sorted_sum",
+    "contribution_cap",
+    "dimension_clip",
+    "company_quality_and_security_valuation"
+  ],
+  "comparison": "persisted_12_decimal_values",
+  "runtime_pin_required": true
+}

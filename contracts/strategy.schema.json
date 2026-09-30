@@ -3,7 +3,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "2.0"
     },
     "strategy_key": {
       "type": "string",
@@ -84,10 +84,6 @@
           "type": "integer",
           "minimum": 1
         },
-        "financial_max_announced_age_days": {
-          "type": "integer",
-          "minimum": 1
-        },
         "price_max_lag_sessions": {
           "type": "integer",
           "minimum": 0
@@ -97,16 +93,19 @@
         },
         "only_approved_inputs": {
           "const": true
+        },
+        "financial_freshness_policy": {
+          "const": "report_obligation_and_required_periods"
         }
       },
       "required": [
         "minimum_coverage",
         "required_dimensions",
         "baseline_max_age_days",
-        "financial_max_announced_age_days",
         "price_max_lag_sessions",
         "currency_and_share_basis_required",
-        "only_approved_inputs"
+        "only_approved_inputs",
+        "financial_freshness_policy"
       ]
     },
     "hard_risk_policy": {
@@ -169,10 +168,24 @@
           "const": "hold_last_confirmed_reset_pending"
         },
         "config_change_notify": {
-          "const": "summary_only"
+          "const": "deferred_change_record_only"
         },
         "historical_notify": {
           "const": false
+        },
+        "require_adjacent_expected_sessions": {
+          "const": true
+        },
+        "final_price_required": {
+          "const": true
+        },
+        "cutoff_grace_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440
+        },
+        "notification_phase": {
+          "const": "deferred"
         }
       },
       "required": [
@@ -182,8 +195,15 @@
         "session_clock",
         "unknown_action",
         "config_change_notify",
-        "historical_notify"
+        "historical_notify",
+        "require_adjacent_expected_sessions",
+        "final_price_required",
+        "cutoff_grace_minutes",
+        "notification_phase"
       ]
+    },
+    "scoring_binding_policy": {
+      "const": "published_per_company_resolution_manifest"
     }
   },
   "required": [
@@ -198,7 +218,8 @@
     "hard_risk_policy",
     "enter",
     "retain",
-    "state_policy"
+    "state_policy",
+    "scoring_binding_policy"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Restricted standard strategy configuration",

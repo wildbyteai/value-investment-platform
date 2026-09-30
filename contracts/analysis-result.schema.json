@@ -3,7 +3,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "2.0"
     },
     "item_revision_id": {
       "type": "string",
@@ -127,6 +127,108 @@
         ]
       },
       "maxItems": 100
+    },
+    "rubric_proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rubric_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "criterion_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "grade": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "company_id",
+          "rubric_ref",
+          "criterion_key",
+          "grade",
+          "confidence",
+          "evidence_ids",
+          "rationale",
+          "valid_until"
+        ]
+      }
+    },
+    "risk_proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "risk_code": {
+            "enum": [
+              "confirmed_fraud",
+              "going_concern_material",
+              "confirmed_debt_default",
+              "delisting_decision"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "risk_code",
+          "confidence",
+          "evidence_ids",
+          "rationale"
+        ]
+      }
     }
   },
   "required": [
@@ -134,7 +236,9 @@
     "item_revision_id",
     "no_link",
     "links",
-    "impact_proposals"
+    "impact_proposals",
+    "rubric_proposals",
+    "risk_proposals"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Unapproved analysis proposal",
@@ -153,6 +257,12 @@
             "maxItems": 0
           },
           "impact_proposals": {
+            "maxItems": 0
+          },
+          "rubric_proposals": {
+            "maxItems": 0
+          },
+          "risk_proposals": {
             "maxItems": 0
           }
         }

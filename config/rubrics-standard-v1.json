@@ -1,0 +1,166 @@
+{
+  "rubric_catalog_version": "rubrics-standard-v1",
+  "unknown_value": null,
+  "scale": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rubrics": {
+    "business-model-v1": {
+      "criteria": [
+        {
+          "key": "repeat_demand",
+          "anchors": [
+            "需求一次性且无续购依据",
+            "偶发续购、主要依赖新增客户",
+            "有稳定续购但受可选消费影响",
+            "重要需求且续购/留存有多期支持",
+            "关键持续需求，续购与留存长期稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "pricing_power",
+          "anchors": [
+            "降价才能维持销量且利润明显恶化",
+            "主要被动跟随价格，传导成本困难",
+            "成本可部分传导，证据显示利润相对稳定",
+            "多期提价/产品组合改善而留存稳定",
+            "持续提价/成本传导与客户价值证据均充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "competitive_barrier",
+          "anchors": [
+            "无差异且替代容易",
+            "差异有限、竞争者容易复制",
+            "有品牌/渠道/技术优势但可被替代",
+            "切换成本或规模优势持续且有证据",
+            "多重壁垒长期维持，竞争检验与投入证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "concentration",
+          "anchors": [
+            "单一客户/供应商依赖且无替代，已产生重大损害",
+            "高度集中，替代措施弱",
+            "存在集中但合同/备选支持缓解",
+            "客户与供应商较分散或替代经验证",
+            "分散、可替换且多期压力下稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_intensity",
+          "anchors": [
+            "持续大额投入且回报不足、维护支出不清",
+            "投入重且效率低、回收期持续拉长",
+            "投入与回报大致匹配、周期风险可解释",
+            "投入效率较好且维护/增长资本可区分",
+            "较低增量资本需求或持续高回报，有跨期依据"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "governance-v1": {
+      "criteria": [
+        {
+          "key": "related_party_transparency",
+          "anchors": [
+            "重大关联交易未解释或被正式认定损害",
+            "披露缺口显著、定价依据弱",
+            "基本披露齐全但公平性证据有限",
+            "范围/定价/审批清晰且可核对",
+            "长期透明、独立核验充分且利益冲突处理有效"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_allocation",
+          "anchors": [
+            "重大配置失误反复且未解释",
+            "资本回报差、融资/投资逻辑薄弱",
+            "配置规则明确，结果与解释基本一致",
+            "回报纪律好，投资/回购/分红与机会匹配",
+            "跨周期配置结果与纪律持续，失败复盘透明"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "disclosure",
+          "anchors": [
+            "重大失实/反复违规有正式依据",
+            "反复迟延或关键口径不清",
+            "基本及时完整，偶有解释不足",
+            "及时一致，关键估计/变化有解释",
+            "长期可核对，主动解释风险与更正且口径稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "growth-v1": {
+      "criteria": [
+        {
+          "key": "revenue_stability",
+          "anchors": [
+            "三年连续显著恶化且原因未解决",
+            "明显波动/萎缩，恢复依据弱",
+            "三年总体稳定但增长不连续",
+            "三年稳定增长，有分部/订单依据",
+            "跨期增长稳定且客户/产品基础可核验"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "incremental_sources",
+          "anchors": [
+            "没有可验证增量或只有宣传",
+            "依赖单一未验证项目",
+            "增量来源明确但转化证据不足",
+            "产品/客户增量已有兑现与持续依据",
+            "多个增量来源兑现且经济性与容量证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "reinvestment_return",
+          "anchors": [
+            "增量投入无回报/持续亏损",
+            "回报低于合理资金成本且改善依据弱",
+            "回报接近合理成本或仍需验证",
+            "增量回报优于成本且可解释",
+            "跨期增量回报持续较高、口径可核对"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    }
+  }
+}

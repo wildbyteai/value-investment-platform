@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "item_revision_id": "00000000-0000-4000-8000-000000000002",
   "no_link": false,
   "links": [
@@ -27,5 +27,20 @@
       ],
       "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
     }
-  ]
+  ],
+  "rubric_proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "rubric_ref": "business-model-v1",
+      "criterion_key": "pricing_power",
+      "grade": 3,
+      "confidence": "0.95",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成材料示范：提价后留存稳定，实际必须验证证据锚点",
+      "valid_until": "2027-03-29T00:00:00Z"
+    }
+  ],
+  "risk_proposals": []
 }

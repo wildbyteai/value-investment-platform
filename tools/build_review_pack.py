@@ -4,12 +4,12 @@ import hashlib
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
-for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json"]:
+for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.append(ROOT / "review/GPT-PRO-PROMPT.md")
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
-parts = ["# 价值投资策略管理系统 v0.1 · GPT Pro 整包评审材料\n\n日期：2026-09-30。设计为提案、系统尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
+parts = ["# 价值投资策略管理系统 v0.2 · GPT Pro 整包评审材料\n\n日期：2026-09-30。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
 for p in paths:
     parts.append(f"| `{p.relative_to(ROOT)}` | `{hashlib.sha256(p.read_bytes()).hexdigest()}` |\n")
 for p in paths:
@@ -30,7 +30,7 @@ sections = []
 for p in source_paths:
     sections.append(f"\n\n===== SOURCE: {p.relative_to(ROOT)} =====\n\n" + p.read_text(encoding="utf-8"))
 instruction = (ROOT / "review/GPT-PRO-PROMPT.md").read_text(encoding="utf-8").split("## 完整提示词\n", 1)[1].strip()
-all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.2。\n"
+all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.3。\n"
 (ROOT / "review/PASTE-ALL.txt").write_text(all_text, encoding="utf-8")
 groups, group = [], ""
 for section in sections:
@@ -43,7 +43,7 @@ if group:
 links = []
 for index, group in enumerate(groups, 1):
     start = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" if index == 1 else ""
-    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.2。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
+    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.3。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
     name = f"PASTE-PART-{index:02}.txt"
     body = start + f"\n[PART {index}/{len(groups)}]\n" + group + f"\n[END PART {index}/{len(groups)}]\n" + end
     (ROOT / "review" / name).write_text(body, encoding="utf-8")
@@ -60,6 +60,6 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
 
-""" + "\n".join(links) + "\n\n这是同一 v0.1 的传递方式变化，未改变业务或工程设计。纯文本完整覆盖 README、领域词汇、实现规则、10份设计、ADR、开源候选调研、2份配置、合同说明与3份Schema、3份合成例子；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+""" + "\n".join(links) + "\n\n这些是当前v0.2的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
 (ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
 print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")

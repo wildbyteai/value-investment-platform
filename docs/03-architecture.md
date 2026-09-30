@@ -14,7 +14,7 @@ flowchart TB
   Q --> CW[采集 Worker]
   Q --> AW[解析 关联 AI Worker]
   Q --> SW[评分与策略 Worker]
-  Q --> IW[索引 / 通知 Worker]
+  Q --> IW[索引 Worker / 后续通知]
   CW --> OBJ[(S3 对象存储 原始快照)]
   CW --> PG
   AW --> PG
@@ -40,7 +40,7 @@ flowchart TB
 | 证据 | S3 兼容对象存储 | 哈希快照、保留权限；商业发行版／自建许可和费用上线前核实 |
 | 身份 | OIDC 适配器，开发隔离模拟身份 | 服务端验证 issuer/audience/expiry；不得把开发入口部署生产 |
 | 工程 | uv、pnpm、pytest、Ruff、mypy、Vitest、Playwright、Storybook | 锁版本、可复现、边界测试；不预填未来“最新版本” |
-| 部署 | OCI 容器；开发 Compose；生产容器平台／托管服务二选一 | 先预算和恢复能力后定主机，首期不强制 Kubernetes |
+| 部署 | OCI 容器；开发 Compose；生产容器平台／托管服务二选一 | 按容量和恢复需求选择资源，开发无固定预算门槛，首期不强制 Kubernetes |
 
 版本须在实施选型时验证支持周期、兼容性及许可证，记录 lockfile/SBOM。此阶段未安装依赖，技术名不是已验证运行环境。
 
@@ -49,11 +49,11 @@ flowchart TB
 - ingestion：计划、检查点、采集结果、原始对象提交，外部源通过 SourceAdapter 变化。
 - identity：公司、证券、别名和有效期关系图；唯一负责身份合并与拆分。
 - information：规范文本、证据定位、讯息修订和事件归并。
-- analysis：候选、模型结果、复核和已批准关联／影响；提交建议，不直接改策略状态。
+- analysis：候选、模型结果、独立DecisionService自动生效/人工覆盖及有效关联/影响；不直接改策略状态。
 - fundamentals：财务、行情、FX 和公司行动规范化；输出有单位、有时间和质量标记的指标。
-- scoring：输入固定快照，返回维度、贡献、覆盖和解释；不读网络、不发送通知。
+- scoring：按固定三层模板解析配置，输入固定快照，返回维度、贡献、覆盖和解释；不读网络、不发送通知。
 - strategy：AST 校验、版本、确定性评估、状态转移；唯一拥有 membership。
-- notification：站内与 delivery，订阅和渠道；发送幂等，不能改判断。
+- notification（后续）：订阅、提醒中心与delivery；首版只在strategy中生成可查变化记录，发送不能改判断。
 - search：全文／向量投影和 ACL 过滤，重建不改变业务真源。
 - governance：权限、审计、模型及源策略、成本账本。
 
@@ -77,7 +77,7 @@ qa/                      # 合成场景、E2E、负载与演练
 
 ## 5. 处理及一致性
 
-外部抓取至少一次，持久化幂等键消重，后续每阶段 task ledger 唯一键 = stage+entity_revision+algorithm_version+mode。领域业务变更与 outbox 同事务。消息包含 ID／revision／trace，不放正文、凭证。消费者先按 ID 取得已提交输入，再领取租约、执行、提交输出和新 outbox；提交后 ACK。
+外部抓取至少一次，持久化幂等键消重，后续每阶段 task ledger 静态唯一键=workspace+stage+entity_revision+algorithm_version+mode+input_hash；时间相关任务再加入固定as_of/cutoff、session/time_bucket、calendar/template/numeric/decision政策版本（12 §6）。领域业务变更与 outbox 同事务。消息包含 ID／revision／trace，不放正文、凭证。消费者先按 ID 取得已提交输入，再领取租约、执行、提交输出和新 outbox；提交后 ACK。
 
 队列丢失由 sweeper 重新投递 ledger 的 due 任务；定时调度使用数据库唯一约束防止多 scheduler 重复创建。长任务用 lease+heartbeat；过期租约用 fencing generation 拒绝旧 worker 的迟到提交。禁止声称队列带来 exactly-once，保证业务效果幂等。
 
@@ -89,6 +89,8 @@ qa/                      # 合成场景、E2E、负载与演练
 
 先以 10 万份合成讯息校准，达到 100 万、1,000 万量级分别测索引、查询、重建。财务／评分按时间和 workspace 分区，search 按月份 rollover，原始对象 lifecycle 按来源权利配置。热向量最多 90 天起步，pgvector 达瓶颈后再评估独立向量库；跨库迁移按相同 chunk ID 双写影子比较后切读，PG 仍是真源。
 
-全文故障：业务公司列表与时间线从 PG 使用结构化索引可用，搜索页面明确降级；语义故障退回全文；模型故障保留规范化证据和人工队列；行情源失败策略 UNKNOWN；通知故障留站内主记录。不能把采集失败显示成“无新闻”。
+全文故障：业务公司列表与时间线从 PG 使用结构化索引可用，搜索页面明确降级；语义故障退回全文；模型故障保留规范化证据和人工队列；行情源失败策略 UNKNOWN；后续通知故障保留变化主记录。不能把采集失败显示成“无新闻”。
 
 不预先加入 Kafka、Temporal、多 Agent 协调、分布式图数据库。只有无法达到实际 SLO、工作流跨日人工恢复确实复杂或队列吞吐形成瓶颈，才用 ADR 决定升级。
+
+开源复用以第二轮research/second-review.md的固定源码核查为依据。优先选择性复用FastAPI Full Stack Template工程基座；Refine可与TanStack共享QueryClient/路由/设计系统，不能以重复依赖为由排除；Prefect是Celery编排层替代候选，PG业务事务不由框架保证。实际采用在W-08做最小验证；不用两套活跃调度器。所有候选均未安装/集成。

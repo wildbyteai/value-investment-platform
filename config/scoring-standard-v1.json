@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "model_key": "scoring-standard-v1",
   "version": 1,
   "dimension_weights": {
@@ -70,19 +70,22 @@
       ]
     },
     "business_model": {
-      "method": "approved_human_rubric",
+      "method": "accepted_evidence_rubric",
       "rubric_ref": "business-model-v1"
     },
     "governance": {
-      "method": "approved_human_rubric",
+      "method": "accepted_evidence_rubric",
       "rubric_ref": "governance-v1"
     },
     "growth_sustainability": {
-      "method": "approved_human_rubric",
+      "method": "accepted_evidence_rubric",
       "rubric_ref": "growth-v1"
     }
   },
   "missing_submetric_policy": "renormalize_valid_weights_and_report_subcoverage",
   "minimum_submetric_coverage": "0.80",
-  "minimum_company_coverage": "0.80"
+  "minimum_company_coverage": "0.80",
+  "metric_definition_ref": "metric-definitions-v2",
+  "numeric_policy_ref": "decimal-python-v1",
+  "rubric_catalog_ref": "rubrics-standard-v1"
 }

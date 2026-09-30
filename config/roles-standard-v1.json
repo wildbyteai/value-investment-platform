@@ -1,0 +1,53 @@
+{
+  "policy_key": "rbac-standard-v1",
+  "workspace_shared_research_default": true,
+  "private_owner_objects": [
+    "note",
+    "strategy"
+  ],
+  "multiple_roles_allowed": true,
+  "roles": {
+    "viewer": [
+      "research.read",
+      "watchlist.own",
+      "notes.own"
+    ],
+    "researcher": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "notes.shared.edit",
+      "analysis.override",
+      "template.edit"
+    ],
+    "strategy_manager": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "template.edit",
+      "template.publish",
+      "strategy.edit",
+      "strategy.simulate",
+      "strategy.publish",
+      "strategy.rollback",
+      "scoring.binding.publish"
+    ],
+    "data_admin": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "source.manage",
+      "job.retry",
+      "identity.manage",
+      "quality.correct"
+    ],
+    "system_admin": [
+      "user.manage",
+      "role.assign",
+      "system.configure",
+      "model.configure",
+      "audit.read",
+      "ops.read"
+    ]
+  }
+}

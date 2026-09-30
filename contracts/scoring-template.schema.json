@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pinned base / industry / company template",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "template_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "level": {
+      "enum": [
+        "base",
+        "industry",
+        "company"
+      ]
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "all"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "industry"
+            },
+            "industry_key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "industry_key"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "company"
+            },
+            "company_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "company_id"
+          ]
+        }
+      ]
+    },
+    "parent_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "key",
+        "version",
+        "sha256"
+      ]
+    },
+    "base_config_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+          },
+          "weight": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "baseline": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "method": {
+                    "const": "weighted_metric_rubric"
+                  },
+                  "metrics": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                        },
+                        "zero_at": {
+                          "type": "string",
+                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                        },
+                        "full_at": {
+                          "type": "string",
+                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "weight",
+                        "zero_at",
+                        "full_at"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "method",
+                  "metrics"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "method": {
+                    "const": "accepted_evidence_rubric"
+                  },
+                  "rubric_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "method",
+                  "rubric_ref"
+                ]
+              }
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "dimension",
+          "reason"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "weight"
+            ]
+          },
+          {
+            "required": [
+              "baseline"
+            ]
+          },
+          {
+            "required": [
+              "disabled"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "template_key",
+    "version",
+    "level",
+    "scope",
+    "patches"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "level": {
+            "const": "base"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "base_config_ref"
+        ],
+        "not": {
+          "required": [
+            "parent_ref"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "parent_ref"
+        ],
+        "not": {
+          "required": [
+            "base_config_ref"
+          ]
+        }
+      }
+    }
+  ]
+}

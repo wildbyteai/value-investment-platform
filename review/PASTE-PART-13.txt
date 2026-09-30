@@ -1,3 +1,9 @@
+
+[PART 13/14]
+
+
+===== SOURCE: tools/validate_design.py =====
+
 #!/usr/bin/env python3
 """Offline v0.2 material checks. This does NOT execute the proposed application."""
 import copy
@@ -180,3 +186,7 @@ for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE 
 report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'8b9d9de36d197b1932c4102cc98888d224984085','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in Matter delivery evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
+
+[END PART 13/14]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

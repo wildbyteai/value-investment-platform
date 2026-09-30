@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "decision_id": "00000000-0000-4000-8000-000000000010",
+  "subject_slot": "synthetic-company:fact-01:profit_quality",
+  "subject_revision": "synthetic-impact-r1",
+  "status": "accepted",
+  "actor_kind": "AUTO",
+  "actor_id": "decision-service",
+  "policy_ref": "auto-review-standard-v1",
+  "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+  "known_at": "2026-09-30T01:00:00Z",
+  "valid_until": null,
+  "supersedes_decision_id": null,
+  "reason": "合成证据、身份、时点和已校准阈值校验通过",
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000003"
+  ]
+}

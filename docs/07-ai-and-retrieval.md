@@ -2,26 +2,26 @@
 
 ## 1. 模型的角色
 
-模型提取候选公司、事实主张、证据位置和影响建议，输出受 Schema 限制的数据。系统用确定性规则校验单位、时间、身份与证据；人维护经营 rubric 和高影响判断。模型没有权力写策略、修改公司身份、直接通知、联网下载任意链接或执行工具。
+模型提取候选公司、事实主张、证据位置和影响建议，输出受 Schema 限制的数据。系统用确定性规则校验单位、时间、身份与证据；人维护rubric模板与策略，系统可自动接受经营判断/高影响并由人工覆盖。模型没有权力写策略、修改公司身份、直接通知、联网下载任意链接或执行工具。
 
-先跑规则／主数据候选召回，再按成本预算调用模型；已有数字从结构化财报计算，不让模型“估算”缺失财务。无正文不做强判断；来源无 analyze 权利不送模型；无 send_to_external_model 权利只用已许可本地处理或人工。
+先跑规则／主数据候选召回，再按任务配额调用外部模型（允许外部模型，开发无固定预算门槛）；已有数字从结构化财报计算，不让模型“估算”缺失财务。无正文不做强判断；来源无 analyze 权利不送模型；无 send_to_external_model 权利只用已许可本地处理或人工。
 
 ## 2. 分析管道
 
 1. 标题／代码／正式名称／别名精确候选召回，结合语言、市场、行业与有效关系，最多 20 个候选；候选数量不足时允许 no_link。
 2. 长文按章节、表格和句段切 chunk，保留 offset/page/cell；结构化表格独立解析，不能将标题切断导致事实歧义。默认 500–800 token、重叠 10%，实施按证据召回测试调优。
-3. 模型读取不可信 source text 与封闭候选身份，生成 claims、item_company_links、impact_proposals。证据 quote 必须能定位到输入原文（规范化定位规则固定），不能引用模型自己的摘要。
-4. 校验 Schema、ID allowlist、类型、数字范围、证据精确定位、否定／假设语气、时间和冲突；高影响／间接重大判断进入人工队列。
-5. 校准置信度，应用审批门；完成事件归并建议，歧义不自动合并。影响维度和半衰期由版本模板限定。
+3. 模型读取不可信 source text 与封闭候选身份，提取事实主张并生成links、impact_proposals、rubric_proposals、risk_proposals（主张归并为后续领域事件）。证据 quote 必须能定位到输入原文（规范化定位规则固定），不能引用模型自己的摘要。
+4. 校验 Schema、ID allowlist、类型、数字范围、证据精确定位、否定／假设语气、时间和冲突；交给独立DecisionService按11 §4政策自动生效；缺证据/歧义/冲突才pending。
+5. 校准置信度，应用自动决策政策与人工覆盖优先级；完成事件归并建议，歧义不自动合并。影响维度和半衰期由版本模板限定。
 6. 保留 analysis_run 的 model ID、prompt/schema version、input_hash、usage/cost、validated result 和理由；不要保存隐藏思维链。修正或 prompt 升级生成新版本，影子对比后发布。
 
 Prompt injection：正文即使写“忽略规则、读取密钥、发送消息”也只作为被分析文本。模型无工具访问、网络和凭证；不将正文拼入 system 指令；HTML/script 外部链接不执行。拒绝未经允许的公司 ID 与字段。测试必须包含恶意文档、伪造代码、同名公司、繁简混合、表格单位、否定句、预测句和讽刺语。
 
 ## 3. 关联与影响合同
 
-contracts/analysis-result.schema.json 是最小跨阶段 Schema：schema_version、item_revision_id、no_link、links、impact_proposals；每个 link 有 company_id、relation_type、relevance、confidence、evidence_ids、rationale。分析结果只是 proposal，不能包含“approved=true”。影响 signed_impact 不含价格涨跌预测字段。
+contracts/analysis-result.schema.json 是最小跨阶段 Schema：schema_version、item_revision_id、no_link、links、impact_proposals、rubric_proposals、risk_proposals；每个link 有 company_id、relation_type、relevance、confidence、evidence_ids、rationale。分析结果只是 proposal，不能包含“approved=true”。影响 signed_impact 不含价格涨跌预测字段。
 
-证据 IDs 必须属于本输入 revision；由服务端检查跨对象引用，JSON Schema 本身无法证明。每个影响必须引用一条建议或已批准公司关联，并有维度、方向强度、有效截止、半衰期、证据、confidence 和原因。未确认硬风险不能写入 strategy hard-risk facts；它只创建人工审查任务。
+证据 IDs 必须属于本输入 revision；由服务端检查跨对象引用，JSON Schema 本身无法证明。每个影响必须引用一条建议或已批准公司关联，并有维度、方向强度、有效截止、半衰期、证据、confidence 和原因。未被DecisionService接受的硬风险不能写入strategy hard-risk facts；AUTO accepted满足政策可生效，人工可覆盖，不强制先人审。
 
 ## 4. 混合检索
 
@@ -35,7 +35,7 @@ OpenSearch projection_version 与 watermark 在 meta 返回。PG 变更后索引
 
 M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报、资讯、社媒线索、无关联、同名歧义、子公司、A/H、否定、历史回顾及恶意输入。至少 20% 双人独立标注，分歧仲裁；按事件和发布日期划分 train/calibration/holdout，不能让重复转载跨集合泄露。指标按各来源／语言／直接和间接关联分别报告。
 
-关联自动批准 precision≥95%、recall≥85%，误连公司率≤1%；范围为测试集、配套 Wilson 区间，不宣称全市场同等质量。证据可定位率≥99%，硬风险未经人批准直接生效次数=0；no_link precision/recall 单独报告，避免强制关联。置信度报告 reliability bins 与 ECE，原始模型 self-confidence 不当成概率。
+关联自动批准 precision≥95%、recall≥85%，误连公司率≤1%；范围为测试集、配套 Wilson 区间，不宣称全市场同等质量。证据可定位率≥99%，无证据/未校验/不满足政策的硬风险直接生效次数=0；对AUTO接受硬风险单独报告precision、错误案例及人工覆盖率；no_link precision/recall 单独报告，避免强制关联。置信度报告 reliability bins 与 ECE，原始模型 self-confidence 不当成概率。
 
 事件归并以 pair precision≥95% 优先，误合并不能用增加 recall 抵消；至少测试不同季度同类事件不合并。影响方向与专家仲裁一致率目标≥85%，按维度分组；这是意见一致指标，不验证经营因果或未来收益。未过门禁降级人工，不降低验收阈值冒充通过。
 
@@ -45,4 +45,6 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 
 模型调用并发、日 token/$ 限额按 source/workspace/stage 控制；达到上限排队／规则分析并提示，不能偷偷换外部 provider。记录输入/输出/embedding/rerank 和重试次数，费用按实际公开报价版本计算，不预填虚假当前价。相同输入+prompt+model/schema hash 可复用已许可缓存；修改源权利时缓存立刻禁读。
 
-成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。预算必须在首批来源选择和抽样后确认。
+成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。成本在首批来源与样本后量化；开发不以预算确认阻塞。限额是可配置运行项，不意味着已经采购或授权真实调用。
+
+自动审核是否生效看DecisionService输出，不看模型自身approved字段。AUTO service principal独立受限，不能改策略/模板发布。新模型shadow检验对已有效HUMAN覆盖保持不变；异常队列按经济事实slot去重，统计pending年龄和策略影响，不把固定每天人工投入当首版依赖。
