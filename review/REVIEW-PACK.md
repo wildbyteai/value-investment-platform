@@ -8,7 +8,7 @@
 
 | 文件 | SHA-256 |
 |---|---|
-| `README.md` | `64b1db8e1b1f0b9c3e14478673c561f229855e2772dce6a2f7a29ceb28aa82c9` |
+| `README.md` | `7705d832bbcd8b0eba9fbc7b05c18c769a98ee7af6beac14667a6251c201f177` |
 | `CONTEXT.md` | `e5d1504f91ebe202f1d514ee789799ae0c9542574ebd75931c953996897aee8d` |
 | `AGENTS.md` | `37b9364e8eda52e1f81b111e91e702ae058c3a2c66ab5bfa0471993720a65b6a` |
 | `docs/01-product-requirements.md` | `d1a5b3660e13423ae5c712e1d1b2d772d51eb12d11dc7580cae9fd721d79619d` |
@@ -22,6 +22,7 @@
 | `docs/09-delivery-plan.md` | `de4d37d9ff81961064369b1f2c27fb57eec07f3139ad6419052ebdc3f616dba4` |
 | `docs/10-acceptance.md` | `206bf7b62494c29ad381b4e090839d0a8cc691be1b5fdd7c9ce52eb1e4a4a8e9` |
 | `docs/adr/0001-architecture-and-truth.md` | `12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1` |
+| `research/open-source-shortlist.md` | `010e0cd633d17dcaf85fd0ca5af1b6a81e2cbbf5a75e0b099c8a719f70c16fe0` |
 | `config/scoring-standard-v1.json` | `316cce28979857ef98e6f74e3d5b1b1d8668601cac84a433678365f3f3c4c76f` |
 | `config/strategy-standard-v1.json` | `493730a89578ac94f8f391311e78b9432256493714ae164616b73ef866682cde` |
 | `contracts/README.md` | `ce775c8a35d15fa7e971ebbcea3d6d664b715f0022df5673ec74548545d1cb2b` |
@@ -31,8 +32,8 @@
 | `examples/analysis-proposal.json` | `d25a968addf37999ce43f75f4f469e12de81c99e5bc2c041009b496ecf597faa` |
 | `examples/job-event.json` | `d16ddd7b7eb29d6dcf4b2bf21df370816dc02fa7568f3f1c29a206c471bbe37c` |
 | `examples/state-machine-cases.json` | `eac51f3acbc2b821c8349b4e975a7f1ef805e6b990393d408fc107c03b9a1825` |
-| `review/GPT-PRO-PROMPT.md` | `6e2fcfbe3e29b2555a85c9088d3fe3893aef40468a463a303b4205a05d99cc13` |
-| `review/validation-result.json` | `2d5a80bd315b94ae75b1418d2f8bb06ccea0a95a61480cf42a1ed6ab6d8b5427` |
+| `review/GPT-PRO-PROMPT.md` | `902eb99f9ed0e22a4dc04f1f92893e2ff3d0bd5b3bd58b111bab9a8672994e4a` |
+| `review/validation-result.json` | `8c5cba7b91f88fbb496bca727d8bc1cff3479f4a2d0c876b9b2a4ccbf1a363ef` |
 
 
 ---
@@ -71,6 +72,7 @@
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
 | [GPT Pro 提示词](./review/GPT-PRO-PROMPT.md) | 独立审查和生成改进版的完整指令 |
 | [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
+| [开源初步候选](./research/open-source-shortlist.md) | 系统、策略及数据框架；已观察许可边界，尚未选型 |
 | [不附文件的使用方式](./review/PASTE-INSTRUCTIONS.md) | 私有 GitHub 直读提示词、完整正文及分段复制入口 |
 
 ## 当前授权与状态
@@ -953,6 +955,58 @@ T-UX-01、02、03 的用户任务与指标以 06 §7 为唯一详细定义。模
 公司经营评分属于 company，价格与估值属于 security；A/H 共用经营事实并分开策略评估。历史记录采用业务有效时间与系统知悉时间，避免重放使用后来才公布的事实。初期不是完整 event sourcing；保存不可变业务修订和必要审计即可。
 
 OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
+
+
+---
+
+# 文件：research/open-source-shortlist.md
+
+# 开源框架初步候选与复用方向
+
+核查日期：2026-09-30。此页为本次只读调研的派生判断与导航，不保存第三方原文／代码；各来源以官方链接回查。已读官方GitHub仓库元数据和README；RQAlpha另外读取当前LICENSE。不是生产选型、兼容测试或法律结论，没有安装或运行候选项目。
+
+用户新增偏好：尽量寻找并复用成熟开源系统框架与策略框架。首期仍以完整研究流程、管理／业务两端、可维护规则和工程质量为目标，维持A股与港股范围，不新增交易执行需求。
+
+## 1. 系统侧
+
+| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
+|---|---|---|---|
+| [FastAPI Full Stack Template](https://github.com/fastapi/full-stack-fastapi-template) · [README](https://github.com/fastapi/full-stack-fastapi-template/blob/master/README.md) | MIT | FastAPI、React、PostgreSQL、生成客户端、Playwright、pytest、Compose与CI脚手架 | 优先评估工程起点；SQLModel vs 现有SQLAlchemy、JWT vs OIDC、部署与同域结构须作显式取舍，不直接继承未经审查的权限模型 |
+| [Refine Core](https://github.com/refinedev/refine) · [README](https://github.com/refinedev/refine/blob/main/README.md) | MIT（核心） | headless React CRUD、认证／权限provider、路由、网络与状态接口 | 优先评估管理端能力与复用hooks；研究业务端保持自己的任务流程与设计系统，避免和模板已有路由／数据状态体系重复 |
+| [Scrapy](https://github.com/scrapy/scrapy) · [README](https://github.com/scrapy/scrapy/blob/master/README.rst) | BSD-3-Clause | 网站结构化数据提取框架 | 有采集许可时作为SourceAdapter；API源不强行走网页爬虫；系统ledger、快照与outbox仍由应用维护 |
+| [Prefect](https://github.com/PrefectHQ/prefect) · [README](https://github.com/PrefectHQ/prefect/blob/main/README.md) | Apache-2.0（核心） | Python数据pipeline与工作流编排；另有Cloud服务 | 和Celery基线对照，按实际长流程/恢复需求择一；评估自托管与付费能力边界，不以编排替代领域事务和通知幂等 |
+
+## 2. 策略、研究与数据侧
+
+| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
+|---|---|---|---|
+| [Qlib](https://github.com/microsoft/qlib) · [README](https://github.com/microsoft/qlib/blob/main/README.md) | MIT | 数据处理、研究workflow、模型、回测与评价工具 | 比较基础因子/研究接口与离线评估；机器学习、RL、自动研发不是本项目首期要求；A/H及point-in-time财务口径尚未核实 |
+| [LEAN](https://github.com/QuantConnect/Lean) · [README](https://github.com/QuantConnect/Lean/blob/master/readme.md) | Apache-2.0 | 事件驱动算法研究／交易引擎 | 比较证券/基本面/筛选与回放接口，不启用实盘交易；C#核心与Python服务集成、数据成本和A/H适配待验证 |
+| [RQAlpha](https://github.com/ricequant/rqalpha) · [LICENSE](https://github.com/ricequant/rqalpha/blob/master/LICENSE) · [README](https://github.com/ricequant/rqalpha/blob/master/README.rst) | 自定义限制，API为NOASSERTION | 可扩展Python回测／算法交易框架；README明确限非商业使用 | **许可未解决前不列为生产可直接复用候选**。当前LICENSE对非商业使用采用Apache2.0条件，商业使用须授权，法人／组织使用定义也受限制；不能简写为Apache2.0无限制。不会替用户联系授权方 |
+| [AKShare](https://github.com/akfamily/akshare) · [README/Statement](https://github.com/akfamily/akshare/blob/main/README.md) | MIT（代码） | 财经数据接口库，README说明接口可能撤销 | 作为接口与数据结构调研候选；README声明数据仅用于学术研究，代码许可不代表上游数据商用/存储/再分发权。生产先核实具体数据来源和权利，不能承诺数据可用性 |
+
+\*除RQAlpha读取LICENSE全文外，其余此处为GitHubAPI识别许可证及已读README，未审查完整依赖、插件、数据许可或商标；GPT Pro需回查精确tag/commit的许可文件，实施前做SBOM和许可核查。
+
+## 3. 维护观察及证据限度
+
+| 仓库 | 查询时默认分支 | 查询时pushed_at（UTC） | archived |
+|---|---|---|---|
+| fastapi/full-stack-fastapi-template | master | 2026-09-18T17:40:40Z | false |
+| refinedev/refine | main | 2026-09-10T12:56:35Z | false |
+| scrapy/scrapy | master | 2026-09-28T15:30:00Z | false |
+| PrefectHQ/prefect | main | 2026-09-30T03:12:13Z | false |
+| microsoft/qlib | main | 2026-09-22T05:57:23Z | false |
+| QuantConnect/Lean | master | 2026-09-29T21:10:46Z | false |
+| ricequant/rqalpha | master | 2026-09-28T03:17:24Z | false |
+| akfamily/akshare | main | 2026-09-30T06:31:13Z | false |
+
+以上仅证明当时未归档和有push记录，不能证明发布稳定、问题响应及时、安全或符合本项目SLO。未审查完整release/issue/security历史、代码接口、真实市场数据、point-in-time输入或端到端集成。候选发现不是PoC通过。
+
+## 4. 下一步选型合同
+
+先以v0.1最少依赖方案为对照，比较“直接复用/适配器复用/只参考/不采用”。系统优先评估全栈模板与管理端hooks，策略框架优先评估离线研究或基础指标适配，不成为实时状态第二真源。核心公司身份、双时间、事件去重、证据、人工版本、质量门、策略状态和通知事务仍需明确领域设计；框架不能自动提供这些正确性。
+
+最终矩阵必须记录revision、来源、许可证、维护证据、自托管/收费边界、A/H与单位/币种/股本/TTM/修订语义、集成与替换成本、最小验证以及R/W/T影响。推荐后由用户确定实施范围；本次不fork、安装、导入第三方代码或切换运行架构。
 
 
 ---
@@ -1918,7 +1972,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…10 的全部文件、docs/adr/0001-architecture-and-truth.md、config/ 的两份配置、contracts/ 的说明及三份 Schema、examples/ 的三份合成例子。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…10 的全部文件、docs/adr/0001-architecture-and-truth.md、config/ 的两份配置、contracts/ 的说明及三份 Schema、examples/ 的三份合成例子，以及 research/open-source-shortlist.md 的候选与已观察限制。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
 
@@ -1954,6 +2008,24 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 
 可以使用公开资料核实技术或金融口径，但不得外传本材料到其他公共服务，不得假装读取真实账号或数据库，不得自动创建仓库、部署或发送消息。禁止编造收益、数据质量、压测、模型性能或 UI 验收结果。v0.2 必须区分：已确认需求、保留的设计决策、你的改动提案、需要我决定的业务项、尚未实现/验证项。
 
+### 开源框架与策略复用（新增重点）
+
+请主动寻找并比较成熟开源项目，优先复用已有能力，分别考察系统工程框架和策略／研究框架。仓库已有 `research/open-source-shortlist.md` 作为初步候选，不是选型结论。请读取候选当前 README、官方文档、LICENSE 和必要代码／接口，允许发现更合适的替代；不能只根据 star 数或项目名称推荐。
+
+系统侧覆盖：全栈工程脚手架、管理端／业务端前端框架、设计系统、采集与数据接入、工作流／调度、检索和实体关联、人审与审计等本项目确实需要的能力。可从 FastAPI Full Stack Template、Refine、Scrapy、Prefect，以及现有 v0.1 使用的框架开始比较，不要求全部采用。同类框架优先择一，避免重叠路由、状态、认证或调度体系。
+
+策略侧覆盖：基本面因子与筛选、指标计算、规则表达式、研究验证与历史回放；在有价值时参考 Qlib、LEAN 等开源研究／回测框架和标准策略样例。区分“规则计算与筛选”“回测与研究”“交易执行”：首版不接交易；回测不是已确认必交付功能，策略框架可以是隔离的研究适配器，不能成为实时状态与告警的第二个真源。
+
+具体要求：
+
+1. 先列本项目已有模块与可复用能力，再对有真实价值的候选比较，优先成熟、文档清楚、许可证兼容、可自行部署和可替换的方案。
+2. 每个候选记录官方仓库／文档、检查日期、检查 revision 或版本、实际维护证据、许可证及商业使用／分发限制、免费开源与付费服务边界、依赖与部署成本、A股/港股及财务时点适配、与现有技术栈的兼容和缺口。缺少证据明确未核实，近期push和高star不能单独证明质量。
+3. 分别判断：直接复用／通过适配器复用／仅参考设计／暂不采用；给出具体复用范围、自研范围、集成方式、数据流、退出成本和最小验证方法。
+4. 优先评估哪些标准基本面指标或因子可直接复用，哪些价值筛选样例可作为初始规则模板。核对单位、股本、币种、TTM、累计报表、缺失、不适用行业和point-in-time语义；不把回测样例当盈利证据，不为了框架示例改成择时或高频交易系统。
+5. 代码开源不代表数据可自由采集、商用、外传或再分发；行情／财务数据授权、云平台收费、插件和样例数据许可证单独核查。尤其回查 RQAlpha 当前商业限制和 AKShare 数据用途声明，不将二者当成无条件生产依赖。
+6. 提供“以现有v0.1为基线的最少依赖方案”和“开源复用后的推荐方案”的对照，说明节省什么工作、增加什么约束、影响哪些需求／接口／数据／UX／验收；若现有基础库已经够用，不强行新增完整平台。
+7. 将推荐方案融入完整v0.2、实施计划和验收，而不是只附一页项目名单。重要维护或许可问题按实际影响分级；未验证能力和未获得授权的数据不能写成已落实。
+
 ### 必须产出的结果
 
 A. 评审结论：是否可进入实施；按阻断/重要/建议给出问题清单。每个问题包含源文件与章节、具体反例、后果、修复方案与对应 R/W/T ID。无证据的担忧不要升级阻断。区分当前阶段设计缺口与将来实施验证，不用“产品还没实现”否定本次设计交付。
@@ -1970,6 +2042,8 @@ F. 不超过 8 个必须由我决定的问题，每题给推荐选择和业务�
 
 G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影响哪些合同/测试、保留什么、仍未验证什么。评审阶段不授权实施，技术提案不得伪装为我的已确认决定。
 
+H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候选来源、许可证与版本、维护证据、适配与缺口、复用决策和验证计划。给出最终推荐组合、明确自研范围、替换与退出办法，以及对v0.1技术栈和交付的变更影响。推荐是提案，不构成实施授权。
+
 请先给关键判断，然后给完整结果。优先具体、可实施和可验证，避免空泛愿景和重复免责声明。如果发现 v0.1 有正确且足够的设计，保留并简要说明；只有带来明显业务或工程价值时才增加复杂度。
 
 
@@ -1983,7 +2057,7 @@ G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影�
   "design_date": "2026-09-30",
   "status": "passed",
   "scope": "Offline material syntax, references, bounded semantic/config and synthetic expected-result checks",
-  "check_count": 182,
+  "check_count": 184,
   "checks": [
     "JSON syntax: config/scoring-standard-v1.json",
     "JSON syntax: config/strategy-standard-v1.json",
@@ -2009,6 +2083,7 @@ G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影�
     "Local link: README.md -> ./contracts/README.md",
     "Local link: README.md -> ./review/GPT-PRO-PROMPT.md",
     "Local link: README.md -> ./review/REVIEW-PACK.md",
+    "Local link: README.md -> ./research/open-source-shortlist.md",
     "Local link: README.md -> ./review/PASTE-INSTRUCTIONS.md",
     "Local link: contracts/README.md -> ./strategy.schema.json",
     "Local link: contracts/README.md -> ./analysis-result.schema.json",
@@ -2156,6 +2231,7 @@ G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影�
     "Targeted credential-pattern scan: examples/analysis-proposal.json",
     "Targeted credential-pattern scan: examples/job-event.json",
     "Targeted credential-pattern scan: examples/state-machine-cases.json",
+    "Targeted credential-pattern scan: research/open-source-shortlist.md",
     "Targeted credential-pattern scan: review/GPT-PRO-PROMPT.md",
     "Targeted credential-pattern scan: review/PASTE-ALL.txt",
     "Targeted credential-pattern scan: review/PASTE-INSTRUCTIONS.md",
@@ -2172,7 +2248,7 @@ G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影�
     ".gitignore": "1763786ceb274eb8108e57ddad59f1dfbbc388a2330d35dc69a7b6a5b39a09f5",
     "AGENTS.md": "37b9364e8eda52e1f81b111e91e702ae058c3a2c66ab5bfa0471993720a65b6a",
     "CONTEXT.md": "e5d1504f91ebe202f1d514ee789799ae0c9542574ebd75931c953996897aee8d",
-    "README.md": "64b1db8e1b1f0b9c3e14478673c561f229855e2772dce6a2f7a29ceb28aa82c9",
+    "README.md": "7705d832bbcd8b0eba9fbc7b05c18c769a98ee7af6beac14667a6251c201f177",
     "config/scoring-standard-v1.json": "316cce28979857ef98e6f74e3d5b1b1d8668601cac84a433678365f3f3c4c76f",
     "config/strategy-standard-v1.json": "493730a89578ac94f8f391311e78b9432256493714ae164616b73ef866682cde",
     "contracts/README.md": "ce775c8a35d15fa7e971ebbcea3d6d664b715f0022df5673ec74548545d1cb2b",
@@ -2193,16 +2269,17 @@ G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影�
     "examples/analysis-proposal.json": "d25a968addf37999ce43f75f4f469e12de81c99e5bc2c041009b496ecf597faa",
     "examples/job-event.json": "d16ddd7b7eb29d6dcf4b2bf21df370816dc02fa7568f3f1c29a206c471bbe37c",
     "examples/state-machine-cases.json": "eac51f3acbc2b821c8349b4e975a7f1ef805e6b990393d408fc107c03b9a1825",
-    "review/GPT-PRO-PROMPT.md": "6e2fcfbe3e29b2555a85c9088d3fe3893aef40468a463a303b4205a05d99cc13",
-    "review/PASTE-ALL.txt": "3677ea64b041eafa232f25af2a32b60bf003e08d1e3c5a8f2ef9d2d288e128db",
-    "review/PASTE-INSTRUCTIONS.md": "812078dbeb3bcd80d1ff4973492dd86c8bae7fdacc197ca58d575a706ca63a16",
-    "review/PASTE-PART-01.txt": "fc3f3350298d28dadd6d9d1b27d0458ff386b8809db28889f9299981a3ac8969",
+    "research/open-source-shortlist.md": "010e0cd633d17dcaf85fd0ca5af1b6a81e2cbbf5a75e0b099c8a719f70c16fe0",
+    "review/GPT-PRO-PROMPT.md": "902eb99f9ed0e22a4dc04f1f92893e2ff3d0bd5b3bd58b111bab9a8672994e4a",
+    "review/PASTE-ALL.txt": "4335a9e576f2dd0774eec9579a37ca7e8bfbced910617d6b9b06b58ea150ee99",
+    "review/PASTE-INSTRUCTIONS.md": "dc83e6218ede58c0b5c2733e9fe47ccb1f091abeb9ea5415254e4611973bfc8b",
+    "review/PASTE-PART-01.txt": "74f5f2826bb13b398c3cd06a6d9e8cdc01b44f4653cc7d51a82422dfdda5c06e",
     "review/PASTE-PART-02.txt": "d1d2546538df7e70c75037753b25474f34420f29b82e25186e5beb9a48cd78b7",
     "review/PASTE-PART-03.txt": "2a37af939287617afb623bae9f4efb9748b01d476994b20882468eca7e76a515",
-    "review/PASTE-PART-04.txt": "7163c29d0569fcd785a8568e53b1631938d8801481da3b6d08afb271a54c0cd3",
-    "review/PASTE-PART-05.txt": "59268ccb27931f0dc746eb31bf23821f96cc63cb1200e9dea4ca20386887b07a",
+    "review/PASTE-PART-04.txt": "05ff33cbc4b830676566d2b5b1804f4bf737026fee7640f28f6d51f301a19ccb",
+    "review/PASTE-PART-05.txt": "8a39d480acd48157349cf3d3975ec8b2815cc757cf3ab60b1f215a4e6cee314e",
     "review/PASTE-PART-06.txt": "f315ddbd30ace60d647a80eb77a555eb440845fa167b0032c80e122a9f1ed2da",
-    "tools/build_review_pack.py": "a911fc0baf1c83a7266ff6c943f9f67c3d9af485c7215961fd9c4fd7d03e97c0",
+    "tools/build_review_pack.py": "3352ae016bae1659b965451ae40cfc5c97cb092ef3ddabed823c9707c6fddcd0",
     "tools/validate_design.py": "801df9f4286a86b9fe75185397c86f4523e737bfe2acda9816bce26b23e726c1"
   },
   "not_run": [

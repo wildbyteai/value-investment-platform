@@ -4,7 +4,7 @@ import hashlib
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
-for pattern in ["docs/*.md", "docs/adr/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json"]:
+for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json"]:
     paths.extend(sorted(ROOT.glob(pattern)))
 paths.append(ROOT / "review/GPT-PRO-PROMPT.md")
 if (ROOT / "review/validation-result.json").exists():
@@ -60,6 +60,6 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
 
-""" + "\n".join(links) + "\n\n这是同一 v0.1 的传递方式变化，未改变业务或工程设计。纯文本完整覆盖 README、领域词汇、实现规则、10份设计、ADR、2份配置、合同说明与3份Schema、3份合成例子；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+""" + "\n".join(links) + "\n\n这是同一 v0.1 的传递方式变化，未改变业务或工程设计。纯文本完整覆盖 README、领域词汇、实现规则、10份设计、ADR、开源候选调研、2份配置、合同说明与3份Schema、3份合成例子；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
 (ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
 print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")

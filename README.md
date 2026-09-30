@@ -30,6 +30,7 @@
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
 | [GPT Pro 提示词](./review/GPT-PRO-PROMPT.md) | 独立审查和生成改进版的完整指令 |
 | [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
+| [开源初步候选](./research/open-source-shortlist.md) | 系统、策略及数据框架；已观察许可边界，尚未选型 |
 | [不附文件的使用方式](./review/PASTE-INSTRUCTIONS.md) | 私有 GitHub 直读提示词、完整正文及分段复制入口 |
 
 ## 当前授权与状态

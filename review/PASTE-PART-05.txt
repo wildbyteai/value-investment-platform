@@ -2,6 +2,98 @@
 [PART 5/6]
 
 
+===== SOURCE: config/scoring-standard-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "model_key": "scoring-standard-v1",
+  "version": 1,
+  "dimension_weights": {
+    "profit_quality": "0.25",
+    "financial_resilience": "0.25",
+    "business_model": "0.25",
+    "governance": "0.15",
+    "growth_sustainability": "0.10"
+  },
+  "event_contribution": {
+    "scale": "10",
+    "cap_per_dimension": "15",
+    "half_life_calendar_days": {
+      "profit_quality": 90,
+      "financial_resilience": 90,
+      "business_model": 180,
+      "governance": 180,
+      "growth_sustainability": 30
+    },
+    "accepted_evidence_only": true,
+    "absorbed_events_excluded": true
+  },
+  "valuation": {
+    "metric": "pe_ttm",
+    "full_score_at": "10",
+    "zero_score_at": "25",
+    "invalid_if_nonpositive": true
+  },
+  "baselines": {
+    "profit_quality": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "roe_ttm",
+          "weight": "0.4",
+          "zero_at": "0.05",
+          "full_at": "0.20"
+        },
+        {
+          "key": "cfo_profit_3y",
+          "weight": "0.4",
+          "zero_at": "0.5",
+          "full_at": "1.2"
+        },
+        {
+          "key": "positive_cfo_year_share_3y",
+          "weight": "0.2",
+          "zero_at": "0",
+          "full_at": "1"
+        }
+      ]
+    },
+    "financial_resilience": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "net_debt_ebitda",
+          "weight": "0.6",
+          "zero_at": "4",
+          "full_at": "0"
+        },
+        {
+          "key": "interest_coverage",
+          "weight": "0.4",
+          "zero_at": "1",
+          "full_at": "8"
+        }
+      ]
+    },
+    "business_model": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "business-model-v1"
+    },
+    "governance": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "governance-v1"
+    },
+    "growth_sustainability": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "growth-v1"
+    }
+  },
+  "missing_submetric_policy": "renormalize_valid_weights_and_report_subcoverage",
+  "minimum_submetric_coverage": "0.80",
+  "minimum_company_coverage": "0.80"
+}
+
+
 ===== SOURCE: config/strategy-standard-v1.json =====
 
 {
