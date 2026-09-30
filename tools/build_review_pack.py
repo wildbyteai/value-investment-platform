@@ -3,7 +3,7 @@
 import hashlib
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-paths = [ROOT / "README.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
+paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
     paths.extend(sorted(ROOT.glob(pattern)))
 paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])

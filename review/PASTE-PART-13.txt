@@ -33,7 +33,7 @@ for pattern in ['config/*.json','contracts/*.json','examples/*.json']:
     for p in sorted(ROOT.glob(pattern)):
         json.loads(p.read_text());check(True,f'JSON syntax: {p.relative_to(ROOT)}')
 for p in sorted(ROOT.rglob('*.md')):
-    if p.name=='REVIEW-PACK.md' or '.git' in p.parts:continue
+    if p.name=='REVIEW-PACK.md' or '.git' in p.parts or 'local-evidence' in p.parts:continue
     for dest in re.findall(r'(?<!!)\[[^\]]+\]\(([^\s)]+)\)',p.read_text()):
         if '://' in dest or dest.startswith('#'):continue
         target=unquote(dest.split('#')[0]);check((p.parent/target).exists(),f'Local link: {p.relative_to(ROOT)} -> {target}')
@@ -180,10 +180,10 @@ for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.m
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
-report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'8b9d9de36d197b1932c4102cc98888d224984085','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in Matter delivery evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'77524649dae91a1d38df5fb93d5b47884e5c86a7','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
 

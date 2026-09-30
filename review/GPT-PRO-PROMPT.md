@@ -15,9 +15,13 @@
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读PROJECT.md、README.md与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
+
+### 独立项目与本轮顺序
+
+项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。
 
 ### 我的目标与已确认范围
 

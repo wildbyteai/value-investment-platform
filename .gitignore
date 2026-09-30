@@ -11,3 +11,6 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+
+# 本机迁移与历史事项证据（持久保留，不是可自动删除的缓存）
+local-evidence/

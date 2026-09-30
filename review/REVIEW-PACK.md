@@ -8,9 +8,10 @@
 
 | 文件 | SHA-256 |
 |---|---|
-| `README.md` | `a01095ecc1f1b5ad674b502a5bebe7e12512db6c74f400edf8a4e70cdca569ef` |
+| `README.md` | `977fc96cfefb2737f496bd40152ea7e66702a94284c324b6388fad692c956128` |
+| `PROJECT.md` | `fddbe02b485625e577965d1f4f850630254d0208bc6ddea3306e0a29ef915a0b` |
 | `CONTEXT.md` | `0c6d164424ccc9184c66d88c2af2077e06d86444825e8940b241c2d4943db861` |
-| `AGENTS.md` | `1f724380063649968b06b590e877ec4bc7c4483a2878bfa3aa1f7a1e82d390f9` |
+| `AGENTS.md` | `8819d3a99665276a44b150439acee8852bccbfd97723db6ead3a9c0d3717c3ca` |
 | `docs/01-product-requirements.md` | `cb85a2b066a818e07c36bd2464f8317e4bf61f71c6f025f8af136297b011c322` |
 | `docs/02-business-design.md` | `5752b1fa3f6f574a9d218b6cee996966f83d718b01853d78a51616adcf2b18b6` |
 | `docs/03-architecture.md` | `426255db88215f35ada8c11f13c49bc19757102703c363ff1602bb1d184f32c9` |
@@ -26,6 +27,7 @@
 | `docs/13-first-slice.md` | `f52dd59535ad55964edbbe9ae0a4f07179d0154ec17bc129bf63e6f20d56908a` |
 | `docs/adr/0001-architecture-and-truth.md` | `12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1` |
 | `docs/adr/0002-v02-confirmed-scope.md` | `134096110f0001c303549952ee39c1ef3d6aedc21affbc11a44fc8e6391b36f4` |
+| `docs/adr/0003-independent-project.md` | `241b8b464274ab2039d9ee7d6180db5d54c905cab842013286e4017021a9ddf6` |
 | `research/open-source-shortlist.md` | `010e0cd633d17dcaf85fd0ca5af1b6a81e2cbbf5a75e0b099c8a719f70c16fe0` |
 | `research/second-review.md` | `0e047782fc9850966545482db258af67f3e99cd55c46ae7afe5f0ff368c7076c` |
 | `config/auto-review-policy-v1.json` | `4a350149c468d9cd5886d0d4e722ecc85db623e44cd158ccbaba01dfd3cf33cb` |
@@ -49,12 +51,12 @@
 | `examples/job-event.json` | `b7123ee7ff0cbfd4b7ee7f2d0223dce56b418e0c84ee718df626177f6b288970` |
 | `examples/state-machine-cases.json` | `9b8497164132a60b1f21fa879658854f4ff3c160e430859dde091501bdd49453` |
 | `examples/v02-boundary-cases.json` | `fc965037233a77ff28b5424a0fb18d99db5f7e9c0e974ab01e748d51240be268` |
-| `tools/build_review_pack.py` | `7488e86c07dcb27143bf0cff963adaa1562d82a232a56ddad68afde2a9d71e06` |
+| `tools/build_review_pack.py` | `f10c0c84b2c2a378359f10ae21f53c21ca0d28a36705c7606f8c1ff876d0e5a0` |
 | `tools/material_schema.py` | `f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a` |
-| `tools/validate_design.py` | `973db474cb84dd256bb2f4216022542882b40c3ad0796532b5fcdb0620ce3ac7` |
-| `review/GPT-PRO-PROMPT.md` | `15c832d4bfe230ccc7e63ecbd8044f27398dbe5c5685a4c05bf7c8865cc632c2` |
+| `tools/validate_design.py` | `6b2299e8e84ef61ed3ea695a5a8c34eafef4e38b77e9f7940a13255910106306` |
+| `review/GPT-PRO-PROMPT.md` | `8c8c115b2a3d776753a23f0d4832a5becae178f077af40c7f0d6f69706f6ccd8` |
 | `review/V02-CHANGELOG.md` | `2a09c862a2a27be6916dde8c0640c0395d3da8c3438fb6626212c72931449c74` |
-| `review/validation-result.json` | `36a3193249609dabcdb94cb8485718f2e147d18c6cb0649a2ea9194104cee4df` |
+| `review/validation-result.json` | `8240109cc0c7c603dd4e1951d4a9ee9040368828370cdd78bcfe02e2858245a5` |
 
 
 ---
@@ -66,6 +68,10 @@
 > 设计基线 v0.2 · 2026-09-30 · A 股与港股 · 用户范围已确认，工程设计待实施验证
 
 从定时采集到公司研究、可解释评分、策略筛选及状态提醒的一套系统。优先建立可信、可恢复、可维护的流程和工程基础；价投规则提供可替换的标准版本，不承诺预测或收益。本仓库当前交付设计与可检查合同，不含可运行产品。
+
+## 独立项目入口
+
+项目已独立于BYTEWATCHER，项目根目录直接管理Git、设计和后续开发。[PROJECT.md](./PROJECT.md)负责阶段与管理入口，[AGENTS.md](./AGENTS.md)负责执行规则；原BW-0051仅保留历史迁移指向。
 
 ## 用户路径
 
@@ -119,6 +125,55 @@ python3 tools/build_review_pack.py
 本v0.2由当前会话按用户已确认范围独立修订，使用Pro共享页可见评审正文与第二轮研究；未获取其完整60文件包。旧v0.1可在Git历史`8b9d9de36d197b1932c4102cc98888d224984085`查看。config文件名中的v1表示第一套标准配置，不表示设计仍为v0.1；当前配置Schema已升级2.0，指标定义另有v2引用，未曾发布运行产品。
 
 合同新增评分配置、分层模板与审核决策Schema。材料工具包含形状/引用/语义与反例检查，仍不是完整draft-2020-12实现或应用状态机测试。
+
+独立迁移不改变v0.2业务/财务/策略合同；历史交付材料在本机local-evidence中保留，设计历史仍可通过原Git提交读取。迁移决策见[ADR-0003](./docs/adr/0003-independent-project.md)。
+
+
+---
+
+# 文件：PROJECT.md
+
+# 独立项目管理入口
+
+项目：value-investment-platform（价值投资策略管理系统）。项目标识不使用Matter ID。
+
+## 项目归属与阶段
+
+本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
+
+当前阶段：v0.2设计基线的第二轮业务与工程评审；产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+
+## 权威文件与管理方式
+
+| 内容 | 唯一权威位置 |
+|---|---|
+| 导航与交付说明 | [README](./README.md) |
+| 项目执行与边界 | [AGENTS](./AGENTS.md) |
+| 已确认业务选择、模板/自动审核/角色 | [11](./docs/11-templates-automation-and-roles.md) |
+| 业务需求与设计 | [01](./docs/01-product-requirements.md)、[02](./docs/02-business-design.md) |
+| 工程架构、数据、API、UX、AI、运维 | docs/03…08 |
+| 实施任务和首个切片 | [09](./docs/09-delivery-plan.md)、[13](./docs/13-first-slice.md) |
+| 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
+| 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md |
+| 机器配置与合同 | config/、contracts/；文档引用，不复制数值真源 |
+| 评审交接 | [GPT Pro完整提示词](./review/GPT-PRO-PROMPT.md)、review/REVIEW-PACK.md |
+| 本机历史与迁移证据 | local-evidence/，忽略Git并持久保留 |
+
+日常工作直接在本项目创建分支、编写设计、执行已授权任务和记录证据，不再创建BYTEWATCHER Matter或依赖其registry/SOURCE_OF_TRUTH。代码开发分支默认codex/前缀，当前文档阶段在main提交；保留完整Git历史与原remote。
+
+每个开发切片引用既有R/W/T和输入manifest，说明正常/失败/权限/恢复预期。设计、已实现与已验证分开记录。依赖或合同变化写ADR/变更账本，不以报告替代代码或验收事实。
+
+## 已确认能力与推进顺序
+
+多人五角色RBAC；通用基础/行业/企业定制评分；自动判断符合政策即生效、人工有效覆盖优先；外部模型接入；开发不设固定成本上限；管理与业务端统一体验；通知后置，策略变化先完整记录。A/H基本资料可查，首批50–100家完整监控是试运行范围。
+
+先完成设计评审，再按单独实施授权推进W-08合成全流程，随后单个获许可真实源→多源/检索→真实评分/策略→运行验收。技术大多有成熟方案，阶段划分按依赖和验证安排，不能因技术实现难度删减已确认需求。
+
+## 历史证据与外部动作
+
+原事项README、matter.yaml和各交付/回读文件完整保存在local-evidence/bytewatcher-origin；本机路径与迁移manifest位于local-evidence/migration，不提交GitHub。历史原文不覆写，其旧相对路径与阶段描述按当时commit解释，当前项目内容从Git历史读取。
+
+GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评审材料；真实业务资料、凭证和私人日志不上传。本轮迁移/评审未授权部署、采购、真实采集、真实模型调用、通知或交易。评审报告提出修改时仍区分建议与已采纳合同。
 
 
 ---
@@ -180,7 +235,9 @@ python3 tools/build_review_pack.py
 
 # 文件：AGENTS.md
 
-# 价值投资系统实现协作规则
+# 价值投资系统独立项目执行规则
+
+本项目独立管理，不再属于BYTEWATCHER事项；先读PROJECT.md和README.md，不再按Matter路由、registry分配或内容生产/DBS流程执行。
 
 本仓库当前是 v0.2 设计基线（范围已确认，产品未实现）。先读 README、CONTEXT、与任务对应的 docs、contracts 和验收矩阵；未经用户授权不把设计任务扩大为部署、真实采集、模型外传、真实告警或交易。用户 scope 优先，技术细节可在已授权 slice 内自主决定。
 
@@ -197,6 +254,8 @@ python3 tools/build_review_pack.py
 任务完成后更新本次影响的文档与验证证据；需要改变合同或阶段范围时先说明原因、风险和受影响对象。
 
 当前边界以docs/11为准：多人RBAC、base/industry/company模板、允许外部模型接入、开发无固定预算门槛；通知后置，首版以membership_transition与固定解释为变化记录，不实现收件人/渠道。时点/数值/纠错以docs/12为准，首slice见13；不要以技术复杂为由收窄已确认能力。
+
+历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
 
 
 ---
@@ -1264,6 +1323,21 @@ OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可
 开源复用：优先FastAPI全栈模板的工程基座；Refine保留管理端薄适配候选，Prefect保留替换Celery的候选，二者不能凭“已有TanStack/Celery”排除。实际采用须通过W-08的最小验证；不叠加两套同职能调度器。Qlib/LEAN仅隔离研究，FinanceToolkit公式对照，Scrapy只用于获许可HTML来源。许可核查不能替代数据权利。没有安装这些项目。
 
 本次独立编写v0.2，输入为旧仓库、Pro共享页可见正文与第二轮研究。未获取Pro声称的完整60文件包，不能说已合并其完整版本。设计修订不授权开发、真实接入或部署；已有GitHub授权仅覆盖新生成设计/合成材料。
+
+
+---
+
+# 文件：docs/adr/0003-independent-project.md
+
+# 独立项目迁移
+
+日期：2026-09-30。状态：用户明确授权并完成。项目由BYTEWATCHER的BW-0051迁出，成为与其同级的独立项目；项目根目录就是Git根目录。
+
+完整移动原独立checkout与.git，保留main、commit历史和wildbyteai/value-investment-platform remote，不创建另一份Git真源。原事项只留metadata与迁移指向，保留registry历史分配，ID不回收。事项关闭只表示移交完成，不表示产品开发完成。
+
+本项目由PROJECT.md/README/AGENTS管理，不再依赖BYTEWATCHER事项路由、知识库控制面或内容生产流程。原事项元数据与本机迁移manifest放local-evidence并忽略Git，精确hash核对后持久保留。GitHub仓库保持原私有可见性，未改变真实数据/部署权限。
+
+本次只改项目结构、入口与交接，业务、配置和关键Schema不因迁移改变。设计仍v0.2；先冻结迁移后的Git revision，再进行第二轮业务/工程复审与GPT Pro交接，评审建议不自动改业务合同。
 
 
 ---
@@ -3863,7 +3937,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 import hashlib
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-paths = [ROOT / "README.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
+paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
     paths.extend(sorted(ROOT.glob(pattern)))
 paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])
@@ -4084,7 +4158,7 @@ for pattern in ['config/*.json','contracts/*.json','examples/*.json']:
     for p in sorted(ROOT.glob(pattern)):
         json.loads(p.read_text());check(True,f'JSON syntax: {p.relative_to(ROOT)}')
 for p in sorted(ROOT.rglob('*.md')):
-    if p.name=='REVIEW-PACK.md' or '.git' in p.parts:continue
+    if p.name=='REVIEW-PACK.md' or '.git' in p.parts or 'local-evidence' in p.parts:continue
     for dest in re.findall(r'(?<!!)\[[^\]]+\]\(([^\s)]+)\)',p.read_text()):
         if '://' in dest or dest.startswith('#'):continue
         target=unquote(dest.split('#')[0]);check((p.parent/target).exists(),f'Local link: {p.relative_to(ROOT)} -> {target}')
@@ -4231,10 +4305,10 @@ for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.m
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
-report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'8b9d9de36d197b1932c4102cc98888d224984085','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in Matter delivery evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'77524649dae91a1d38df5fb93d5b47884e5c86a7','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
 
@@ -4260,9 +4334,13 @@ print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读PROJECT.md、README.md与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
+
+### 独立项目与本轮顺序
+
+项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。
 
 ### 我的目标与已确认范围
 
@@ -4404,12 +4482,12 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
 {
   "design_version": "0.2",
   "design_date": "2026-09-30",
-  "executed_at": "2026-09-30T14:36:36.615334+00:00",
-  "base_commit": "8b9d9de36d197b1932c4102cc98888d224984085",
-  "revision_binding": "source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in Matter delivery evidence",
+  "executed_at": "2026-09-30T15:01:50.162700+00:00",
+  "base_commit": "77524649dae91a1d38df5fb93d5b47884e5c86a7",
+  "revision_binding": "source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence",
   "status": "passed",
   "scope": "Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance",
-  "check_count": 298,
+  "check_count": 314,
   "checks": [
     "JSON syntax: config/auto-review-policy-v1.json",
     "JSON syntax: config/metric-definitions-v2.json",
@@ -4431,6 +4509,17 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "JSON syntax: examples/job-event.json",
     "JSON syntax: examples/state-machine-cases.json",
     "JSON syntax: examples/v02-boundary-cases.json",
+    "Local link: PROJECT.md -> ./README.md",
+    "Local link: PROJECT.md -> ./AGENTS.md",
+    "Local link: PROJECT.md -> ./docs/11-templates-automation-and-roles.md",
+    "Local link: PROJECT.md -> ./docs/01-product-requirements.md",
+    "Local link: PROJECT.md -> ./docs/02-business-design.md",
+    "Local link: PROJECT.md -> ./docs/09-delivery-plan.md",
+    "Local link: PROJECT.md -> ./docs/13-first-slice.md",
+    "Local link: PROJECT.md -> ./docs/10-acceptance.md",
+    "Local link: PROJECT.md -> ./review/GPT-PRO-PROMPT.md",
+    "Local link: README.md -> ./PROJECT.md",
+    "Local link: README.md -> ./AGENTS.md",
     "Local link: README.md -> ./CONTEXT.md",
     "Local link: README.md -> ./docs/01-product-requirements.md",
     "Local link: README.md -> ./docs/02-business-design.md",
@@ -4454,6 +4543,7 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "Local link: README.md -> ./research/second-review.md",
     "Local link: README.md -> ./review/V02-CHANGELOG.md",
     "Local link: README.md -> ./review/PASTE-INSTRUCTIONS.md",
+    "Local link: README.md -> ./docs/adr/0003-independent-project.md",
     "Local link: contracts/README.md -> ./strategy.schema.json",
     "Local link: contracts/README.md -> ./analysis-result.schema.json",
     "Local link: contracts/README.md -> ./job-event.schema.json",
@@ -4488,6 +4578,8 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-10.txt",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-11.txt",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-12.txt",
+    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-13.txt",
+    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-14.txt",
     "Schema dialect: analysis-result.schema.json",
     "Schema dialect: job-event.schema.json",
     "Schema dialect: review-decision.schema.json",
@@ -4665,6 +4757,7 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "No superseded mandatory-human gate: AGENTS.md",
     "Targeted credential-pattern scan: AGENTS.md",
     "Targeted credential-pattern scan: CONTEXT.md",
+    "Targeted credential-pattern scan: PROJECT.md",
     "Targeted credential-pattern scan: README.md",
     "Targeted credential-pattern scan: config/auto-review-policy-v1.json",
     "Targeted credential-pattern scan: config/metric-definitions-v2.json",
@@ -4696,6 +4789,7 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "Targeted credential-pattern scan: docs/13-first-slice.md",
     "Targeted credential-pattern scan: docs/adr/0001-architecture-and-truth.md",
     "Targeted credential-pattern scan: docs/adr/0002-v02-confirmed-scope.md",
+    "Targeted credential-pattern scan: docs/adr/0003-independent-project.md",
     "Targeted credential-pattern scan: examples/analysis-proposal.json",
     "Targeted credential-pattern scan: examples/auto-decision.json",
     "Targeted credential-pattern scan: examples/human-override.json",
@@ -4711,9 +4805,10 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "Targeted credential-pattern scan: tools/validate_design.py"
   ],
   "source_sha256": {
-    "AGENTS.md": "1f724380063649968b06b590e877ec4bc7c4483a2878bfa3aa1f7a1e82d390f9",
+    "AGENTS.md": "8819d3a99665276a44b150439acee8852bccbfd97723db6ead3a9c0d3717c3ca",
     "CONTEXT.md": "0c6d164424ccc9184c66d88c2af2077e06d86444825e8940b241c2d4943db861",
-    "README.md": "a01095ecc1f1b5ad674b502a5bebe7e12512db6c74f400edf8a4e70cdca569ef",
+    "PROJECT.md": "fddbe02b485625e577965d1f4f850630254d0208bc6ddea3306e0a29ef915a0b",
+    "README.md": "977fc96cfefb2737f496bd40152ea7e66702a94284c324b6388fad692c956128",
     "config/auto-review-policy-v1.json": "4a350149c468d9cd5886d0d4e722ecc85db623e44cd158ccbaba01dfd3cf33cb",
     "config/metric-definitions-v2.json": "6e605de1702f71db3f3cab1e4b06ec3d8f801d65753858b22cb29a1bfe425d3b",
     "config/numeric-policy-v1.json": "f7f143287bceb0af3e828139cf544331d704a39e545d41f34762ade3c0eeff27",
@@ -4744,6 +4839,7 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "docs/13-first-slice.md": "f52dd59535ad55964edbbe9ae0a4f07179d0154ec17bc129bf63e6f20d56908a",
     "docs/adr/0001-architecture-and-truth.md": "12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1",
     "docs/adr/0002-v02-confirmed-scope.md": "134096110f0001c303549952ee39c1ef3d6aedc21affbc11a44fc8e6391b36f4",
+    "docs/adr/0003-independent-project.md": "241b8b464274ab2039d9ee7d6180db5d54c905cab842013286e4017021a9ddf6",
     "examples/analysis-proposal.json": "43d0e83ce5a4d9b4e3c854c09e91d3c08109ef2215f54d502085738fd77d02b3",
     "examples/auto-decision.json": "f7611e2d367c10a6a130416b233069e43b489b23dfcf346937827a87a172df3e",
     "examples/human-override.json": "5beb97d90389975d083f8db587e80281458d0010a39edc32ed667147340a3590",
@@ -4752,11 +4848,11 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
     "examples/v02-boundary-cases.json": "fc965037233a77ff28b5424a0fb18d99db5f7e9c0e974ab01e748d51240be268",
     "research/open-source-shortlist.md": "010e0cd633d17dcaf85fd0ca5af1b6a81e2cbbf5a75e0b099c8a719f70c16fe0",
     "research/second-review.md": "0e047782fc9850966545482db258af67f3e99cd55c46ae7afe5f0ff368c7076c",
-    "review/GPT-PRO-PROMPT.md": "15c832d4bfe230ccc7e63ecbd8044f27398dbe5c5685a4c05bf7c8865cc632c2",
+    "review/GPT-PRO-PROMPT.md": "8c8c115b2a3d776753a23f0d4832a5becae178f077af40c7f0d6f69706f6ccd8",
     "review/V02-CHANGELOG.md": "2a09c862a2a27be6916dde8c0640c0395d3da8c3438fb6626212c72931449c74",
-    "tools/build_review_pack.py": "7488e86c07dcb27143bf0cff963adaa1562d82a232a56ddad68afde2a9d71e06",
+    "tools/build_review_pack.py": "f10c0c84b2c2a378359f10ae21f53c21ca0d28a36705c7606f8c1ff876d0e5a0",
     "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a",
-    "tools/validate_design.py": "973db474cb84dd256bb2f4216022542882b40c3ad0796532b5fcdb0620ce3ac7"
+    "tools/validate_design.py": "6b2299e8e84ef61ed3ea695a5a8c34eafef4e38b77e9f7940a13255910106306"
   },
   "not_run": [
     "Full draft-2020-12 validation with a standards implementation",
