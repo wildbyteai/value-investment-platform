@@ -35,7 +35,8 @@ REST /api/v1；完整 OpenAPI 由 M0 后端 DTO 生成，当前文档是详细�
 | GET /notifications（后续） | unread,type,strategy,cursor | 本人；显示原因和证据入口 |
 | POST /notifications/{id}/ack（后续） | reviewed/snooze+until | 不改变 membership；读过和处理过分开 |
 | PUT /subscriptions/{id}（后续） | strategy/security,channels,quiet_hours | 本人；首次外部连接验证后方可 enabled |
-| POST /reviews | subject_revision,decision,reason,evidence,If-Match | analysis.override，拒绝stale subject；11定义人工优先与依赖重算 |
+| POST /decisions/{slot_id}/overrides | OverrideCommand action=accept/reject/pending/replace，If-Match、Idempotency-Key | analysis.override；返回immutable revision/decision与generation，11 §7 |
+| POST /decisions/{slot_id}/release-override | 同合同action=release，引用当前人工revision | analysis.override；清有效人工指针并固定cutoff重评，非恢复旧AUTO |
 | GET /evidence/{id}/access | 受控代理或短期 signed URL | source_policy 再校验，访问留日志 |
 
 ## 3. 管理端端点
@@ -77,3 +78,6 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 前端只调用生成客户端；TanStack Query keys 包括 workspace、filters、snapshot，切换 workspace 清除敏感缓存。写成功按后端返回 revision 精确失效相关 query，不强制整页刷新。未知任务状态显示“等待更新”并提供 request_id。核心变化与任务更新可 SSE（只发 ID、质量／进度），断线退回有限轮询；SSE 不必保证消息持久性，刷新从事实库取得正确状态。
 
 模板解析/模拟/发布、企业评分绑定、人工覆盖/解除、研究笔记/保存视图、用户角色端点详见11 §6。API返回有效父链与字段来源；发布固定binding manifest。POST /correction-previews与POST /corrections采用12 §4的窗口/锚点、If-Match和scope，返回固定历史解释和当前影响；禁止通过普通job retry回写封存session。
+
+
+v0.3覆盖命令/201合成响应及预期持久化见11 §7与examples/v03-human-replacements.json。path slot是操作身份，body保留slot_id用于审计一致性；并发只用一个If-Match generation，服务端读取当前decision，不要求重复的expected decision/generation字段。普通覆盖端点不接受release动作，release端点只接受release。输入evidence_ids需包含新判断value中的全部证据。单项人工覆盖提交后直接返回影响和重算状态；preview仅用于批量、模板/策略发布和主数据合并等需要先比较影响的操作，绑定输入hash、slot generation、受影响证券及操作者。无权或过期预览不授权提交。内部seal命令非公开API，12 §8定义worker身份、冻结事务和提交原子性。

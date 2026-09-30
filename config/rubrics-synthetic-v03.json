@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "catalog_key": "rubrics-synthetic-v03",
+  "rubrics": {
+    "customer-retention-synthetic-v1": {
+      "method": "equal_weight_criteria",
+      "minimum_criterion_coverage": "0.80",
+      "criteria": [
+        {
+          "key": "repeat_purchase",
+          "anchors": [
+            "持续流失且有数据支持",
+            "留存弱且恶化",
+            "留存一般且稳定",
+            "留存较强且有连续证据",
+            "留存强且跨期稳定"
+          ]
+        }
+      ]
+    }
+  }
+}

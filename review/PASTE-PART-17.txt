@@ -1,0 +1,540 @@
+
+[PART 17/27]
+
+
+===== SOURCE: contracts/override-command.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "action": {
+      "enum": [
+        "accept",
+        "reject",
+        "pending",
+        "replace",
+        "release"
+      ]
+    },
+    "slot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "replacement": {
+      "$ref": "#/$defs/judgment"
+    },
+    "override_valid_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "action",
+    "slot_id",
+    "override_valid_until",
+    "reason",
+    "evidence_ids"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Human override command; one If-Match generation and Idempotency-Key are required",
+  "$defs": {
+    "judgment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "link"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "relation_type": {
+                  "enum": [
+                    "direct",
+                    "subsidiary",
+                    "customer_supplier",
+                    "competitor",
+                    "industry_policy",
+                    "indirect_theme"
+                  ]
+                },
+                "relevance": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "relation_type",
+                "relevance",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "impact"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "dimension": {
+                  "type": "string",
+                  "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+                },
+                "signed_impact": {
+                  "type": "string",
+                  "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "half_life_days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 730
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "economic_fact_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "event_time": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "dimension",
+                "signed_impact",
+                "confidence",
+                "half_life_days",
+                "valid_until",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "economic_fact_id",
+                "event_time"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "rubric"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "rubric_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "criterion_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "grade": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "period": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "end": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                }
+              },
+              "required": [
+                "company_id",
+                "rubric_ref",
+                "criterion_key",
+                "grade",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "valid_until",
+                "effective_from",
+                "period"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "risk"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "risk_code": {
+                  "enum": [
+                    "confirmed_fraud",
+                    "going_concern_material",
+                    "confirmed_debt_default",
+                    "delisting_decision"
+                  ]
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_kind": {
+                  "enum": [
+                    "company",
+                    "security",
+                    "listing"
+                  ]
+                },
+                "target_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "risk_code",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "target_kind",
+                "target_id",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "replace"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "replacement"
+        ],
+        "not": {
+          "required": [
+            "subject_revision_id"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "subject_revision_id"
+        ],
+        "not": {
+          "required": [
+            "replacement"
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
+===== SOURCE: contracts/review-decision.schema.json =====
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionService decision; model proposal cannot approve itself",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "decision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_slot": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_revision": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "pending"
+      ]
+    },
+    "actor_kind": {
+      "enum": [
+        "AUTO",
+        "HUMAN"
+      ]
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "known_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "supersedes_decision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "decision_id",
+    "subject_slot",
+    "subject_revision",
+    "status",
+    "actor_kind",
+    "actor_id",
+    "policy_ref",
+    "input_manifest_id",
+    "known_at",
+    "valid_until",
+    "supersedes_decision_id",
+    "reason",
+    "evidence_ids"
+  ]
+}
+
+[END PART 17/27]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

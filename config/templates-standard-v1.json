@@ -1,25 +1,25 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "synthetic_company_customization": true,
   "templates": [
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "base-standard",
-      "version": 1,
+      "version": 2,
       "level": "base",
       "scope": {
         "kind": "all"
       },
       "base_config_ref": {
         "path": "config/scoring-standard-v1.json",
-        "sha256": "e62aeb17948d03374a0a4bff46d6a80b8a5efc2afa4aead5153fefc6a42eb12d"
+        "sha256": "5de1ce826f98af392f459095ca57d2b33453624163aeeda845c83caef2670cd6"
       },
       "patches": []
     },
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "industry-manufacturing",
-      "version": 1,
+      "version": 2,
       "level": "industry",
       "scope": {
         "kind": "industry",
@@ -27,8 +27,8 @@
       },
       "parent_ref": {
         "key": "base-standard",
-        "version": 1,
-        "sha256": "242e44337476e4b8a399058f6bc298dc22759f43e7bf2d89d968306d2f98e185"
+        "version": 2,
+        "sha256": "d70df2f21ee51018c5e1978f9ae3d85229b10938e5f62b638329b40bce3c1719"
       },
       "patches": [
         {
@@ -44,9 +44,9 @@
       ]
     },
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "company-synthetic-manufacturer",
-      "version": 1,
+      "version": 2,
       "level": "company",
       "scope": {
         "kind": "company",
@@ -54,8 +54,8 @@
       },
       "parent_ref": {
         "key": "industry-manufacturing",
-        "version": 1,
-        "sha256": "bce3cd3ac718ac0b44d1ddaefc354faa169a96352244a56ce43946c7aeb9b306"
+        "version": 2,
+        "sha256": "4ab9f3166ef772e7b5f718c9fcba6a4df175a1f8ccd89dbf50c6af37df199c6d"
       },
       "patches": [
         {

@@ -1,17 +1,17 @@
-你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.2 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.3 改进版。请使用中文。不需要我上传任何附件。
+你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.3 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.3 改进版。请使用中文。不需要我上传任何附件。
 
 ### 材料读取方式
 
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，若发起消息指定commit，必须使用该完整SHA；否则先解析main的实际commit SHA并固定。先读PROJECT.md、README.md、review/ROUND-2-REQUEST.md、review/ROUND-2-REVIEW.md、review/ROUND-2-PROBES.json与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，若发起消息指定commit，必须使用该完整SHA；否则先解析main的实际commit SHA并固定。先读PROJECT.md、README.md、review/ROUND-2-REQUEST.md、review/ROUND-2-REVIEW.md、review/ROUND-2-PROBES.json与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md、review/V03-COUNTEREXAMPLES.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
 
 ### 独立项目与本轮顺序
 
-项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。迁移冻结基线为1b16f381a8742b910cdaa8ba5b928a32857a5b69；本轮Codex报告对该基线提出F01…05，属于提案，未改业务合同。请独立核查每项，允许用原文反驳，给accepted/rejected/modified/deferred与理由；F05已有cutoff≤generated_at，不要误报当前允许提前封存。新问题另编号，不能只审查这五项。
+项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。迁移冻结基线为1b16f381a8742b910cdaa8ba5b928a32857a5b69；历史Codex报告对该基线提出F01…05；当前v0.3工作树已在设计层补齐合同，处置见V03-CHANGELOG。请评审固定输入版本的实际内容，不能把历史探针当当前缺陷或把当前设计当产品通过。请独立核查每项，允许用原文反驳，给accepted/rejected/modified/deferred与理由；F05已有cutoff≤generated_at，不要误报当前允许提前封存。新问题另编号，不能只审查这五项。
 
 ### 我的目标与已确认范围
 
@@ -32,11 +32,11 @@
 
 不要以功能“技术复杂”为由删除已确认业务能力，不把完整目标降为个人工具，也不要把通知后置误解为可以不实现进出/风险状态。技术大多有成熟实现，主要挑战是正确业务语义、连续用户路径、工程一致性和可维护性。只讨论确实影响当前方案的新决定，不把已解决问题重新列成待确认。
 
-上一轮Pro共享评审：https://chatgpt.com/s/t_6abcd1c0c9088191bc2d635b33b84f6f 。本仓库只使用该页可见正文，未取得完整60文件附件。不要把之前声称生成的文件当本轮已读取输入；当前v0.2为独立修订，请以固定仓库内容核查。
+上一轮Pro共享评审：https://chatgpt.com/s/t_6abcd1c0c9088191bc2d635b33b84f6f 。本仓库只使用该页可见正文，未取得完整60文件附件。不要把之前声称生成的文件当本轮已读取输入；历史v0.2为独立修订，当前v0.3在此基础上完善，请以固定仓库内容核查。
 
 ### 评审要求
 
-完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把 v0.2 当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
+完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把当前设计当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
 
 逐项挑战以下内容：
 
@@ -98,7 +98,7 @@ H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候�
 
 # 价值投资策略管理系统
 
-> 设计基线 v0.2 · 2026-09-30 · A 股与港股 · 用户范围已确认，工程设计待实施验证
+> 设计基线 v0.3 · 2026-09-30 · A 股与港股 · 用户范围已确认，工程设计待实施验证
 
 从定时采集到公司研究、可解释评分、策略筛选及状态提醒的一套系统。优先建立可信、可恢复、可维护的流程和工程基础；价投规则提供可替换的标准版本，不承诺预测或收益。本仓库当前交付设计与可检查合同，不含可运行产品。
 
@@ -137,7 +137,7 @@ H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候�
 | [GPT Pro 提示词](./review/GPT-PRO-PROMPT.md) | 独立审查和生成改进版的完整指令 |
 | [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
 | [开源初步候选](./research/open-source-shortlist.md) / [第二轮核查](./research/second-review.md) | 固定源码核查、候选取舍与边界，尚未集成 |
-| [v0.2变更账本](./review/V02-CHANGELOG.md) | 原需求、Pro可见反馈、独立研究到当前设计的映射 |
+| [v0.2变更账本](./review/V02-CHANGELOG.md) / [v0.3处置](./review/V03-CHANGELOG.md) | 历史需求映射与二轮五项设计合同完善 |
 | [不附文件的使用方式](./review/PASTE-INSTRUCTIONS.md) | 私有 GitHub 直读提示词、完整正文及分段复制入口 |
 
 ## 当前授权与状态
@@ -156,11 +156,13 @@ python3 tools/build_review_pack.py
 
 工具只读设计文件、生成评审包与材料检查结果，不连接数据库或外部平台。校验不能替代系统验收。设计修改后重新生成整包；仓库不保存真实平台内容、持仓、密钥或账号资料。不声明开源许可，公开和实施另行决策。
 
-本v0.2由当前会话按用户已确认范围独立修订，使用Pro共享页可见评审正文与第二轮研究；未获取其完整60文件包。旧v0.1可在Git历史`8b9d9de36d197b1932c4102cc98888d224984085`查看。config文件名中的v1表示第一套标准配置，不表示设计仍为v0.1；当前配置Schema已升级2.0，指标定义另有v2引用，未曾发布运行产品。
+历史v0.2由当前会话按用户已确认范围独立修订，使用Pro共享页可见评审正文与第二轮研究；未获取其完整60文件包。旧v0.1可在Git历史`8b9d9de36d197b1932c4102cc98888d224984085`查看。config文件名中的v1表示第一套标准配置，不表示设计仍为v0.1；当前scoring/analysis配置合同已升级3.0，template/review-decision为2.0，strategy/job保持2.0，指标定义另有v2引用，未曾发布运行产品。
 
 合同新增评分配置、分层模板与审核决策Schema。材料工具包含形状/引用/语义与反例检查，仍不是完整draft-2020-12实现或应用状态机测试。
 
 独立迁移不改变v0.2业务/财务/策略合同；历史交付材料在本机local-evidence中保留，设计历史仍可通过原Git提交读取。迁移决策见[ADR-0003](./docs/adr/0003-independent-project.md)。
+
+当前v0.3在v0.2上补齐二轮F01…05设计合同，见[V03-CHANGELOG](./review/V03-CHANGELOG.md)与[跨模块推演](./review/V03-COUNTEREXAMPLES.md)。11 §7…9/12 §8是新增权威语义；T-39…43列出未来运行验收。设计已写与材料检查已执行分开记录，尚未启动W-08、部署、真实源/模型或通知。GPT Pro是可选独立复核，不作为开发前置。
 
 
 ===== SOURCE: PROJECT.md =====
@@ -173,7 +175,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.2迁移后第二轮Codex业务/工程复审已完成，GPT Pro独立复审材料已准备；产品尚未实施。评审发现与提案见review/ROUND-2-REVIEW.md，未自动改合同。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3二轮设计完善；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；原v0.2评审/probes保持历史记录。GPT Pro独立复审为可选复核，尚未执行，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -186,7 +188,7 @@ python3 tools/build_review_pack.py
 | 工程架构、数据、API、UX、AI、运维 | docs/03…08 |
 | 实施任务和首个切片 | [09](./docs/09-delivery-plan.md)、[13](./docs/13-first-slice.md) |
 | 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
-| 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md |
+| 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md |
 | 机器配置与合同 | config/、contracts/；文档引用，不复制数值真源 |
 | 评审交接 | [GPT Pro完整提示词](./review/GPT-PRO-PROMPT.md)、review/REVIEW-PACK.md |
 | 本机历史与迁移证据 | local-evidence/，忽略Git并持久保留 |
@@ -194,6 +196,8 @@ python3 tools/build_review_pack.py
 日常工作直接在本项目创建分支、编写设计、执行已授权任务和记录证据，不再创建BYTEWATCHER Matter或依赖其registry/SOURCE_OF_TRUTH。代码开发分支默认codex/前缀，当前文档阶段在main提交；保留完整Git历史与原remote。
 
 每个开发切片引用既有R/W/T和输入manifest，说明正常/失败/权限/恢复预期。设计、已实现与已验证分开记录。依赖或合同变化写ADR/变更账本，不以报告替代代码或验收事实。
+
+项目全过程的优先级遵循[AGENTS“项目管理与设计优先级”](./AGENTS.md#项目管理与设计优先级)：以业务闭环的落地安排工作，按实际影响选择设计与验证，不把全量工程清单或可选完善作为每一步的前置门槛。2026-10-01用户明确此原则适用于整个项目管理过程；当前阶段仍为设计完善。
 
 ## 已确认能力与推进顺序
 
@@ -267,7 +271,18 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 
 本项目独立管理，不再属于BYTEWATCHER事项；先读PROJECT.md和README.md，不再按Matter路由、registry分配或内容生产/DBS流程执行。
 
-本仓库当前是 v0.2 设计基线（范围已确认，产品未实现）。先读 README、CONTEXT、与任务对应的 docs、contracts 和验收矩阵；未经用户授权不把设计任务扩大为部署、真实采集、模型外传、真实告警或交易。用户 scope 优先，技术细节可在已授权 slice 内自主决定。
+本仓库当前是 v0.3 设计基线（范围已确认，产品未实现）。先读 README、CONTEXT、与任务对应的 docs、contracts 和验收矩阵；未经用户授权不把设计任务扩大为部署、真实采集、模型外传、真实告警或交易。用户 scope 优先，技术细节可在已授权 slice 内自主决定。
+
+## 项目管理与设计优先级
+
+以业务逻辑落地和用户可用的完整闭环为先，贯穿需求、设计、任务拆分、实现、评审、测试和交付。设计、安全与工程严谨性服务于业务目标；不以设计穷尽、所有可选安全措施或技术实现完美作为推进前提。
+
+- 按当前任务的业务影响和实际风险选择最小充分的方案、校验和验证；避免重复校验、过度审批、无需求抽象和推测性边界扩张。
+- 优先完成主路径和影响业务结果的关键失败路径；记录已知局限、未覆盖项和后续任务，允许在边界明确的情况下递进交付。可选加固、性能优化、更多选型实验与额外评审不阻塞当前闭环。
+- 问题是否阻断以当前业务目标、数据正确性、真实权限/机密边界和恢复需要的具体影响判断，不因“不够严谨”或存在假设风险自动升级。已明确的授权、保密和数据边界仍按本文件执行。
+- 检查按改动影响选择，通过后收口；不要求每次任务执行整套工程清单。调整既定业务合同或必选验收需说明理由和影响，不能把未通过或未执行写成已完成。
+
+## 项目合同与执行边界
 
 - 保持 R/W/T 稳定追踪；设计、已实现、已验证分别记录。实现前固定本 slice 的正常、失败、边界、权限与恢复预期；不能更改预期掩盖缺陷。
 - company 与 security 独立；A/H 分开估值与策略评估。严格使用有效时间与系统知识截止时间；不可变修订与已发布版本不覆写。
@@ -290,7 +305,7 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 
 # 01 产品需求与范围
 
-版本 v0.2；用户确认的边界见11，工程机制为待实施验证设计。日期 2026-09-30。
+版本 v0.3；用户确认的边界见11，工程机制为待实施验证设计。日期 2026-09-30。
 
 ## 1. 目标与成功定义
 
@@ -570,6 +585,9 @@ qa/                      # 合成场景、E2E、负载与演练
 开源复用以第二轮research/second-review.md的固定源码核查为依据。优先选择性复用FastAPI Full Stack Template工程基座；Refine可与TanStack共享QueryClient/路由/设计系统，不能以重复依赖为由排除；Prefect是Celery编排层替代候选，PG业务事务不由框架保证。实际采用在W-08做最小验证；不用两套活跃调度器。所有候选均未安装/集成。
 
 
+v0.3不新增服务或平台：analysis拥有类型化人工修订/slot、risk目标校验；scoring拥有冻结registry与policy解析；strategy拥有risk适用集合和evaluation seal。公开应用服务可加入同一PG事务，不能由队列先更新baseline/membership再补audit。开源候选与固定源码依据沿用research/second-review.md，本轮未联网刷新或安装；正式兼容/传递许可核验留在授权实施M0。
+
+
 ===== SOURCE: docs/04-data-design.md =====
 
 # 04 数据模型、时间与约束
@@ -657,6 +675,19 @@ OpenSearch mapping：keyword company_id/security_id/source/ACL，date 时间，�
 economic_fact与contribution_slot防止跨event重复；baseline吸收同事务更新slot。score/metric/evaluation记录template_resolution_hash、numeric_policy_ref、required_source_ids与权限指纹。撤权后派生总分、计数和缓存同样重新校验。原文observation、主挂牌、FINAL价格标记及独立撤权journal完整定义见12。
 
 
+## 6. v0.3补齐的逻辑记录与约束
+
+| 对象 | 字段/约束 | 写责任 |
+|---|---|---|
+| human_judgment_revision | workspace,slot UUID,previous_revision,subject_kind,完整typed value,effective区间,known/created_at,input_manifest,actor；append-only | analysis；只replace创建，旧修订不变 |
+| risk_revision / risk_resolution | target_kind/id,company,risk_code,economic_fact,有效区间,evidence；identity/policy版本,适用release/security manifest | analysis验证目标；strategy消费明确适用集合 |
+| decision_slot | kind+自然键唯一，current_decision,override_expiry,generation；revision/decision归属同workspace | analysis；自然键与原子替换见11 §7/8 |
+| dimension_registry / effective_config | 固定registry hash,逐维quality/event policies,origin与全部内容hash | scoring；继承发布见11 §9 |
+| evaluation_seal / frozen_manifest | 唯一workspace+release+security+session+mode，generation,fence,完整输入/缺口,cutoff watermark,hash,sealed_at/token,application_status | strategy；12 §8独占冻结/CAS/唯一封存 |
+
+risk解除引用确切revision，membership提交另校验risk generation；封存与普通状态原子提交见12。所有修订/manifest保留source ACL继承和同workspace复合引用；DDL与运行约束仍未实现。
+
+
 ===== SOURCE: docs/05-api-and-jobs.md =====
 
 # 05 API、异步任务与并发合同
@@ -696,7 +727,8 @@ REST /api/v1；完整 OpenAPI 由 M0 后端 DTO 生成，当前文档是详细�
 | GET /notifications（后续） | unread,type,strategy,cursor | 本人；显示原因和证据入口 |
 | POST /notifications/{id}/ack（后续） | reviewed/snooze+until | 不改变 membership；读过和处理过分开 |
 | PUT /subscriptions/{id}（后续） | strategy/security,channels,quiet_hours | 本人；首次外部连接验证后方可 enabled |
-| POST /reviews | subject_revision,decision,reason,evidence,If-Match | analysis.override，拒绝stale subject；11定义人工优先与依赖重算 |
+| POST /decisions/{slot_id}/overrides | OverrideCommand action=accept/reject/pending/replace，If-Match、Idempotency-Key | analysis.override；返回immutable revision/decision与generation，11 §7 |
+| POST /decisions/{slot_id}/release-override | 同合同action=release，引用当前人工revision | analysis.override；清有效人工指针并固定cutoff重评，非恢复旧AUTO |
 | GET /evidence/{id}/access | 受控代理或短期 signed URL | source_policy 再校验，访问留日志 |
 
 ## 3. 管理端端点
@@ -738,6 +770,9 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 前端只调用生成客户端；TanStack Query keys 包括 workspace、filters、snapshot，切换 workspace 清除敏感缓存。写成功按后端返回 revision 精确失效相关 query，不强制整页刷新。未知任务状态显示“等待更新”并提供 request_id。核心变化与任务更新可 SSE（只发 ID、质量／进度），断线退回有限轮询；SSE 不必保证消息持久性，刷新从事实库取得正确状态。
 
 模板解析/模拟/发布、企业评分绑定、人工覆盖/解除、研究笔记/保存视图、用户角色端点详见11 §6。API返回有效父链与字段来源；发布固定binding manifest。POST /correction-previews与POST /corrections采用12 §4的窗口/锚点、If-Match和scope，返回固定历史解释和当前影响；禁止通过普通job retry回写封存session。
+
+
+v0.3覆盖命令/201合成响应及预期持久化见11 §7与examples/v03-human-replacements.json。path slot是操作身份，body保留slot_id用于审计一致性；并发只用一个If-Match generation，服务端读取当前decision，不要求重复的expected decision/generation字段。普通覆盖端点不接受release动作，release端点只接受release。输入evidence_ids需包含新判断value中的全部证据。单项人工覆盖提交后直接返回影响和重算状态；preview仅用于批量、模板/策略发布和主数据合并等需要先比较影响的操作，绑定输入hash、slot generation、受影响证券及操作者。无权或过期预览不授权提交。内部seal命令非公开API，12 §8定义worker身份、冻结事务和提交原子性。
 
 
 ===== SOURCE: docs/06-ux-and-design-system.md =====
@@ -825,6 +860,13 @@ T-UX-01：5名目标用户完成“新变化→理解原因→原始证据→理
 T-UX-04：数据管理员完成“发现受影响公司→定位失败任务→只重试失败项→验证恢复”，4/5无帮助≤3min，误触全量补采为0。模板比较任务并入T-UX-02：解释行业与企业覆盖以及口径不同的分数，不能误认为同百分制天然可比。业务页呈现领域原因；队列、hash与numeric-policy等工程字段放管理诊断详情。
 
 
+## 8. v0.3具体交互补齐
+
+覆盖页旧值/完整新值并列，影响的正负号、rubric档位、证据、有效期间与A/H影响常显；提交后显示新人工修订及重算等待状态，409保留草稿并比较当前值。风险卡明确“公司全部适用证券”“仅这只证券”或“仅H挂牌”，提供确切旧判断及仍有效风险；“拒绝本风险”和“解除人工覆盖”分开。模板三列还显示证据要求、90/180日龄期、字段来源及“事件参与/仅基准”，不能保存后被后端忽略。评估页区分“最终价格已到”“等待截止封存”“封存后缺口”，业务正文显示日期/原因，token/hash只在管理诊断。
+
+T-UX-01增加完成+0.8→−0.2及grade3→1替换的任务样本；T-UX-02增加解释H挂牌风险不等于A风险、120日证据在90日模板无效、baseline-only无事件贡献。原06 §7的时间、人数与理解错误指标保持，不宣称本轮已执行。
+
+
 ===== SOURCE: docs/07-ai-and-retrieval.md =====
 
 # 07 AI 分析、关联与检索设计
@@ -877,6 +919,9 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。成本在首批来源与样本后量化；开发不以预算确认阻塞。限额是可配置运行项，不意味着已经采购或授权真实调用。
 
 自动审核是否生效看DecisionService输出，不看模型自身approved字段。AUTO service principal独立受限，不能改策略/模板发布。新模型shadow检验对已有效HUMAN覆盖保持不变；异常队列按经济事实slot去重，统计pending年龄和策略影响，不把固定每天人工投入当首版依赖。
+
+
+v0.3模型输入manifest除公司候选外，还固定有效security/listing候选和解析dimension/event policy allowlist。analysis Schema3.0支持受限x_ ID与风险target，语义服务验证候选归属、half_life与enabled、原始披露和目标传播；Schema通过不能授权模型扩大范围。模型输出的业务有效时间不改变系统known_at。11 §7/8/9为唯一覆盖、风险与维度合同；前端和检索不得另推传播规则。
 
 
 ===== SOURCE: docs/08-security-and-operations.md =====
@@ -943,6 +988,9 @@ PG 定期全备+WAL、对象受权利约束版本备份，至少按季度隔离�
 开发阶段不堆复杂审批/权限系统，保留账号身份、服务端RBAC、对象隔离、凭证保护和操作追溯。对真实接入和部署的授权边界不由“权限先松后紧”自动替代；当前仅修订设计。模型缓存和派生分数也继承来源状态，撤权/更正不能只删原文链接。
 
 
+v0.3覆盖/风险/封存的最小权限与恢复补齐：每次提交重新验证capability、workspace、证据ACL、risk/slot generation与worker fence；客户端actor/known_at不可信任。封存中途崩溃从已冻结manifest恢复，失权输入fail closed，双worker使用同seal slot；应用落后或新release不能回写当前membership。未知目标/维度拒绝，不能以管理员身份修正业务判断。合同版本变化仅为未运行设计，未来旧payload兼容规则见V03-CHANGELOG，不能静默扩大旧风险。
+
+
 ===== SOURCE: docs/09-delivery-plan.md =====
 
 # 09 实施规划与工程规范
@@ -955,8 +1003,8 @@ PG 定期全备+WAL、对象受权利约束版本备份，至少按季度隔离�
 
 | 阶段 | 任务 ID | 交付和依赖 | 验收出口 |
 |---|---|---|---|
-| M0 约 1–2 周 | W-01 | 将11已确认边界落实；真实接入前补齐剩余供应商/运行配置、repo 结构、OIDC/ACL、开发隔离库、合同生成、CI、设计 tokens | 基础认证与越权测试、依赖锁定、Schema/OpenAPI 同源，UX 导航原型评审 |
-| M0b | W-08 | 两家公司/三只证券的合成全流程、五角色、三层模板、AUTO/HUMAN、FINAL/状态/纠错；任务书13 | 主用户路径与故障/权限恢复通过，产品实测后重估工期 |
+| M0 最小基础 | W-01 | 只准备 W-08 必需的 repo 结构、项目隔离库、mock 身份/RBAC、合同生成入口和本地运行命令；真实 OIDC、完整 CI、生产 ACL 与其他治理后置 | 合成环境能启动、最小权限边界可验证、主路径输入输出可运行 |
+| M0b 首个切片 | W-08 | 两家公司/三只证券的合成全流程、五角色、三层模板、AUTO/HUMAN、FINAL/状态/纠错；任务书13 | 主用户路径与关键失败/权限恢复通过，产品实测后重估工期 |
 | M1 约 2 周 | W-02 | 合成公司/证券与一个获许可真实源 adapter、调度、原文、去重、固定时点公司时间线 | 采集失败可恢复、证据可回读、A/H 身份不混、列表和时间线 UX 首测 |
 | M2 约 2–3 周 | W-03 | 多源、自动判断与人工覆盖、事件归并、OpenSearch、热向量选配、标注集 | 多公司/无公司/歧义正确、去重、ACL、模型质量与检索指标达标 |
 | M3 约 2 周 | W-04 | 财务/日行情/FX/公司行动、三层模板、rubric、评分、解释页、时点回放 | 财报修订不前视、A/H 估值独立、missing/stale、贡献不双计 |
@@ -973,11 +1021,13 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 
 ## 4. CI 与发布门禁（目标流水线）
 
-- 每 PR：format/lint/typecheck、JSON Schema/OpenAPI 合同、领域单测、扫描 secret、锁文件一致性、影响模块的集成／UI 关键测试。
-- 涉及 DB：项目隔离合成 PostgreSQL/Redis 实例运行迁移前后、并发、RLS、outbox 恢复测试；必须验证实际服务位置和数据分类。
-- 涉及 UX：共享组件 Storybook 状态、键盘/contrast、Playwright 当前关键路径和截图；不是每 PR 跑所有历史机型。
-- release candidate：真实依赖 adapter 的获许可最小读回、固定时点评分/策略闭环、性能、安全负面、备份恢复、人工 UAT。模拟成功与真实接入通过分开记录。
-- 供应链：锁依赖、SBOM、license check、漏洞分级、镜像摘要、构建和发布 provenance。签名/分支保护等权限变更待实施授权，不在本阶段操作 GitHub 设置。
+以下是按影响选择的检查目录，不是每项任务必须全量执行的清单；项目全过程遵循AGENTS的业务落地优先级。设计/文档修改做相关合同、引用和材料检查；代码修改验证受影响业务路径；生产候选再验证实际运行条件。未涉及的机制和可选增强不成为当前交付门槛。
+
+- 代码 PR：按改动涉及的语言、合同和依赖选择format/lint/typecheck、JSON Schema/OpenAPI、领域单测、secret扫描和锁文件检查；集成／UI测试聚焦受影响主路径及关键失败场景。
+- 涉及 DB：先验证实际服务位置和数据分类；在项目隔离合成实例中按影响验证。迁移验证迁移前后，事务/并发改动验证冲突与原子性，恢复改动验证outbox/ledger；仅已采用且本次涉及RLS时运行其测试，不因“涉及DB”全量执行。
+- 涉及 UX：按受影响页面/组件检查共享状态、键盘/contrast、当前关键路径；截图、Storybook与Playwright用于对应风险，不要求每次修改覆盖全部页面或历史机型。
+- release candidate：按本次候选范围验收业务闭环、关键权限/恢复和用户任务；涉及真实adapter时做获许可最小读回，涉及容量目标时做对应性能验证。模拟与真实接入通过分开记录，沿用已固定的必选验收预期，不自动追加所有未来阶段检查。
+- 供应链：依赖变更核对锁版本、许可与已知重大漏洞；正式交付按部署范围维护SBOM、镜像摘要和构建/发布provenance。签名/分支保护等增强按实际需要与授权安排，不成为设计阶段或合成闭环的前置条件。
 
 结果证据记录 commit SHA、环境、fixture/source manifest、command/scenario、expected/actual、执行者和时间。不得把 build 成功、/health 200、测试已写当实际验收通过。
 
@@ -1007,7 +1057,12 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 
 先 50–100 家用户选定公司、两个市场、已许可数据源、少量内测人员；同时运行标准策略 shadow 和人工核验。达到 M5 出口才启用live策略变化记录；通知后续独立启用；外部发送独立授权。异常可逐源／逐策略关闭，不删历史。试运行记录是否实际符合研究流程，不用收益指标为首版流程验收背书。
 
-实施顺序用于先验证架构和主路径，不是缩减产品。开源基座优先FastAPI模板；Refine/Prefect按13中薄适配与恢复比较择用。已确认的模板、自动审核、多人权限不能仅因技术容易或困难而省略业务合同与验收。
+实施顺序用于先验证架构和主路径，不是缩减产品。开源基座优先FastAPI模板；Refine/Prefect只在主路径遇到具体管理端或编排问题时再做有界比较，不作为W-08前置依赖。已确认的模板、自动审核、多人权限不能仅因技术容易或困难而省略业务合同与验收。
+
+
+## v0.3设计出口与实施顺序
+
+当前仅推进二轮设计评审，W-08没有启动。F01…05的合同与固定预期先入设计；对应T-39…43同步到10/13。另获实施授权后先准备最小运行基础，再直接贯通W-08主路径；人工替换、风险范围、policy/维度解析、seal协议按主路径需要逐步加入。不能以五维示例先通过为理由删完整模板扩展能力；也不要求引入更多框架或真实供应商才能验证合成链路。开源适配候选仍按research固定核查有界验证，尚未完成新选型实测。
 
 
 ===== SOURCE: docs/10-acceptance.md =====
@@ -1103,11 +1158,24 @@ T-UX-01、02、03、04 的用户任务与指标以 06 §7 为唯一详细定义�
 W-08覆盖各模块的最小代表场景，完整需求追踪仍由对应W-01…06实施验证。W-07及T-16的渠道发送部分为后续，不阻塞当前变化记录。B/S发现→当前修复→T场景的映射见review/V02-CHANGELOG.md；本地材料工具演示/检查不冒充上表产品测试通过。
 
 
+## 6. v0.3二轮补齐（产品测试均not_run）
+
+| ID | 固定动作/边界 | 预期（不以材料检查代替执行） | 追踪 |
+|---|---|---|---|
+| T-39 | +0.8→−0.2、rubric3→1，accept/reject/pending/release；无权、双人、重复key、到期 | 一个If-Match generation完成CAS；完整新修订+HUMAN决策+audit/outbox原子；旧行不改；同key同结果，不同payload409；viewer403，stale409保留输入；AUTO不覆盖，到期合法重评；A/H重算等待显式UNKNOWN | R-03/05/09/16，W-03/04/08，11 §7，T-27/28/T-UX-01 |
+| T-40 | H挂牌退市、公司违约、H风险撤销、错误候选/父子传播、迟到风险解除 | H风险只影响H；违约A/H各自RISK；撤销H仍违约OUT；身份不符422，不能隐式全公司解除；旧generation不覆盖新风险，最后风险解除后重新两session确认 | R-06/08/16，W-03/05/08，11 §8 |
+| T-41 | 相同120日治理证据，模板180/90日；发行人正文要求；到期精确边界、父版本升级 | 180有效、90 stale且必需维度UNKNOWN；字段来源/hash可查；旧release不变；模板宽松不绕策略180上限；财务按义务非龄期 | R-05/15/16，W-04/08，11 §9，T-25/26/37 |
+| T-42 | 注册x_customer_retention、未注册/不适用维度、错误H、baseline-only提案 | 合法全配置/事件参与可解释；非法拒绝，不产贡献；baseline-only仍用有效基准；总权重=1，必需维度保留；catalog/registry/policy hash固定 | R-05/15/16，W-03/04/08，11 §9，T-08/25/26 |
+| T-43 | +15最终价、−5公告+40 observed/+50 decision/+60 cutoff/+65生成；双worker、崩溃/失ACK、缺价、+61知识、新风险/撤权 | +15仅provisional；+60同manifest含+40/+50，+65真实generated_at且token唯一仅一次应用；+61不回填；缺价UNKNOWN，cutoff不延长；权限/旧fence拒绝；实时新风险不被普通评估清除 | R-06/08/12，W-05/08，12 §8，T-14/31/38 |
+
+需求映射补充：R-03→T-39；R-05→T-39/41/42；R-06→T-40/43；R-08→T-40/43；R-09→T-39/T-UX-01/02；R-11/12→T-39/40/43权限/恢复；R-15→T-41/42；R-16→T-39…42。原R/W/T不更号不弱化。
+
+
 ===== SOURCE: docs/11-templates-automation-and-roles.md =====
 
 # 11 分层评分模板、自动审核与角色权限
 
-设计版本 v0.2，2026-09-30。本文件是模板解析、判断生效和首版角色的权威合同；02、04、05、06 引用它，不另定义继承算法。
+设计版本 v0.3，2026-09-30。本文件是模板解析、判断生效和首版角色的权威合同；02、04、05、06 引用它，不另定义继承算法。
 
 ## 1. 用户已确认的边界
 
@@ -1129,7 +1197,7 @@ W-08覆盖各模块的最小代表场景，完整需求追踪仍由对应W-01…
 
 父引用包含 key、version 和内容 SHA-256，不使用 latest。发布后的模板不可变；草稿可编辑，ETag防并发覆盖。不允许循环、跳级、跨 workspace 父引用、公司套用不适用行业，或者没有证据口径的新指标。正式运行解析器加载固定父链，校验哈希，按base→industry→company应用patch，生成完整 EffectiveScoringConfig、字段来源和 resolution_hash。
 
-patch 按稳定 dimension ID 修改，不按数组位置修改。每项可覆盖 weight、完整 baseline 或 disabled；未覆盖的属性继承。baseline替换整个维度规则，不递归拼接半份指标数组。维度禁用同时移除其权重；新增 x_ 开头自定义维度必须同时提供权重和baseline。重复patch、未知指标、未知rubric、总权重不等于1、必需维度被禁用均拒绝发布，不偷偷归一化维度权重。有效子指标的缺失归一化仍按评分配置处理，两者不是同一个规则。
+patch 按稳定 dimension ID 修改，不按数组位置修改。每项可覆盖 weight、完整 baseline、完整 quality_policy、完整 event_policy 或 disabled；未覆盖的属性继承。baseline替换整个维度规则，不递归拼接半份指标数组。维度禁用同时移除其权重；新增 x_ 开头自定义维度必须已在冻结registry注册，同时提供权重和baseline，并加载注册默认policy；disabled=true不可混用其他覆盖字段，禁用同时移除权重、baseline和policy。重复patch、未知指标、未知rubric、总权重不等于1、必需维度被禁用均拒绝发布，不偷偷归一化维度权重。有效子指标的缺失归一化仍按评分配置处理，两者不是同一个规则。
 
 模板可配置指标、权重、rubric、证据和新鲜度要求；数值算法、计量单位、字段注册与规范版本通过受控版本发布变更，不能靠任意Python/JS片段扩展。首个标准行业模板服务一般非金融企业；金融、地产和资源周期的专用模板可接入同一框架，尚未提供适用模板时显示unsupported。这是规则适用范围，不阻止公司研究、讯息关联和事件时间线。
 
@@ -1149,9 +1217,9 @@ patch 按稳定 dimension ID 修改，不按数组位置修改。每项可覆盖
 
 标准政策示例：一般关联r≥0.5、校准c≥0.9；影响判断校准a≥0.9且对应关联已accepted；rubric每项有有效证据与档位锚点、校准置信度≥0.9；硬风险校准c≥0.98且有有效监管/发行人原始披露，事实措辞满足对应risk_code。模型自报数字必须经过校准映射；没有可用校准版本时pending，而非伪造可信程度。这些阈值是可维护初始规则，性能尚未测得，正式启用通过07的评估要求。
 
-人工覆盖按subject_slot(company+economic_fact/criterion+dimension)建立新决策，使用If-Match校验当前有效决策。可改关联、拒绝影响、设置无法确认、撤销硬风险或修订rubric。覆盖可以带valid_until；有效期间后续自动重跑仍可保存建议，但不能覆盖人工决定。期满后触发一次有固定cutoff的重新评估；不能简单恢复一条已过时旧AUTO结论。人工撤销覆盖也生成新记录，并重新应用当前合法输入与政策。
+人工覆盖按服务端分配的opaque UUID slot_id建立新决策（自然键见§7），用一个If-Match slot generation校验并发。服务端从slot读取当前decision，不要求调用方再提交重复的decision ID和generation字段。可改关联、拒绝影响、设置无法确认、撤销硬风险或修订rubric。覆盖命令可以带override_valid_until（决策记录为valid_until）；有效期间后续自动重跑仍可保存建议，但不能覆盖人工决定。期满后触发一次有固定cutoff的重新评估；不能简单恢复一条已过时旧AUTO结论。人工撤销覆盖也生成新记录，并重新应用当前合法输入与政策。
 
-DecisionService、有效判断指针、audit、outbox同事务提交。人工拒绝解除关联时，受其支撑的影响、基准和硬风险失效，触发有界评分与策略重算；不能只改前端标签。一次覆盖可能影响多个证券，预览展示A/H影响。普通小修改一个明确动作完成；只有批量或会改变已发布策略状态的操作需要影响预览，不把所有编辑做成审批流程。
+DecisionService、有效判断指针、audit、outbox同事务提交。人工拒绝解除关联时，受其支撑的影响、基准和硬风险失效，触发有界评分与策略重算；不能只改前端标签。一次覆盖可能影响多个证券，提交后直接展示A/H影响和重算状态。普通小修改一个明确动作完成；只有批量修改、模板/策略发布或主数据合并等本来需要比较影响的操作才要求预览，不把单项人工编辑做成审批流程。
 
 ## 5. 首版角色与权限
 
@@ -1176,11 +1244,48 @@ GET /decisions?company_id&status&actor_kind；POST /decisions/{slot}/overrides�
 GET /admin/roles；PUT /admin/users/{id}/roles。响应包含可授予权限和版本，写入采用If-Match、明确差异、审计；403无权、409并发冲突、422不合法角色组合或模板配置。模板Schema校验形状；父链、权重、scope、引用和人工覆盖优先级由语义校验补充。
 
 
+## 7. 类型化人工修改与不可变修订（F01）
+
+合同为[OverrideCommand](../contracts/override-command.schema.json)、[HumanJudgmentRevision](../contracts/human-judgment.schema.json)和review-decision。命令不携带actor、known_at或新decision ID：这些由认证上下文与服务端clock生成。action=accept/reject/pending引用确切subject_revision_id；replace携带完整replacement，不同时引用subject_revision_id；release引用当前人工subject_revision_id。字段不是reason文本中的隐式JSON。
+
+slot自然键：link=(workspace,item/event身份,company,relation_type)；impact=(workspace,company,economic_fact,dimension)；rubric=(workspace,company,rubric,criterion,period)；risk=(workspace,target_kind,target_id,risk_code,economic_fact)。subject_revision归属和旧值必须匹配slot。replace不能改身份键、扩大发生事实、风险目标或rubric期间；这些属于另建判断的有权流程，不冒充值修改。impact完整记录signed_impact、confidence、半衰期、economic_fact、event_time、业务有效期、证据与理由；rubric记录grade、period及对应锚点。link/risk同样有完整类型分支。
+
+If-Match必须带当前slot generation；缺头428，过期409。服务端从当前slot解析decision，避免客户端重复提交并发字段。Idempotency-Key按05 §1绑定。analysis.override与workspace/visibility/证据访问权在提交时再检查，viewer为403；不可见对象为404。有效期半开；known_at不早于所有输入observed_at和本次提交时间，不能用effective_from回填系统历史。override_valid_until不晚于replacement的valid_until；到期即停用，缺新合法判断则pending/UNKNOWN。人工修改也不能绕过证据定位、数值、registry、来源权利和身份语义校验。
+
+同一事务锁slot并用If-Match CAS：校验→replace创建不可变human_judgment_revision(previous_revision_id)→创建HUMAN accepted决策→更新有效slot指针/generation→audit/outbox。accept/reject/pending不虚构新值；reject/pending仍成为人工有效覆盖，抑制后续AUTO。release生成append-only解除记录、清人工锁、移除旧有效指针并排入固定cutoff重评；过渡期无可用判断，不恢复过期AUTO。事务失败全部回滚；同幂等重试返回原201/结果而非新修订。
+
+业务读视图按当前slot generation校验；依赖重算未完成时显示pending_review/UNKNOWN，不沿用被拒或替换的贡献。封存历史不覆写；当前A/H经营评分均重新计算，各证券估值独立；影响封存历史且属于原错误时走12 §4纠错，普通新人工判断仅从known_at生效。AUTO保存新建议但有效HUMAN覆盖仍优先。
+
+[两项完整例子](../examples/v03-human-replacements.json)列出+0.8→−0.2、grade3→1的请求头/新修订/决策/预期表写入链；它们是设计结果，不是数据库回读。同一slot改变值而非旧行UPDATE，409必须保留输入。拒绝risk表示解除该确切风险判断；release表示解除人工覆盖，可能重新接受合法风险，二者按钮不可混称“撤销风险”。
+
+## 8. 硬风险目标与传播（F02）
+
+risk proposal必须包含company_id、target_kind(company/security/listing)、target_id、risk_code、effective_from、valid_until和证据。分析输入manifest提供受限company→security→listing候选及有效身份版本；DecisionService检查target位于本输入候选、上下级一致、证据真正支持该作用范围。[risk-target-policy](../config/risk-target-policy-v1.json)规定每个risk_code允许的目标类型，政策版本固定到决策及风险resolution manifest；delisting_decision只接受listing目标，不能根据来源市场猜目标。
+
+公司级风险传播到release中该公司的全部适用证券；security级只作用那只证券；listing级只匹配该release冻结primary_listing_id的证券。首版非primary listing风险仍记录，但不传播到其他挂牌。传播不沿母子关系自动扩散；需要本实体独立证据和判断。resolution固定目标身份版本、policy/hash、风险修订和适用release/security列表，投影不是传播权威。
+
+strategy消费有效风险集合；任意一个适用accepted风险仍在半开有效期即硬风险OUT。撤销使用确切slot+revision和generation，不按risk_code全公司清除。新风险generation提升同事务落审计/outbox；membership提交校验当前风险generation，旧普通评估或解除任务不得把风险OUT覆盖为IN。撤销最后风险后保留last_confirmed=OUT，清pending，普通规则重新两session确认，不即时ENTER；若仍有公司级违约则继续OUT。实时风险独立于收盘封存，按实际known_at生效。
+
+[H挂牌退市与公司违约例子](../examples/v03-risk-targets.json)：仅H退市→H OUT/RISK，A不因该风险变化；公司违约→A/H各自产生适用RISK；撤销H风险不解除公司违约。此处是预期，实际事务/传播尚未运行。
+
+## 9. 质量与自定义维度解析（F03/F04）
+
+[dimension registry](../config/dimensions-standard-v1.json)由人发布版本，定义稳定ID、适用行业、允许baseline方法及默认quality/event policy。base配置以path+SHA固定registry；父链中不能热换registry，注册扩展通过新base版本及绑定升级。registry注册不等于启用该维度，启用需模板weight+baseline且总权重仍为1。现有必需维度不能被禁用；未知、不适用、缺baseline或rubric引用的维度拒绝发布。
+
+quality_policy完整替换继承值，含evidence_requirement与freshness。accessible_original要求可定位获许可原文；issuer_or_regulator_original进一步要求发行人/监管正文。age_days用于rubric，按as_of−判断effective_from计龄，修订created_at不能刷新年龄；上限与valid_until同时检查，到期边界t≥期限为stale。report_obligation用于财务指标，仍按12 §1所需期间检查，不给三年历史套180天。rubric锚点定义“证据支持哪一档”，quality policy定义“证据类别/时效可否用”，二者均须满足；AUTO policy负责校准接受门，不代替质量门。
+
+先registry默认→base→industry→company，记录每个policy字段的origin；整个policy替换但未覆盖则继承。策略quality_gates再加限制，不让模板绕过必需维度、覆盖度或策略180日rubric上限。age_days有效最大龄期=min(模板龄期,策略baseline_max_age_days)；财务始终按义务。对同一治理输入age=120日，模板180有效，模板90 stale；若该维度为策略必需，后者评估UNKNOWN。严格正文要求不满足即missing/pending_review，不能仅藏证据链接仍给分。
+
+event_policy为enabled=false（baseline-only，无半衰期）或enabled=true+half_life_days。标准五维半衰期由scoring配置的兼容映射与dimension_policies保持一致；解析后event_policy为计算真源，同步生成映射，不容许两个可编辑值冲突。baseline-only拒绝该维度影响，不造零值影响。分析proposal维度从固定枚举扩为受限ID，服务端用解析manifest白名单验证enabled/适用性/半衰期；模型不能任意注册字段或改H。既有同事实去重、cap和Decimal顺序不变，前端不计算策略。
+
+[自定义模板例子](../examples/v03-template-custom.json)启用x_customer_retention、90日/发行人正文与事件H=90；配套[合成rubric](../config/rubrics-synthetic-v03.json)不是生产规则。只在该公司解析方案加载该catalog，catalog内容hash纳入resolved manifest；旧release不变。规则发布固定父链、registry、rubric/metric/numeric/policy内容hash、完整解析值及origin，不能仅冻结path或可变key。模板UI显示“接受事件/仅基准”、证据要求/龄期和最终来源；policy变更同样模拟→预览→新绑定/release。
+
+
 ===== SOURCE: docs/12-time-numerics-and-corrections.md =====
 
 # 12 时点、数值与纠错合同
 
-v0.2设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
+v0.3设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
 
 ## 1. 财务指标与rubric
 
@@ -1198,7 +1303,7 @@ HK主板通常全年业绩≤年结后3个月、半年业绩≤期末后2个月�
 
 日历只给expected sessions及市场时段，不能证明价格FINAL。港股适用CAS证券的最终收盘不能用16:00连续交易末值替代；半日和非CAS按获许可源的价格类型处理。适配器必须输出session、price_kind、is_final、source_revision、observed_at。日历固定版本、年份范围、临时休市和深市映射；覆盖不足显式UNKNOWN，不用工作日猜测。
 
-标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。FINAL判定需要全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
+标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。价格is_final只说明报价类别；收盘evaluation封存另需§8协议，全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
 
 | 输入类别 | 收盘评估的可用条件 |
 |---|---|
@@ -1248,6 +1353,21 @@ age是UTC有效事件时间到as_of的完整秒数除86400，不按本地午夜�
 恢复始终在隔离环境、无发送；验证journal完整性和最新watermark，施加自备份cutoff之后全部撤权，重建ACL/索引并测试，再开放受影响读路径。不能验证最新依据时fail closed相关范围。首版合成场景用独立本地journal fixture验证合同；真实资料接入/生产恢复前才选择实际独立耐久存储并演练，不把尚未配置的灾备说成已实现。
 
 
+## 8. 收盘输入冻结与唯一封存（F05）
+
+价格FINAL、输入冻结、evaluation封存、membership应用是独立状态。session_due→provisional→ready_to_seal→sealed；终态sealed结果可为valid/UNKNOWN/SUSPENDED，不意味着全输入有效。provisional的knowledge_cutoff使用本次实际已知截止且≤generated_at，目标收盘截止另存planned_seal_cutoff；不得把未来+60作为提前run的已知截止。目标cutoff前只可provisional，不创建finalization_token、不计session、不推进普通membership。只有服务端clock≥固定cutoff且日历/最终市场时点合法才能ready_to_seal；没有最终价仍可封存明确UNKNOWN质量缺口，日历/时点未知则记不可封存缺口，禁止用worker now猜cutoff。
+
+strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定release/security/primary_listing/session/as_of/cutoff、manifest ID/hash及expected_generation。用户或模型不能自行封存；调用身份须有受限strategy worker capability，提交仍检查workspace、来源权利与lease fencing。[manifest合同](../contracts/evaluation-input-manifest.schema.json)与[合成示例](../examples/v03-seal-manifest.json)逐类强制输入或缺口；示例hash真实绑定命令，不是已获数据。manifest包含身份/日历、价格/FX/股本、财务/报告义务、关联/影响/rubric/风险/人工覆盖、全部政策/模板/算法版本，逐类revision或显式缺口；不能只冻结价格。
+
+输入选择以§2为准。每类在cutoff内的最后合法修订按known/observed+稳定revision排序；决策与依赖引用也须同cutoff。同时间冲突记录conflicting，不任意择高分。全部参与提交的输入写入事务时由数据库生成knowledge序列和不可回填时间；cutoff后写入不得伪造为早期已知。冻结在PG一致性snapshot内完成，持久化input_refs/quality gaps、内容hash、cutoff watermarks与selection算法版本。队列中的未完成分析不算已知判断，不等待并放宽cutoff；缺口如实UNKNOWN。
+
+冻结manifest与seal slot的generation/CAS同事务，只允许一个(worker fence有效的)冻结候选。固定键(workspace,release,security,session,live)唯一seal slot；provisional有独立run，不占最终键。cutoff后算分可在事务外运行；worker崩溃/丢ACK重用已冻结manifest，双worker不得以各自manifest分别宣称同session FINAL。未sealed候选需要因合法校验失败重新冻结时先CAS废弃旧generation且保留历史记录；已sealed只能走CORRECTION。迟到原数据更正与新知识按§4区分，不能借重试改manifest。
+
+最终事务校验manifest hash、cutoff≤sealed_at/generated_at、当前release/binding、seal generation、worker fence和最新risk/ACL generation；写immutable evaluation、seal_at/token、应用指针、transition解释、audit/outbox同事务。唯一token按seal slot稳定生成；幂等重试返回原结果。若release/session已更迭，封存历史可保留但application_status=superseded，不应用当前membership。实时硬风险仍独立优先，旧普通评估不能解除新风险。撤权使旧冻结输入不可读/不可应用，记录失效并走安全重算/纠错，不为复现保留违规正文。
+
+固定推演（T-43）：以本证券最终市场时点为+0；+15价已is_final只能provisional；一份published=−5min公告+40 observed、+50判断生效→在+60冻结时可用；+60生成manifest，+65实际完成则generated_at=+65，唯一封存且仅一次计数。+61才known的判断不进入此manifest；收盘后新公告也不因+60前observed进入本收盘。缺价封存UNKNOWN清pending；重试不把cutoff延到+70。状态/原子性是设计合同，尚无worker/数据库运行证据。
+
+
 ===== SOURCE: docs/13-first-slice.md =====
 
 # 13 首个开发切片任务书
@@ -1263,7 +1383,7 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 ## 2. 依赖与实现合同
 
 - 项目隔离且无真实业务数据的本机PostgreSQL、Redis及本地对象存储；启动前核验实际服务器、用途和数据分类。远程/共享/未知DB保持只读。
-- 从固定开源脚手架选择性复用认证接口、生成客户端、基础UI、CI；mock身份和外部模型，无真实外发。Refine/Prefect仅各做有界适配验证，选一套运行编排，不叠加调度器。
+- 从固定开源脚手架选择性复用认证接口、生成客户端、基础UI、CI；mock身份和外部模型，无真实外发。先用一套简单执行方式贯通主路径；Refine/Prefect适配属于可选实验，主路径完成前不作为依赖，也不叠加调度器。
 - 首个slice实现身份/RBAC、ingestion、analysis/decision、scoring/templates、strategy、ledger/outbox和必要审计。PG提供结构化检索，OpenSearch全文/语义在W-03；不得把结构化查询冒充完成R-02全部检索。
 - Schema/Pydantic/OpenAPI和生成TypeScript客户端同源。04逻辑表落实本slice物理迁移，数据库变更与outbox同事务；clock/calendar显式注入。
 
@@ -1293,6 +1413,13 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 目标交付：可运行web/API/worker、项目隔离Compose、迁移、生成客户端、合成fixtures、领域/集成/关键UI测试、slice验证报告与启动/恢复说明。成本记录简单可查看，没有开发预算审批。实测后更新工期和后续任务，不预填“已验证节省多少工作”。
 
 停止受影响步骤：DB分类未知；需要真实凭证、采集、外部模型调用、购买、部署或修改远程业务数据而未获授权；发现跨角色/组织泄漏、错误历史前视或重复状态生效。保留完成的合成链路和证据，报告最小必要输入；不绕过限制。
+
+
+## 6. v0.3纳入本slice的五项边界
+
+合成输入增加：+0.8/−0.2影响、grade3/1修订链、H挂牌退市与独立公司违约、90/180日120日龄证据、x_customer_retention完整模板与baseline-only反例、收盘+15/+40/+50/+60/+65时钟序列。11 §7…9及12 §8固定请求/记录/作用范围/冻结协议；T-39…43必须和原主路径一起验证，不能只实现接受/拒绝按钮或仅公司级风险。
+
+数据库仍须按§2验证为项目隔离无真实数据；本轮没有创建库或启动代码。后续实际交付需要逐项回读human修订/有效指针、A/H risk resolutions、resolved config/origin及seal manifest/token、membership/audit/outbox；合成JSON的expected_response不是运行证据。局部故障中旧有效值不能当新值成功展示；release/到期重评与重算等待显式可诊断。
 
 
 ===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
@@ -1618,7 +1745,7 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
 
 {
   "policy_key": "auto-review-standard-v1",
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "default_mode": "auto_accept_when_valid",
   "calibrated_confidence_required": true,
   "link": {
@@ -1641,7 +1768,140 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
   "invalid_or_conflicting": "pending",
   "human_override_precedence": "until_released_or_expired",
   "on_override_expiry": "reevaluate_current_legal_inputs",
-  "template_and_strategy_auto_publish": false
+  "template_and_strategy_auto_publish": false,
+  "risk_target_policy_ref": {
+    "path": "config/risk-target-policy-v1.json",
+    "sha256": "b23f957335f5c59c9654aa1f0cdf43dd5dfbb273d6030df277e6412395a80774"
+  }
+}
+
+
+===== SOURCE: config/dimensions-standard-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "registry_key": "dimensions-standard-v1",
+  "version": 1,
+  "entries": [
+    {
+      "dimension": "profit_quality",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "financial_resilience",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "business_model",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "governance",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "growth_sustainability",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 30
+      }
+    },
+    {
+      "dimension": "x_customer_retention",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "issuer_or_regulator_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 90
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    }
+  ]
 }
 
 
@@ -1712,6 +1972,38 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
   ],
   "comparison": "persisted_12_decimal_values",
   "runtime_pin_required": true
+}
+
+
+===== SOURCE: config/risk-target-policy-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "policy_key": "risk-target-standard-v1",
+  "version": 1,
+  "allowed_target_kinds": {
+    "confirmed_fraud": [
+      "company",
+      "security",
+      "listing"
+    ],
+    "going_concern_material": [
+      "company"
+    ],
+    "confirmed_debt_default": [
+      "company",
+      "security"
+    ],
+    "delisting_decision": [
+      "listing"
+    ]
+  },
+  "company_propagation": "all_applicable_release_securities",
+  "security_propagation": "exact_security",
+  "listing_propagation": "release_primary_listing_only",
+  "parent_child_propagation": "none",
+  "revocation": "exact_slot_revision_generation",
+  "after_last_risk_removed": "OUT_then_normal_adjacent_session_confirmation"
 }
 
 
@@ -1942,10 +2234,36 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
 }
 
 
+===== SOURCE: config/rubrics-synthetic-v03.json =====
+
+{
+  "synthetic": true,
+  "catalog_key": "rubrics-synthetic-v03",
+  "rubrics": {
+    "customer-retention-synthetic-v1": {
+      "method": "equal_weight_criteria",
+      "minimum_criterion_coverage": "0.80",
+      "criteria": [
+        {
+          "key": "repeat_purchase",
+          "anchors": [
+            "持续流失且有数据支持",
+            "留存弱且恶化",
+            "留存一般且稳定",
+            "留存较强且有连续证据",
+            "留存强且跨期稳定"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
 ===== SOURCE: config/scoring-standard-v1.json =====
 
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "model_key": "scoring-standard-v1",
   "version": 1,
   "dimension_weights": {
@@ -2033,7 +2351,76 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
   "minimum_company_coverage": "0.80",
   "metric_definition_ref": "metric-definitions-v2",
   "numeric_policy_ref": "decimal-python-v1",
-  "rubric_catalog_ref": "rubrics-standard-v1"
+  "rubric_catalog_ref": "rubrics-standard-v1",
+  "dimension_registry_ref": {
+    "path": "config/dimensions-standard-v1.json",
+    "sha256": "3c91a60057655ee0dae110a01362c6962d7093b4bb45d9f12b1a11b840dc2c42"
+  },
+  "dimension_policies": {
+    "profit_quality": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    "financial_resilience": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    "business_model": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    "governance": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    "growth_sustainability": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 30
+      }
+    }
+  }
 }
 
 
@@ -2169,27 +2556,27 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
 ===== SOURCE: config/templates-standard-v1.json =====
 
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "synthetic_company_customization": true,
   "templates": [
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "base-standard",
-      "version": 1,
+      "version": 2,
       "level": "base",
       "scope": {
         "kind": "all"
       },
       "base_config_ref": {
         "path": "config/scoring-standard-v1.json",
-        "sha256": "e62aeb17948d03374a0a4bff46d6a80b8a5efc2afa4aead5153fefc6a42eb12d"
+        "sha256": "5de1ce826f98af392f459095ca57d2b33453624163aeeda845c83caef2670cd6"
       },
       "patches": []
     },
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "industry-manufacturing",
-      "version": 1,
+      "version": 2,
       "level": "industry",
       "scope": {
         "kind": "industry",
@@ -2197,8 +2584,8 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
       },
       "parent_ref": {
         "key": "base-standard",
-        "version": 1,
-        "sha256": "242e44337476e4b8a399058f6bc298dc22759f43e7bf2d89d968306d2f98e185"
+        "version": 2,
+        "sha256": "d70df2f21ee51018c5e1978f9ae3d85229b10938e5f62b638329b40bce3c1719"
       },
       "patches": [
         {
@@ -2214,9 +2601,9 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
       ]
     },
     {
-      "schema_version": "1.0",
+      "schema_version": "2.0",
       "template_key": "company-synthetic-manufacturer",
-      "version": 1,
+      "version": 2,
       "level": "company",
       "scope": {
         "kind": "company",
@@ -2224,8 +2611,8 @@ Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最�
       },
       "parent_ref": {
         "key": "industry-manufacturing",
-        "version": 1,
-        "sha256": "bce3cd3ac718ac0b44d1ddaefc354faa169a96352244a56ce43946c7aeb9b306"
+        "version": 2,
+        "sha256": "4ab9f3166ef772e7b5f718c9fcba6a4df175a1f8ccd89dbf50c6af37df199c6d"
       },
       "patches": [
         {
@@ -2260,9 +2647,18 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 
 本阶段工具用Python标准库做保守的Schema子集形状、范围与示例一致检查，并逐文件检查 JSON 语法和 Schema 本地引用；没有安装完整 JSON Schema validator，正式 draft 2020-12 validation 属于 M0 未运行项。此限制在 validation-result 中明列，不能将文档检查说成业务验收。
 
-当前strategy/job/scoring/analysis-result Schema为2.0；analysis-result包含关联、影响、rubric与风险proposal，仍不能自我批准。模板父hash采用UTF-8、ensure_ascii=False、indent=2与末尾换行的JSON文件字节SHA-256，发布固定此canonical格式。config路径中的v1表示首套标准配置，其指标定义引用v2，不是设计v0.1。
+v0.2时strategy/job/scoring/analysis-result Schema为2.0（v0.3当前版本见下节）；analysis-result包含关联、影响、rubric与风险proposal，仍不能自我批准。模板父hash采用UTF-8、ensure_ascii=False、indent=2与末尾换行的JSON文件字节SHA-256，发布固定此canonical格式。config路径中的v1表示首套标准配置，其指标定义引用v2，不是设计v0.1。
 
 模板层级/继承/发布和审核优先级见11，数值/时点/更正见12。shape校验不能证明身份、证据、父scope或业务权限；所有跨对象关系还需语义校验。examples中的AUTO accepted由DecisionService生成，不能直接使用模型proposal冒充accepted。
+
+
+## v0.3合同升级
+
+analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strategy/job仍2.0，不因设计版本统一强制改号。旧合同字节保留在固定Git历史；未运行产品不存在生产迁移。
+
+新增[override-command](./override-command.schema.json)、[human-judgment](./human-judgment.schema.json)、[dimension-registry](./dimension-registry.schema.json)、[evaluation-seal](./evaluation-seal.schema.json)及[完整冻结manifest](./evaluation-input-manifest.schema.json)。review-decision只引用opaque UUID修订，不携带替换值；OverrideCommand的四类judgment与HumanRevision同形，材料工具检查同步。模型风险带target/有效期；维度ID形状扩大后还须manifest白名单校验。registry/模板政策及兼容半衰期映射由语义校验保持一致，类型通过不证明业务授权。
+
+新例子分别见examples/v03-human-replacements.json、v03-risk-targets.json、v03-template-custom.json和v03-seal-command.json；都是设计预期。v0.2探针仍绑定原commit/hash，不用当前Schema重写其观察。schema版本选择、旧风险消歧与不可回填规则见[V03-CHANGELOG](../review/V03-CHANGELOG.md)。
 
 
 ===== SOURCE: contracts/analysis-result.schema.json =====
@@ -2272,7 +2668,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "const": "3.0"
     },
     "item_revision_id": {
       "type": "string",
@@ -2345,13 +2741,8 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
             "format": "uuid"
           },
           "dimension": {
-            "enum": [
-              "profit_quality",
-              "financial_resilience",
-              "business_model",
-              "governance",
-              "growth_sustainability"
-            ]
+            "type": "string",
+            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
           },
           "signed_impact": {
             "type": "string",
@@ -2488,6 +2879,28 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
           "rationale": {
             "type": "string",
             "minLength": 1
+          },
+          "target_kind": {
+            "enum": [
+              "company",
+              "security",
+              "listing"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "valid_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         },
         "required": [
@@ -2495,7 +2908,11 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
           "risk_code",
           "confidence",
           "evidence_ids",
-          "rationale"
+          "rationale",
+          "target_kind",
+          "target_id",
+          "effective_from",
+          "valid_until"
         ]
       }
     }
@@ -2545,6 +2962,2005 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
       }
     }
   ]
+}
+
+
+===== SOURCE: contracts/dimension-registry.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "registry_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+          },
+          "applicable_industries": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allowed_baseline_methods": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "weighted_metric_rubric",
+                "accepted_evidence_rubric"
+              ]
+            }
+          },
+          "quality_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "evidence_requirement": {
+                "enum": [
+                  "accessible_original",
+                  "issuer_or_regulator_original"
+                ]
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "report_obligation"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "age_days"
+                      },
+                      "max_age_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3650
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "max_age_days"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "evidence_requirement",
+              "freshness"
+            ]
+          },
+          "event_policy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "half_life_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 730
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "half_life_days"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "dimension",
+          "applicable_industries",
+          "allowed_baseline_methods",
+          "quality_policy",
+          "event_policy"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "registry_key",
+    "version",
+    "entries"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Versioned dimension registry defaults; publication is human controlled"
+}
+
+
+===== SOURCE: contracts/evaluation-input-manifest.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "release_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "security_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "primary_listing_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_session": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluation_as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "knowledge_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "selection_algorithm_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cutoff_knowledge_sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "calendar": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "price": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "fx": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "share_capital": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "financials": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "report_obligations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "impacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rubrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "risks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "human_overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "templates": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "decision_policies": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "algorithms": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rights": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "identity",
+        "calendar",
+        "price",
+        "fx",
+        "share_capital",
+        "financials",
+        "report_obligations",
+        "links",
+        "impacts",
+        "rubrics",
+        "risks",
+        "human_overrides",
+        "templates",
+        "decision_policies",
+        "algorithms",
+        "rights"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "release_id",
+    "security_id",
+    "primary_listing_id",
+    "market_session",
+    "evaluation_as_of",
+    "knowledge_cutoff",
+    "frozen_at",
+    "selection_algorithm_ref",
+    "cutoff_knowledge_sequence",
+    "inputs"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Immutable seal input manifest; all input classes or explicit quality gaps"
+}
+
+
+===== SOURCE: contracts/evaluation-seal.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "release_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "security_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "primary_listing_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_session": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluation_as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "knowledge_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expected_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_id",
+    "security_id",
+    "primary_listing_id",
+    "market_session",
+    "evaluation_as_of",
+    "knowledge_cutoff",
+    "expected_generation",
+    "manifest_id",
+    "manifest_sha256"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evaluation seal command; internal strategy service only"
+}
+
+
+===== SOURCE: contracts/human-judgment.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "slot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "previous_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "actor_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "judgment": {
+      "$ref": "#/$defs/judgment"
+    }
+  },
+  "required": [
+    "schema_version",
+    "revision_id",
+    "slot_id",
+    "previous_revision_id",
+    "actor_id",
+    "created_at",
+    "input_manifest_id",
+    "judgment"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Immutable human judgment revision",
+  "$defs": {
+    "judgment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "link"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "relation_type": {
+                  "enum": [
+                    "direct",
+                    "subsidiary",
+                    "customer_supplier",
+                    "competitor",
+                    "industry_policy",
+                    "indirect_theme"
+                  ]
+                },
+                "relevance": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "relation_type",
+                "relevance",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "impact"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "dimension": {
+                  "type": "string",
+                  "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+                },
+                "signed_impact": {
+                  "type": "string",
+                  "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "half_life_days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 730
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "economic_fact_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "event_time": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "dimension",
+                "signed_impact",
+                "confidence",
+                "half_life_days",
+                "valid_until",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "economic_fact_id",
+                "event_time"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "rubric"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "rubric_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "criterion_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "grade": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "period": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "end": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                }
+              },
+              "required": [
+                "company_id",
+                "rubric_ref",
+                "criterion_key",
+                "grade",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "valid_until",
+                "effective_from",
+                "period"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "risk"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "risk_code": {
+                  "enum": [
+                    "confirmed_fraud",
+                    "going_concern_material",
+                    "confirmed_debt_default",
+                    "delisting_decision"
+                  ]
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_kind": {
+                  "enum": [
+                    "company",
+                    "security",
+                    "listing"
+                  ]
+                },
+                "target_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "risk_code",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "target_kind",
+                "target_id",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        }
+      ]
+    }
+  }
 }
 
 
@@ -2710,6 +5126,441 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 }
 
 
+===== SOURCE: contracts/override-command.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "action": {
+      "enum": [
+        "accept",
+        "reject",
+        "pending",
+        "replace",
+        "release"
+      ]
+    },
+    "slot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "replacement": {
+      "$ref": "#/$defs/judgment"
+    },
+    "override_valid_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "action",
+    "slot_id",
+    "override_valid_until",
+    "reason",
+    "evidence_ids"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Human override command; one If-Match generation and Idempotency-Key are required",
+  "$defs": {
+    "judgment": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "link"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "relation_type": {
+                  "enum": [
+                    "direct",
+                    "subsidiary",
+                    "customer_supplier",
+                    "competitor",
+                    "industry_policy",
+                    "indirect_theme"
+                  ]
+                },
+                "relevance": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "relation_type",
+                "relevance",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "impact"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "dimension": {
+                  "type": "string",
+                  "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+                },
+                "signed_impact": {
+                  "type": "string",
+                  "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "half_life_days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 730
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "economic_fact_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "event_time": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "dimension",
+                "signed_impact",
+                "confidence",
+                "half_life_days",
+                "valid_until",
+                "evidence_ids",
+                "rationale",
+                "effective_from",
+                "economic_fact_id",
+                "event_time"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "rubric"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "rubric_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "criterion_key": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "grade": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "period": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "end": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                }
+              },
+              "required": [
+                "company_id",
+                "rubric_ref",
+                "criterion_key",
+                "grade",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "valid_until",
+                "effective_from",
+                "period"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "subject_kind": {
+              "const": "risk"
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "company_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "risk_code": {
+                  "enum": [
+                    "confirmed_fraud",
+                    "going_concern_material",
+                    "confirmed_debt_default",
+                    "delisting_decision"
+                  ]
+                },
+                "confidence": {
+                  "type": "string",
+                  "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                },
+                "evidence_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_kind": {
+                  "enum": [
+                    "company",
+                    "security",
+                    "listing"
+                  ]
+                },
+                "target_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "effective_from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "valid_until": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "company_id",
+                "risk_code",
+                "confidence",
+                "evidence_ids",
+                "rationale",
+                "target_kind",
+                "target_id",
+                "effective_from",
+                "valid_until"
+              ]
+            }
+          },
+          "required": [
+            "subject_kind",
+            "value"
+          ]
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "action": {
+            "const": "replace"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "replacement"
+        ],
+        "not": {
+          "required": [
+            "subject_revision_id"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "subject_revision_id"
+        ],
+        "not": {
+          "required": [
+            "replacement"
+          ]
+        }
+      }
+    }
+  ]
+}
+
+
 ===== SOURCE: contracts/review-decision.schema.json =====
 
 {
@@ -2719,7 +5570,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "2.0"
     },
     "decision_id": {
       "type": "string",
@@ -2727,11 +5578,11 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     },
     "subject_slot": {
       "type": "string",
-      "minLength": 1
+      "format": "uuid"
     },
     "subject_revision": {
       "type": "string",
-      "minLength": 1
+      "format": "uuid"
     },
     "status": {
       "enum": [
@@ -2818,7 +5669,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "2.0"
     },
     "template_key": {
       "type": "string",
@@ -3012,6 +5863,90 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
           "reason": {
             "type": "string",
             "minLength": 1
+          },
+          "quality_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "evidence_requirement": {
+                "enum": [
+                  "accessible_original",
+                  "issuer_or_regulator_original"
+                ]
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "report_obligation"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "age_days"
+                      },
+                      "max_age_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3650
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "max_age_days"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "evidence_requirement",
+              "freshness"
+            ]
+          },
+          "event_policy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "half_life_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 730
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "half_life_days"
+                ]
+              }
+            ]
           }
         },
         "required": [
@@ -3032,6 +5967,16 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
           {
             "required": [
               "disabled"
+            ]
+          },
+          {
+            "required": [
+              "quality_policy"
+            ]
+          },
+          {
+            "required": [
+              "event_policy"
             ]
           }
         ]
@@ -3089,7 +6034,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "const": "3.0"
     },
     "model_key": {
       "type": "string",
@@ -3260,6 +6205,122 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     "minimum_company_coverage": {
       "type": "string",
       "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+    },
+    "dimension_registry_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "dimension_policies": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "quality_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "evidence_requirement": {
+                "enum": [
+                  "accessible_original",
+                  "issuer_or_regulator_original"
+                ]
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "report_obligation"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "age_days"
+                      },
+                      "max_age_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3650
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "max_age_days"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "evidence_requirement",
+              "freshness"
+            ]
+          },
+          "event_policy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "half_life_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 730
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "half_life_days"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "quality_policy",
+          "event_policy"
+        ]
+      }
     }
   },
   "required": [
@@ -3275,7 +6336,9 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     "baselines",
     "missing_submetric_policy",
     "minimum_submetric_coverage",
-    "minimum_company_coverage"
+    "minimum_company_coverage",
+    "dimension_registry_ref",
+    "dimension_policies"
   ]
 }
 
@@ -3567,7 +6630,7 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 ===== SOURCE: examples/analysis-proposal.json =====
 
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "item_revision_id": "00000000-0000-4000-8000-000000000002",
   "no_link": false,
   "links": [
@@ -3617,10 +6680,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 ===== SOURCE: examples/auto-decision.json =====
 
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "decision_id": "00000000-0000-4000-8000-000000000010",
-  "subject_slot": "synthetic-company:fact-01:profit_quality",
-  "subject_revision": "synthetic-impact-r1",
+  "subject_slot": "00000000-0000-4000-8000-000000000020",
+  "subject_revision": "00000000-0000-4000-8000-000000000021",
   "status": "accepted",
   "actor_kind": "AUTO",
   "actor_id": "decision-service",
@@ -3639,10 +6702,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 ===== SOURCE: examples/human-override.json =====
 
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "decision_id": "00000000-0000-4000-8000-000000000011",
-  "subject_slot": "synthetic-company:fact-01:profit_quality",
-  "subject_revision": "synthetic-impact-r2",
+  "subject_slot": "00000000-0000-4000-8000-000000000020",
+  "subject_revision": "00000000-0000-4000-8000-000000000021",
   "status": "rejected",
   "actor_kind": "HUMAN",
   "actor_id": "synthetic-researcher",
@@ -3838,6 +6901,538 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 }
 
 
+===== SOURCE: examples/v03-human-replacements.json =====
+
+{
+  "synthetic": true,
+  "status": "design_expectations_not_runtime_results",
+  "cases": [
+    {
+      "id": "T-39-impact",
+      "headers": {
+        "If-Match": "slot-generation-4",
+        "Idempotency-Key": "synthetic-replace-impact"
+      },
+      "previous_value": "0.8",
+      "replacement_value": "-0.2",
+      "request": {
+        "schema_version": "1.0",
+        "action": "replace",
+        "slot_id": "00000000-0000-4000-8000-000000000020",
+        "replacement": {
+          "subject_kind": "impact",
+          "value": {
+            "company_id": "00000000-0000-4000-8000-000000000001",
+            "dimension": "profit_quality",
+            "signed_impact": "-0.2",
+            "confidence": "0.95",
+            "half_life_days": 90,
+            "valid_until": "2026-10-30T00:00:00Z",
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000000003"
+            ],
+            "rationale": "合成原文中的新增成本削弱盈利质量，人工修订方向为负。",
+            "economic_fact_id": "00000000-0000-4000-8000-000000000030",
+            "event_time": "2026-09-29T00:00:00Z",
+            "effective_from": "2026-09-30T02:00:00Z"
+          }
+        },
+        "override_valid_until": "2026-10-30T00:00:00Z",
+        "reason": "合成人工修订，保留原判断与证据",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ]
+      },
+      "expected_response": {
+        "status": 201,
+        "revision": {
+          "schema_version": "1.0",
+          "revision_id": "00000000-0000-4000-8000-000000000040",
+          "slot_id": "00000000-0000-4000-8000-000000000020",
+          "previous_revision_id": "00000000-0000-4000-8000-000000000021",
+          "actor_id": "00000000-0000-4000-8000-000000000050",
+          "created_at": "2026-09-30T02:00:00Z",
+          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+          "judgment": {
+            "subject_kind": "impact",
+            "value": {
+              "company_id": "00000000-0000-4000-8000-000000000001",
+              "dimension": "profit_quality",
+              "signed_impact": "-0.2",
+              "confidence": "0.95",
+              "half_life_days": 90,
+              "valid_until": "2026-10-30T00:00:00Z",
+              "evidence_ids": [
+                "00000000-0000-4000-8000-000000000003"
+              ],
+              "rationale": "合成原文中的新增成本削弱盈利质量，人工修订方向为负。",
+              "economic_fact_id": "00000000-0000-4000-8000-000000000030",
+              "event_time": "2026-09-29T00:00:00Z",
+              "effective_from": "2026-09-30T02:00:00Z"
+            }
+          }
+        },
+        "decision": {
+          "schema_version": "2.0",
+          "decision_id": "00000000-0000-4000-8000-000000000060",
+          "subject_slot": "00000000-0000-4000-8000-000000000020",
+          "subject_revision": "00000000-0000-4000-8000-000000000040",
+          "status": "accepted",
+          "actor_kind": "HUMAN",
+          "actor_id": "synthetic-researcher",
+          "policy_ref": "auto-review-standard-v1",
+          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+          "known_at": "2026-09-30T02:00:00Z",
+          "valid_until": "2026-10-30T00:00:00Z",
+          "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+          "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+          "evidence_ids": [
+            "00000000-0000-4000-8000-000000000003"
+          ]
+        },
+        "slot_generation": 5
+      },
+      "expected_persistence": {
+        "append": [
+          "human_judgment_revision",
+          "review_decision",
+          "audit_event",
+          "outbox"
+        ],
+        "cas_slot_generation": [
+          4,
+          5
+        ],
+        "old_revision_unchanged": true,
+        "recompute_security_ids": [
+          "00000000-0000-4000-8000-000000000101",
+          "00000000-0000-4000-8000-000000000102"
+        ]
+      }
+    },
+    {
+      "id": "T-39-rubric",
+      "headers": {
+        "If-Match": "slot-generation-4",
+        "Idempotency-Key": "synthetic-replace-rubric"
+      },
+      "previous_value": 3,
+      "replacement_value": 1,
+      "request": {
+        "schema_version": "1.0",
+        "action": "replace",
+        "slot_id": "00000000-0000-4000-8000-000000000024",
+        "replacement": {
+          "subject_kind": "rubric",
+          "value": {
+            "company_id": "00000000-0000-4000-8000-000000000001",
+            "rubric_ref": "business-model-v1",
+            "criterion_key": "pricing_power",
+            "grade": 1,
+            "confidence": "0.95",
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000000003"
+            ],
+            "rationale": "合成证据显示提价后客户流失，原定价权档位3依据不成立，改为档位1。",
+            "valid_until": "2026-10-30T00:00:00Z",
+            "effective_from": "2026-09-30T02:00:00Z",
+            "period": {
+              "start": "2026-01-01T00:00:00Z",
+              "end": "2027-01-01T00:00:00Z"
+            }
+          }
+        },
+        "override_valid_until": "2026-10-30T00:00:00Z",
+        "reason": "合成人工修订，保留原判断与证据",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ]
+      },
+      "expected_response": {
+        "status": 201,
+        "revision": {
+          "schema_version": "1.0",
+          "revision_id": "00000000-0000-4000-8000-000000000041",
+          "slot_id": "00000000-0000-4000-8000-000000000024",
+          "previous_revision_id": "00000000-0000-4000-8000-000000000022",
+          "actor_id": "00000000-0000-4000-8000-000000000050",
+          "created_at": "2026-09-30T02:00:00Z",
+          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+          "judgment": {
+            "subject_kind": "rubric",
+            "value": {
+              "company_id": "00000000-0000-4000-8000-000000000001",
+              "rubric_ref": "business-model-v1",
+              "criterion_key": "pricing_power",
+              "grade": 1,
+              "confidence": "0.95",
+              "evidence_ids": [
+                "00000000-0000-4000-8000-000000000003"
+              ],
+              "rationale": "合成证据显示提价后客户流失，原定价权档位3依据不成立，改为档位1。",
+              "valid_until": "2026-10-30T00:00:00Z",
+              "effective_from": "2026-09-30T02:00:00Z",
+              "period": {
+                "start": "2026-01-01T00:00:00Z",
+                "end": "2027-01-01T00:00:00Z"
+              }
+            }
+          }
+        },
+        "decision": {
+          "schema_version": "2.0",
+          "decision_id": "00000000-0000-4000-8000-000000000061",
+          "subject_slot": "00000000-0000-4000-8000-000000000024",
+          "subject_revision": "00000000-0000-4000-8000-000000000041",
+          "status": "accepted",
+          "actor_kind": "HUMAN",
+          "actor_id": "synthetic-researcher",
+          "policy_ref": "auto-review-standard-v1",
+          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+          "known_at": "2026-09-30T02:00:00Z",
+          "valid_until": "2026-10-30T00:00:00Z",
+          "supersedes_decision_id": "00000000-0000-4000-8000-000000000014",
+          "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+          "evidence_ids": [
+            "00000000-0000-4000-8000-000000000003"
+          ]
+        },
+        "slot_generation": 5
+      },
+      "expected_persistence": {
+        "append": [
+          "human_judgment_revision",
+          "review_decision",
+          "audit_event",
+          "outbox"
+        ],
+        "cas_slot_generation": [
+          4,
+          5
+        ],
+        "old_revision_unchanged": true,
+        "recompute_security_ids": [
+          "00000000-0000-4000-8000-000000000101",
+          "00000000-0000-4000-8000-000000000102"
+        ]
+      }
+    }
+  ]
+}
+
+
+===== SOURCE: examples/v03-risk-targets.json =====
+
+{
+  "synthetic": true,
+  "proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "risk_code": "delisting_decision",
+      "target_kind": "listing",
+      "target_id": "00000000-0000-4000-8000-000000000202",
+      "confidence": "0.99",
+      "effective_from": "2026-09-30T02:00:00Z",
+      "valid_until": null,
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成原始披露支持本目标，非真实投资判断"
+    },
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "risk_code": "confirmed_debt_default",
+      "target_kind": "company",
+      "target_id": "00000000-0000-4000-8000-000000000001",
+      "confidence": "0.99",
+      "effective_from": "2026-09-30T02:00:00Z",
+      "valid_until": null,
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成原始披露支持本目标，非真实投资判断"
+    }
+  ],
+  "identity_fixture": {
+    "company_id": "00000000-0000-4000-8000-000000000001",
+    "securities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "primary_listing_id": "00000000-0000-4000-8000-000000000201"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000102",
+        "primary_listing_id": "00000000-0000-4000-8000-000000000202"
+      }
+    ]
+  },
+  "expected": {
+    "listing_risk_targets": [
+      "00000000-0000-4000-8000-000000000102"
+    ],
+    "company_risk_targets": [
+      "00000000-0000-4000-8000-000000000101",
+      "00000000-0000-4000-8000-000000000102"
+    ],
+    "reject_listing_risk_keeps_company_risk": true
+  },
+  "runtime_status": "not_run"
+}
+
+
+===== SOURCE: examples/v03-seal-command.json =====
+
+{
+  "schema_version": "1.0",
+  "release_id": "00000000-0000-4000-8000-000000000070",
+  "security_id": "00000000-0000-4000-8000-000000000102",
+  "primary_listing_id": "00000000-0000-4000-8000-000000000202",
+  "market_session": "synthetic-s1",
+  "evaluation_as_of": "2026-09-30T08:10:00Z",
+  "knowledge_cutoff": "2026-09-30T09:10:00Z",
+  "expected_generation": 4,
+  "manifest_id": "00000000-0000-4000-8000-000000000080",
+  "manifest_sha256": "b94233fdea35bf8c64966278ae6e052f4c6ab5ad222e3ddbcdc00b905f94337f"
+}
+
+
+===== SOURCE: examples/v03-seal-manifest.json =====
+
+{
+  "schema_version": "1.0",
+  "release_id": "00000000-0000-4000-8000-000000000070",
+  "security_id": "00000000-0000-4000-8000-000000000102",
+  "primary_listing_id": "00000000-0000-4000-8000-000000000202",
+  "market_session": "synthetic-s1",
+  "evaluation_as_of": "2026-09-30T08:10:00Z",
+  "knowledge_cutoff": "2026-09-30T09:10:00Z",
+  "manifest_id": "00000000-0000-4000-8000-000000000080",
+  "frozen_at": "2026-09-30T09:10:00Z",
+  "selection_algorithm_ref": "synthetic-cutoff-selection-v1",
+  "cutoff_knowledge_sequence": 120,
+  "inputs": {
+    "identity": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000300",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "calendar": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000301",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "price": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000302",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "fx": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000303",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "share_capital": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000304",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "financials": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000305",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "report_obligations": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000306",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "links": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000307",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "impacts": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000308",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "rubrics": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000309",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "risks": {
+      "quality": "not_applicable",
+      "inputs": [],
+      "reason_codes": [
+        "synthetic_no_active_risks"
+      ]
+    },
+    "human_overrides": {
+      "quality": "not_applicable",
+      "inputs": [],
+      "reason_codes": [
+        "synthetic_no_active_human_overrides"
+      ]
+    },
+    "templates": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000312",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "decision_policies": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000313",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "algorithms": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000314",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "rights": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000315",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    }
+  }
+}
+
+
+===== SOURCE: examples/v03-template-custom.json =====
+
+{
+  "schema_version": "2.0",
+  "template_key": "company-synthetic-custom-dimension",
+  "version": 1,
+  "level": "company",
+  "scope": {
+    "kind": "company",
+    "company_id": "00000000-0000-4000-8000-000000000001"
+  },
+  "parent_ref": {
+    "key": "industry-manufacturing",
+    "version": 2,
+    "sha256": "4ab9f3166ef772e7b5f718c9fcba6a4df175a1f8ccd89dbf50c6af37df199c6d"
+  },
+  "patches": [
+    {
+      "dimension": "governance",
+      "quality_policy": {
+        "evidence_requirement": "issuer_or_regulator_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 90
+        }
+      },
+      "reason": "90日行业/企业证据口径示范"
+    },
+    {
+      "dimension": "growth_sustainability",
+      "weight": "0.05",
+      "reason": "为新增维度保留0.05权重"
+    },
+    {
+      "dimension": "x_customer_retention",
+      "weight": "0.05",
+      "baseline": {
+        "method": "accepted_evidence_rubric",
+        "rubric_ref": "customer-retention-synthetic-v1"
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      },
+      "reason": "合成客户留存扩展示范"
+    }
+  ]
+}
+
+
 ===== SOURCE: tools/build_review_pack.py =====
 
 #!/usr/bin/env python3
@@ -3848,11 +7443,11 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md"])
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
-parts = ["# 价值投资策略管理系统 v0.2 · GPT Pro 整包评审材料\n\n日期：2026-09-30。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
+parts = ["# 价值投资策略管理系统 v0.3 · GPT Pro 整包评审材料\n\n日期：2026-09-30。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
 for p in paths:
     parts.append(f"| `{p.relative_to(ROOT)}` | `{hashlib.sha256(p.read_bytes()).hexdigest()}` |\n")
 for p in paths:
@@ -3903,7 +7498,7 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
 
-""" + "\n".join(links) + "\n\n这些是当前v0.2的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+""" + "\n".join(links) + "\n\n这些是当前v0.3的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
 (ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
 print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")
 
@@ -4032,10 +7627,106 @@ def validate(value, schema, root=None):
             raise MaterialError("numeric bounds")
 
 
+===== SOURCE: tools/v03_material_checks.py =====
+
+"""Offline contract predicates and expected examples, never product acceptance."""
+import copy
+from decimal import Decimal
+from datetime import datetime
+from material_schema import validate
+
+
+def run(read, check, reject, resolve, bundle, scoring, canonical_hash):
+    # Shared typed payload copies cannot drift across the request and stored revision.
+    command_schema=read('contracts/override-command.schema.json')
+    human_schema=read('contracts/human-judgment.schema.json')
+    check(command_schema['$defs']['judgment']==human_schema['$defs']['judgment'], 'v03 typed request/revision judgment agreement')
+    decision_schema=read('contracts/review-decision.schema.json')
+    replacements=read('examples/v03-human-replacements.json')['cases']
+    for case in replacements:
+        cmd=case['request'];response=case['expected_response'];rev=response['revision'];dec=response['decision']
+        validate(cmd,command_schema);validate(rev,human_schema);validate(dec,decision_schema)
+        check(rev['judgment']==cmd['replacement'] and rev['slot_id']==cmd['slot_id']==dec['subject_slot'], 'v03 replacement value / slot: '+case['id'])
+        check(dec['subject_revision']==rev['revision_id'] and rev['previous_revision_id']!=rev['revision_id'] and dec['status']=='accepted' and dec['actor_kind']=='HUMAN', 'v03 immutable revision/decision references: '+case['id'])
+        match=case['headers']['If-Match'].rsplit('-', 1)[-1]
+        check(dec['supersedes_decision_id'] and response['slot_generation']==int(match)+1, 'v03 single If-Match CAS expectation: '+case['id'])
+        check(set(cmd['replacement']['value']['evidence_ids'])<=set(cmd['evidence_ids']), 'v03 replacement evidence bound: '+case['id'])
+        bad=copy.deepcopy(cmd);del bad['replacement'];reject(lambda:validate(bad,command_schema),'v03 replace without full value')
+        bad=copy.deepcopy(cmd);bad['subject_revision_id']=rev['previous_revision_id'];reject(lambda:validate(bad,command_schema),'v03 replace mixed with subject reference')
+    for action in ['accept','reject','pending','release']:
+        cmd=copy.deepcopy(replacements[0]['request']);del cmd['replacement'];cmd.update(action=action,subject_revision_id=replacements[0]['expected_response']['revision']['previous_revision_id'])
+        validate(cmd,command_schema);check(True,'v03 non-replacement action shape: '+action)
+        bad=copy.deepcopy(cmd);bad['replacement']=replacements[0]['request']['replacement'];reject(lambda:validate(bad,command_schema),'v03 non-replace carries replacement: '+action)
+    # Material target-resolution counterexamples. These predicates are not runtime DecisionService.
+    fixture=read('examples/v03-risk-targets.json');policy=read('config/risk-target-policy-v1.json')
+    risk_schema=read('contracts/analysis-result.schema.json')['properties']['risk_proposals']['items']
+    def targets(p):
+        validate(p,risk_schema)
+        if p['company_id']!=fixture['identity_fixture']['company_id']:raise ValueError('company outside candidates')
+        if p['target_kind'] not in policy['allowed_target_kinds'][p['risk_code']]:raise ValueError('risk kind')
+        securities=fixture['identity_fixture']['securities']
+        if p['target_kind']=='company':
+            if p['target_id']!=p['company_id']:raise ValueError('company target')
+            return [s['id'] for s in securities]
+        matches=[s['id'] for s in securities if s['id' if p['target_kind']=='security' else 'primary_listing_id']==p['target_id']]
+        if not matches:raise ValueError('target outside candidates')
+        return matches
+    a,b=fixture['proposals']
+    check(targets(a)==fixture['expected']['listing_risk_targets'],'v03 H listing-only expected resolution')
+    check(targets(b)==fixture['expected']['company_risk_targets'],'v03 company default expected resolution A/H')
+    check(set(targets(b))==set(targets(a))|set(targets(b)), 'v03 removal of listing risk leaves independent company risk set')
+    for changes,label in [({'target_kind':'company','target_id':a['company_id']},'delisting cannot broaden to company'),({'target_id':'00000000-0000-4000-8000-000000999999'},'target outside manifest'),({'company_id':'00000000-0000-4000-8000-000000999999'},'wrong parent company')]:
+        bad=copy.deepcopy(a);bad.update(changes);reject(lambda:targets(bad),'v03 '+label)
+    old=copy.deepcopy(a);del old['target_kind'];del old['target_id'];reject(lambda:validate(old,risk_schema),'v03 ambiguous company-only old risk rejected')
+    # Registry / inheritance / custom contribution whitelist shape and material semantics.
+    registry=read('config/dimensions-standard-v1.json');validate(registry,read('contracts/dimension-registry.schema.json'));check(True,'v03 registry shape')
+    custom=read('examples/v03-template-custom.json');templates=copy.deepcopy(bundle['templates'])+[custom]
+    resolved=resolve(custom['template_key'],templates)
+    check(sum(Decimal(v) for v in resolved['dimension_weights'].values())==1 and resolved['dimension_policies']['x_customer_retention']['event_policy']=={'enabled':True,'half_life_days':90},'v03 custom dimension resolved weight/event golden')
+    q=resolved['dimension_policies']['governance']['quality_policy']
+    check(q['freshness']['max_age_days']==90 and q['evidence_requirement']=='issuer_or_regulator_original','v03 complete policy patch golden')
+    check(scoring['dimension_policies']['governance']['quality_policy']['freshness']['max_age_days']==180,'v03 base 180-day policy unchanged')
+    check(120<180 and not 120<90 and not 90<90,'v03 120-day freshness / exact expiry boundary arithmetic, NOT runtime freshness')
+    check(min(365,180)==180,'v03 restrictive strategy age composition arithmetic')
+    for changes,label in [({'dimension':'x_not_registered'},'unknown custom dimension'),({'event_policy':{'enabled':True,'half_life_days':0}},'invalid event half-life'),({'disabled':True},'disabled mixed with patch')]:
+        ts=copy.deepcopy(templates);ts[-1]['patches'][-1].update(changes);reject(lambda:resolve(custom['template_key'],ts),'v03 '+label)
+    # Blueprint policy references are frozen: a different content hash cannot load silently.
+    bad=copy.deepcopy(templates);bad[0]['base_config_ref']['sha256']='0'*64;reject(lambda:resolve(custom['template_key'],bad),'v03 old parent hash not hot-replaced')
+    impact=copy.deepcopy(read('examples/analysis-proposal.json')['impact_proposals'][0]);impact.update(dimension='x_customer_retention',half_life_days=90)
+    impact_schema=read('contracts/analysis-result.schema.json')['properties']['impact_proposals']['items']
+    def allow(p,c):
+        validate(p,impact_schema)
+        if p['dimension'] not in c['dimension_weights']:raise ValueError('dimension not active')
+        event=c['dimension_policies'][p['dimension']]['event_policy']
+        if not event['enabled'] or p['half_life_days']!=event['half_life_days']:raise ValueError('event policy')
+    allow(impact,resolved);check(True,'v03 registered active custom impact material allowlist')
+    bad=copy.deepcopy(impact);bad['dimension']='x_not_registered';reject(lambda:allow(bad,resolved),'v03 unregistered impact')
+    bad=copy.deepcopy(impact);bad['half_life_days']=30;reject(lambda:allow(bad,resolved),'v03 model cannot alter event half-life')
+    ts=copy.deepcopy(templates);ts[-1]['patches'][-1]['event_policy']={'enabled':False};baseline_only=resolve(custom['template_key'],ts)
+    check(baseline_only['baselines']['x_customer_retention']==resolved['baselines']['x_customer_retention'],'v03 baseline-only retains baseline')
+    check('x_customer_retention' not in baseline_only['event_contribution']['half_life_calendar_days'],'v03 baseline-only no fictitious half-life')
+    reject(lambda:allow(impact,baseline_only),'v03 baseline-only refuses event proposal')
+    check(resolve('company-synthetic-manufacturer')['baselines']==scoring['baselines'],'v03 custom template does not mutate old standard chain')
+    # Only temporal boundary / command shape assertions. No seal/token or SQL execution exists.
+    seal=read('examples/v03-seal-command.json');validate(seal,read('contracts/evaluation-seal.schema.json'));check(True,'v03 seal command shape')
+    manifest=read('examples/v03-seal-manifest.json');manifest_schema=read('contracts/evaluation-input-manifest.schema.json')
+    validate(manifest,manifest_schema)
+    check(canonical_hash(manifest)==seal['manifest_sha256'] and manifest['manifest_id']==seal['manifest_id'], 'v03 frozen manifest hash/reference binding')
+    check(all(manifest[k]==seal[k] for k in ['release_id','security_id','primary_listing_id','market_session','evaluation_as_of','knowledge_cutoff']), 'v03 seal/manifest fixed context agreement')
+    bad=copy.deepcopy(manifest);del bad['inputs']['human_overrides'];reject(lambda:validate(bad,manifest_schema),'v03 manifest cannot omit input class')
+    bad=copy.deepcopy(manifest);bad['inputs']['price']['inputs']=[];reject(lambda:validate(bad,manifest_schema),'v03 valid price class without input')
+    bad=copy.deepcopy(manifest);bad['inputs']['price']={'quality':'missing','inputs':[],'reason_codes':[]};reject(lambda:validate(bad,manifest_schema),'v03 missing input without quality reason')
+    check(all(datetime.fromisoformat(i['known_at'])<=datetime.fromisoformat(manifest['knowledge_cutoff']) for g in manifest['inputs'].values() for i in g['inputs']), 'v03 manifest fixture does not include late known input')
+    cutoff=datetime.fromisoformat(seal['knowledge_cutoff']);asof=datetime.fromisoformat(seal['evaluation_as_of'])
+    check((cutoff-asof).total_seconds()==3600,'v03 seal fixture fixed 60 minute cutoff')
+    check(15<60 and 40<=60 and 50<=60 and 61>60 and 65>=60,'v03 +15/+40/+50/+60/+61/+65 boundary arithmetic; token/concurrency NOT RUN')
+    bad=copy.deepcopy(seal);bad['worker_now']='2026-09-30T09:20:00Z';reject(lambda:validate(bad,read('contracts/evaluation-seal.schema.json')),'v03 seal cannot replace cutoff with caller now')
+
+
 ===== SOURCE: tools/validate_design.py =====
 
 #!/usr/bin/env python3
-"""Offline v0.2 material checks. This does NOT execute the proposed application."""
+"""Offline v0.3 material checks. This does NOT execute the proposed application."""
 import copy
 import hashlib
 import json
@@ -4090,6 +7781,10 @@ for filename,schemafile in pairs:
     reject(lambda:validate(bad,s),filename+' missing required field')
 
 strategy=read('config/strategy-standard-v1.json');scoring=read('config/scoring-standard-v1.json');metrics=read('config/metric-definitions-v2.json')['metrics'];rubrics=read('config/rubrics-standard-v1.json')['rubrics']
+all_rubrics={**rubrics,**read('config/rubrics-synthetic-v03.json')['rubrics']}
+registry=read('config/dimensions-standard-v1.json');registry_entries={x['dimension']:x for x in registry['entries']}
+check(len(registry_entries)==len(registry['entries']),'Unique registered dimension IDs')
+check(scoring['dimension_registry_ref']['sha256']==sha(ROOT/scoring['dimension_registry_ref']['path']),'Pinned dimension registry content hash')
 check(strategy['universe']['markets']==['CN_A','HK'],'Confirmed A/H scope')
 check(strategy['scoring_model_ref']==scoring['model_key'],'Strategy scoring reference')
 check(scoring['metric_definition_ref']=='metric-definitions-v2','Corrected metric-definition version')
@@ -4132,6 +7827,7 @@ def resolve(key,templates=None,stack=()):
     if t['level']=='base':
         if t['base_config_ref']['sha256']!=sha(ROOT/t['base_config_ref']['path']):raise ValueError('base hash')
         c=copy.deepcopy(read(t['base_config_ref']['path']))
+        if c['dimension_registry_ref']['sha256']!=sha(ROOT/c['dimension_registry_ref']['path']):raise ValueError('registry hash')
     else:
         parent=bykey[t['parent_ref']['key']]
         if t['parent_ref']['version']!=parent['version'] or t['parent_ref']['sha256']!=canonical_hash(parent):raise ValueError('parent version/hash')
@@ -4142,20 +7838,35 @@ def resolve(key,templates=None,stack=()):
         d=patch['dimension']
         if d in seen:raise ValueError('duplicate patch')
         seen.add(d)
+        if d not in registry_entries:raise ValueError('unregistered dimension')
+        if t['level']=='industry' and t['scope']['industry_key'] not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
+        if t['level']=='company':
+            industry=bykey[t['parent_ref']['key']]['scope']['industry_key']
+            if industry not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
         if patch.get('disabled'):
-            c['dimension_weights'].pop(d,None);c['baselines'].pop(d,None)
+            if set(patch)-{'dimension','reason','disabled'}:raise ValueError('mixed disable')
+            c['dimension_weights'].pop(d,None);c['baselines'].pop(d,None);c['dimension_policies'].pop(d,None)
         else:
             if d not in c['dimension_weights'] and not(d.startswith('x_') and 'weight' in patch and 'baseline' in patch):raise ValueError('unregistered new dimension')
+            if d not in c['dimension_policies']:c['dimension_policies'][d]={k:copy.deepcopy(registry_entries[d][k]) for k in ['quality_policy','event_policy']}
             if 'weight' in patch:c['dimension_weights'][d]=patch['weight']
             if 'baseline' in patch:c['baselines'][d]=copy.deepcopy(patch['baseline'])
+            for key in ['quality_policy','event_policy']:
+                if key in patch:c['dimension_policies'][d][key]=copy.deepcopy(patch[key])
     if sum(Decimal(x) for x in c['dimension_weights'].values())!=1:raise ValueError('weight sum')
     if set(c['baselines'])!=set(c['dimension_weights']):raise ValueError('dimensions/weights')
     if not set(strategy['quality_gates']['required_dimensions'])<=set(c['baselines']):raise ValueError('required disabled')
-    for base in c['baselines'].values():
+    if set(c['dimension_policies'])!=set(c['baselines']):raise ValueError('policies/dimensions')
+    c['event_contribution']['half_life_calendar_days']={d:v['event_policy']['half_life_days'] for d,v in c['dimension_policies'].items() if v['event_policy']['enabled']}
+    validate(c,read('contracts/scoring.schema.json'))
+    for d,base in c['baselines'].items():
+        if base['method'] not in registry_entries[d]['allowed_baseline_methods']:raise ValueError('baseline method')
+        freshness=c['dimension_policies'][d]['quality_policy']['freshness']['kind']
+        if (base['method']=='weighted_metric_rubric')!=(freshness=='report_obligation'):raise ValueError('freshness method')
         validate(base,read('contracts/scoring.schema.json')['properties']['baselines']['additionalProperties'])
         if 'metrics' in base and (sum(Decimal(x['weight']) for x in base['metrics'])!=1 or any(Decimal(x['zero_at'])==Decimal(x['full_at']) for x in base['metrics'])):raise ValueError('submetric weights/range')
         if 'metrics' in base and not all(x['key'] in metrics for x in base['metrics']):raise ValueError('unknown metric')
-        if 'rubric_ref' in base and base['rubric_ref'] not in rubrics:raise ValueError('unknown rubric')
+        if 'rubric_ref' in base and base['rubric_ref'] not in all_rubrics:raise ValueError('unknown rubric')
     return c
 industry=resolve('industry-manufacturing');company=resolve('company-synthetic-manufacturer')
 check(industry['dimension_weights']['profit_quality']=='0.30','Industry override golden value')
@@ -4173,6 +7884,7 @@ for label,mutator in [
     bad=copy.deepcopy(bundle['templates']);mutator(bad);reject(lambda:resolve('company-synthetic-manufacturer',bad),label)
 
 policy=read('config/auto-review-policy-v1.json');roles=read('config/roles-standard-v1.json')['roles']
+check(policy['risk_target_policy_ref']['sha256']==sha(ROOT/policy['risk_target_policy_ref']['path']),'Pinned risk target policy hash')
 check(policy['hard_risk']['allow_auto_accept'] and not policy['template_and_strategy_auto_publish'],'AUTO risk allowed, templates/strategy human-published')
 check(policy['human_override_precedence']=='until_released_or_expired' and policy['on_override_expiry']=='reevaluate_current_legal_inputs','Human override precedence/expiry')
 check(set(roles)=={'viewer','researcher','strategy_manager','data_admin','system_admin'},'Five confirmed roles')
@@ -4208,12 +7920,18 @@ for n in range(1,9):check(f'W-{n:02}' in plan and f'W-{n:02}' in accept,f'Work t
 for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.md']:
     text=(ROOT/doc).read_text();check('必须人工复核' not in text and '高影响先人工批准' not in text,f'No superseded mandatory-human gate: {doc}')
 
+from v03_material_checks import run as run_v03_checks
+run_v03_checks(read,check,reject,resolve,bundle,scoring,canonical_hash)
+for n in range(39,44):check(f'T-{n:02}' in accept,f'v03 acceptance scenario: T-{n:02}')
+for d,v in scoring['dimension_policies'].items():
+    check(v['event_policy']['half_life_days']==scoring['event_contribution']['half_life_calendar_days'][d],f'Standard event half-life policy agreement: {d}')
+
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
-report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'77524649dae91a1d38df5fb93d5b47884e5c86a7','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+report={'design_version':'0.3','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_binding':'source_sha256 binds the exact working-tree inputs; uncommitted design working tree on main; no new commit or remote delivery claimed','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
 
@@ -4267,6 +7985,96 @@ print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes
 R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04。首版通知范围按用户决定调整，T-16实际发送部分后续执行，不降低状态变化与去重验收。策略/评分文件名v1保持第一套标准配置名称，Schema/指标定义独立升版本，尚无生产配置被替换。
 
 材料检查结果见validation-result.json：JSON、有限Schema形状、引用/hash、模板/规则一致性、合成黄金算术/负例等；不能替代完整JSON Schema库验证或产品运行验收。未执行数据库迁移/并发、真实源/模型、检索标注、UI/设备/UAT、性能和备份恢复；没有收益验证。GitHub提交与回读证据留在当前Matter，不把本机路径、原始网页或凭证上传。
+
+
+===== SOURCE: review/V03-CHANGELOG.md =====
+
+# v0.2 → v0.3 二轮设计修订账本
+
+日期：2026-09-30；修改起点`00ac20433c33a0a6296797c94d81136e0499e13f`，原二轮冻结基线`1b16f381a8742b910cdaa8ba5b928a32857a5b69`。本轮在独立项目工作区推进Codex主会话设计复核及合同完善，没有第二Agent或GPT Pro实际运行。用户授权本轮继续设计，未授权产品开发、部署、真实输入或外部模型调用。本文的“采纳”指本设计修订，不能冒称用户新增业务决定或运行验收。
+
+## 1. 逐项disposition
+
+| 发现 | 处理 | 复核依据与修订理由 | 合同及出口 | R/W/T |
+|---|---|---|---|---|
+| F01 P1 | accepted | 原05的reviews只能引用旧判断，11/06/13要求编辑新值；Decision对象保持引用结构本身正确，缺的是创建修订命令 | 11 §7，OverrideCommand/HumanRevision，05端点，04逻辑记录，完整+0.8→−0.2/3→1例子；事务/CAS/409/幂等/到期明确 | R-03/05/09/16，W-03/04/08，T-39及27/28 |
+| F02 P1 | accepted | company/security/listing既有分离与company-only风险不一致；H退市不应靠来源市场推测作用范围 | 11 §8，analysis Schema3.0，risk-target policy，目标/候选/身份/传播manifest、确切撤销与risk generation | R-06/08/16，W-03/05/08，T-40 |
+| F03 P2 | modified | 保留可配置证据/新鲜度能力；无需另建policy服务，类型化完整quality_policy即可固定版本 | 11 §9，template2.0/scoring3.0，策略180与模板90取更严格门；财务继续报告义务，旧release不热改 | R-05/15/16，W-04/08，T-41 |
+| F04 P2 | modified | 不把新增维度收窄为baseline-only，也不允许模型任意字段；registry+policy在同模块足够 | 11 §9，冻结dimension registry、enabled/H、受限ID+allowlist，完整合成custom模板/rubric，baseline-only显式分支 | R-05/15/16，W-03/04/08，T-42 |
+| F05 P2 | accepted（细化） | 原04已禁止cutoff>generated_at；未证实存在提前封存漏洞，本轮只定义价格/冻结/封存/应用的协议 | 12 §8，内部seal命令、PG snapshot、cutoff watermark、唯一slot/token、CAS/fencing/故障恢复、缺口与实时风险 | R-06/08/12，W-05/08，T-43 |
+
+F01/F02原设计主路径缺口现已有目标合同，设计层可交接；产品行为仍须T-39/40实施验证。F03…05同样为设计闭合，不声称运行修复。原ROUND-2-REVIEW与PROBES保留原文/hash/日期，不用新Schema重跑后覆写历史观察。
+
+## 2. 保留与实际影响
+
+保留docs/11所有用户决定：五角色/可兼任、三层模板、AUTO判断/人工有效覆盖、外部模型能力、开发无固定预算、通知后置、A/H与共享UI；保留R-01…17/W-01…08/T-01…38及UX指标。追加T-39…43，未降低旧预期。首批50–100是试运行，首slice仍两家公司三只证券合成。没有本轮必须重新询问的业务选择。
+
+不改标准权重、五维公式、阈值、Decimal精度、指标财务范围、报告义务、60min收盘cutoff或两相邻session政策。自动审核配置Schema升为2.0并固定risk_target_policy_ref内容hash；既有阈值不变。新增registry与dimension policy描述已有数字及受控扩展；标准模板版本升为2以固定新合同/父hash，不覆盖曾发布产品。新custom模板/rubric仅合成材料，标准11项rubric未加减。
+
+架构仍模块化单体/PG真源；没有新增微服务、调度平台或生产依赖。已有research固定源码依据继续作为候选，未重新联网核实版本/许可/价格、安装依赖或宣称完成开源选型。Refine/Prefect是可选适配实验，不再是W-08前置；先用简单执行方式贯通业务主路径，只有遇到具体问题才比较替换。
+
+原W-08补齐五类输入/页面状态/恢复预期，但本轮没有启动。API仅设计：以decisions覆盖/解除为唯一入口，取消旧POST /reviews的独立合同；客户端未来从同源类型生成。前端展示新旧值、目标范围、质量政策与封存进度，不自行推导分数或传播。
+
+## 3. Schema兼容与版本边界
+
+| 合同 | v0.2 → v0.3 | 不兼容处/处理 |
+|---|---|---|
+| analysis-result | 2.0 → 3.0 | 风险必须带target/有效期；维度改受限ID。旧风险不能默认扩大到company，需证据消歧后生成新proposal/decision；无证据pending |
+| review-decision | 1.0 → 2.0 | slot/revision固定opaque UUID；禁止直接解析旧字符串成身份。若将来导入历史，服务端显式映射自然键并保留原引用 |
+| scoring-template | 1.0 → 2.0 | 新增完整quality/event policies；标准固定父链发布新版。未知字段不会被旧解析器静默忽略 |
+| scoring | 2.0 → 3.0 | 固定registry hash、逐维政策；半衰期兼容map须与event policy一致，拒绝分歧 |
+| 新命令/修订/registry/seal | 新1.0 | 与设计版号独立；命令不代表端点或数据库已经运行 |
+| strategy/job | 保持2.0 | 既有数值和事件外壳不变；输入manifest包含新增引用，运行版本兼容仍待M0验证 |
+
+当前无部署和真实数据，无运行迁移。历史设计读取须固定commit，不能用当前3.0 Schema去解释旧2.0样例。未来若有导入，只读旧合同并生成可追溯新修订/映射，禁止回填known_at或重写已封存结果；生产/真实业务迁移需要另行范围授权。
+
+## 4. 验证与剩余出口
+
+已编写合同、配置、合成请求/预期结果、T-39…43、跨模块推演与离线检查；实际检查执行状态/输入hash以[validation-result](./validation-result.json)为准。工具只运行材料Schema子集、引用/hash/继承语义和固定算术。JSON例子的expected_response/表写入链不是数据库回读；risk/policy/temporal谓词不是产品状态机。
+
+正式draft-2020-12库、产品/DB/API/worker/并发/角色授权/真实UI及用户任务、模型/检索、真实源、性能、恢复均未运行。GPT Pro独立复审仍未执行，完整60文件包仍未取得；该复核是可选项，不阻塞W-08，也不虚构新增外部评审。后续如确有具体争议可针对性复核；W-08启动要单独实施授权。真实供应商/权利、身份/部署/保留期限和运营负责人仍在上线前决定，不重问已确认能力。
+
+本轮工作树的准确输入由source_sha256绑定；未声称新commit/推送或GitHub回读。已有本机迁移证据保持不动。PROJECT是项目管理真源，11/12是业务合同真源，不返回Matter管理。
+
+## 5. 2026-10-01项目全过程优先级确认
+
+用户明确：整个项目管理过程优先业务逻辑落地，不追求100%设计穷尽、所有安全措施或代码技术逻辑完美。权威执行定义新增于AGENTS“项目管理与设计优先级”，PROJECT引用；09的检查目录改为按当前阶段/改动实际影响选择，取消“涉及DB就全量RLS/并发/恢复”的笼统要求。可选加固、框架实验和额外评审不升级为交付前置。
+
+本次调整管理与检查范围的表述，未改评分/风险/时点数值合同或R/W/T预期，不将未执行或失败宣称通过。已授权范围、真实权限、机密与数据库边界继续按既有规则执行；没有启动产品开发或真实接入。现有覆盖命令重复并发字段、日常编辑预览范围、首slice可选选型实验已在本轮精简中处理。
+
+
+## 6. 本轮精简（业务落地优先）
+
+本轮按用户确认的项目管理原则收敛三个地方：人工覆盖并发只保留请求头`If-Match`这一份slot generation，服务端读取当前decision；单项人工修改提交后直接显示影响和重算状态，预览只用于批量、模板/策略发布和主数据合并；Refine/Prefect和GPT Pro复审均标为可选，不阻塞W-08主路径。必要的权限、证据、业务状态和幂等约束保留。
+
+这是一轮合同简化，已同步Schema、示例、验收文字和材料检查；不降低人工覆盖、A/H风险、时点封存或历史纠错等业务预期。未删除旧评审证据，未启动产品开发、数据库、真实源或模型调用。
+
+
+===== SOURCE: review/V03-COUNTEREXAMPLES.md =====
+
+# v0.3跨模块固定推演
+
+全部合成、设计预期；NOT RUN产品/数据库/UI。原场景不更改，新增细化以T-39…43追踪。下表“记录”均为期望，首版delivery=0，无真实发送。
+
+| 场景/覆盖 | 输入及顺序 | 应有事实/分数/状态与恢复 | 追踪 |
+|---|---|---|---|
+| C01 多公司/无关联 | 一份原文直接涉及A/B，另一份无封闭候选匹配 | 两条独立证据关联；no_link不得附影响/风险；歧义pending且不贡献；重试原逻辑键不重复 | T-05/06/17 |
+| C02 A/H风险分离 | 同company A/H；只H挂牌退市→之后公司债务违约→拒绝H判断 | 首次H OUT/RISK，A不因此改变；违约A/H适用；拒绝H仍公司风险OUT。最后风险解除从OUT重新正常确认，不即刻ENTER | T-10/40 |
+| C03 市场休假/停牌 | 港股session开放/A股批准休市；随后H停牌 | A休市不算漏评估，H各自日历；H SUSPENDED保留last_confirmed并清pending，恢复后重新两session确认 | T-11/30/31 |
+| C04 财报修订/TTM | 旧财报合并CFO75/合并利润100；归母利润50；缺一季度但有本/上年累计 | 比率0.75非1.5；TTM合法推导并保留来源，缺必需期missing；旧报告更正不满足新期义务 | T-07/36/37 |
+| C05 晚到/封存 | 价格+15 FINAL，公告−5 published/+40 observed/+50决策，+60冻结/+65完成 | +15仅provisional不计数，最终manifest有公告/决策；+65真实生成仅一次应用；+61 known不回填，原错误才CORRECTION | T-38/43 |
+| C06 转载/吸收 | 同订单五篇转述、两个event映射一个economic_fact；财报吸收并故障 | 单slot贡献；baseline、吸收指针和outbox同事务，失败全回滚，恢复无双计 | T-03/08/34 |
+| C07 来源冲突/证据缺失 | 两份正文互相矛盾；另风险只有标题 | 留support/refute而非按高权重强取；pending不贡献/不风险OUT；缺价或必需基准UNKNOWN保留last_confirmed | T-06/09/21/28 |
+| C08 缺失覆盖/未知恢复 | Q高但coverage0.75；s1 true、s2缺口、s3 true | 不因高Q入选；s2 UNKNOWN清pending，s3只1/2；旧s2迟到不拼连续计数；原基线不丢 | T-09/13/30 |
+| C09 人工完整修改 | AUTO impact+0.8→HUMAN−0.2；rubric3→1；新AUTO到达 | 新不可变修订/accepted决策/CAS审计outbox同事务；重算A/H经营分，估值独立；旧值保留；新AUTO不覆盖；到期固定cutoff合法重评 | T-27/28/39 |
+| C10 并发/崩溃 | 两人generation4编辑；双worker同seal；commit后崩溃/Redis清空/旧lease迟到 | 一人成功另一人409保输入；同manifest唯一token/transition，ACK丢重读原结果；ledger恢复，旧fence拒绝，权限撤销提交重验 | T-14/18/39/43 |
+| C11 模板/策略发布 | 180日治理输入age120改90；发布父版/企业版；同百分制不同口径 | 新90 stale且必需项UNKNOWN，180旧release不变；source/origin/hash固定；模拟预览新binding/release为CONFIG_CHANGE，不伪市场EXIT | T-12/25/26/41 |
+| C12 自定义维度 | company模板启用注册x_customer_retention H90；随后baseline-only；模型送未注册维度/H30 | 合法维度weight/baseline/policy齐全，总和1；基准解释保留；baseline-only拒绝事件，不造贡献；未知/不适用/H不符422 | T-08/25/42 |
+| C13 历史纠错/新release | s2 ENTER、s4 EXIT、独立s6 ENTER；纠正s2同时发布新release | 原记录不删除，冻结窗口重放；独立s6仍IN。当前reconciliation CAS新generation，新release不被旧结果覆写；只CORRECTION | T-14/32 |
+| C14 撤权/旧备份 | 引用资料撤权后恢复早期DB备份，journal缺最新watermark | 独立journal未确认就关闭相关读路径；确认后施加全部撤权，派生分数/缓存/搜索也失效；隔离恢复无发送 | T-15/19/34 |
+| C15 外部发送未知（后置） | 将来渠道不支持幂等，发送超时 | UNKNOWN_DELIVERY查询/人工确认，不盲重发、不重跑membership；本阶段不创建delivery，delivery=0 | T-16（后续） |
+
+本轮材料检查覆盖其中字段形状、继承和少量确定性边界；并未执行上述整条路径。用户任务指标仍以06 §7/8为准，不能从这张表推导UAT通过。
 
 
 ===== SOURCE: review/ROUND-2-PROBES.json =====
@@ -4428,11 +8236,11 @@ R-01…14/W-01…07/T-01…24保留，追加R-15…17/W-08/T-25…38及T-UX-04�
 
 # 第二轮GPT Pro评审请求
 
-项目已独立管理，迁移前后v0.2业务合同未变。迁移后的冻结基线是`1b16f381a8742b910cdaa8ba5b928a32857a5b69`。当前review目录包含本轮Codex报告和探针，报告不是已采纳的新合同。
+项目已独立管理，迁移前后v0.2业务合同未变。迁移后的冻结基线是`1b16f381a8742b910cdaa8ba5b928a32857a5b69`。ROUND-2-REVIEW/PROBES是该固定v0.2基线的历史报告。当前工作树v0.3已在设计层处置F01…05，见V03-CHANGELOG，尚未实施/验证产品；独立评审须核查这些处置，不默认通过。
 
 实际输入请以发起消息指定的完整commit为准；未指定则先读取main一次并解析完整SHA，随后所有文件固定该SHA，不混版本。无需附件或本机路径。
 
-1. 读取PROJECT/README、[ROUND-2-REVIEW.md](./ROUND-2-REVIEW.md)、[ROUND-2-PROBES.json](./ROUND-2-PROBES.json)，再按[GPT-PRO-PROMPT.md](./GPT-PRO-PROMPT.md)完整读取设计原文。
+1. 读取PROJECT/README、[ROUND-2-REVIEW.md](./ROUND-2-REVIEW.md)、[ROUND-2-PROBES.json](./ROUND-2-PROBES.json)，读取V03-CHANGELOG和V03-COUNTEREXAMPLES，再按[GPT-PRO-PROMPT.md](./GPT-PRO-PROMPT.md)完整读取设计原文。
 2. 独立判断F01/F02是否真实影响人工编辑与风险传播；F03/F04是否需要policy/dimension注册合同；F05要尊重docs/04已有cutoff≤generated_at，不能误报当前允许提前封存。
 3. 对每项给accepted/rejected/modified/deferred及证据、理由和修订内容；新发现另编号。继续完整检查金融口径、状态、权限、恢复、UX与开源复用，不限于五项。
 4. 保留docs/11已确认需求。输出完整v0.3主文、改动合同/配置/示例、实施任务书和追踪账本，全部在对话正文交付。不得只提供附件、虚构下载链接或声称文件已入仓库。

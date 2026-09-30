@@ -1,6 +1,6 @@
 # 12 时点、数值与纠错合同
 
-v0.2设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
+v0.3设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
 
 ## 1. 财务指标与rubric
 
@@ -18,7 +18,7 @@ HK主板通常全年业绩≤年结后3个月、半年业绩≤期末后2个月�
 
 日历只给expected sessions及市场时段，不能证明价格FINAL。港股适用CAS证券的最终收盘不能用16:00连续交易末值替代；半日和非CAS按获许可源的价格类型处理。适配器必须输出session、price_kind、is_final、source_revision、observed_at。日历固定版本、年份范围、临时休市和深市映射；覆盖不足显式UNKNOWN，不用工作日猜测。
 
-标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。FINAL判定需要全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
+标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。价格is_final只说明报价类别；收盘evaluation封存另需§8协议，全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
 
 | 输入类别 | 收盘评估的可用条件 |
 |---|---|
@@ -66,3 +66,18 @@ age是UTC有效事件时间到as_of的完整秒数除86400，不按本地午夜�
 恢复安全合同保留，但实现不要求新微服务。正常权利撤销先向独立于应用备份的耐久revocation_journal追加序号、scope和hash链，取得durable receipt后再撤销DB权限和投影；拒绝读取可以先发生，撤销操作未完整耐久则状态pending禁止恢复开放。journal使用独立保留的对象存储/介质，latest watermark不能来自同一份旧DB备份。
 
 恢复始终在隔离环境、无发送；验证journal完整性和最新watermark，施加自备份cutoff之后全部撤权，重建ACL/索引并测试，再开放受影响读路径。不能验证最新依据时fail closed相关范围。首版合成场景用独立本地journal fixture验证合同；真实资料接入/生产恢复前才选择实际独立耐久存储并演练，不把尚未配置的灾备说成已实现。
+
+
+## 8. 收盘输入冻结与唯一封存（F05）
+
+价格FINAL、输入冻结、evaluation封存、membership应用是独立状态。session_due→provisional→ready_to_seal→sealed；终态sealed结果可为valid/UNKNOWN/SUSPENDED，不意味着全输入有效。provisional的knowledge_cutoff使用本次实际已知截止且≤generated_at，目标收盘截止另存planned_seal_cutoff；不得把未来+60作为提前run的已知截止。目标cutoff前只可provisional，不创建finalization_token、不计session、不推进普通membership。只有服务端clock≥固定cutoff且日历/最终市场时点合法才能ready_to_seal；没有最终价仍可封存明确UNKNOWN质量缺口，日历/时点未知则记不可封存缺口，禁止用worker now猜cutoff。
+
+strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定release/security/primary_listing/session/as_of/cutoff、manifest ID/hash及expected_generation。用户或模型不能自行封存；调用身份须有受限strategy worker capability，提交仍检查workspace、来源权利与lease fencing。[manifest合同](../contracts/evaluation-input-manifest.schema.json)与[合成示例](../examples/v03-seal-manifest.json)逐类强制输入或缺口；示例hash真实绑定命令，不是已获数据。manifest包含身份/日历、价格/FX/股本、财务/报告义务、关联/影响/rubric/风险/人工覆盖、全部政策/模板/算法版本，逐类revision或显式缺口；不能只冻结价格。
+
+输入选择以§2为准。每类在cutoff内的最后合法修订按known/observed+稳定revision排序；决策与依赖引用也须同cutoff。同时间冲突记录conflicting，不任意择高分。全部参与提交的输入写入事务时由数据库生成knowledge序列和不可回填时间；cutoff后写入不得伪造为早期已知。冻结在PG一致性snapshot内完成，持久化input_refs/quality gaps、内容hash、cutoff watermarks与selection算法版本。队列中的未完成分析不算已知判断，不等待并放宽cutoff；缺口如实UNKNOWN。
+
+冻结manifest与seal slot的generation/CAS同事务，只允许一个(worker fence有效的)冻结候选。固定键(workspace,release,security,session,live)唯一seal slot；provisional有独立run，不占最终键。cutoff后算分可在事务外运行；worker崩溃/丢ACK重用已冻结manifest，双worker不得以各自manifest分别宣称同session FINAL。未sealed候选需要因合法校验失败重新冻结时先CAS废弃旧generation且保留历史记录；已sealed只能走CORRECTION。迟到原数据更正与新知识按§4区分，不能借重试改manifest。
+
+最终事务校验manifest hash、cutoff≤sealed_at/generated_at、当前release/binding、seal generation、worker fence和最新risk/ACL generation；写immutable evaluation、seal_at/token、应用指针、transition解释、audit/outbox同事务。唯一token按seal slot稳定生成；幂等重试返回原结果。若release/session已更迭，封存历史可保留但application_status=superseded，不应用当前membership。实时硬风险仍独立优先，旧普通评估不能解除新风险。撤权使旧冻结输入不可读/不可应用，记录失效并走安全重算/纠错，不为复现保留违规正文。
+
+固定推演（T-43）：以本证券最终市场时点为+0；+15价已is_final只能provisional；一份published=−5min公告+40 observed、+50判断生效→在+60冻结时可用；+60生成manifest，+65实际完成则generated_at=+65，唯一封存且仅一次计数。+61才known的判断不进入此manifest；收盘后新公告也不因+60前observed进入本收盘。缺价封存UNKNOWN清pending；重试不把cutoff延到+70。状态/原子性是设计合同，尚无worker/数据库运行证据。

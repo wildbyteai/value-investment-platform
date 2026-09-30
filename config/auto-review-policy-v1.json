@@ -1,6 +1,6 @@
 {
   "policy_key": "auto-review-standard-v1",
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "default_mode": "auto_accept_when_valid",
   "calibrated_confidence_required": true,
   "link": {
@@ -23,5 +23,9 @@
   "invalid_or_conflicting": "pending",
   "human_override_precedence": "until_released_or_expired",
   "on_override_expiry": "reevaluate_current_legal_inputs",
-  "template_and_strategy_auto_publish": false
+  "template_and_strategy_auto_publish": false,
+  "risk_target_policy_ref": {
+    "path": "config/risk-target-policy-v1.json",
+    "sha256": "b23f957335f5c59c9654aa1f0cdf43dd5dfbb273d6030df277e6412395a80774"
+  }
 }

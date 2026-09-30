@@ -81,3 +81,16 @@ OpenSearch mapping：keyword company_id/security_id/source/ACL，date 时间，�
 数据保留期限由 source_policy 驱动：原文撤回或到期后关闭证据访问，删除受控投影并记录 tombstone；审计保留哈希／引用及“依据已不可访问”，不为重现违规保留全文。备份到期清理与恢复后再施加 tombstone 是合同的一部分。默认保留期限是待决定的运行配置，不强行永久存全部原文。
 
 economic_fact与contribution_slot防止跨event重复；baseline吸收同事务更新slot。score/metric/evaluation记录template_resolution_hash、numeric_policy_ref、required_source_ids与权限指纹。撤权后派生总分、计数和缓存同样重新校验。原文observation、主挂牌、FINAL价格标记及独立撤权journal完整定义见12。
+
+
+## 6. v0.3补齐的逻辑记录与约束
+
+| 对象 | 字段/约束 | 写责任 |
+|---|---|---|
+| human_judgment_revision | workspace,slot UUID,previous_revision,subject_kind,完整typed value,effective区间,known/created_at,input_manifest,actor；append-only | analysis；只replace创建，旧修订不变 |
+| risk_revision / risk_resolution | target_kind/id,company,risk_code,economic_fact,有效区间,evidence；identity/policy版本,适用release/security manifest | analysis验证目标；strategy消费明确适用集合 |
+| decision_slot | kind+自然键唯一，current_decision,override_expiry,generation；revision/decision归属同workspace | analysis；自然键与原子替换见11 §7/8 |
+| dimension_registry / effective_config | 固定registry hash,逐维quality/event policies,origin与全部内容hash | scoring；继承发布见11 §9 |
+| evaluation_seal / frozen_manifest | 唯一workspace+release+security+session+mode，generation,fence,完整输入/缺口,cutoff watermark,hash,sealed_at/token,application_status | strategy；12 §8独占冻结/CAS/唯一封存 |
+
+risk解除引用确切revision，membership提交另校验risk generation；封存与普通状态原子提交见12。所有修订/manifest保留source ACL继承和同workspace复合引用；DDL与运行约束仍未实现。

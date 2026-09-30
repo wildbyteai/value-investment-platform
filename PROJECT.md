@@ -6,7 +6,7 @@
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.2迁移后第二轮Codex业务/工程复审已完成，GPT Pro独立复审材料已准备；产品尚未实施。评审发现与提案见review/ROUND-2-REVIEW.md，未自动改合同。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3二轮设计完善；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；原v0.2评审/probes保持历史记录。GPT Pro独立复审为可选复核，尚未执行，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -19,7 +19,7 @@
 | 工程架构、数据、API、UX、AI、运维 | docs/03…08 |
 | 实施任务和首个切片 | [09](./docs/09-delivery-plan.md)、[13](./docs/13-first-slice.md) |
 | 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
-| 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md |
+| 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md |
 | 机器配置与合同 | config/、contracts/；文档引用，不复制数值真源 |
 | 评审交接 | [GPT Pro完整提示词](./review/GPT-PRO-PROMPT.md)、review/REVIEW-PACK.md |
 | 本机历史与迁移证据 | local-evidence/，忽略Git并持久保留 |
@@ -27,6 +27,8 @@
 日常工作直接在本项目创建分支、编写设计、执行已授权任务和记录证据，不再创建BYTEWATCHER Matter或依赖其registry/SOURCE_OF_TRUTH。代码开发分支默认codex/前缀，当前文档阶段在main提交；保留完整Git历史与原remote。
 
 每个开发切片引用既有R/W/T和输入manifest，说明正常/失败/权限/恢复预期。设计、已实现与已验证分开记录。依赖或合同变化写ADR/变更账本，不以报告替代代码或验收事实。
+
+项目全过程的优先级遵循[AGENTS“项目管理与设计优先级”](./AGENTS.md#项目管理与设计优先级)：以业务闭环的落地安排工作，按实际影响选择设计与验证，不把全量工程清单或可选完善作为每一步的前置门槛。2026-10-01用户明确此原则适用于整个项目管理过程；当前阶段仍为设计完善。
 
 ## 已确认能力与推进顺序
 

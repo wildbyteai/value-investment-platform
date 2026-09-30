@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "decision_id": "00000000-0000-4000-8000-000000000010",
-  "subject_slot": "synthetic-company:fact-01:profit_quality",
-  "subject_revision": "synthetic-impact-r1",
+  "subject_slot": "00000000-0000-4000-8000-000000000020",
+  "subject_revision": "00000000-0000-4000-8000-000000000021",
   "status": "accepted",
   "actor_kind": "AUTO",
   "actor_id": "decision-service",

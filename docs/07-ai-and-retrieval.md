@@ -48,3 +48,6 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。成本在首批来源与样本后量化；开发不以预算确认阻塞。限额是可配置运行项，不意味着已经采购或授权真实调用。
 
 自动审核是否生效看DecisionService输出，不看模型自身approved字段。AUTO service principal独立受限，不能改策略/模板发布。新模型shadow检验对已有效HUMAN覆盖保持不变；异常队列按经济事实slot去重，统计pending年龄和策略影响，不把固定每天人工投入当首版依赖。
+
+
+v0.3模型输入manifest除公司候选外，还固定有效security/listing候选和解析dimension/event policy allowlist。analysis Schema3.0支持受限x_ ID与风险target，语义服务验证候选归属、half_life与enabled、原始披露和目标传播；Schema通过不能授权模型扩大范围。模型输出的业务有效时间不改变系统known_at。11 §7/8/9为唯一覆盖、风险与维度合同；前端和检索不得另推传播规则。

@@ -4,24 +4,24 @@
 
 无需上传附件。把本文件“完整提示词”下的全部内容复制给 GPT Pro，优先使用已获授权的 GitHub 连接直接读取私有仓库。若没有仓库读取权限，使用 [纯文本粘贴入口](./PASTE-INSTRUCTIONS.md)，把提示词和完整材料作为消息正文发送；单条文本或按编号分段均可。链接本身不会赋予私有仓库访问权限，不要改为公开或粘贴 Token。
 
-本仓库：`wildbyteai/value-investment-platform`；设计基线 v0.2，2026-09-30。让 GPT Pro 输出 v0.3 新文件／完整改进文档；在评审输出中保留变更账本，不直接修改仓库。评审是建议，用户取舍后再确定实施版本。本文件本身也被整包收录，正文以这里为真源。
+本仓库：`wildbyteai/value-investment-platform`；当前设计工作树 v0.3，2026-09-30（历史二轮基线v0.2）。如用户需要，可让 GPT Pro 独立复核v0.3并输出改进文档；该复核是可选建议，不是开发前置。在评审输出中保留变更账本，不直接修改仓库。评审是建议，用户取舍后再确定实施版本。本文件本身也被整包收录，正文以这里为真源。
 
 ## 完整提示词
 
-你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.2 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.3 改进版。请使用中文。不需要我上传任何附件。
+你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.3 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.3 改进版。请使用中文。不需要我上传任何附件。
 
 ### 材料读取方式
 
 仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
 1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，若发起消息指定commit，必须使用该完整SHA；否则先解析main的实际commit SHA并固定。先读PROJECT.md、README.md、review/ROUND-2-REQUEST.md、review/ROUND-2-REVIEW.md、review/ROUND-2-PROBES.json与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，若发起消息指定commit，必须使用该完整SHA；否则先解析main的实际commit SHA并固定。先读PROJECT.md、README.md、review/ROUND-2-REQUEST.md、review/ROUND-2-REVIEW.md、review/ROUND-2-PROBES.json与review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…13全部文件、docs/adr/全部决策、config/所有配置、contracts/说明与所有Schema、examples/全部合成例子、tools/材料工具、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md、review/V03-COUNTEREXAMPLES.md，以及research/两轮核查。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
 3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
 4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
 
 ### 独立项目与本轮顺序
 
-项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。迁移冻结基线为1b16f381a8742b910cdaa8ba5b928a32857a5b69；本轮Codex报告对该基线提出F01…05，属于提案，未改业务合同。请独立核查每项，允许用原文反驳，给accepted/rejected/modified/deferred与理由；F05已有cutoff≤generated_at，不要误报当前允许提前封存。新问题另编号，不能只审查这五项。
+项目已从BYTEWATCHER的BW-0051迁出，独立管理；GitHub仓库未变。迁移不改变业务合同。请针对迁移完成后的固定revision进行第二轮设计评审，不要求读取BYTEWATCHER、Matter目录或本机local-evidence。先核对PROJECT.md和已确认边界，再审查完整流程与工程/UX，不把结构迁移当成产品已实现。迁移冻结基线为1b16f381a8742b910cdaa8ba5b928a32857a5b69；历史Codex报告对该基线提出F01…05；当前v0.3工作树已在设计层补齐合同，处置见V03-CHANGELOG。请评审固定输入版本的实际内容，不能把历史探针当当前缺陷或把当前设计当产品通过。请独立核查每项，允许用原文反驳，给accepted/rejected/modified/deferred与理由；F05已有cutoff≤generated_at，不要误报当前允许提前封存。新问题另编号，不能只审查这五项。
 
 ### 我的目标与已确认范围
 
@@ -42,11 +42,11 @@
 
 不要以功能“技术复杂”为由删除已确认业务能力，不把完整目标降为个人工具，也不要把通知后置误解为可以不实现进出/风险状态。技术大多有成熟实现，主要挑战是正确业务语义、连续用户路径、工程一致性和可维护性。只讨论确实影响当前方案的新决定，不把已解决问题重新列成待确认。
 
-上一轮Pro共享评审：https://chatgpt.com/s/t_6abcd1c0c9088191bc2d635b33b84f6f 。本仓库只使用该页可见正文，未取得完整60文件附件。不要把之前声称生成的文件当本轮已读取输入；当前v0.2为独立修订，请以固定仓库内容核查。
+上一轮Pro共享评审：https://chatgpt.com/s/t_6abcd1c0c9088191bc2d635b33b84f6f 。本仓库只使用该页可见正文，未取得完整60文件附件。不要把之前声称生成的文件当本轮已读取输入；历史v0.2为独立修订，当前v0.3在此基础上完善，请以固定仓库内容核查。
 
 ### 评审要求
 
-完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把 v0.2 当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
+完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把当前设计当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
 
 逐项挑战以下内容：
 

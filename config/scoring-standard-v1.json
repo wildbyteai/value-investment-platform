@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "model_key": "scoring-standard-v1",
   "version": 1,
   "dimension_weights": {
@@ -87,5 +87,74 @@
   "minimum_company_coverage": "0.80",
   "metric_definition_ref": "metric-definitions-v2",
   "numeric_policy_ref": "decimal-python-v1",
-  "rubric_catalog_ref": "rubrics-standard-v1"
+  "rubric_catalog_ref": "rubrics-standard-v1",
+  "dimension_registry_ref": {
+    "path": "config/dimensions-standard-v1.json",
+    "sha256": "3c91a60057655ee0dae110a01362c6962d7093b4bb45d9f12b1a11b840dc2c42"
+  },
+  "dimension_policies": {
+    "profit_quality": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    "financial_resilience": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    "business_model": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    "governance": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    "growth_sustainability": {
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 30
+      }
+    }
+  }
 }

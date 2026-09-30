@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "release_id": "00000000-0000-4000-8000-000000000070",
+  "security_id": "00000000-0000-4000-8000-000000000102",
+  "primary_listing_id": "00000000-0000-4000-8000-000000000202",
+  "market_session": "synthetic-s1",
+  "evaluation_as_of": "2026-09-30T08:10:00Z",
+  "knowledge_cutoff": "2026-09-30T09:10:00Z",
+  "expected_generation": 4,
+  "manifest_id": "00000000-0000-4000-8000-000000000080",
+  "manifest_sha256": "b94233fdea35bf8c64966278ae6e052f4c6ab5ad222e3ddbcdc00b905f94337f"
+}

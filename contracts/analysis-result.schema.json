@@ -3,7 +3,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "const": "3.0"
     },
     "item_revision_id": {
       "type": "string",
@@ -76,13 +76,8 @@
             "format": "uuid"
           },
           "dimension": {
-            "enum": [
-              "profit_quality",
-              "financial_resilience",
-              "business_model",
-              "governance",
-              "growth_sustainability"
-            ]
+            "type": "string",
+            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
           },
           "signed_impact": {
             "type": "string",
@@ -219,6 +214,28 @@
           "rationale": {
             "type": "string",
             "minLength": 1
+          },
+          "target_kind": {
+            "enum": [
+              "company",
+              "security",
+              "listing"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "valid_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         },
         "required": [
@@ -226,7 +243,11 @@
           "risk_code",
           "confidence",
           "evidence_ids",
-          "rationale"
+          "rationale",
+          "target_kind",
+          "target_id",
+          "effective_from",
+          "valid_until"
         ]
       }
     }

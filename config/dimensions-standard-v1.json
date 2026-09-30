@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "registry_key": "dimensions-standard-v1",
+  "version": 1,
+  "entries": [
+    {
+      "dimension": "profit_quality",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "financial_resilience",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "business_model",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "governance",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "growth_sustainability",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 30
+      }
+    },
+    {
+      "dimension": "x_customer_retention",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "issuer_or_regulator_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 90
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    }
+  ]
+}

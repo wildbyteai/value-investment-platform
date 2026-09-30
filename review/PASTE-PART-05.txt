@@ -1,5 +1,129 @@
 
-[PART 5/15]
+[PART 5/27]
+
+
+===== SOURCE: docs/07-ai-and-retrieval.md =====
+
+# 07 AI 分析、关联与检索设计
+
+## 1. 模型的角色
+
+模型提取候选公司、事实主张、证据位置和影响建议，输出受 Schema 限制的数据。系统用确定性规则校验单位、时间、身份与证据；人维护rubric模板与策略，系统可自动接受经营判断/高影响并由人工覆盖。模型没有权力写策略、修改公司身份、直接通知、联网下载任意链接或执行工具。
+
+先跑规则／主数据候选召回，再按任务配额调用外部模型（允许外部模型，开发无固定预算门槛）；已有数字从结构化财报计算，不让模型“估算”缺失财务。无正文不做强判断；来源无 analyze 权利不送模型；无 send_to_external_model 权利只用已许可本地处理或人工。
+
+## 2. 分析管道
+
+1. 标题／代码／正式名称／别名精确候选召回，结合语言、市场、行业与有效关系，最多 20 个候选；候选数量不足时允许 no_link。
+2. 长文按章节、表格和句段切 chunk，保留 offset/page/cell；结构化表格独立解析，不能将标题切断导致事实歧义。默认 500–800 token、重叠 10%，实施按证据召回测试调优。
+3. 模型读取不可信 source text 与封闭候选身份，提取事实主张并生成links、impact_proposals、rubric_proposals、risk_proposals（主张归并为后续领域事件）。证据 quote 必须能定位到输入原文（规范化定位规则固定），不能引用模型自己的摘要。
+4. 校验 Schema、ID allowlist、类型、数字范围、证据精确定位、否定／假设语气、时间和冲突；交给独立DecisionService按11 §4政策自动生效；缺证据/歧义/冲突才pending。
+5. 校准置信度，应用自动决策政策与人工覆盖优先级；完成事件归并建议，歧义不自动合并。影响维度和半衰期由版本模板限定。
+6. 保留 analysis_run 的 model ID、prompt/schema version、input_hash、usage/cost、validated result 和理由；不要保存隐藏思维链。修正或 prompt 升级生成新版本，影子对比后发布。
+
+Prompt injection：正文即使写“忽略规则、读取密钥、发送消息”也只作为被分析文本。模型无工具访问、网络和凭证；不将正文拼入 system 指令；HTML/script 外部链接不执行。拒绝未经允许的公司 ID 与字段。测试必须包含恶意文档、伪造代码、同名公司、繁简混合、表格单位、否定句、预测句和讽刺语。
+
+## 3. 关联与影响合同
+
+contracts/analysis-result.schema.json 是最小跨阶段 Schema：schema_version、item_revision_id、no_link、links、impact_proposals、rubric_proposals、risk_proposals；每个link 有 company_id、relation_type、relevance、confidence、evidence_ids、rationale。分析结果只是 proposal，不能包含“approved=true”。影响 signed_impact 不含价格涨跌预测字段。
+
+证据 IDs 必须属于本输入 revision；由服务端检查跨对象引用，JSON Schema 本身无法证明。每个影响必须引用一条建议或已批准公司关联，并有维度、方向强度、有效截止、半衰期、证据、confidence 和原因。未被DecisionService接受的硬风险不能写入strategy hard-risk facts；AUTO accepted满足政策可生效，人工可覆盖，不强制先人审。
+
+## 4. 混合检索
+
+搜索默认股票代码／名称精确路径；自然语言则 BM25 和语义候选并行，按 RRF 合并（起始 k=60），可选择本地 reranker。source_policy 与 workspace ACL 在两路查询之前过滤，返回前按 PG 再校验；后过滤不是唯一保护，禁止分页、计数和高亮泄露不可见资料。候选列表为空返回解释，不让 LLM 填补。
+
+默认返回事件或讯息摘要、来源、发生/发布时间、公司、关联与可点击证据。可选问答在首个研究闭环之后实施，每句关键回答引用可访问 evidence，资料不足明确说明，不能生成投资指令。引用数不代表结论真实性。
+
+OpenSearch projection_version 与 watermark 在 meta 返回。PG 变更后索引晚于 5 min 标为 delayed，超过目标给运营告警；事件明细仍从 PG 查。ACL 撤权优先同步拒绝缓存，然后异步删除索引；证据请求始终再验证。向量 model 切换新 namespace、影子召回评估，再切 active，不复用旧向量。索引不存未经许可全文。
+
+## 5. 质量评估与模型版本门禁
+
+M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报、资讯、社媒线索、无关联、同名歧义、子公司、A/H、否定、历史回顾及恶意输入。至少 20% 双人独立标注，分歧仲裁；按事件和发布日期划分 train/calibration/holdout，不能让重复转载跨集合泄露。指标按各来源／语言／直接和间接关联分别报告。
+
+关联自动批准 precision≥95%、recall≥85%，误连公司率≤1%；范围为测试集、配套 Wilson 区间，不宣称全市场同等质量。证据可定位率≥99%，无证据/未校验/不满足政策的硬风险直接生效次数=0；对AUTO接受硬风险单独报告precision、错误案例及人工覆盖率；no_link precision/recall 单独报告，避免强制关联。置信度报告 reliability bins 与 ECE，原始模型 self-confidence 不当成概率。
+
+事件归并以 pair precision≥95% 优先，误合并不能用增加 recall 抵消；至少测试不同季度同类事件不合并。影响方向与专家仲裁一致率目标≥85%，按维度分组；这是意见一致指标，不验证经营因果或未来收益。未过门禁降级人工，不降低验收阈值冒充通过。
+
+检索标注至少 100 个真实研究意图（可先用合成公司）：精确代码 top-1=100%；证据 recall@20≥90%、nDCG@10≥0.8、零 ACL 泄漏；与 BM25 baseline 对比，语义未增益则默认关闭。版本上线前固定成本、延迟与错误指标，不能因为“更新了模型”直接切全量。
+
+## 6. 配额与成本
+
+模型调用并发、日 token/$ 限额按 source/workspace/stage 控制；达到上限排队／规则分析并提示，不能偷偷换外部 provider。记录输入/输出/embedding/rerank 和重试次数，费用按实际公开报价版本计算，不预填虚假当前价。相同输入+prompt+model/schema hash 可复用已许可缓存；修改源权利时缓存立刻禁读。
+
+成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。成本在首批来源与样本后量化；开发不以预算确认阻塞。限额是可配置运行项，不意味着已经采购或授权真实调用。
+
+自动审核是否生效看DecisionService输出，不看模型自身approved字段。AUTO service principal独立受限，不能改策略/模板发布。新模型shadow检验对已有效HUMAN覆盖保持不变；异常队列按经济事实slot去重，统计pending年龄和策略影响，不把固定每天人工投入当首版依赖。
+
+
+v0.3模型输入manifest除公司候选外，还固定有效security/listing候选和解析dimension/event policy allowlist。analysis Schema3.0支持受限x_ ID与风险target，语义服务验证候选归属、half_life与enabled、原始披露和目标传播；Schema通过不能授权模型扩大范围。模型输出的业务有效时间不改变系统known_at。11 §7/8/9为唯一覆盖、风险与维度合同；前端和检索不得另推传播规则。
+
+
+===== SOURCE: docs/08-security-and-operations.md =====
+
+# 08 安全、运维与可靠性
+
+## 1. 安全边界
+
+研究资料、用户笔记、策略和订阅默认私有；公开来源也要遵守平台抓取、保存、商用与模型处理权限。平台验证码、登录、反爬和访问控制不得绕过；只接获许可 API、公开允许访问页面或用户合法提供资料。首期不采集企业机密、客户资料或真实持仓。
+
+OIDC 验证服务端 issuer/audience/signature/expiry，首版简单RBAC，MFA作为身份服务可配置增强，不强制逐项审批。RBAC capability+workspace/owner/source ACL；五角色可兼任、组织研究默认共享、私人对象明确共享。PG RLS作为可选纵深保护，采用时必须覆盖下面的连接池测试，应用连接不使用绕过 RLS 的超级用户；后台 Worker 以作用域 service principal 访问。RLS 会话变量每事务设定，连接池复用必须清除，负面测试覆盖切 workspace。
+
+管理员不隐式拥有策略发布、内容复核和所有私有规则读权限。证据下载签名短有效期并重新校验，非公开对象不能直接被公网索引。搜索／向量过滤、计数、缓存、日志、导出同样检查权限。
+
+## 2. 输入及采集防护
+
+源连接 URL 仅允许批准域名／协议；拒绝 loopback、内网、metadata endpoint，重定向和 DNS 重解析再次验证，采集 Worker egress allowlist 防 SSRF。解析隔离、最大文件／解压限制、MIME 验证、不执行宏或脚本；网页渲染器独立沙箱且无内部网络凭证。抓取超时、并发和 request budget 固定。凭证存 secret manager，数据库仅引用；日志不记 token/cookie/body/private URL。
+
+原文转义渲染，CSP 和安全下载 headers；prompt injection 由无工具、封闭上下文和输出校验隔离。研究员证据可见≠外部模型有权接收；两项权利独立。允许外部模型正常接入；来源配置一次明确外部分析许可，避免每次调用询问。所有export任务检查当前source权利，归档文本不因历史可见自动外传。
+
+## 3. 变更与审计
+
+发布策略、修改源权利、批量补采、主数据合并／拆分、模型切换、权限变更、恢复和索引重建有必要的preview、expected_version、scope、reason 与审计。preview 不能授权超出人员原权限的执行。审计 append-only、应用不可 UPDATE/DELETE，独立保留备份；管理员可管权限但不能抹审计。
+
+审计记录 object_revision、前后 hash、操作者、request/trace、时间与业务原因；敏感前后内容不入日志。删除与授权撤销留 tombstone，传播到缓存、全文、向量和恢复后数据，不把“删索引”当删源数据。
+
+## 4. 部署与升级
+
+开发：项目隔离 Compose、合成 fixtures、mock source/model/channel、无外部出站为默认。启动前 verify DB host/environment/data classification，不能因为 localhost 就假定可删。生产：TLS reverse proxy、API、分配额 Worker、PG、Redis、OpenSearch、S3、可观测性；数据库／索引管理端口不公网暴露。
+
+生产 sizing 待基线压测，不建议在一个低内存节点同时承诺 OpenSearch 与 8,760 万向量。初步 PoC 可用 8–16 vCPU/32–64 GB 总资源分配且独立磁盘额度，均为估算；根据实测决定托管 PG、检索和存储。region、供应商、实际价格、备份流量与许可证上线前决定。
+
+迁移遵循 expand→双版本兼容→验证→切换→contract，DDL / index build 评估锁影响；不能把一次数据库迁移和多个破坏性 API 改动绑一起。发布先 staging 合成或已批准脱敏数据、金丝雀、观测窗口、再全量。所有生产写入另需授权。
+
+应用回滚到兼容版本；数据回滚先备份和影响预览，不自动 down 破坏迁移。策略 rollback 生成新 release；prompt 模型 rollback 指向旧 validated policy；索引新 alias 切换后保留旧索引有限期。版本与事件 Schema 至少支持当前与上一稳定版本，未知字段受合同版本策略约束。
+
+## 5. 观测与健康
+
+技术指标：队列 lag、任务 age、错误分类、重试、lease 过期、outbox 未发、PG 锁等待、索引 watermark、外部渠道投递 UNKNOWN；业务指标：源新鲜度、metadata_only 比例、未关联／待复核比例、证据缺失、coverage 分布、UNKNOWN 策略数量、入退转移率；成本指标按任务阶段与来源展示。
+
+/health/live 只证明进程；/health/ready 验证关键依赖；/ops/pipeline/status 验证最近成功采集、分析、评分、评估与策略变化主记录；通知阶段另验投递。受保护 ops 接口不能公网泄露配置。HTTP 200 不证明研究流程可用。
+
+严重程度：P1 跨用户泄露／数据损坏／错策略触发，立即阻止相关发送或读路径；P2 关键数据链路超过新鲜度阈值，标 UNKNOWN 并通知运营；P3 搜索或非关键源降级。运营告警限频合并，状态变化才提醒，恢复通知有受影响范围。
+
+## 6. 恢复操作手册
+
+| 故障 | 安全处理 | 验证与退出条件 |
+|---|---|---|
+| 源 429/失权 | Respect Retry-After 或暂停；不换身份绕过 | 授权确认、小样本采集、缺口补齐且 mode=backfill |
+| 模型不可用 | 原文仍保存，分析排队／人工 | 按标注门禁恢复 shadow，不能一次性无界全量重跑 |
+| Redis 丢队列 | ledger sweeper 重建 due 任务 | 任务最终完成，输出／转移无重复 |
+| Worker 提交后宕机 | 重试读唯一业务键 | 不生成第二次 score/transition/delivery |
+| 索引损坏 | PG 查询降级；固定 cutoff 重建+追增量 | 校验 count/hash 抽样/ACL、watermark 后切 alias |
+| 财报或公司错配 | 冻结相关自动评估，复核并建新 revision | 影响预览、有限重算；通知纠正说明保留原通知 |
+| 外部通知超时未知 | UNKNOWN_DELIVERY，查询或人工确定 | 不盲重试；变化记录保留（通知模块后续） |
+| PG 故障 | 停止写与发送；从备份在隔离环境恢复 | RPO/RTO、manifest、审计、策略基线完整后恢复 |
+
+PG 定期全备+WAL、对象受权利约束版本备份，至少按季度隔离恢复演练。恢复后按12 §7独立journal/latest watermark施加撤权再放开读取；不能从旧DB取所谓最新依据；历史任务默认 mode=replay、静默投递，不能自动给所有人补发几个月告警。演练需实测耗时和丢失窗口。
+
+## 7. 发布阻断项
+
+发现任何 ACL 泄露、未来数据污染历史、重复实际发送、部分失败被显示为有效结果、无出处强影响生效、无权源可抓取／分析、开发身份入口在生产可用，都阻断上线。可选功能、更多数据库或全机型测试不阻断本次已定义 slice。
+
+开发阶段不堆复杂审批/权限系统，保留账号身份、服务端RBAC、对象隔离、凭证保护和操作追溯。对真实接入和部署的授权边界不由“权限先松后紧”自动替代；当前仅修订设计。模型缓存和派生分数也继承来源状态，撤权/更正不能只删原文链接。
+
+
+v0.3覆盖/风险/封存的最小权限与恢复补齐：每次提交重新验证capability、workspace、证据ACL、risk/slot generation与worker fence；客户端actor/known_at不可信任。封存中途崩溃从已冻结manifest恢复，失权输入fail closed，双worker使用同seal slot；应用落后或新release不能回写当前membership。未知目标/维度拒绝，不能以管理员身份修正业务判断。合同版本变化仅为未运行设计，未来旧payload兼容规则见V03-CHANGELOG，不能静默扩大旧风险。
 
 
 ===== SOURCE: docs/09-delivery-plan.md =====
@@ -14,8 +138,8 @@
 
 | 阶段 | 任务 ID | 交付和依赖 | 验收出口 |
 |---|---|---|---|
-| M0 约 1–2 周 | W-01 | 将11已确认边界落实；真实接入前补齐剩余供应商/运行配置、repo 结构、OIDC/ACL、开发隔离库、合同生成、CI、设计 tokens | 基础认证与越权测试、依赖锁定、Schema/OpenAPI 同源，UX 导航原型评审 |
-| M0b | W-08 | 两家公司/三只证券的合成全流程、五角色、三层模板、AUTO/HUMAN、FINAL/状态/纠错；任务书13 | 主用户路径与故障/权限恢复通过，产品实测后重估工期 |
+| M0 最小基础 | W-01 | 只准备 W-08 必需的 repo 结构、项目隔离库、mock 身份/RBAC、合同生成入口和本地运行命令；真实 OIDC、完整 CI、生产 ACL 与其他治理后置 | 合成环境能启动、最小权限边界可验证、主路径输入输出可运行 |
+| M0b 首个切片 | W-08 | 两家公司/三只证券的合成全流程、五角色、三层模板、AUTO/HUMAN、FINAL/状态/纠错；任务书13 | 主用户路径与关键失败/权限恢复通过，产品实测后重估工期 |
 | M1 约 2 周 | W-02 | 合成公司/证券与一个获许可真实源 adapter、调度、原文、去重、固定时点公司时间线 | 采集失败可恢复、证据可回读、A/H 身份不混、列表和时间线 UX 首测 |
 | M2 约 2–3 周 | W-03 | 多源、自动判断与人工覆盖、事件归并、OpenSearch、热向量选配、标注集 | 多公司/无公司/歧义正确、去重、ACL、模型质量与检索指标达标 |
 | M3 约 2 周 | W-04 | 财务/日行情/FX/公司行动、三层模板、rubric、评分、解释页、时点回放 | 财报修订不前视、A/H 估值独立、missing/stale、贡献不双计 |
@@ -32,11 +156,13 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 
 ## 4. CI 与发布门禁（目标流水线）
 
-- 每 PR：format/lint/typecheck、JSON Schema/OpenAPI 合同、领域单测、扫描 secret、锁文件一致性、影响模块的集成／UI 关键测试。
-- 涉及 DB：项目隔离合成 PostgreSQL/Redis 实例运行迁移前后、并发、RLS、outbox 恢复测试；必须验证实际服务位置和数据分类。
-- 涉及 UX：共享组件 Storybook 状态、键盘/contrast、Playwright 当前关键路径和截图；不是每 PR 跑所有历史机型。
-- release candidate：真实依赖 adapter 的获许可最小读回、固定时点评分/策略闭环、性能、安全负面、备份恢复、人工 UAT。模拟成功与真实接入通过分开记录。
-- 供应链：锁依赖、SBOM、license check、漏洞分级、镜像摘要、构建和发布 provenance。签名/分支保护等权限变更待实施授权，不在本阶段操作 GitHub 设置。
+以下是按影响选择的检查目录，不是每项任务必须全量执行的清单；项目全过程遵循AGENTS的业务落地优先级。设计/文档修改做相关合同、引用和材料检查；代码修改验证受影响业务路径；生产候选再验证实际运行条件。未涉及的机制和可选增强不成为当前交付门槛。
+
+- 代码 PR：按改动涉及的语言、合同和依赖选择format/lint/typecheck、JSON Schema/OpenAPI、领域单测、secret扫描和锁文件检查；集成／UI测试聚焦受影响主路径及关键失败场景。
+- 涉及 DB：先验证实际服务位置和数据分类；在项目隔离合成实例中按影响验证。迁移验证迁移前后，事务/并发改动验证冲突与原子性，恢复改动验证outbox/ledger；仅已采用且本次涉及RLS时运行其测试，不因“涉及DB”全量执行。
+- 涉及 UX：按受影响页面/组件检查共享状态、键盘/contrast、当前关键路径；截图、Storybook与Playwright用于对应风险，不要求每次修改覆盖全部页面或历史机型。
+- release candidate：按本次候选范围验收业务闭环、关键权限/恢复和用户任务；涉及真实adapter时做获许可最小读回，涉及容量目标时做对应性能验证。模拟与真实接入通过分开记录，沿用已固定的必选验收预期，不自动追加所有未来阶段检查。
+- 供应链：依赖变更核对锁版本、许可与已知重大漏洞；正式交付按部署范围维护SBOM、镜像摘要和构建/发布provenance。签名/分支保护等增强按实际需要与授权安排，不成为设计阶段或合成闭环的前置条件。
 
 结果证据记录 commit SHA、环境、fixture/source manifest、command/scenario、expected/actual、执行者和时间。不得把 build 成功、/health 200、测试已写当实际验收通过。
 
@@ -66,174 +192,13 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 
 先 50–100 家用户选定公司、两个市场、已许可数据源、少量内测人员；同时运行标准策略 shadow 和人工核验。达到 M5 出口才启用live策略变化记录；通知后续独立启用；外部发送独立授权。异常可逐源／逐策略关闭，不删历史。试运行记录是否实际符合研究流程，不用收益指标为首版流程验收背书。
 
-实施顺序用于先验证架构和主路径，不是缩减产品。开源基座优先FastAPI模板；Refine/Prefect按13中薄适配与恢复比较择用。已确认的模板、自动审核、多人权限不能仅因技术容易或困难而省略业务合同与验收。
+实施顺序用于先验证架构和主路径，不是缩减产品。开源基座优先FastAPI模板；Refine/Prefect只在主路径遇到具体管理端或编排问题时再做有界比较，不作为W-08前置依赖。已确认的模板、自动审核、多人权限不能仅因技术容易或困难而省略业务合同与验收。
 
 
-===== SOURCE: docs/10-acceptance.md =====
+## v0.3设计出口与实施顺序
 
-# 10 验收矩阵与证据要求
+当前仅推进二轮设计评审，W-08没有启动。F01…05的合同与固定预期先入设计；对应T-39…43同步到10/13。另获实施授权后先准备最小运行基础，再直接贯通W-08主路径；人工替换、风险范围、policy/维度解析、seal协议按主路径需要逐步加入。不能以五维示例先通过为理由删完整模板扩展能力；也不要求引入更多框架或真实供应商才能验证合成链路。开源适配候选仍按research固定核查有界验证，尚未完成新选型实测。
 
-本文件列未来系统测试，本阶段产品运行均未运行。材料检查报告只说明文档、合成合同和示例一致，不说明功能通过。验收固定真实输入 manifest、策略版本、clock 与市场 calendar。
-
-## 1. 需求—设计—任务追踪
-
-| 需求 | 主要设计章节 | 实施任务 | 验收场景 |
-|---|---|---|---|
-| R-01 | 02 §2、05 §3、08 §2 | W-02/W-03 | T-01/T-02/T-21 |
-| R-02 | 02 §3、04 §2/5、07 §4 | W-02/W-03 | T-03/T-04/T-15 |
-| R-03 | 02 §3、07 §2/5 | W-03 | T-05/T-06/T-17 |
-| R-04 | 04 §3、06 §3/4 | W-02/W-03 | T-04/T-07/T-UX-01 |
-| R-05 | 02 §4、04 §2/4 | W-04 | T-08/T-09/T-10 |
-| R-06 | 02 §4/5、04 §3/4 | W-04 | T-07/T-10/T-11 |
-| R-07 | 02 §5、05 §2/5 | W-05 | T-12/T-13/T-UX-03 |
-| R-08 | 02 §6、05 §5 | W-05/W-07 | T-11/T-13/T-14/T-16 |
-| R-09 | 06 §2–7 | W-02/W-04/W-05 | T-UX-01/T-UX-02/T-22 |
-| R-10 | 05 §3、06 §3、08 §5/6 | W-03/W-06 | T-18/T-19/T-23 |
-| R-11 | 04 §2/5、08 §1–3 | W-01/W-06 | T-15/T-17/T-20/T-21 |
-| R-12 | 03 §5/6、05 §5、08 §6 | W-02/W-05/W-06 | T-14/T-16/T-18/T-19 |
-| R-13 | 09 §3/4 | W-01/W-06 | T-23/T-24 |
-| R-14 | 06 §5–7 | W-01/W-05/W-08 | T-UX-01…04/T-22 |
-| R-15 | 11 §2/3、04 | W-04/W-08 | T-25/T-26/T-UX-02 |
-| R-16 | 11 §4、07 | W-03/W-04/W-08 | T-27/T-28 |
-| R-17 | 11 §5/6、08 | W-01/W-08 | T-20/T-29 |
-
-## 2. 场景与明确预期
-
-| ID | 输入／动作 | 必须观察的结果 |
-|---|---|---|
-| T-01 | 定时、暂停、相同时点两个 scheduler | 只一个 run，暂停不采集；resume 不无限补采 |
-| T-02 | 分页第三页失败、重复抓取、晚到与源修订 | checkpoint 不越过失败洞，重试不重建相同 revision；新内容建新版本 |
-| T-03 | 五篇转载同订单、另一季度相似订单、错误合并修正 | 同事实一个 event、一份贡献；另季度不同 event；split 可审计可重算 |
-| T-04 | 发布时间与发生时间不同、仅日期、未知发生时间 | 时间线标精度／代用，切 known time 稳定、游标不重复漏项 |
-| T-05 | 无公司、一家公司、三家公司、简称重名、母子公司 | 分别正确 no_link/1/3，歧义 candidate；母子推导有有效期及证据 |
-| T-06 | r 高 c 低、r 低影响很强、无证据模型输出 | 不自动批准，人工队列；关联度不冒充影响、invalid 不生效 |
-| T-07 | 财报次日发布、后续修订、晚到、历史知识截止 | 公布／系统知悉前不使用；旧评估不覆写，重建模式单独标签 |
-| T-08 | 同模型 manifest 两次 score、贡献吸收、超过±15上限 | 确定性一致；吸收不双计；上限可解释且完整分值发布 |
-| T-09 | 一个维度缺失、coverage 0、分母负或 0 | null+reason，未调查不50分；覆盖不够不得入选；算术无无穷值 |
-| T-10 | A/H 同公司、不同币种/价格、同权与不同权、拆股 | 经营分相同，估值独立且分母/FX一致；不支持权利模型时 invalid |
-| T-11 | 港股开放A股休市、停牌、行情失效、恢复 | 依各市场 calendar；UNKNOWN/SUSPENDED 保留基线，不误发退出 |
-| T-12 | 无权发布、草稿非法 AST、预览后输入改变、双人编辑 | 403/422/409、保留草稿，不执行 arbitrary code、不静默覆盖 |
-| T-13 | 初始基线、两次相邻expected FINAL sessions入选、同 session 重算、退出、再入选、改策略 | 基线静默；各真实转移一条；重算不计两次；配置变化分类独立 |
-| T-14 | 两 Worker 同证券提交、commit 后崩溃、旧 generation 迟到 | membership/transition/explanation/outbox原子且唯一（首版无notification）；迟到不能覆盖最新 |
-| T-15 | 跨 workspace 查询/计数/搜索/向量/下载、缓存复用、source 撤权 | 全路径无内容与存在性泄漏；撤权即禁读并清投影 |
-| T-16 | 补采、replay、shadow、发送超时且 provider 无幂等 | 不外发历史；UNKNOWN_DELIVERY 不盲重发；delivery 不重新改状态 |
-| T-17 | prompt 注入、假公司 ID、伪证据、巨大附件、SSRF | 无工具/无密钥外传，输出拒绝；隔离解析和网络范围拦截 |
-| T-18 | Redis 清空、任务 lease 过期、索引宕机/重建 | 从 ledger 恢复，fencing 拒旧提交；PG 时间线可用且标降级 |
-| T-19 | PG 隔离备份恢复、撤权后恢复旧备份 | 实测 RPO/RTO；验证独立journal最新watermark、施加撤权后开放，静默重放、审计可回查 |
-| T-20 | 管理员无业务 publish/override capability、失效 OIDC、连接池 scope 切换 | 拒绝权限，不能继承前用户 workspace；生产无开发身份后门 |
-| T-21 | 源无 fetch/store/analyze 权、凭证过期、429 | 对应阶段停并解释；不绕过限制；日志无 secret |
-| T-22 | 核心页面全状态、指定视口、键盘、200%缩放、断线冲突 | 无遮挡溢出、能恢复输入；数值未知不为0；同语义同组件 |
-| T-23 | 20并发列表/搜索、10万到1000万阶梯、运行期可选成本上限（开发不设固定预算门） | 记录分位、索引容量及 backlog；超预算排队可解释，按01目标判定 |
-| T-24 | 迁移前后与应用回滚、事件前一版本、失败 release | 数据不损坏、兼容读写、必要恢复；新失败不替换成功 snapshot |
-
-T-UX-01、02、03、04 的用户任务与指标以 06 §7 为唯一详细定义。模型与检索 gold-set 指标以 07 §5 为唯一详细定义；不写第二份可能漂移的阈值。
-
-## 3. 标准状态机序列（合成）
-
-固定合成 security，连续 session：s0 有效 false→静默 OUT；s1 true→ENTER_PENDING；s1 新评估 true→不递增；s2 true→IN/一条ENTER变化记录；s3 missing→UNKNOWN,last=IN,计数清零；s4 retain true→IN/不新 ENTER；s5 retain false→EXIT_PENDING；s6 false→OUT/一条EXIT变化记录；s7 true、s8 true→IN/第二条 ENTER；s9 AUTO accepted硬风险→OUT/一条RISK变化记录。
-
-未知→恢复后 pending 重新计数；恰好阈值值按 >=/<=；不把浮点误差当跨线。另一策略新 release 建基线，live 第一次有效结果也不冒充市场变化。所有重放 sequence 的 transition数、类型、evidence hash与delivery=0（通知后置） 有精确预期。
-
-## 4. 证据模板与签收
-
-每项记录 {requirement_id,test_id,commit,environment,manifest_hash,strategy_release,scenario,expected,actual,status,executed_at,owner,evidence_refs}。status=passed/failed/blocked/not_run；只有实际执行且 expected 匹配才能 passed。失败修复后保留失败证据并新增记录；不得改预期掩盖失败。
-
-数据库前确认服务器位置、环境、数据性质和作用域；真实源／通知只运行获授权最小验证并回读真实结构；UI 标明模拟或真机，性能标明数据量。正式签收至少产品/研究负责人、工程负责人共同确认本 slice 的 mandatory 项；可选增强不作为额外强制审查轮次。
-
-## 5. v0.2追加边界（均为未来产品验收预期）
-
-| ID | 输入/动作 | 必须观察的结果 |
-|---|---|---|
-| T-25 | base→industry→company解析；循环/跳级/重复patch/错误hash/权重和不为1 | 合法链完整配置+逐字段来源；非法拒绝，不静默修权重 |
-| T-26 | 发布父模板新版本；旧release、企业定制与不同口径对比 | 旧解析hash和评分不变；显式升级模拟新绑定；不同口径有标识 |
-| T-27 | 同slot AUTO accepted→HUMAN rejected→新AUTO | 新建议可存，有效指针仍HUMAN；依赖贡献/风险解除和评分重算 |
-| T-28 | 双人覆盖、过期/解除覆盖、无证据硬风险与合法AUTO硬风险 | 409保留输入；到期重新合法评估；非法pending；合法AUTO可RISK |
-| T-29 | 五角色各自操作、角色兼任、撤权、最后管理员移除 | 正常路径有权可完成；viewer不能覆盖等越权403；不无意移除最后管理员 |
-| T-30 | s1 true、s2应有但漏评估、s3 true；休市；旧s2迟到 | s3只1/2；休市非缺口；旧s2不改变当前或补发历史事件 |
-| T-31 | 港股16:00 provisional→CAS final；半日；日历越界/深市映射缺失 | provisional不推进，final仅一次；未知日历显式UNKNOWN |
-| T-32 | s2 ENTER、s4 EXIT、独立s6 ENTER后纠正s2；并行新release | 历史CORRECTION保留实际转移；独立s6仍IN；旧generation不覆盖新release |
-| T-33 | 原文A→B→A；对象未标committed但有DB引用 | 三次observation保留；活跃引用不删，重试可恢复 |
-| T-34 | 同fact多event转载；新baseline吸收时故障；派生证据撤权 | 单slot贡献；baseline/吸收原子不双计；无权派生总分失效/重算 |
-| T-35 | 精确/贴近阈值、非整数半衰期、UTC/时区、显示舍入 | 按numeric policy固定12位黄金结果，显示值不改变比较；重复重放一致 |
-| T-36 | 合并CFO75、合并利润100、归母利润50 | cfo_profit_3y=0.75，不满足0.8；不能得出混口径1.5 |
-| T-37 | 三年旧年度、TTM缺季、旧报告更正、下一报告义务到期 | 历史期间可用；TTM合法推导或missing；更正不能满足新期间；逾期stale |
-| T-38 | 正式收盘价收盘后到达；收盘后新公告；cutoff后新判断 | 价可在宽限内用；公告不入本收盘评估；判断不回填；计算generated_at真实 |
-
-W-08覆盖各模块的最小代表场景，完整需求追踪仍由对应W-01…06实施验证。W-07及T-16的渠道发送部分为后续，不阻塞当前变化记录。B/S发现→当前修复→T场景的映射见review/V02-CHANGELOG.md；本地材料工具演示/检查不冒充上表产品测试通过。
-
-
-===== SOURCE: docs/11-templates-automation-and-roles.md =====
-
-# 11 分层评分模板、自动审核与角色权限
-
-设计版本 v0.2，2026-09-30。本文件是模板解析、判断生效和首版角色的权威合同；02、04、05、06 引用它，不另定义继承算法。
-
-## 1. 用户已确认的边界
-
-| 决定 | 已确认内容 | 对原 v0.1 的影响 |
-|---|---|---|
-| D-02A 使用范围 | 从首版支持多人、角色权限，由用户先使用验证；一个私有研究组织可起步 | 不降级为个人工具，不要求先建设公共 SaaS 或部门体系 |
-| D-02B 成本 | 开发阶段不设固定预算上限，优先成熟度、效率与维护性 | 成本记录保留；预算门禁不是开发前置条件，实际采购仍是后续接入动作 |
-| D-03A 通知 | 通知功能后置；当前实现规划先完成进出区间与风险变化的正确记录和查看 | 首版无需提醒中心、收件人订阅、已读/稍后提醒或任何渠道投递 |
-| D-04A 模板 | 通用基础→行业→企业定制，模板由人维护发布 | 企业只覆盖差异，上层升级不悄悄改变已发布配置 |
-| D-05A 模型 | 允许外部模型作为正常分析能力，权限先松后紧 | 简单 RBAC 与来源可分析标记；不为首版叠加复杂审批、逐字段 ABAC、强制 MFA 流程 |
-| D-07A 判断 | 系统自动给出审核结论，符合配置规则即生效，人工可以覆盖 | 移除“重大影响必须先人工批准”和固定每日人工投入假设；无法确认仍是未知 |
-| 范围与体验 | A/H；全市场基本资料可查，首批50–100家公司完整监控；桌面完整操作，手机查看和轻量处理 | 50–100是试运行范围，不是数据模型或产品能力上限 |
-
-用户最后确认“按这版定”。本轮授权是修订并提交设计材料，未授权构建产品、采购、真实采集、调用模型或部署。技术功能以成熟方式可实现为设计前提；分阶段只是依赖和验证顺序，不能以“技术复杂”为由删掉已确认业务能力。
-
-## 2. 模板继承与发布
-
-对象为 ScoringTemplateVersion：template_key、version、level(base/industry/company)、parent_ref、scope、patches。base 固定引用评分配置版本；industry 固定引用 base；company 固定引用 industry。公司必须只有一个生效的行业归属绑定；跨行业公司通过显式企业定制表达，不隐式混合多个父模板。分类变化必须预览、发布新绑定。
-
-父引用包含 key、version 和内容 SHA-256，不使用 latest。发布后的模板不可变；草稿可编辑，ETag防并发覆盖。不允许循环、跳级、跨 workspace 父引用、公司套用不适用行业，或者没有证据口径的新指标。正式运行解析器加载固定父链，校验哈希，按base→industry→company应用patch，生成完整 EffectiveScoringConfig、字段来源和 resolution_hash。
-
-patch 按稳定 dimension ID 修改，不按数组位置修改。每项可覆盖 weight、完整 baseline 或 disabled；未覆盖的属性继承。baseline替换整个维度规则，不递归拼接半份指标数组。维度禁用同时移除其权重；新增 x_ 开头自定义维度必须同时提供权重和baseline。重复patch、未知指标、未知rubric、总权重不等于1、必需维度被禁用均拒绝发布，不偷偷归一化维度权重。有效子指标的缺失归一化仍按评分配置处理，两者不是同一个规则。
-
-模板可配置指标、权重、rubric、证据和新鲜度要求；数值算法、计量单位、字段注册与规范版本通过受控版本发布变更，不能靠任意Python/JS片段扩展。首个标准行业模板服务一般非金融企业；金融、地产和资源周期的专用模板可接入同一框架，尚未提供适用模板时显示unsupported。这是规则适用范围，不阻止公司研究、讯息关联和事件时间线。
-
-企业定制以(company,template_version)作用于公司经营评分；A/H对应证券共用该公司配置与经营事实，各自估值。可以存在多个研究方案，但当前标准绑定在同一研究组织中只选一个；新增研究方案需要显式profile ID，不能把两个定制分数当同一分数。策略发布固定 scoring_binding_manifest，其中记录每家公司父链和resolved hash。后续模板更新经模拟→差异预览→新绑定/策略release→CONFIG_CHANGE基线，不向旧策略release热替换。
-
-## 3. 模板与分数的人类可读解释
-
-模板编辑页提供三列：继承值、企业覆盖值、最终值。每个覆盖项有理由；可撤销覆盖恢复继承。显示受影响公司、哪些策略会改变、是否减少覆盖度。发布上层新版本时提供显式升级清单和冲突，不能把更新提示变成自动升级。
-
-评分解释返回 dimension→metric/rubric→baseline→event_contribution，并给每个字段 origin_template_ref。两个分数若resolved hash、metric-definition或numeric-policy不同，比较页提示口径不同；可比较共同指标原始值，不能用相同百分制声称等价，也不自动生成未计算的“统一分”。
-
-## 4. 自动审核与人工覆盖
-
-模型只输出proposal。独立DecisionService校验Schema、证据归属/定位、候选身份、数值/单位、适用模板、有效时间和来源状态，之后按auto-review-policy产生append-only review_decision。高影响、基准rubric与硬风险也可自动生效，前提是满足对应政策；不再统一要求先人工审核。
-
-决策状态 accepted/rejected/pending；accepted的生效来源为AUTO或HUMAN。AUTO记录service_principal、policy/version、模型/输入manifest和理由；HUMAN记录actor、理由和证据。旧字段approved统一表示accepted，不代表必须由人批准。硬风险需要明确risk_code和支持事实，自动判定也不能把预测、媒体猜测或无正文标题当已确认事实。
-
-标准政策示例：一般关联r≥0.5、校准c≥0.9；影响判断校准a≥0.9且对应关联已accepted；rubric每项有有效证据与档位锚点、校准置信度≥0.9；硬风险校准c≥0.98且有有效监管/发行人原始披露，事实措辞满足对应risk_code。模型自报数字必须经过校准映射；没有可用校准版本时pending，而非伪造可信程度。这些阈值是可维护初始规则，性能尚未测得，正式启用通过07的评估要求。
-
-人工覆盖按subject_slot(company+economic_fact/criterion+dimension)建立新决策，使用If-Match校验当前有效决策。可改关联、拒绝影响、设置无法确认、撤销硬风险或修订rubric。覆盖可以带valid_until；有效期间后续自动重跑仍可保存建议，但不能覆盖人工决定。期满后触发一次有固定cutoff的重新评估；不能简单恢复一条已过时旧AUTO结论。人工撤销覆盖也生成新记录，并重新应用当前合法输入与政策。
-
-DecisionService、有效判断指针、audit、outbox同事务提交。人工拒绝解除关联时，受其支撑的影响、基准和硬风险失效，触发有界评分与策略重算；不能只改前端标签。一次覆盖可能影响多个证券，预览展示A/H影响。普通小修改一个明确动作完成；只有批量或会改变已发布策略状态的操作需要影响预览，不把所有编辑做成审批流程。
-
-## 5. 首版角色与权限
-
-| 角色ID | 默认权限 | 未默认授予 |
-|---|---|---|
-| viewer | 查看组织共享公司/证据/评分/策略/变化，维护本人自选与私人笔记 | 修改判断、源或发布规则 |
-| researcher | viewer + analysis.override、template.edit、共享研究笔记 | 模板/策略发布、凭证、用户授权 |
-| strategy_manager | viewer + template.edit/publish、strategy.edit/simulate/publish/rollback、scoring.binding.publish | 数据源凭证、用户授权 |
-| data_admin | viewer + source.manage、job.retry、identity.manage、quality.correct | 模板/策略发布、用户授权 |
-| system_admin | user.manage、role.assign、system.configure、model.configure、audit.read、运行状态查看 | 业务覆盖/发布不隐式授予，可明确兼任其他角色 |
-
-RBAC以稳定capability检查，角色只是预置组合；同一用户可兼任。每项写入需同时满足role capability、workspace和对象visibility。组织研究对象默认workspace共享，私人笔记/策略由owner明确共享；无需逐家公司授权。公共市场主数据只读共享，私有判断不跨组织。服务端查询与写入统一检查，前端显示入口/按钮与PermissionNotice，不以按钮隐藏代替授权。
-
-初始管理员通过部署初始化流程授予，不能由公开注册者自选角色。role.assign不能扩大到授权人不具备的可授予范围；最后一名系统管理员不能被无替代地移除。角色撤销后下一请求与后台业务提交重新校验，不依赖长缓存。实现可复用成熟身份服务，无须首版复杂组织树、逐字段ABAC或强制双人审批。
-
-## 6. API与合同映射
-
-GET /scoring-templates；POST /scoring-templates/{id}/drafts；PATCH /template-drafts/{id}；POST /template-drafts/{id}/resolve、simulations、publish；GET /companies/{id}/scoring-config；POST /scoring-bindings/publish。resolve返回完整配置、origin map、hash与错误；publish校验If-Match及预览输入hash。
-
-GET /decisions?company_id&status&actor_kind；POST /decisions/{slot}/overrides；POST /decisions/{slot}/release-override；GET /companies/{id}/notes；POST/PATCH /notes/{id}；GET/PUT /saved-views/{id}。草稿、笔记和视图保存在服务端，具有owner/visibility、revision/ETag；浏览器临时缓存不是唯一保存位置。
-
-GET /admin/roles；PUT /admin/users/{id}/roles。响应包含可授予权限和版本，写入采用If-Match、明确差异、审计；403无权、409并发冲突、422不合法角色组合或模板配置。模板Schema校验形状；父链、权重、scope、引用和人工覆盖优先级由语义校验补充。
-
-[END PART 5/15]
+[END PART 5/27]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

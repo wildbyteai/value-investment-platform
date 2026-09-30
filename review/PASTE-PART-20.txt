@@ -1,0 +1,564 @@
+
+[PART 20/27]
+
+
+===== SOURCE: contracts/strategy.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "strategy_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scoring_model_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "universe": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "CN_A",
+              "HK"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "exclude_sector_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "common_equity_only": {
+          "const": true
+        }
+      },
+      "required": [
+        "markets",
+        "exclude_sector_groups",
+        "common_equity_only"
+      ]
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minimum_coverage": {
+          "type": "string",
+          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+        },
+        "required_dimensions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "profit_quality",
+              "financial_resilience",
+              "business_model",
+              "governance",
+              "growth_sustainability"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "baseline_max_age_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "price_max_lag_sessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency_and_share_basis_required": {
+          "const": true
+        },
+        "only_approved_inputs": {
+          "const": true
+        },
+        "financial_freshness_policy": {
+          "const": "report_obligation_and_required_periods"
+        }
+      },
+      "required": [
+        "minimum_coverage",
+        "required_dimensions",
+        "baseline_max_age_days",
+        "price_max_lag_sessions",
+        "currency_and_share_basis_required",
+        "only_approved_inputs",
+        "financial_freshness_policy"
+      ]
+    },
+    "hard_risk_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "confirmed_only": {
+          "const": true
+        },
+        "action": {
+          "const": "immediate_out_risk"
+        },
+        "risk_codes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "confirmed_fraud",
+              "going_concern_material",
+              "confirmed_debt_default",
+              "delisting_decision"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "confirmed_only",
+        "action",
+        "risk_codes"
+      ]
+    },
+    "enter": {
+      "$ref": "#/$defs/expression"
+    },
+    "retain": {
+      "$ref": "#/$defs/expression"
+    },
+    "state_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "initial_baseline_notify": {
+          "const": false
+        },
+        "enter_distinct_sessions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "exit_distinct_sessions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "session_clock": {
+          "const": "security_exchange_close"
+        },
+        "unknown_action": {
+          "const": "hold_last_confirmed_reset_pending"
+        },
+        "config_change_notify": {
+          "const": "deferred_change_record_only"
+        },
+        "historical_notify": {
+          "const": false
+        },
+        "require_adjacent_expected_sessions": {
+          "const": true
+        },
+        "final_price_required": {
+          "const": true
+        },
+        "cutoff_grace_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440
+        },
+        "notification_phase": {
+          "const": "deferred"
+        }
+      },
+      "required": [
+        "initial_baseline_notify",
+        "enter_distinct_sessions",
+        "exit_distinct_sessions",
+        "session_clock",
+        "unknown_action",
+        "config_change_notify",
+        "historical_notify",
+        "require_adjacent_expected_sessions",
+        "final_price_required",
+        "cutoff_grace_minutes",
+        "notification_phase"
+      ]
+    },
+    "scoring_binding_policy": {
+      "const": "published_per_company_resolution_manifest"
+    }
+  },
+  "required": [
+    "schema_version",
+    "strategy_key",
+    "version",
+    "name",
+    "description",
+    "scoring_model_ref",
+    "universe",
+    "quality_gates",
+    "hard_risk_policy",
+    "enter",
+    "retain",
+    "state_policy",
+    "scoring_binding_policy"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Restricted standard strategy configuration",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 30,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            }
+          },
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "enum": [
+                "company.quality_score",
+                "company.coverage",
+                "security.valuation_score",
+                "metrics.roe_ttm",
+                "metrics.cfo_profit_3y",
+                "metrics.net_debt_ebitda"
+              ]
+            },
+            "op": {
+              "enum": [
+                "gte",
+                "lte"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          },
+          "required": [
+            "field",
+            "op",
+            "value"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
+===== SOURCE: examples/analysis-proposal.json =====
+
+{
+  "schema_version": "3.0",
+  "item_revision_id": "00000000-0000-4000-8000-000000000002",
+  "no_link": false,
+  "links": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "relation_type": "direct",
+      "relevance": "0.95",
+      "confidence": "0.93",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成材料明确描述示例制造订单，不代表真实公司判断。"
+    }
+  ],
+  "impact_proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "dimension": "growth_sustainability",
+      "signed_impact": "0.4",
+      "confidence": "0.8",
+      "half_life_days": 30,
+      "valid_until": "2026-12-31T00:00:00Z",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+    }
+  ],
+  "rubric_proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "rubric_ref": "business-model-v1",
+      "criterion_key": "pricing_power",
+      "grade": 3,
+      "confidence": "0.95",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成材料示范：提价后留存稳定，实际必须验证证据锚点",
+      "valid_until": "2027-03-29T00:00:00Z"
+    }
+  ],
+  "risk_proposals": []
+}
+
+
+===== SOURCE: examples/auto-decision.json =====
+
+{
+  "schema_version": "2.0",
+  "decision_id": "00000000-0000-4000-8000-000000000010",
+  "subject_slot": "00000000-0000-4000-8000-000000000020",
+  "subject_revision": "00000000-0000-4000-8000-000000000021",
+  "status": "accepted",
+  "actor_kind": "AUTO",
+  "actor_id": "decision-service",
+  "policy_ref": "auto-review-standard-v1",
+  "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+  "known_at": "2026-09-30T01:00:00Z",
+  "valid_until": null,
+  "supersedes_decision_id": null,
+  "reason": "合成证据、身份、时点和已校准阈值校验通过",
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000003"
+  ]
+}
+
+
+===== SOURCE: examples/human-override.json =====
+
+{
+  "schema_version": "2.0",
+  "decision_id": "00000000-0000-4000-8000-000000000011",
+  "subject_slot": "00000000-0000-4000-8000-000000000020",
+  "subject_revision": "00000000-0000-4000-8000-000000000021",
+  "status": "rejected",
+  "actor_kind": "HUMAN",
+  "actor_id": "synthetic-researcher",
+  "policy_ref": "auto-review-standard-v1",
+  "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+  "known_at": "2026-09-30T02:00:00Z",
+  "valid_until": "2026-10-30T00:00:00Z",
+  "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+  "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000003"
+  ]
+}
+
+
+===== SOURCE: examples/job-event.json =====
+
+{
+  "event_id": "00000000-0000-4000-8000-000000000004",
+  "event_type": "AnalysisProposed",
+  "schema_version": "2.0",
+  "workspace_id": "00000000-0000-4000-8000-000000000005",
+  "entity_id": "00000000-0000-4000-8000-000000000002",
+  "entity_revision": "synthetic-r1",
+  "occurred_at": "2026-09-30T00:00:00Z",
+  "trace_id": "synthetic-trace-01",
+  "mode": "shadow",
+  "generation": 1,
+  "payload": {
+    "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+    "job_id": "00000000-0000-4000-8000-000000000007"
+  },
+  "evaluation_context": {
+    "as_of": null,
+    "knowledge_cutoff": null,
+    "time_bucket": null,
+    "calendar_ref": null,
+    "template_resolution_hash": null,
+    "numeric_policy_ref": null,
+    "decision_policy_ref": null
+  }
+}
+
+
+===== SOURCE: examples/state-machine-cases.json =====
+
+{
+  "synthetic": true,
+  "cases": [
+    {
+      "session": "s0",
+      "input": "enter_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s1",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s1",
+      "input": "enter_true_recompute",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s2",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "change_event": "ENTER",
+      "delivery_expected": false
+    },
+    {
+      "session": "s3",
+      "input": "missing",
+      "confirmed": "IN",
+      "display": "UNKNOWN",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s4",
+      "input": "retain_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s5",
+      "input": "retain_false",
+      "confirmed": "IN",
+      "display": "EXIT_PENDING",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s6",
+      "input": "retain_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "change_event": "EXIT",
+      "delivery_expected": false
+    },
+    {
+      "session": "s7",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "change_event": null,
+      "delivery_expected": false
+    },
+    {
+      "session": "s8",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "change_event": "ENTER",
+      "delivery_expected": false
+    },
+    {
+      "session": "s9",
+      "input": "auto_accepted_hard_risk",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "change_event": "RISK",
+      "delivery_expected": false
+    }
+  ],
+  "notification_phase": "deferred"
+}
+
+
+===== SOURCE: examples/v02-boundary-cases.json =====
+
+{
+  "synthetic": true,
+  "material_expectations_only": true,
+  "cases": [
+    {
+      "id": "T-30",
+      "input": "s1 true; s2 expected but absent; s3 true",
+      "expected_display": "ENTER_PENDING",
+      "expected_count": 1,
+      "expected_change_events": []
+    },
+    {
+      "id": "T-31",
+      "input": "XHKG 16:00 provisional; later final CAS close",
+      "expected_provisional_count": 0,
+      "expected_final_count": 1
+    },
+    {
+      "id": "T-32",
+      "input": "s2 ENTER; s4 EXIT; independent s6 ENTER; correction s2",
+      "expected_current_state": "IN",
+      "expected_new_record": "CORRECTION",
+      "expected_new_market_event": null
+    },
+    {
+      "id": "T-35",
+      "input": "10*0.8*0.5*0.95*0.8; H=30 days; age=30 days",
+      "expected_before_decay": "3.040000000000",
+      "expected_after_decay": "1.520000000000"
+    },
+    {
+      "id": "T-36",
+      "input": "3y group CFO=75; group profit=100; attributable profit=50",
+      "expected_cfo_profit": "0.750000000000",
+      "expected_rule_gte_0_8": false
+    },
+    {
+      "id": "T-37",
+      "input": "old annual report correction without new fiscal period",
+      "expected_satisfies_new_obligation": false
+    },
+    {
+      "id": "T-38",
+      "input": "final close observed before grace cutoff; new announcement first published after close",
+      "expected_close_usable": true,
+      "expected_announcement_usable_in_close_evaluation": false
+    }
+  ]
+}
+
+[END PART 20/27]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

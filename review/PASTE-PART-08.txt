@@ -1,558 +1,188 @@
 
-[PART 8/15]
+[PART 8/27]
 
 
-===== SOURCE: config/auto-review-policy-v1.json =====
+===== SOURCE: docs/12-time-numerics-and-corrections.md =====
 
-{
-  "policy_key": "auto-review-standard-v1",
-  "schema_version": "1.0",
-  "default_mode": "auto_accept_when_valid",
-  "calibrated_confidence_required": true,
-  "link": {
-    "minimum_relevance": "0.50",
-    "minimum_confidence": "0.90"
-  },
-  "impact": {
-    "minimum_confidence": "0.90",
-    "accepted_link_required": true
-  },
-  "rubric": {
-    "minimum_confidence": "0.90",
-    "anchored_evidence_required": true
-  },
-  "hard_risk": {
-    "minimum_confidence": "0.98",
-    "primary_regulator_or_issuer_evidence_required": true,
-    "allow_auto_accept": true
-  },
-  "invalid_or_conflicting": "pending",
-  "human_override_precedence": "until_released_or_expired",
-  "on_override_expiry": "reevaluate_current_legal_inputs",
-  "template_and_strategy_auto_publish": false
-}
+# 12 时点、数值与纠错合同
 
+v0.3设计。修复第二轮研究B-01…04与S-01…09；研究报告记录旧版证据，本文件定义当前目标行为。未运行产品或灾备演练。
 
-===== SOURCE: config/metric-definitions-v2.json =====
+## 1. 财务指标与rubric
 
-{
-  "definition_version": "metric-definitions-v2",
-  "metrics": {
-    "roe_ttm": {
-      "unit": "ratio",
-      "formula": "ordinary_attributable_profit_ttm / average_ordinary_attributable_equity",
-      "scope": "matching_ordinary_equity",
-      "invalid": "denominator_nonpositive_or_unmatched_scope"
-    },
-    "cfo_profit_3y": {
-      "unit": "ratio",
-      "formula": "sum(consolidated_cfo_last_3_full_years) / sum(consolidated_net_profit_same_3_years)",
-      "scope": "matching_consolidated_group",
-      "invalid": "profit_sum_nonpositive_or_missing_period_or_unmatched_scope"
-    },
-    "positive_cfo_year_share_3y": {
-      "unit": "ratio",
-      "formula": "positive_cfo_year_count / 3",
-      "scope": "last_3_full_fiscal_years",
-      "invalid": "missing_required_year"
-    },
-    "net_debt_ebitda": {
-      "unit": "ratio",
-      "formula": "(interest_bearing_debt - cash_and_cash_equivalents) / ebitda_ttm",
-      "scope": "matching_consolidated_group",
-      "invalid": "ebitda_nonpositive_or_unmatched_scope"
-    },
-    "interest_coverage": {
-      "unit": "ratio",
-      "formula": "ebit_ttm / interest_expense_ttm",
-      "scope": "matching_consolidated_group",
-      "invalid": "interest_nonpositive_or_unmatched_scope"
-    },
-    "pe_ttm": {
-      "unit": "multiple",
-      "formula": "primary_listing_raw_final_close / fx_converted_ordinary_eps_ttm",
-      "scope": "matching_equivalent_ordinary_shares",
-      "invalid": "earnings_nonpositive_or_unmatched_share_rights"
-    }
-  }
-}
+指标定义数字真源为[metric-definitions-v2.json](../config/metric-definitions-v2.json)。CFO现金转换率=最近三个完整财政年度合并CFO合计/同三个年度合并净利润合计；不能用集团CFO除归母利润。ROE采用归属普通股股东的TTM利润/匹配范围平均普通股权益；证券PE另用同权普通股每股归属盈利。合并净利润、归母利润、普通股利润分别存储，不互相代填。无法匹配合并范围、会计期、单位/币种则invalid。
+
+TTM按合法已知期间计算；市场未提供季度资料时可使用“最近年度+本期累计−去年同期累计”，仍缺必要期间则missing，不拼造季度。3年历史本来需要旧年度，不按公告年龄一刀切。财务新鲜度由report_obligation记录发行人、市场/板块、财年末、报告类型、所需期、到期日、正式例外及来源。旧报告更正不能当新期间。到期前用最新合法可用期，超过批准宽限仍缺应有报告则stale；三年指标同时检查三个完整年度及最新应有年度。
+
+HK主板通常全年业绩≤年结后3个月、半年业绩≤期末后2个月，仅是第二轮已核查的常规例子，不涵盖所有例外或报告派发期限。A股、其他板块、发行人例外必须在真实适配器接入前固定义务映射；未配置不能自称新鲜。合成切片直接提供冻结义务表，不阻碍开发。
+
+[rubrics-standard-v1.json](../config/rubrics-standard-v1.json)提供11项0–4档锚点。每项判断记录period、档位、支持/反驳证据、confidence、effective/known时间、有效期和AUTO/HUMAN决策。无证据或未调查用null；冲突不能取中位数。rubric不是统计概率或投资收益。
+
+## 2. 最终收盘与知识边界
+
+每证券首版绑定一个primary Listing，保存exchange、currency、calendar_ref与close_policy。A/H为不同security、共享company；报价/FX来源属于listing。多币种柜台若未配置独立估值口径则unsupported，不能共享一个不标币种的V。首版membership仍为workspace+release+security，其release固定primary_listing_id。
+
+日历只给expected sessions及市场时段，不能证明价格FINAL。港股适用CAS证券的最终收盘不能用16:00连续交易末值替代；半日和非CAS按获许可源的价格类型处理。适配器必须输出session、price_kind、is_final、source_revision、observed_at。日历固定版本、年份范围、临时休市和深市映射；覆盖不足显式UNKNOWN，不用工作日猜测。
+
+标准evaluation_as_of为该证券批准session的最终市场时点，knowledge_cutoff固定为该时点后60分钟；这是初始可维护宽限，不是已验证源SLO。价格is_final只说明报价类别；收盘evaluation封存另需§8协议，全部冻结输入合法或明确质量缺口，到cutoff不能取得最终价则该session生成UNKNOWN缺口。重试沿用cutoff，不使用重试时now延长。
+
+| 输入类别 | 收盘评估的可用条件 |
+|---|---|
+| 日收盘行情 | 正确session和最终价格类型；在固定cutoff前observed，允许供应商收盘后发布 |
+| 公告/经营事实 | 首次published≤evaluation_as_of且observed≤cutoff，有效期适用；收盘后新公告进入下一session，日内硬风险走独立即时判断 |
+| AUTO/HUMAN判断 | decision.known_at≤cutoff，引用输入也满足对应类别条件；晚批准不能回填 |
+| 确定性计算 | 可以cutoff后完成，但只能消费已冻结合法manifest；generated_at记录真实完成时间 |
+
+实时硬风险在其决策实际生效时更新风险状态，不把当晚新信息伪装为收盘前信息。research_reconstruction、reanalysis和历史纠错与live分开，不混算性能或补发过去信号。
+
+## 3. 相邻session、单调应用与暂停
+
+enter/exit均需两个相邻expected FINAL sessions。同session provisional更新不计数；FINAL只应用一次；UNKNOWN、应有session漏评估、停牌、范围级暂停打断pending。周末或日历批准休市不算漏评估。s1 true、s2缺口、s3 true只能1/2。迟到s2不能倒灌当前membership，也不能把s1与s3重新拼成连续满足。
+
+membership记录last_applied_session、generation、finalization_token及pending session IDs。提交检查release/binding/input generation、当前session单调性、唯一finalization_token和行锁/CAS。更早session保留历史结果，不能改当前指针；同session封存后更正走下节。硬风险独立revision/generation同样检查，不能由旧风险解除覆盖新风险。
+
+个人静默/订阅暂停只影响后续notification delivery；不属于共同membership的SUSPENDED条件。范围级暂停需strategy.manage权限并明确影响全部订阅者；首版没有个人通知开关。市场停牌仍SUSPENDED并保留last_confirmed。
+
+## 4. 历史纠错与当前状态
+
+FINAL后的输入修订建立correction_run，不覆写原evaluation、finalization_token或transition。correction记录原对象、错误类别、合法替换manifest、影响范围、算法/模板版本、截止和新解释。只有原数据/映射/计算错误属于纠错；现在新出现的知识是新判断，不能回填过去。
+
+从受影响窗口之前的未受影响FINAL锚点，沿冻结后续sessions重放原发布策略及对应模板，逐项标记哪些evaluation/transition失效或保持成立。历史视图保留“当时记录”和“更正说明”；不删除实际发生过的ENTER/EXIT。纠错结果产生CORRECTION记录。若重放影响当前状态，使用最新合法输入完成当前reconciliation；提交前CAS最新release、generation、last_applied_session，过时则重新预览而不覆盖。
+
+若s2 ENTER、s4 EXIT、s6 ENTER，后来纠正s2，不能直接把当前IN改为OUT；必须检查s4/s6依据和相邻确认。后续s6独立成立则当前仍IN，只追加历史说明。若确需改变当前状态，产生一条CORRECTION状态调整而非伪造今天的市场EXIT。首次基线/CONFIG_CHANGE/CORRECTION/RISK/MARKET分别分类。
+
+## 5. 经济事实去重与吸收
+
+event容纳多个claims；economic_fact_id定义公司/对象+动作+财务期间/合同批次等同一经济事实。贡献slot=(company,economic_fact_id,dimension)。多event或转载指向同一事实也只允许一个有效贡献。事实矛盾保留support/refute，不通过“更高来源权重”无条件消灭冲突。
+
+新baseline吸收事实时，baseline revision、吸收的fact/slot版本、有效贡献指针和outbox同事务提交；不能先加新baseline再异步减旧贡献。跨workspace/不可访问来源的贡献不会偷偷进入可见总分。派生snapshot继承required_source_ids/visibility；证据撤权导致当前结果重新检查、降覆盖或失效，而非仅隐藏证据链接。
+
+讯息的content revision与observation分开：A→B→A可以复用A内容blob，但必须有三次不可变observation(sequence,observed_at,revision_ref)，当前指针由最新observation确定，不因内容hash重复丢失回退历史。对象清理必须同时检查DB活跃引用及保留期限，不能仅凭对象tag删除。
+
+## 6. 确定性数值与任务身份
+
+[numeric-policy-v1.json](../config/numeric-policy-v1.json)是算法数值规范。金额和比率十进制字符串；后端Python Decimal作为唯一规则计算路径。precision=50、ROUND_HALF_EVEN；每个持久化计算节点quantize到小数点后12位（系数输入保留原有效精度），按metric→baseline→单事实贡献→按fact ID排序求和→贡献cap→维度clip→Q/V顺序处理。策略比较使用持久化12位值，显示1位小数不参与比较。
+
+age是UTC有效事件时间到as_of的完整秒数除86400，不按本地午夜跳日；日期粒度事件采用来源时区当日00:00并标precision，不精确宣称秒级时间。衰减通过precision=70的guard上下文计算Decimal(2)**(-age/H)，然后ROUND_HALF_EVEN量化12位；实现锁定Python/decimal运行版本、算法hash，并提供非整数幂黄金向量。不同语言仅离线误差对照，不能另做membership判断。时间到valid_until采用半开区间，t≥valid_until贡献0。
+
+解析/索引等静态job身份=workspace+stage+entity_revision+algorithm_version+mode+input_hash。评分/到期/收盘/覆盖解除等时间相关job再包括as_of、knowledge_cutoff、time_bucket/session、calendar、template_resolution、numeric_policy和decision_policy版本。重试沿用完整逻辑键；时点不同必须是不同job。新job不意味着允许旧输入覆盖当前，generation/fencing仍必要。
+
+## 7. 旧备份恢复后的撤权
+
+恢复安全合同保留，但实现不要求新微服务。正常权利撤销先向独立于应用备份的耐久revocation_journal追加序号、scope和hash链，取得durable receipt后再撤销DB权限和投影；拒绝读取可以先发生，撤销操作未完整耐久则状态pending禁止恢复开放。journal使用独立保留的对象存储/介质，latest watermark不能来自同一份旧DB备份。
+
+恢复始终在隔离环境、无发送；验证journal完整性和最新watermark，施加自备份cutoff之后全部撤权，重建ACL/索引并测试，再开放受影响读路径。不能验证最新依据时fail closed相关范围。首版合成场景用独立本地journal fixture验证合同；真实资料接入/生产恢复前才选择实际独立耐久存储并演练，不把尚未配置的灾备说成已实现。
 
 
-===== SOURCE: config/numeric-policy-v1.json =====
+## 8. 收盘输入冻结与唯一封存（F05）
 
-{
-  "policy_key": "decimal-python-v1",
-  "precision": 50,
-  "guard_precision": 70,
-  "rounding": "ROUND_HALF_EVEN",
-  "storage_decimal_places": 12,
-  "display_decimal_places": 1,
-  "age_unit": "utc_elapsed_seconds_div_86400",
-  "decay_method": "decimal_power_two",
-  "operation_order": [
-    "metrics",
-    "baseline",
-    "fact_contributions",
-    "fact_id_sorted_sum",
-    "contribution_cap",
-    "dimension_clip",
-    "company_quality_and_security_valuation"
-  ],
-  "comparison": "persisted_12_decimal_values",
-  "runtime_pin_required": true
-}
+价格FINAL、输入冻结、evaluation封存、membership应用是独立状态。session_due→provisional→ready_to_seal→sealed；终态sealed结果可为valid/UNKNOWN/SUSPENDED，不意味着全输入有效。provisional的knowledge_cutoff使用本次实际已知截止且≤generated_at，目标收盘截止另存planned_seal_cutoff；不得把未来+60作为提前run的已知截止。目标cutoff前只可provisional，不创建finalization_token、不计session、不推进普通membership。只有服务端clock≥固定cutoff且日历/最终市场时点合法才能ready_to_seal；没有最终价仍可封存明确UNKNOWN质量缺口，日历/时点未知则记不可封存缺口，禁止用worker now猜cutoff。
+
+strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定release/security/primary_listing/session/as_of/cutoff、manifest ID/hash及expected_generation。用户或模型不能自行封存；调用身份须有受限strategy worker capability，提交仍检查workspace、来源权利与lease fencing。[manifest合同](../contracts/evaluation-input-manifest.schema.json)与[合成示例](../examples/v03-seal-manifest.json)逐类强制输入或缺口；示例hash真实绑定命令，不是已获数据。manifest包含身份/日历、价格/FX/股本、财务/报告义务、关联/影响/rubric/风险/人工覆盖、全部政策/模板/算法版本，逐类revision或显式缺口；不能只冻结价格。
+
+输入选择以§2为准。每类在cutoff内的最后合法修订按known/observed+稳定revision排序；决策与依赖引用也须同cutoff。同时间冲突记录conflicting，不任意择高分。全部参与提交的输入写入事务时由数据库生成knowledge序列和不可回填时间；cutoff后写入不得伪造为早期已知。冻结在PG一致性snapshot内完成，持久化input_refs/quality gaps、内容hash、cutoff watermarks与selection算法版本。队列中的未完成分析不算已知判断，不等待并放宽cutoff；缺口如实UNKNOWN。
+
+冻结manifest与seal slot的generation/CAS同事务，只允许一个(worker fence有效的)冻结候选。固定键(workspace,release,security,session,live)唯一seal slot；provisional有独立run，不占最终键。cutoff后算分可在事务外运行；worker崩溃/丢ACK重用已冻结manifest，双worker不得以各自manifest分别宣称同session FINAL。未sealed候选需要因合法校验失败重新冻结时先CAS废弃旧generation且保留历史记录；已sealed只能走CORRECTION。迟到原数据更正与新知识按§4区分，不能借重试改manifest。
+
+最终事务校验manifest hash、cutoff≤sealed_at/generated_at、当前release/binding、seal generation、worker fence和最新risk/ACL generation；写immutable evaluation、seal_at/token、应用指针、transition解释、audit/outbox同事务。唯一token按seal slot稳定生成；幂等重试返回原结果。若release/session已更迭，封存历史可保留但application_status=superseded，不应用当前membership。实时硬风险仍独立优先，旧普通评估不能解除新风险。撤权使旧冻结输入不可读/不可应用，记录失效并走安全重算/纠错，不为复现保留违规正文。
+
+固定推演（T-43）：以本证券最终市场时点为+0；+15价已is_final只能provisional；一份published=−5min公告+40 observed、+50判断生效→在+60冻结时可用；+60生成manifest，+65实际完成则generated_at=+65，唯一封存且仅一次计数。+61才known的判断不进入此manifest；收盘后新公告也不因+60前observed进入本收盘。缺价封存UNKNOWN清pending；重试不把cutoff延到+70。状态/原子性是设计合同，尚无worker/数据库运行证据。
 
 
-===== SOURCE: config/roles-standard-v1.json =====
+===== SOURCE: docs/13-first-slice.md =====
 
-{
-  "policy_key": "rbac-standard-v1",
-  "workspace_shared_research_default": true,
-  "private_owner_objects": [
-    "note",
-    "strategy"
-  ],
-  "multiple_roles_allowed": true,
-  "roles": {
-    "viewer": [
-      "research.read",
-      "watchlist.own",
-      "notes.own"
-    ],
-    "researcher": [
-      "research.read",
-      "watchlist.own",
-      "notes.own",
-      "notes.shared.edit",
-      "analysis.override",
-      "template.edit"
-    ],
-    "strategy_manager": [
-      "research.read",
-      "watchlist.own",
-      "notes.own",
-      "template.edit",
-      "template.publish",
-      "strategy.edit",
-      "strategy.simulate",
-      "strategy.publish",
-      "strategy.rollback",
-      "scoring.binding.publish"
-    ],
-    "data_admin": [
-      "research.read",
-      "watchlist.own",
-      "notes.own",
-      "source.manage",
-      "job.retry",
-      "identity.manage",
-      "quality.correct"
-    ],
-    "system_admin": [
-      "user.manage",
-      "role.assign",
-      "system.configure",
-      "model.configure",
-      "audit.read",
-      "ops.read"
-    ]
-  }
-}
+# 13 首个开发切片任务书
+
+W-08：合成端到端切片。设计任务书，尚未实施；批准设计不等于启动开发或真实接入。目标验证全流程和关键架构，不能用技术复杂性削减目标系统能力。
+
+## 1. 固定范围与输入
+
+两家合成公司、三只证券（其中一家A/H两只同权证券）；一个local-fixture source，mock外部模型adapter，冻结财务/FX/股本/义务日历与FINAL/provisional报价。50–100家公司为以后试运行范围，当前fixture不假装全市场接入。五个角色至少各一名合成用户，同一人可兼任；一个研究组织和第二个隔离测试组织。
+
+公司A使用base→manufacturing→company override，B使用base→manufacturing；提供11项rubric证据、重复转载、no_link、歧义、已接受影响、硬风险、人工覆盖、A→B→A原文观察和迟到财报。默认数字来自config；不为使fixture通过改变阈值。
+
+## 2. 依赖与实现合同
+
+- 项目隔离且无真实业务数据的本机PostgreSQL、Redis及本地对象存储；启动前核验实际服务器、用途和数据分类。远程/共享/未知DB保持只读。
+- 从固定开源脚手架选择性复用认证接口、生成客户端、基础UI、CI；mock身份和外部模型，无真实外发。先用一套简单执行方式贯通主路径；Refine/Prefect适配属于可选实验，主路径完成前不作为依赖，也不叠加调度器。
+- 首个slice实现身份/RBAC、ingestion、analysis/decision、scoring/templates、strategy、ledger/outbox和必要审计。PG提供结构化检索，OpenSearch全文/语义在W-03；不得把结构化查询冒充完成R-02全部检索。
+- Schema/Pydantic/OpenAPI和生成TypeScript客户端同源。04逻辑表落实本slice物理迁移，数据库变更与outbox同事务；clock/calendar显式注入。
+
+## 3. 连续用户路径
+
+管理员分配角色→数据管理员导入合成源→研究员查看公司时间线与自动接受判断→人工覆盖一项影响→策略管理员查看三层配置及差异、模拟并发布→跨两个相邻FINAL sessions生成ENTER→查看当时规则/证据→UNKNOWN缺口→恢复→EXIT→历史纠错说明。
+
+页面：今日变化、公司研究工作区（时间线/评分/证券估值）、判断详情与覆盖、模板编辑/解析预览、策略编辑/模拟、来源与任务恢复、用户角色管理。采用共享组件完整覆盖加载、空、部分失败、无权、冲突、UNKNOWN和更新提示。首版没有提醒中心或投递任务；策略变化是业务记录，从列表跳固定历史snapshot再跳当前状态。
+
+## 4. 验证与通过条件
+
+| 场景 | 精确预期 | 追踪 |
+|---|---|---|
+| 正常合成链路 | 原文→证据→AUTO accepted→Q/V→两相邻FINAL→ENTER，全链引用一致 | R-01…08，T-01/03/05/08/10/13 |
+| 模板解析 | A与B各有解析hash/来源；企业差异只影响A，父升级不热改旧release | R-15，T-25/26 |
+| 覆盖与并发 | 人工有效覆盖不被新AUTO替换；冲突409保留输入；依赖影响一并重算 | R-16，T-27/28 |
+| 权限 | viewer不能覆盖；researcher不能发布；data_admin不能分角色；system_admin不隐式发布；跨组织不可读 | R-11/17，T-15/20/29 |
+| 时间与数值 | FINAL前不计数，s1/s3缺口不入选，12位阈值和半衰期golden一致 | R-05/06/08，T-30/31/35 |
+| 错误与恢复 | Redis清空能恢复；commit后崩溃不重复；旧generation不覆盖；s2纠正不抹独立s6 | R-12，T-14/18/32 |
+| 证据生命周期 | observation回退历史保留；吸收原子；独立journal恢复后撤权不可读 | R-02/11/12，T-19/33/34 |
+| UX | 四项用户任务可完成，页面与代表视口完整状态；导航不暴露工程内部参数 | R-09/14，T-UX-01…04/T-22 |
+
+每项运行证据绑定commit、fixture hash、实际DB分类/环境、场景、expected/actual、命令和执行时间。产品运行测试、UI可用性、材料Schema检查分别记录。正常链路与故障/权限主路径通过且无未解决本slice阻断项，才推进单个获许可真实源；不以新增可选平台、全机型或更多审查阻碍收口。
+
+## 5. 交付物与停止条件
+
+目标交付：可运行web/API/worker、项目隔离Compose、迁移、生成客户端、合成fixtures、领域/集成/关键UI测试、slice验证报告与启动/恢复说明。成本记录简单可查看，没有开发预算审批。实测后更新工期和后续任务，不预填“已验证节省多少工作”。
+
+停止受影响步骤：DB分类未知；需要真实凭证、采集、外部模型调用、购买、部署或修改远程业务数据而未获授权；发现跨角色/组织泄漏、错误历史前视或重复状态生效。保留完成的合成链路和证据，报告最小必要输入；不绕过限制。
 
 
-===== SOURCE: config/rubrics-standard-v1.json =====
+## 6. v0.3纳入本slice的五项边界
 
-{
-  "rubric_catalog_version": "rubrics-standard-v1",
-  "unknown_value": null,
-  "scale": [
-    0,
-    1,
-    2,
-    3,
-    4
-  ],
-  "rubrics": {
-    "business-model-v1": {
-      "criteria": [
-        {
-          "key": "repeat_demand",
-          "anchors": [
-            "需求一次性且无续购依据",
-            "偶发续购、主要依赖新增客户",
-            "有稳定续购但受可选消费影响",
-            "重要需求且续购/留存有多期支持",
-            "关键持续需求，续购与留存长期稳定"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "pricing_power",
-          "anchors": [
-            "降价才能维持销量且利润明显恶化",
-            "主要被动跟随价格，传导成本困难",
-            "成本可部分传导，证据显示利润相对稳定",
-            "多期提价/产品组合改善而留存稳定",
-            "持续提价/成本传导与客户价值证据均充分"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "competitive_barrier",
-          "anchors": [
-            "无差异且替代容易",
-            "差异有限、竞争者容易复制",
-            "有品牌/渠道/技术优势但可被替代",
-            "切换成本或规模优势持续且有证据",
-            "多重壁垒长期维持，竞争检验与投入证据充分"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "concentration",
-          "anchors": [
-            "单一客户/供应商依赖且无替代，已产生重大损害",
-            "高度集中，替代措施弱",
-            "存在集中但合同/备选支持缓解",
-            "客户与供应商较分散或替代经验证",
-            "分散、可替换且多期压力下稳定"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "capital_intensity",
-          "anchors": [
-            "持续大额投入且回报不足、维护支出不清",
-            "投入重且效率低、回收期持续拉长",
-            "投入与回报大致匹配、周期风险可解释",
-            "投入效率较好且维护/增长资本可区分",
-            "较低增量资本需求或持续高回报，有跨期依据"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        }
-      ],
-      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
-      "minimum_criterion_coverage": "0.80",
-      "validity_days": 180
-    },
-    "governance-v1": {
-      "criteria": [
-        {
-          "key": "related_party_transparency",
-          "anchors": [
-            "重大关联交易未解释或被正式认定损害",
-            "披露缺口显著、定价依据弱",
-            "基本披露齐全但公平性证据有限",
-            "范围/定价/审批清晰且可核对",
-            "长期透明、独立核验充分且利益冲突处理有效"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "capital_allocation",
-          "anchors": [
-            "重大配置失误反复且未解释",
-            "资本回报差、融资/投资逻辑薄弱",
-            "配置规则明确，结果与解释基本一致",
-            "回报纪律好，投资/回购/分红与机会匹配",
-            "跨周期配置结果与纪律持续，失败复盘透明"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "disclosure",
-          "anchors": [
-            "重大失实/反复违规有正式依据",
-            "反复迟延或关键口径不清",
-            "基本及时完整，偶有解释不足",
-            "及时一致，关键估计/变化有解释",
-            "长期可核对，主动解释风险与更正且口径稳定"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        }
-      ],
-      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
-      "minimum_criterion_coverage": "0.80",
-      "validity_days": 180
-    },
-    "growth-v1": {
-      "criteria": [
-        {
-          "key": "revenue_stability",
-          "anchors": [
-            "三年连续显著恶化且原因未解决",
-            "明显波动/萎缩，恢复依据弱",
-            "三年总体稳定但增长不连续",
-            "三年稳定增长，有分部/订单依据",
-            "跨期增长稳定且客户/产品基础可核验"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "incremental_sources",
-          "anchors": [
-            "没有可验证增量或只有宣传",
-            "依赖单一未验证项目",
-            "增量来源明确但转化证据不足",
-            "产品/客户增量已有兑现与持续依据",
-            "多个增量来源兑现且经济性与容量证据充分"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        },
-        {
-          "key": "reinvestment_return",
-          "anchors": [
-            "增量投入无回报/持续亏损",
-            "回报低于合理资金成本且改善依据弱",
-            "回报接近合理成本或仍需验证",
-            "增量回报优于成本且可解释",
-            "跨期增量回报持续较高、口径可核对"
-          ],
-          "weight": "equal",
-          "evidence_required": true
-        }
-      ],
-      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
-      "minimum_criterion_coverage": "0.80",
-      "validity_days": 180
-    }
-  }
-}
+合成输入增加：+0.8/−0.2影响、grade3/1修订链、H挂牌退市与独立公司违约、90/180日120日龄证据、x_customer_retention完整模板与baseline-only反例、收盘+15/+40/+50/+60/+65时钟序列。11 §7…9及12 §8固定请求/记录/作用范围/冻结协议；T-39…43必须和原主路径一起验证，不能只实现接受/拒绝按钮或仅公司级风险。
+
+数据库仍须按§2验证为项目隔离无真实数据；本轮没有创建库或启动代码。后续实际交付需要逐项回读human修订/有效指针、A/H risk resolutions、resolved config/origin及seal manifest/token、membership/audit/outbox；合成JSON的expected_response不是运行证据。局部故障中旧有效值不能当新值成功展示；release/到期重评与重算等待显式可诊断。
 
 
-===== SOURCE: config/scoring-standard-v1.json =====
+===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
 
-{
-  "schema_version": "2.0",
-  "model_key": "scoring-standard-v1",
-  "version": 1,
-  "dimension_weights": {
-    "profit_quality": "0.25",
-    "financial_resilience": "0.25",
-    "business_model": "0.25",
-    "governance": "0.15",
-    "growth_sustainability": "0.10"
-  },
-  "event_contribution": {
-    "scale": "10",
-    "cap_per_dimension": "15",
-    "half_life_calendar_days": {
-      "profit_quality": 90,
-      "financial_resilience": 90,
-      "business_model": 180,
-      "governance": 180,
-      "growth_sustainability": 30
-    },
-    "accepted_evidence_only": true,
-    "absorbed_events_excluded": true
-  },
-  "valuation": {
-    "metric": "pe_ttm",
-    "full_score_at": "10",
-    "zero_score_at": "25",
-    "invalid_if_nonpositive": true
-  },
-  "baselines": {
-    "profit_quality": {
-      "method": "weighted_metric_rubric",
-      "metrics": [
-        {
-          "key": "roe_ttm",
-          "weight": "0.4",
-          "zero_at": "0.05",
-          "full_at": "0.20"
-        },
-        {
-          "key": "cfo_profit_3y",
-          "weight": "0.4",
-          "zero_at": "0.5",
-          "full_at": "1.2"
-        },
-        {
-          "key": "positive_cfo_year_share_3y",
-          "weight": "0.2",
-          "zero_at": "0",
-          "full_at": "1"
-        }
-      ]
-    },
-    "financial_resilience": {
-      "method": "weighted_metric_rubric",
-      "metrics": [
-        {
-          "key": "net_debt_ebitda",
-          "weight": "0.6",
-          "zero_at": "4",
-          "full_at": "0"
-        },
-        {
-          "key": "interest_coverage",
-          "weight": "0.4",
-          "zero_at": "1",
-          "full_at": "8"
-        }
-      ]
-    },
-    "business_model": {
-      "method": "accepted_evidence_rubric",
-      "rubric_ref": "business-model-v1"
-    },
-    "governance": {
-      "method": "accepted_evidence_rubric",
-      "rubric_ref": "governance-v1"
-    },
-    "growth_sustainability": {
-      "method": "accepted_evidence_rubric",
-      "rubric_ref": "growth-v1"
-    }
-  },
-  "missing_submetric_policy": "renormalize_valid_weights_and_report_subcoverage",
-  "minimum_submetric_coverage": "0.80",
-  "minimum_company_coverage": "0.80",
-  "metric_definition_ref": "metric-definitions-v2",
-  "numeric_policy_ref": "decimal-python-v1",
-  "rubric_catalog_ref": "rubrics-standard-v1"
-}
+# 模块化单体与可重建检索投影
+
+状态：proposed，待评审与实施授权。
+
+采用模块化单体配独立 Worker，PostgreSQL 保存事实、版本、策略状态和 outbox；OpenSearch 与热语义索引仅为投影。相比微服务和“所有资料直接放向量库”，此方案牺牲一些独立扩展能力，换取小团队可维护的事务、权限、追溯与恢复，且保留按实际瓶颈拆分的接口。
+
+公司经营评分属于 company，价格与估值属于 security；A/H 共用经营事实并分开策略评估。历史记录采用业务有效时间与系统知悉时间，避免重放使用后来才公布的事实。初期不是完整 event sourcing；保存不可变业务修订和必要审计即可。
+
+OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
 
 
-===== SOURCE: config/strategy-standard-v1.json =====
+===== SOURCE: docs/adr/0002-v02-confirmed-scope.md =====
 
-{
-  "schema_version": "2.0",
-  "strategy_key": "value-standard",
-  "version": 1,
-  "name": "标准价投候选 v1（非金融行业）",
-  "description": "人维护的示范筛选规则；研究提醒，不下单，不验证收益。",
-  "scoring_model_ref": "scoring-standard-v1",
-  "universe": {
-    "markets": [
-      "CN_A",
-      "HK"
-    ],
-    "exclude_sector_groups": [
-      "financials",
-      "real_estate",
-      "commodity_cyclicals"
-    ],
-    "common_equity_only": true
-  },
-  "quality_gates": {
-    "minimum_coverage": "0.80",
-    "required_dimensions": [
-      "profit_quality",
-      "financial_resilience",
-      "business_model"
-    ],
-    "baseline_max_age_days": 180,
-    "price_max_lag_sessions": 0,
-    "currency_and_share_basis_required": true,
-    "only_approved_inputs": true,
-    "financial_freshness_policy": "report_obligation_and_required_periods"
-  },
-  "hard_risk_policy": {
-    "confirmed_only": true,
-    "action": "immediate_out_risk",
-    "risk_codes": [
-      "confirmed_fraud",
-      "going_concern_material",
-      "confirmed_debt_default",
-      "delisting_decision"
-    ]
-  },
-  "state_policy": {
-    "initial_baseline_notify": false,
-    "enter_distinct_sessions": 2,
-    "exit_distinct_sessions": 2,
-    "session_clock": "security_exchange_close",
-    "unknown_action": "hold_last_confirmed_reset_pending",
-    "config_change_notify": "deferred_change_record_only",
-    "historical_notify": false,
-    "require_adjacent_expected_sessions": true,
-    "final_price_required": true,
-    "cutoff_grace_minutes": 60,
-    "notification_phase": "deferred"
-  },
-  "enter": {
-    "all": [
-      {
-        "field": "company.quality_score",
-        "op": "gte",
-        "value": "70"
-      },
-      {
-        "field": "company.coverage",
-        "op": "gte",
-        "value": "0.80"
-      },
-      {
-        "field": "security.valuation_score",
-        "op": "gte",
-        "value": "60"
-      },
-      {
-        "field": "metrics.roe_ttm",
-        "op": "gte",
-        "value": "0.10"
-      },
-      {
-        "field": "metrics.cfo_profit_3y",
-        "op": "gte",
-        "value": "0.80"
-      },
-      {
-        "field": "metrics.net_debt_ebitda",
-        "op": "lte",
-        "value": "2.0"
-      }
-    ]
-  },
-  "retain": {
-    "all": [
-      {
-        "field": "company.quality_score",
-        "op": "gte",
-        "value": "65"
-      },
-      {
-        "field": "company.coverage",
-        "op": "gte",
-        "value": "0.80"
-      },
-      {
-        "field": "security.valuation_score",
-        "op": "gte",
-        "value": "50"
-      },
-      {
-        "field": "metrics.roe_ttm",
-        "op": "gte",
-        "value": "0.10"
-      },
-      {
-        "field": "metrics.cfo_profit_3y",
-        "op": "gte",
-        "value": "0.80"
-      },
-      {
-        "field": "metrics.net_debt_ebitda",
-        "op": "lte",
-        "value": "2.0"
-      }
-    ]
-  },
-  "scoring_binding_policy": "published_per_company_resolution_manifest"
-}
+# v0.2 已确认范围与设计修订
 
-[END PART 8/15]
+2026-09-30；用户完成grilling访谈并明确“按这版定”。产品范围已确认；技术机制为本次交付设计、尚未实施。继承[0001](./0001-architecture-and-truth.md)的模块化单体和投影原则。
+
+采纳多人RBAC、base/industry/company模板、自动审核按政策生效及人工覆盖、外部模型接入、开发成本不设固定门槛。通知后置，先记录策略变化；保留完整业务与管理端能力，不因技术实现难度删减范围。模板/策略由人维护发布，模型不会自动发布规则。
+
+修复B-01…04、S-01…09：财务范围与rubric锚点、时间相关job身份、FINAL/相邻session、输入分类cutoff、历史纠错/当前状态分离、订阅不改共享状态、义务新鲜度、数值规范、Listing边界、独立撤权依据。详见11/12/10。
+
+开源复用：优先FastAPI全栈模板的工程基座；Refine保留管理端薄适配候选，Prefect保留替换Celery的候选，二者不能凭“已有TanStack/Celery”排除。实际采用须通过W-08的最小验证；不叠加两套同职能调度器。Qlib/LEAN仅隔离研究，FinanceToolkit公式对照，Scrapy只用于获许可HTML来源。许可核查不能替代数据权利。没有安装这些项目。
+
+本次独立编写v0.2，输入为旧仓库、Pro共享页可见正文与第二轮研究。未获取Pro声称的完整60文件包，不能说已合并其完整版本。设计修订不授权开发、真实接入或部署；已有GitHub授权仅覆盖新生成设计/合成材料。
+
+
+===== SOURCE: docs/adr/0003-independent-project.md =====
+
+# 独立项目迁移
+
+日期：2026-09-30。状态：用户明确授权并完成。项目由BYTEWATCHER的BW-0051迁出，成为与其同级的独立项目；项目根目录就是Git根目录。
+
+完整移动原独立checkout与.git，保留main、commit历史和wildbyteai/value-investment-platform remote，不创建另一份Git真源。原事项只留metadata与迁移指向，保留registry历史分配，ID不回收。事项关闭只表示移交完成，不表示产品开发完成。
+
+本项目由PROJECT.md/README/AGENTS管理，不再依赖BYTEWATCHER事项路由、知识库控制面或内容生产流程。原事项元数据与本机迁移manifest放local-evidence并忽略Git，精确hash核对后持久保留。GitHub仓库保持原私有可见性，未改变真实数据/部署权限。
+
+本次只改项目结构、入口与交接，业务、配置和关键Schema不因迁移改变。设计仍v0.2；先冻结迁移后的Git revision，再进行第二轮业务/工程复审与GPT Pro交接，评审建议不自动改业务合同。
+
+[END PART 8/27]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

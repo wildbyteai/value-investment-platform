@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline v0.2 material checks. This does NOT execute the proposed application."""
+"""Offline v0.3 material checks. This does NOT execute the proposed application."""
 import copy
 import hashlib
 import json
@@ -54,6 +54,10 @@ for filename,schemafile in pairs:
     reject(lambda:validate(bad,s),filename+' missing required field')
 
 strategy=read('config/strategy-standard-v1.json');scoring=read('config/scoring-standard-v1.json');metrics=read('config/metric-definitions-v2.json')['metrics'];rubrics=read('config/rubrics-standard-v1.json')['rubrics']
+all_rubrics={**rubrics,**read('config/rubrics-synthetic-v03.json')['rubrics']}
+registry=read('config/dimensions-standard-v1.json');registry_entries={x['dimension']:x for x in registry['entries']}
+check(len(registry_entries)==len(registry['entries']),'Unique registered dimension IDs')
+check(scoring['dimension_registry_ref']['sha256']==sha(ROOT/scoring['dimension_registry_ref']['path']),'Pinned dimension registry content hash')
 check(strategy['universe']['markets']==['CN_A','HK'],'Confirmed A/H scope')
 check(strategy['scoring_model_ref']==scoring['model_key'],'Strategy scoring reference')
 check(scoring['metric_definition_ref']=='metric-definitions-v2','Corrected metric-definition version')
@@ -96,6 +100,7 @@ def resolve(key,templates=None,stack=()):
     if t['level']=='base':
         if t['base_config_ref']['sha256']!=sha(ROOT/t['base_config_ref']['path']):raise ValueError('base hash')
         c=copy.deepcopy(read(t['base_config_ref']['path']))
+        if c['dimension_registry_ref']['sha256']!=sha(ROOT/c['dimension_registry_ref']['path']):raise ValueError('registry hash')
     else:
         parent=bykey[t['parent_ref']['key']]
         if t['parent_ref']['version']!=parent['version'] or t['parent_ref']['sha256']!=canonical_hash(parent):raise ValueError('parent version/hash')
@@ -106,20 +111,35 @@ def resolve(key,templates=None,stack=()):
         d=patch['dimension']
         if d in seen:raise ValueError('duplicate patch')
         seen.add(d)
+        if d not in registry_entries:raise ValueError('unregistered dimension')
+        if t['level']=='industry' and t['scope']['industry_key'] not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
+        if t['level']=='company':
+            industry=bykey[t['parent_ref']['key']]['scope']['industry_key']
+            if industry not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
         if patch.get('disabled'):
-            c['dimension_weights'].pop(d,None);c['baselines'].pop(d,None)
+            if set(patch)-{'dimension','reason','disabled'}:raise ValueError('mixed disable')
+            c['dimension_weights'].pop(d,None);c['baselines'].pop(d,None);c['dimension_policies'].pop(d,None)
         else:
             if d not in c['dimension_weights'] and not(d.startswith('x_') and 'weight' in patch and 'baseline' in patch):raise ValueError('unregistered new dimension')
+            if d not in c['dimension_policies']:c['dimension_policies'][d]={k:copy.deepcopy(registry_entries[d][k]) for k in ['quality_policy','event_policy']}
             if 'weight' in patch:c['dimension_weights'][d]=patch['weight']
             if 'baseline' in patch:c['baselines'][d]=copy.deepcopy(patch['baseline'])
+            for key in ['quality_policy','event_policy']:
+                if key in patch:c['dimension_policies'][d][key]=copy.deepcopy(patch[key])
     if sum(Decimal(x) for x in c['dimension_weights'].values())!=1:raise ValueError('weight sum')
     if set(c['baselines'])!=set(c['dimension_weights']):raise ValueError('dimensions/weights')
     if not set(strategy['quality_gates']['required_dimensions'])<=set(c['baselines']):raise ValueError('required disabled')
-    for base in c['baselines'].values():
+    if set(c['dimension_policies'])!=set(c['baselines']):raise ValueError('policies/dimensions')
+    c['event_contribution']['half_life_calendar_days']={d:v['event_policy']['half_life_days'] for d,v in c['dimension_policies'].items() if v['event_policy']['enabled']}
+    validate(c,read('contracts/scoring.schema.json'))
+    for d,base in c['baselines'].items():
+        if base['method'] not in registry_entries[d]['allowed_baseline_methods']:raise ValueError('baseline method')
+        freshness=c['dimension_policies'][d]['quality_policy']['freshness']['kind']
+        if (base['method']=='weighted_metric_rubric')!=(freshness=='report_obligation'):raise ValueError('freshness method')
         validate(base,read('contracts/scoring.schema.json')['properties']['baselines']['additionalProperties'])
         if 'metrics' in base and (sum(Decimal(x['weight']) for x in base['metrics'])!=1 or any(Decimal(x['zero_at'])==Decimal(x['full_at']) for x in base['metrics'])):raise ValueError('submetric weights/range')
         if 'metrics' in base and not all(x['key'] in metrics for x in base['metrics']):raise ValueError('unknown metric')
-        if 'rubric_ref' in base and base['rubric_ref'] not in rubrics:raise ValueError('unknown rubric')
+        if 'rubric_ref' in base and base['rubric_ref'] not in all_rubrics:raise ValueError('unknown rubric')
     return c
 industry=resolve('industry-manufacturing');company=resolve('company-synthetic-manufacturer')
 check(industry['dimension_weights']['profit_quality']=='0.30','Industry override golden value')
@@ -137,6 +157,7 @@ for label,mutator in [
     bad=copy.deepcopy(bundle['templates']);mutator(bad);reject(lambda:resolve('company-synthetic-manufacturer',bad),label)
 
 policy=read('config/auto-review-policy-v1.json');roles=read('config/roles-standard-v1.json')['roles']
+check(policy['risk_target_policy_ref']['sha256']==sha(ROOT/policy['risk_target_policy_ref']['path']),'Pinned risk target policy hash')
 check(policy['hard_risk']['allow_auto_accept'] and not policy['template_and_strategy_auto_publish'],'AUTO risk allowed, templates/strategy human-published')
 check(policy['human_override_precedence']=='until_released_or_expired' and policy['on_override_expiry']=='reevaluate_current_legal_inputs','Human override precedence/expiry')
 check(set(roles)=={'viewer','researcher','strategy_manager','data_admin','system_admin'},'Five confirmed roles')
@@ -172,11 +193,17 @@ for n in range(1,9):check(f'W-{n:02}' in plan and f'W-{n:02}' in accept,f'Work t
 for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.md']:
     text=(ROOT/doc).read_text();check('必须人工复核' not in text and '高影响先人工批准' not in text,f'No superseded mandatory-human gate: {doc}')
 
+from v03_material_checks import run as run_v03_checks
+run_v03_checks(read,check,reject,resolve,bundle,scoring,canonical_hash)
+for n in range(39,44):check(f'T-{n:02}' in accept,f'v03 acceptance scenario: T-{n:02}')
+for d,v in scoring['dimension_policies'].items():
+    check(v['event_policy']['half_life_days']==scoring['event_contribution']['half_life_calendar_days'][d],f'Standard event half-life policy agreement: {d}')
+
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
-report={'design_version':'0.2','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'77524649dae91a1d38df5fb93d5b47884e5c86a7','revision_binding':'source_sha256 binds the exact working-tree inputs; GitHub delivery revision is recorded in independent-project local-evidence','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+report={'design_version':'0.3','design_date':'2026-09-30','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_binding':'source_sha256 binds the exact working-tree inputs; uncommitted design working tree on main; no new commit or remote delivery claimed','status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')

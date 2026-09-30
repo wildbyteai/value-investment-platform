@@ -1,0 +1,102 @@
+
+[PART 24/27]
+
+
+===== SOURCE: tools/v03_material_checks.py =====
+
+"""Offline contract predicates and expected examples, never product acceptance."""
+import copy
+from decimal import Decimal
+from datetime import datetime
+from material_schema import validate
+
+
+def run(read, check, reject, resolve, bundle, scoring, canonical_hash):
+    # Shared typed payload copies cannot drift across the request and stored revision.
+    command_schema=read('contracts/override-command.schema.json')
+    human_schema=read('contracts/human-judgment.schema.json')
+    check(command_schema['$defs']['judgment']==human_schema['$defs']['judgment'], 'v03 typed request/revision judgment agreement')
+    decision_schema=read('contracts/review-decision.schema.json')
+    replacements=read('examples/v03-human-replacements.json')['cases']
+    for case in replacements:
+        cmd=case['request'];response=case['expected_response'];rev=response['revision'];dec=response['decision']
+        validate(cmd,command_schema);validate(rev,human_schema);validate(dec,decision_schema)
+        check(rev['judgment']==cmd['replacement'] and rev['slot_id']==cmd['slot_id']==dec['subject_slot'], 'v03 replacement value / slot: '+case['id'])
+        check(dec['subject_revision']==rev['revision_id'] and rev['previous_revision_id']!=rev['revision_id'] and dec['status']=='accepted' and dec['actor_kind']=='HUMAN', 'v03 immutable revision/decision references: '+case['id'])
+        match=case['headers']['If-Match'].rsplit('-', 1)[-1]
+        check(dec['supersedes_decision_id'] and response['slot_generation']==int(match)+1, 'v03 single If-Match CAS expectation: '+case['id'])
+        check(set(cmd['replacement']['value']['evidence_ids'])<=set(cmd['evidence_ids']), 'v03 replacement evidence bound: '+case['id'])
+        bad=copy.deepcopy(cmd);del bad['replacement'];reject(lambda:validate(bad,command_schema),'v03 replace without full value')
+        bad=copy.deepcopy(cmd);bad['subject_revision_id']=rev['previous_revision_id'];reject(lambda:validate(bad,command_schema),'v03 replace mixed with subject reference')
+    for action in ['accept','reject','pending','release']:
+        cmd=copy.deepcopy(replacements[0]['request']);del cmd['replacement'];cmd.update(action=action,subject_revision_id=replacements[0]['expected_response']['revision']['previous_revision_id'])
+        validate(cmd,command_schema);check(True,'v03 non-replacement action shape: '+action)
+        bad=copy.deepcopy(cmd);bad['replacement']=replacements[0]['request']['replacement'];reject(lambda:validate(bad,command_schema),'v03 non-replace carries replacement: '+action)
+    # Material target-resolution counterexamples. These predicates are not runtime DecisionService.
+    fixture=read('examples/v03-risk-targets.json');policy=read('config/risk-target-policy-v1.json')
+    risk_schema=read('contracts/analysis-result.schema.json')['properties']['risk_proposals']['items']
+    def targets(p):
+        validate(p,risk_schema)
+        if p['company_id']!=fixture['identity_fixture']['company_id']:raise ValueError('company outside candidates')
+        if p['target_kind'] not in policy['allowed_target_kinds'][p['risk_code']]:raise ValueError('risk kind')
+        securities=fixture['identity_fixture']['securities']
+        if p['target_kind']=='company':
+            if p['target_id']!=p['company_id']:raise ValueError('company target')
+            return [s['id'] for s in securities]
+        matches=[s['id'] for s in securities if s['id' if p['target_kind']=='security' else 'primary_listing_id']==p['target_id']]
+        if not matches:raise ValueError('target outside candidates')
+        return matches
+    a,b=fixture['proposals']
+    check(targets(a)==fixture['expected']['listing_risk_targets'],'v03 H listing-only expected resolution')
+    check(targets(b)==fixture['expected']['company_risk_targets'],'v03 company default expected resolution A/H')
+    check(set(targets(b))==set(targets(a))|set(targets(b)), 'v03 removal of listing risk leaves independent company risk set')
+    for changes,label in [({'target_kind':'company','target_id':a['company_id']},'delisting cannot broaden to company'),({'target_id':'00000000-0000-4000-8000-000000999999'},'target outside manifest'),({'company_id':'00000000-0000-4000-8000-000000999999'},'wrong parent company')]:
+        bad=copy.deepcopy(a);bad.update(changes);reject(lambda:targets(bad),'v03 '+label)
+    old=copy.deepcopy(a);del old['target_kind'];del old['target_id'];reject(lambda:validate(old,risk_schema),'v03 ambiguous company-only old risk rejected')
+    # Registry / inheritance / custom contribution whitelist shape and material semantics.
+    registry=read('config/dimensions-standard-v1.json');validate(registry,read('contracts/dimension-registry.schema.json'));check(True,'v03 registry shape')
+    custom=read('examples/v03-template-custom.json');templates=copy.deepcopy(bundle['templates'])+[custom]
+    resolved=resolve(custom['template_key'],templates)
+    check(sum(Decimal(v) for v in resolved['dimension_weights'].values())==1 and resolved['dimension_policies']['x_customer_retention']['event_policy']=={'enabled':True,'half_life_days':90},'v03 custom dimension resolved weight/event golden')
+    q=resolved['dimension_policies']['governance']['quality_policy']
+    check(q['freshness']['max_age_days']==90 and q['evidence_requirement']=='issuer_or_regulator_original','v03 complete policy patch golden')
+    check(scoring['dimension_policies']['governance']['quality_policy']['freshness']['max_age_days']==180,'v03 base 180-day policy unchanged')
+    check(120<180 and not 120<90 and not 90<90,'v03 120-day freshness / exact expiry boundary arithmetic, NOT runtime freshness')
+    check(min(365,180)==180,'v03 restrictive strategy age composition arithmetic')
+    for changes,label in [({'dimension':'x_not_registered'},'unknown custom dimension'),({'event_policy':{'enabled':True,'half_life_days':0}},'invalid event half-life'),({'disabled':True},'disabled mixed with patch')]:
+        ts=copy.deepcopy(templates);ts[-1]['patches'][-1].update(changes);reject(lambda:resolve(custom['template_key'],ts),'v03 '+label)
+    # Blueprint policy references are frozen: a different content hash cannot load silently.
+    bad=copy.deepcopy(templates);bad[0]['base_config_ref']['sha256']='0'*64;reject(lambda:resolve(custom['template_key'],bad),'v03 old parent hash not hot-replaced')
+    impact=copy.deepcopy(read('examples/analysis-proposal.json')['impact_proposals'][0]);impact.update(dimension='x_customer_retention',half_life_days=90)
+    impact_schema=read('contracts/analysis-result.schema.json')['properties']['impact_proposals']['items']
+    def allow(p,c):
+        validate(p,impact_schema)
+        if p['dimension'] not in c['dimension_weights']:raise ValueError('dimension not active')
+        event=c['dimension_policies'][p['dimension']]['event_policy']
+        if not event['enabled'] or p['half_life_days']!=event['half_life_days']:raise ValueError('event policy')
+    allow(impact,resolved);check(True,'v03 registered active custom impact material allowlist')
+    bad=copy.deepcopy(impact);bad['dimension']='x_not_registered';reject(lambda:allow(bad,resolved),'v03 unregistered impact')
+    bad=copy.deepcopy(impact);bad['half_life_days']=30;reject(lambda:allow(bad,resolved),'v03 model cannot alter event half-life')
+    ts=copy.deepcopy(templates);ts[-1]['patches'][-1]['event_policy']={'enabled':False};baseline_only=resolve(custom['template_key'],ts)
+    check(baseline_only['baselines']['x_customer_retention']==resolved['baselines']['x_customer_retention'],'v03 baseline-only retains baseline')
+    check('x_customer_retention' not in baseline_only['event_contribution']['half_life_calendar_days'],'v03 baseline-only no fictitious half-life')
+    reject(lambda:allow(impact,baseline_only),'v03 baseline-only refuses event proposal')
+    check(resolve('company-synthetic-manufacturer')['baselines']==scoring['baselines'],'v03 custom template does not mutate old standard chain')
+    # Only temporal boundary / command shape assertions. No seal/token or SQL execution exists.
+    seal=read('examples/v03-seal-command.json');validate(seal,read('contracts/evaluation-seal.schema.json'));check(True,'v03 seal command shape')
+    manifest=read('examples/v03-seal-manifest.json');manifest_schema=read('contracts/evaluation-input-manifest.schema.json')
+    validate(manifest,manifest_schema)
+    check(canonical_hash(manifest)==seal['manifest_sha256'] and manifest['manifest_id']==seal['manifest_id'], 'v03 frozen manifest hash/reference binding')
+    check(all(manifest[k]==seal[k] for k in ['release_id','security_id','primary_listing_id','market_session','evaluation_as_of','knowledge_cutoff']), 'v03 seal/manifest fixed context agreement')
+    bad=copy.deepcopy(manifest);del bad['inputs']['human_overrides'];reject(lambda:validate(bad,manifest_schema),'v03 manifest cannot omit input class')
+    bad=copy.deepcopy(manifest);bad['inputs']['price']['inputs']=[];reject(lambda:validate(bad,manifest_schema),'v03 valid price class without input')
+    bad=copy.deepcopy(manifest);bad['inputs']['price']={'quality':'missing','inputs':[],'reason_codes':[]};reject(lambda:validate(bad,manifest_schema),'v03 missing input without quality reason')
+    check(all(datetime.fromisoformat(i['known_at'])<=datetime.fromisoformat(manifest['knowledge_cutoff']) for g in manifest['inputs'].values() for i in g['inputs']), 'v03 manifest fixture does not include late known input')
+    cutoff=datetime.fromisoformat(seal['knowledge_cutoff']);asof=datetime.fromisoformat(seal['evaluation_as_of'])
+    check((cutoff-asof).total_seconds()==3600,'v03 seal fixture fixed 60 minute cutoff')
+    check(15<60 and 40<=60 and 50<=60 and 61>60 and 65>=60,'v03 +15/+40/+50/+60/+61/+65 boundary arithmetic; token/concurrency NOT RUN')
+    bad=copy.deepcopy(seal);bad['worker_now']='2026-09-30T09:20:00Z';reject(lambda:validate(bad,read('contracts/evaluation-seal.schema.json')),'v03 seal cannot replace cutoff with caller now')
+
+[END PART 24/27]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

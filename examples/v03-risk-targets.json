@@ -1,0 +1,55 @@
+{
+  "synthetic": true,
+  "proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "risk_code": "delisting_decision",
+      "target_kind": "listing",
+      "target_id": "00000000-0000-4000-8000-000000000202",
+      "confidence": "0.99",
+      "effective_from": "2026-09-30T02:00:00Z",
+      "valid_until": null,
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成原始披露支持本目标，非真实投资判断"
+    },
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "risk_code": "confirmed_debt_default",
+      "target_kind": "company",
+      "target_id": "00000000-0000-4000-8000-000000000001",
+      "confidence": "0.99",
+      "effective_from": "2026-09-30T02:00:00Z",
+      "valid_until": null,
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成原始披露支持本目标，非真实投资判断"
+    }
+  ],
+  "identity_fixture": {
+    "company_id": "00000000-0000-4000-8000-000000000001",
+    "securities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "primary_listing_id": "00000000-0000-4000-8000-000000000201"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000102",
+        "primary_listing_id": "00000000-0000-4000-8000-000000000202"
+      }
+    ]
+  },
+  "expected": {
+    "listing_risk_targets": [
+      "00000000-0000-4000-8000-000000000102"
+    ],
+    "company_risk_targets": [
+      "00000000-0000-4000-8000-000000000101",
+      "00000000-0000-4000-8000-000000000102"
+    ],
+    "reject_listing_risk_keeps_company_risk": true
+  },
+  "runtime_status": "not_run"
+}

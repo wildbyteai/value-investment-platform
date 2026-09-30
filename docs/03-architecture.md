@@ -94,3 +94,6 @@ qa/                      # 合成场景、E2E、负载与演练
 不预先加入 Kafka、Temporal、多 Agent 协调、分布式图数据库。只有无法达到实际 SLO、工作流跨日人工恢复确实复杂或队列吞吐形成瓶颈，才用 ADR 决定升级。
 
 开源复用以第二轮research/second-review.md的固定源码核查为依据。优先选择性复用FastAPI Full Stack Template工程基座；Refine可与TanStack共享QueryClient/路由/设计系统，不能以重复依赖为由排除；Prefect是Celery编排层替代候选，PG业务事务不由框架保证。实际采用在W-08做最小验证；不用两套活跃调度器。所有候选均未安装/集成。
+
+
+v0.3不新增服务或平台：analysis拥有类型化人工修订/slot、risk目标校验；scoring拥有冻结registry与policy解析；strategy拥有risk适用集合和evaluation seal。公开应用服务可加入同一PG事务，不能由队列先更新baseline/membership再补audit。开源候选与固定源码依据沿用research/second-review.md，本轮未联网刷新或安装；正式兼容/传递许可核验留在授权实施M0。

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "risk-target-standard-v1",
+  "version": 1,
+  "allowed_target_kinds": {
+    "confirmed_fraud": [
+      "company",
+      "security",
+      "listing"
+    ],
+    "going_concern_material": [
+      "company"
+    ],
+    "confirmed_debt_default": [
+      "company",
+      "security"
+    ],
+    "delisting_decision": [
+      "listing"
+    ]
+  },
+  "company_propagation": "all_applicable_release_securities",
+  "security_propagation": "exact_security",
+  "listing_propagation": "release_primary_listing_only",
+  "parent_child_propagation": "none",
+  "revocation": "exact_slot_revision_generation",
+  "after_last_risk_removed": "OUT_then_normal_adjacent_session_confirmation"
+}

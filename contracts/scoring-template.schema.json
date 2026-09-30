@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "2.0"
     },
     "template_key": {
       "type": "string",
@@ -199,6 +199,90 @@
           "reason": {
             "type": "string",
             "minLength": 1
+          },
+          "quality_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "evidence_requirement": {
+                "enum": [
+                  "accessible_original",
+                  "issuer_or_regulator_original"
+                ]
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "report_obligation"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "age_days"
+                      },
+                      "max_age_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3650
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "max_age_days"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "evidence_requirement",
+              "freshness"
+            ]
+          },
+          "event_policy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "half_life_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 730
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "half_life_days"
+                ]
+              }
+            ]
           }
         },
         "required": [
@@ -219,6 +303,16 @@
           {
             "required": [
               "disabled"
+            ]
+          },
+          {
+            "required": [
+              "quality_policy"
+            ]
+          },
+          {
+            "required": [
+              "event_policy"
             ]
           }
         ]
