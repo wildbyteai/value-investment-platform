@@ -1,0 +1,306 @@
+
+[PART 4/6]
+
+
+===== SOURCE: docs/08-security-and-operations.md =====
+
+# 08 安全、运维与可靠性
+
+## 1. 安全边界
+
+研究资料、用户笔记、策略和订阅默认私有；公开来源也要遵守平台抓取、保存、商用与模型处理权限。平台验证码、登录、反爬和访问控制不得绕过；只接获许可 API、公开允许访问页面或用户合法提供资料。首期不采集企业机密、客户资料或真实持仓。
+
+OIDC 验证服务端 issuer/audience/signature/expiry，管理高影响动作可要求近期 MFA。RBAC capability+workspace/owner/source ACL；PG RLS 作为纵深保护，应用连接不使用绕过 RLS 的超级用户；后台 Worker 以作用域 service principal 访问。RLS 会话变量每事务设定，连接池复用必须清除，负面测试覆盖切 workspace。
+
+管理员不隐式拥有策略发布、内容复核和所有私有规则读权限。证据下载签名短有效期并重新校验，非公开对象不能直接被公网索引。搜索／向量过滤、计数、缓存、日志、导出同样检查权限。
+
+## 2. 输入及采集防护
+
+源连接 URL 仅允许批准域名／协议；拒绝 loopback、内网、metadata endpoint，重定向和 DNS 重解析再次验证，采集 Worker egress allowlist 防 SSRF。解析隔离、最大文件／解压限制、MIME 验证、不执行宏或脚本；网页渲染器独立沙箱且无内部网络凭证。抓取超时、并发和 request budget 固定。凭证存 secret manager，数据库仅引用；日志不记 token/cookie/body/private URL。
+
+原文转义渲染，CSP 和安全下载 headers；prompt injection 由无工具、封闭上下文和输出校验隔离。研究员证据可见≠外部模型有权接收；两项权利独立。所有 export 任务检查当前 source 权利，归档文本不因历史可见自动外传。
+
+## 3. 变更与审计
+
+发布策略、修改源权利、批量补采、主数据合并／拆分、模型切换、权限变更、恢复和索引重建均有 preview、expected_version、scope、reason 与审计。preview 不能授权超出人员原权限的执行。审计 append-only、应用不可 UPDATE/DELETE，独立保留备份；管理员可管权限但不能抹审计。
+
+审计记录 object_revision、前后 hash、操作者、request/trace、时间与业务原因；敏感前后内容不入日志。删除与授权撤销留 tombstone，传播到缓存、全文、向量和恢复后数据，不把“删索引”当删源数据。
+
+## 4. 部署与升级
+
+开发：项目隔离 Compose、合成 fixtures、mock source/model/channel、无外部出站为默认。启动前 verify DB host/environment/data classification，不能因为 localhost 就假定可删。生产：TLS reverse proxy、API、分配额 Worker、PG、Redis、OpenSearch、S3、可观测性；数据库／索引管理端口不公网暴露。
+
+生产 sizing 待基线压测，不建议在一个低内存节点同时承诺 OpenSearch 与 8,760 万向量。初步 PoC 可用 8–16 vCPU/32–64 GB 总资源分配且独立磁盘额度，均为估算；根据实测决定托管 PG、检索和存储。region、供应商、实际价格、备份流量与许可证上线前决定。
+
+迁移遵循 expand→双版本兼容→验证→切换→contract，DDL / index build 评估锁影响；不能把一次数据库迁移和多个破坏性 API 改动绑一起。发布先 staging 合成或已批准脱敏数据、金丝雀、观测窗口、再全量。所有生产写入另需授权。
+
+应用回滚到兼容版本；数据回滚先备份和影响预览，不自动 down 破坏迁移。策略 rollback 生成新 release；prompt 模型 rollback 指向旧 validated policy；索引新 alias 切换后保留旧索引有限期。版本与事件 Schema 至少支持当前与上一稳定版本，未知字段受合同版本策略约束。
+
+## 5. 观测与健康
+
+技术指标：队列 lag、任务 age、错误分类、重试、lease 过期、outbox 未发、PG 锁等待、索引 watermark、外部渠道投递 UNKNOWN；业务指标：源新鲜度、metadata_only 比例、未关联／待复核比例、证据缺失、coverage 分布、UNKNOWN 策略数量、入退转移率；成本指标按任务阶段与来源展示。
+
+/health/live 只证明进程；/health/ready 验证关键依赖；/ops/pipeline/status 验证最近成功采集、分析、评分、评估与通知主记录。受保护 ops 接口不能公网泄露配置。HTTP 200 不证明研究流程可用。
+
+严重程度：P1 跨用户泄露／数据损坏／错策略触发，立即阻止相关发送或读路径；P2 关键数据链路超过新鲜度阈值，标 UNKNOWN 并通知运营；P3 搜索或非关键源降级。运营告警限频合并，状态变化才提醒，恢复通知有受影响范围。
+
+## 6. 恢复操作手册
+
+| 故障 | 安全处理 | 验证与退出条件 |
+|---|---|---|
+| 源 429/失权 | Respect Retry-After 或暂停；不换身份绕过 | 授权确认、小样本采集、缺口补齐且 mode=backfill |
+| 模型不可用 | 原文仍保存，分析排队／人工 | 按标注门禁恢复 shadow，不能一次性无界全量重跑 |
+| Redis 丢队列 | ledger sweeper 重建 due 任务 | 任务最终完成，输出／转移无重复 |
+| Worker 提交后宕机 | 重试读唯一业务键 | 不生成第二次 score/transition/delivery |
+| 索引损坏 | PG 查询降级；固定 cutoff 重建+追增量 | 校验 count/hash 抽样/ACL、watermark 后切 alias |
+| 财报或公司错配 | 冻结相关自动评估，复核并建新 revision | 影响预览、有限重算；通知纠正说明保留原通知 |
+| 外部通知超时未知 | UNKNOWN_DELIVERY，查询或人工确定 | 不盲重试；站内记录保留 |
+| PG 故障 | 停止写与发送；从备份在隔离环境恢复 | RPO/RTO、manifest、审计、策略基线完整后恢复 |
+
+PG 定期全备+WAL、对象受权利约束版本备份，至少按季度隔离恢复演练。恢复后先应用最新撤权 tombstone，再放开读取；历史任务默认 mode=replay、静默投递，不能自动给所有人补发几个月告警。演练需实测耗时和丢失窗口。
+
+## 7. 发布阻断项
+
+发现任何 ACL 泄露、未来数据污染历史、重复实际发送、部分失败被显示为有效结果、无出处强影响生效、无权源可抓取／分析、开发身份入口在生产可用，都阻断上线。可选功能、更多数据库或全机型测试不阻断本次已定义 slice。
+
+
+===== SOURCE: docs/09-delivery-plan.md =====
+
+# 09 实施规划与工程规范
+
+## 1. 阶段与授权
+
+本次为 P0 设计交付；M0–M5 是未来实施计划，没有执行授权。预计 2–3 名工程人员（前端、后端/数据、QA 可兼职）加 1 名产品/研究负责人，在数据权利和环境明确后 10–14 周建立试运行候选；这是估算，不是承诺。人力减少、来源接入、真实 UI 研究或采购延迟需重新估算。每阶段交付可验收纵向闭环，不同时铺满全部页面。
+
+## 2. 里程碑与任务
+
+| 阶段 | 任务 ID | 交付和依赖 | 验收出口 |
+|---|---|---|---|
+| M0 约 1–2 周 | W-01 | 确认 D-01…D-07、repo 结构、OIDC/ACL、开发隔离库、合同生成、CI、设计 tokens | 基础认证与越权测试、依赖锁定、Schema/OpenAPI 同源，UX 导航原型评审 |
+| M1 约 2 周 | W-02 | 合成公司/证券与一个获许可真实源 adapter、调度、原文、去重、固定时点公司时间线 | 采集失败可恢复、证据可回读、A/H 身份不混、列表和时间线 UX 首测 |
+| M2 约 2–3 周 | W-03 | 多源、关联建议与复核、事件归并、OpenSearch、热向量选配、标注集 | 多公司/无公司/歧义正确、去重、ACL、模型质量与检索指标达标 |
+| M3 约 2 周 | W-04 | 财务/日行情/FX/公司行动、rubric、评分、解释页、时点回放 | 财报修订不前视、A/H 估值独立、missing/stale、贡献不双计 |
+| M4 约 2 周 | W-05 | 标准策略、AST 编辑/模拟/发布、状态机、站内提醒、个人订阅、业务完整路径 | 入退/风险/UNKNOWN/防抖/重算静默、前后版本可解释、人类可用性通过 |
+| M5 约 1–3 周 | W-06 | 配额、成本、生产候选部署、安全、性能、备份恢复、运营手册 | 发布阻断项=0、容量目标实测、恢复演练和 UAT；批准后小范围试运行 |
+
+外部通知接入 W-07 可在 M4 后按独立授权开展；不阻塞站内闭环。问答、多市场扩展、行业特化模型、多租户计费为后续需求，不塞进首版。
+
+## 3. 每个纵向 slice 的工程合同
+
+需求/验收 ID→目标行为→输入与权限→失败与恢复→接口与数据修订→UI 全状态→实现→验证证据。变更 approved 行为先记录原因和影响；新阈值不能为了让测试通过临时改掉。Bug 修复附回归场景，不做只复刻实现的测试。
+
+PR 需写触发条件、前后行为、数据／权限／通知影响、必要验证、回滚和未验证事项；scope 有界，禁止无关重构。领域层无网络／时间全局依赖，注入 clock/calendar；可独立重放。明确模块表所有权，接口变更同时更新客户端与事件兼容性。
+
+## 4. CI 与发布门禁（目标流水线）
+
+- 每 PR：format/lint/typecheck、JSON Schema/OpenAPI 合同、领域单测、扫描 secret、锁文件一致性、影响模块的集成／UI 关键测试。
+- 涉及 DB：项目隔离合成 PostgreSQL/Redis 实例运行迁移前后、并发、RLS、outbox 恢复测试；必须验证实际服务位置和数据分类。
+- 涉及 UX：共享组件 Storybook 状态、键盘/contrast、Playwright 当前关键路径和截图；不是每 PR 跑所有历史机型。
+- release candidate：真实依赖 adapter 的获许可最小读回、固定时点评分/策略闭环、性能、安全负面、备份恢复、人工 UAT。模拟成功与真实接入通过分开记录。
+- 供应链：锁依赖、SBOM、license check、漏洞分级、镜像摘要、构建和发布 provenance。签名/分支保护等权限变更待实施授权，不在本阶段操作 GitHub 设置。
+
+结果证据记录 commit SHA、环境、fixture/source manifest、command/scenario、expected/actual、执行者和时间。不得把 build 成功、/health 200、测试已写当实际验收通过。
+
+## 5. 责任与风险
+
+产品负责人维护 scope 和 UAT；研究负责人维护 rubric、gold set 和标准策略；后端负责时间/财务/状态安全，数据运营负责权利与源质量，前端负责一致性和真实用户任务，QA 负责验收证据。小团队可以兼任但不能没人拥有人工判断。
+
+| 风险 | 应对／验证 |
+|---|---|
+| 数据权限或商业成本不明 | 先批准 source_policy、少量接入；不能靠非官方爬虫当确定能力 |
+| 工程规模膨胀 | 先合成→单源→多源闭环、模块单体；向量选配、无自动交易 |
+| 模型错连与伪事实 | 证据定位、校准、holdout、人工队列；不合格不自动生效 |
+| 评分被新闻条数操纵 | event 去重、贡献封顶、baseline 吸收与解释 |
+| A/H 财务口径错误 | 经济权利/币种/全股本明确、gold fixtures、无效值 UNKNOWN |
+| 阈值波动与告警泛滥 | 各市场 session 防抖、滞回、状态去重；无 silent threshold tuning |
+| 多人并发与慢任务覆盖 | ETag、generation、fencing、row lock、幂等表与恢复测试 |
+| “UI 美观”无法验收 | token 与状态库、明确用户任务、原型早测和真实 UI 再测 |
+| 全量向量存储过大 | 热索引期限、容量阶梯测试、旧证据全文检索按需 embedding |
+
+## 6. 成本与容量试算
+
+原始规范正文 20,000×8 KB≈160 MB/日，3 年≈175 GB（十进制，未含 HTML/PDF、复制与索引）。若 4 chunk/讯息、1,024 维 float32，全量向量仅数值≈359 GB，另加 metadata/index/副本；90 日热量约 720 万向量，数值≈29.5 GB。数字用于量级判断，真实 embedding dim 与存储格式待选型。
+
+账单拆为源订阅、模型、计算、PG、OpenSearch、对象/备份流量、通知和人工审查；上线前用一周样本的实际请求/token/文件大小推算月度上限。策略规则简单不代表数据与运维成本低。预算达上限优先停止可选分析/语义，不损坏原始证据和业务状态。
+
+## 7. 试运行与收口
+
+先 50–100 家用户选定公司、两个市场、已许可数据源、少量内测人员；同时运行标准策略 shadow 和人工核验。达到 M5 出口才开启站内 live 状态提醒；外部发送独立授权。异常可逐源／逐策略关闭，不删历史。试运行记录是否实际符合研究流程，不用收益指标为首版流程验收背书。
+
+
+===== SOURCE: docs/10-acceptance.md =====
+
+# 10 验收矩阵与证据要求
+
+本文件列未来系统测试，本阶段均未运行。材料检查报告只说明文档、合成合同和示例一致，不说明功能通过。验收固定真实输入 manifest、策略版本、clock 与市场 calendar。
+
+## 1. 需求—设计—任务追踪
+
+| 需求 | 主要设计章节 | 实施任务 | 验收场景 |
+|---|---|---|---|
+| R-01 | 02 §2、05 §3、08 §2 | W-02/W-03 | T-01/T-02/T-21 |
+| R-02 | 02 §3、04 §2/5、07 §4 | W-02/W-03 | T-03/T-04/T-15 |
+| R-03 | 02 §3、07 §2/5 | W-03 | T-05/T-06/T-17 |
+| R-04 | 04 §3、06 §3/4 | W-02/W-03 | T-04/T-07/T-UX-01 |
+| R-05 | 02 §4、04 §2/4 | W-04 | T-08/T-09/T-10 |
+| R-06 | 02 §4/5、04 §3/4 | W-04 | T-07/T-10/T-11 |
+| R-07 | 02 §5、05 §2/5 | W-05 | T-12/T-13/T-UX-03 |
+| R-08 | 02 §6、05 §5 | W-05/W-07 | T-11/T-13/T-14/T-16 |
+| R-09 | 06 §2–7 | W-02/W-04/W-05 | T-UX-01/T-UX-02/T-22 |
+| R-10 | 05 §3、06 §3、08 §5/6 | W-03/W-06 | T-18/T-19/T-23 |
+| R-11 | 04 §2/5、08 §1–3 | W-01/W-06 | T-15/T-17/T-20/T-21 |
+| R-12 | 03 §5/6、05 §5、08 §6 | W-02/W-05/W-06 | T-14/T-16/T-18/T-19 |
+| R-13 | 09 §3/4 | W-01/W-06 | T-23/T-24 |
+| R-14 | 06 §5–7 | W-01/W-05 | T-UX-01…03/T-22 |
+
+## 2. 场景与明确预期
+
+| ID | 输入／动作 | 必须观察的结果 |
+|---|---|---|
+| T-01 | 定时、暂停、相同时点两个 scheduler | 只一个 run，暂停不采集；resume 不无限补采 |
+| T-02 | 分页第三页失败、重复抓取、晚到与源修订 | checkpoint 不越过失败洞，重试不重建相同 revision；新内容建新版本 |
+| T-03 | 五篇转载同订单、另一季度相似订单、错误合并修正 | 同事实一个 event、一份贡献；另季度不同 event；split 可审计可重算 |
+| T-04 | 发布时间与发生时间不同、仅日期、未知发生时间 | 时间线标精度／代用，切 known time 稳定、游标不重复漏项 |
+| T-05 | 无公司、一家公司、三家公司、简称重名、母子公司 | 分别正确 no_link/1/3，歧义 candidate；母子推导有有效期及证据 |
+| T-06 | r 高 c 低、r 低影响很强、无证据模型输出 | 不自动批准，人工队列；关联度不冒充影响、invalid 不生效 |
+| T-07 | 财报次日发布、后续修订、晚到、历史知识截止 | 公布／系统知悉前不使用；旧评估不覆写，重建模式单独标签 |
+| T-08 | 同模型 manifest 两次 score、贡献吸收、超过±15上限 | 确定性一致；吸收不双计；上限可解释且完整分值发布 |
+| T-09 | 一个维度缺失、coverage 0、分母负或 0 | null+reason，未调查不50分；覆盖不够不得入选；算术无无穷值 |
+| T-10 | A/H 同公司、不同币种/价格、同权与不同权、拆股 | 经营分相同，估值独立且分母/FX一致；不支持权利模型时 invalid |
+| T-11 | 港股开放A股休市、停牌、行情失效、恢复 | 依各市场 calendar；UNKNOWN/SUSPENDED 保留基线，不误发退出 |
+| T-12 | 无权发布、草稿非法 AST、预览后输入改变、双人编辑 | 403/422/409、保留草稿，不执行 arbitrary code、不静默覆盖 |
+| T-13 | 初始基线、两次不同 session 入选、同 session 重算、退出、再入选、改策略 | 基线静默；各真实转移一条；重算不计两次；配置变化分类独立 |
+| T-14 | 两 Worker 同证券提交、commit 后崩溃、旧 generation 迟到 | membership/transition/outbox 原子且唯一；迟到不能覆盖最新 |
+| T-15 | 跨 workspace 查询/计数/搜索/向量/下载、缓存复用、source 撤权 | 全路径无内容与存在性泄漏；撤权即禁读并清投影 |
+| T-16 | 补采、replay、shadow、发送超时且 provider 无幂等 | 不外发历史；UNKNOWN_DELIVERY 不盲重发；delivery 不重新改状态 |
+| T-17 | prompt 注入、假公司 ID、伪证据、巨大附件、SSRF | 无工具/无密钥外传，输出拒绝；隔离解析和网络范围拦截 |
+| T-18 | Redis 清空、任务 lease 过期、索引宕机/重建 | 从 ledger 恢复，fencing 拒旧提交；PG 时间线可用且标降级 |
+| T-19 | PG 隔离备份恢复、撤权后恢复旧备份 | 实测 RPO/RTO；重新 tombstone 后开放，静默重放、审计可回查 |
+| T-20 | 管理员无业务 publish/review capability、失效 OIDC、连接池 scope 切换 | 拒绝权限，不能继承前用户 workspace；生产无开发身份后门 |
+| T-21 | 源无 fetch/store/analyze 权、凭证过期、429 | 对应阶段停并解释；不绕过限制；日志无 secret |
+| T-22 | 核心页面全状态、指定视口、键盘、200%缩放、断线冲突 | 无遮挡溢出、能恢复输入；数值未知不为0；同语义同组件 |
+| T-23 | 20并发列表/搜索、10万到1000万阶梯、成本上限 | 记录分位、索引容量及 backlog；超预算排队可解释，按01目标判定 |
+| T-24 | 迁移前后与应用回滚、事件前一版本、失败 release | 数据不损坏、兼容读写、必要恢复；新失败不替换成功 snapshot |
+
+T-UX-01、02、03 的用户任务与指标以 06 §7 为唯一详细定义。模型与检索 gold-set 指标以 07 §5 为唯一详细定义；不写第二份可能漂移的阈值。
+
+## 3. 标准状态机序列（合成）
+
+固定合成 security，连续 session：s0 有效 false→静默 OUT；s1 true→ENTER_PENDING；s1 新评估 true→不递增；s2 true→IN/一条 ENTER；s3 missing→UNKNOWN,last=IN,计数清零；s4 retain true→IN/不新 ENTER；s5 retain false→EXIT_PENDING；s6 false→OUT/一条 EXIT；s7 true、s8 true→IN/第二条 ENTER；s9 已批准硬风险→OUT/一条 RISK。
+
+未知→恢复后 pending 重新计数；恰好阈值值按 >=/<=；不把浮点误差当跨线。另一策略新 release 建基线，live 第一次有效结果也不冒充市场变化。所有重放 sequence 的 transition 数、类型、evidence hash 有精确预期。
+
+## 4. 证据模板与签收
+
+每项记录 {requirement_id,test_id,commit,environment,manifest_hash,strategy_release,scenario,expected,actual,status,executed_at,owner,evidence_refs}。status=passed/failed/blocked/not_run；只有实际执行且 expected 匹配才能 passed。失败修复后保留失败证据并新增记录；不得改预期掩盖失败。
+
+数据库前确认服务器位置、环境、数据性质和作用域；真实源／通知只运行获授权最小验证并回读真实结构；UI 标明模拟或真机，性能标明数据量。正式签收至少产品/研究负责人、工程负责人共同确认本 slice 的 mandatory 项；可选增强不作为额外强制审查轮次。
+
+
+===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
+
+# 模块化单体与可重建检索投影
+
+状态：proposed，待评审与实施授权。
+
+采用模块化单体配独立 Worker，PostgreSQL 保存事实、版本、策略状态和 outbox；OpenSearch 与热语义索引仅为投影。相比微服务和“所有资料直接放向量库”，此方案牺牲一些独立扩展能力，换取小团队可维护的事务、权限、追溯与恢复，且保留按实际瓶颈拆分的接口。
+
+公司经营评分属于 company，价格与估值属于 security；A/H 共用经营事实并分开策略评估。历史记录采用业务有效时间与系统知悉时间，避免重放使用后来才公布的事实。初期不是完整 event sourcing；保存不可变业务修订和必要审计即可。
+
+OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
+
+
+===== SOURCE: config/scoring-standard-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "model_key": "scoring-standard-v1",
+  "version": 1,
+  "dimension_weights": {
+    "profit_quality": "0.25",
+    "financial_resilience": "0.25",
+    "business_model": "0.25",
+    "governance": "0.15",
+    "growth_sustainability": "0.10"
+  },
+  "event_contribution": {
+    "scale": "10",
+    "cap_per_dimension": "15",
+    "half_life_calendar_days": {
+      "profit_quality": 90,
+      "financial_resilience": 90,
+      "business_model": 180,
+      "governance": 180,
+      "growth_sustainability": 30
+    },
+    "accepted_evidence_only": true,
+    "absorbed_events_excluded": true
+  },
+  "valuation": {
+    "metric": "pe_ttm",
+    "full_score_at": "10",
+    "zero_score_at": "25",
+    "invalid_if_nonpositive": true
+  },
+  "baselines": {
+    "profit_quality": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "roe_ttm",
+          "weight": "0.4",
+          "zero_at": "0.05",
+          "full_at": "0.20"
+        },
+        {
+          "key": "cfo_profit_3y",
+          "weight": "0.4",
+          "zero_at": "0.5",
+          "full_at": "1.2"
+        },
+        {
+          "key": "positive_cfo_year_share_3y",
+          "weight": "0.2",
+          "zero_at": "0",
+          "full_at": "1"
+        }
+      ]
+    },
+    "financial_resilience": {
+      "method": "weighted_metric_rubric",
+      "metrics": [
+        {
+          "key": "net_debt_ebitda",
+          "weight": "0.6",
+          "zero_at": "4",
+          "full_at": "0"
+        },
+        {
+          "key": "interest_coverage",
+          "weight": "0.4",
+          "zero_at": "1",
+          "full_at": "8"
+        }
+      ]
+    },
+    "business_model": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "business-model-v1"
+    },
+    "governance": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "governance-v1"
+    },
+    "growth_sustainability": {
+      "method": "approved_human_rubric",
+      "rubric_ref": "growth-v1"
+    }
+  },
+  "missing_submetric_policy": "renormalize_valid_weights_and_report_subcoverage",
+  "minimum_submetric_coverage": "0.80",
+  "minimum_company_coverage": "0.80"
+}
+
+[END PART 4/6]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

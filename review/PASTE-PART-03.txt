@@ -1,0 +1,219 @@
+
+[PART 3/6]
+
+
+===== SOURCE: docs/05-api-and-jobs.md =====
+
+# 05 API、异步任务与并发合同
+
+## 1. 同步 API 通则
+
+REST /api/v1；完整 OpenAPI 由 M0 后端 DTO 生成，当前文档是详细合同目录，JSON Schema 是跨端关键对象合同。OIDC 会话建议 BFF/同域 HttpOnly Cookie，CSRF 检查与合理 SameSite；跨域 Token 模式须单独审核。服务端鉴权，列表、详情、导出、任务和证据下载均应用相同 ACL。
+
+返回 {data,meta:{request_id,snapshot_id,generated_at,data_as_of,quality}}；分页 opaque cursor 包含过滤 hash 和 snapshot，limit 默认 30、最大 100；排序有稳定 ID 次键。金钱/比例 numeric 在 JSON 用 decimal 字符串，分数亦用 decimal 字符串；日期 ISO 8601，单位与币种明确；unknown 使用 null+reason。
+
+修改草稿支持 ETag/If-Match；缺 expected version 返回 428，版本冲突 409。写请求 Idempotency-Key 与 actor+workspace+route+payload_hash 绑定，重用相同 key 不同 payload 返回 409；重试相同 payload 返回原结果。保存 7 日是默认提案，长期业务唯一约束另外保证。
+
+错误体符合 Problem Details 思路：type/title/status/code/detail/instance/request_id/field_errors；detail 不含内部 URL、SQL、模型提示词或 secret。400 无效参数，401 未认证，403 权限不足，404 不存在或不可见对象（不可泄露），409 冲突，422 合同或业务规则错误，429 配额，503 依赖不可用。部分内容故障返回 200+quality，不伪装完整有效。
+
+## 2. 业务端端点
+
+| 方法与路径 | 输入与输出 | 权限／行为 |
+|---|---|---|
+| GET /me | capability 与首选项 | 只返回本人 |
+| GET /dashboard | as_of, strategy_id；关注变化、提醒、质量概览 | 完整 snapshot；不用全局大屏排行榜 |
+| GET /companies | query, filters, cursor；身份+经营分+coverage | 只读；过滤状态可分享 URL |
+| GET /companies/{id} | securities、经营摘要、关键变化 | 公司名称+各证券市场明确区分 |
+| GET /companies/{id}/timeline | event/published/known time, dimension,r_min,cursor | 聚合事件、已批准关联、待复核可独立筛选 |
+| GET /companies/{id}/scores | snapshot/as_of；维度、基准、贡献、缺口 | 解释与总分来自同一 snapshot |
+| GET /securities/{id}/valuation | snapshot/as_of；价格、FX、分母与质量 | A/H 独立、停牌/过期说明 |
+| GET /information/{id}/revisions/{revision} | 来源、证据、关联、事件 | metadata_only 不返回虚构正文 |
+| GET /events/{id} | 历史修订、支持／反驳来源、公司影响 | 权限过滤后仍显示“部分证据不可见” |
+| POST /search | q, company_ids,date range,types,mode,cursor | 精确／全文／语义，可降级；ACL 在检索前应用 |
+| GET /strategies | 本人／组织可见版本与区间数量 | 不泄露他人私有规则 |
+| GET /strategies/{id}/evaluations | security,state,release,snapshot | 每规则结果 true/false/unknown 与原因 |
+| POST /strategies/{id}/drafts | config,parent_release | strategy.edit；JSON Schema 校验 |
+| POST /strategy-drafts/{id}/simulations | fixed_as_of,universe_manifest | strategy.simulate；202 job，不发通知 |
+| POST /strategy-drafts/{id}/publish | If-Match,preview_id,preview_hash,confirmation | strategy.publish；预览过期 409，无效不能发布 |
+| POST /strategy-releases/{id}/rollback-preview | target_version,as_of | 生成新发布提案与变化预览，不直接修改旧版 |
+| GET/PATCH /watchlists/{id} | security_ids，If-Match | 本人，越权证券不可附加 |
+| GET /notifications | unread,type,strategy,cursor | 本人；显示原因和证据入口 |
+| POST /notifications/{id}/ack | reviewed/snooze+until | 不改变 membership；读过和处理过分开 |
+| PUT /subscriptions/{id} | strategy/security,channels,quiet_hours | 本人；首次外部连接验证后方可 enabled |
+| POST /reviews | subject_revision,decision,reason,evidence,If-Match | analysis.review，拒绝 stale subject |
+| GET /evidence/{id}/access | 受控代理或短期 signed URL | source_policy 再校验，访问留日志 |
+
+## 3. 管理端端点
+
+/admin/sources CRUD 草稿；/sources/{id}/preview、publish、pause、resume；/source-runs 和 /jobs；/jobs/{id}/retry-preview、retry；/identity/merge-preview、merge、split；/review-queue；/rubrics/versions；/models/policies；/index/rebuild-preview、rebuild；/users/capabilities；/audit；/quality；/costs。所有高影响动作分 preview→confirm，返回预计对象、请求量、费用、变化数与回滚说明。删除数据、改权限、源授权和历史重放不能混进“重试失败任务”。
+
+授权不是按钮显隐：对应 capability 且目标 workspace 合法。管理员可以查看运行状态，但 business strategy.publish 和 analysis.review 独立授权。preview object 与请求 hash、版本、负责人绑定；确认后 202 task_id，任务详情可追溯。
+
+## 4. 异步事件合同
+
+事件共同字段见 contracts/job-event.schema.json：event_id、event_type、schema_version、workspace_id、entity_id/revision、occurred_at、trace_id、mode、generation、payload 引用。类型包括 ItemCaptured/ItemNormalized/AnalysisProposed/ReviewApproved/EventChanged/FundamentalChanged/ScoreCompleted/StrategyEvaluated/MembershipChanged/NotificationRequested/IndexRequested。消费者不信任消息内权限，重新从事实库校验。
+
+mode=live/backfill/replay/shadow/research_reconstruction。只有 live 且本次 source/strategy/subscription 权利均有效才可外部通知。事件发生与实际投递时间分开；任务传播 mode 不能默认回 live。
+
+默认 job 重试最多 5 次，指数退避 30s 起、上限 30min、随机 jitter；源 429 服从 Retry-After 且并发配额全源共享；认证/权限/Schema 错误无盲重试。LLM 合同错误最多一次受限修复，仍失败进入人工队列；按 cost budget 判断是否可重试。DLQ 保留错误分类和指针，不放秘密或完整原文。
+
+## 5. 事务与并发示例
+
+### 策略评估提交
+
+1. 以固定 input_manifest 计算规则，不锁整个系统。
+2. BEGIN；取得 membership 行锁，验证 release 当前、expected generation、session 与 context。
+3. 若已消费 evaluation_id 则返回同结果。若输入过时则记录 superseded、终止状态变更。
+4. 更新确认计数／状态；不同 session 才递增。生成 transition+notification+outbox+audit，统一 COMMIT。
+5. relay 投递；consumer 用 delivery 的唯一键创建／领取发送任务。
+
+双 Worker 并行同证券时只允许一个转移；丢 ACK 重试不生成第二条。其他公司独立并发，不全局锁。评分发布 CAS 与评估 generation 防止慢任务覆盖新财报。
+
+### 通知外部副作用
+
+渠道支持幂等键时发送 delivery_id 为 provider key。若 provider 不支持，发送超时结果标为 UNKNOWN_DELIVERY，查询投递状态或人工确认，不能盲重发导致重复。数据库 exactly-once 业务记录不能证明外部信道 exactly-once。站内通知仍可正常访问；没有渠道授权不能发送测试消息。
+
+### 主数据合并
+
+merge-preview 展示证券、别名、事件、评分和策略影响；confirm 写不可变 merge decision、alias redirect、新 identity generation 并触发固定范围重算。不删除旧 company_id；历史引用旧版本仍可解释，当前查询显式跳转。split 与误合并恢复同理，不直接批量 UPDATE 历史。
+
+## 6. 客户端合同
+
+前端只调用生成客户端；TanStack Query keys 包括 workspace、filters、snapshot，切换 workspace 清除敏感缓存。写成功按后端返回 revision 精确失效相关 query，不强制整页刷新。未知任务状态显示“等待更新”并提供 request_id。核心通知与任务更新可 SSE（只发 ID、质量／进度），断线退回有限轮询；SSE 不必保证消息持久性，刷新从事实库取得正确状态。
+
+
+===== SOURCE: docs/06-ux-and-design-system.md =====
+
+# 06 前端信息架构、交互与设计系统
+
+## 1. 体验目标
+
+研究人员应在一次连续路径里理解“发生什么、和我关注的公司有什么关系、判断依据是什么、要不要复核”；不需要理解任务队列、embedding 或系统内部 ID。进入页面先看变化与结论，再展开细节。所有漂亮图表都必须能定位证据和数值，不能遮盖缺失数据。
+
+桌面为研究和管理主要环境；手机业务端支持看提醒、公司摘要、证据和加入自选，复杂规则编辑仅保留查看并提示去桌面。建议验证桌面 1440×900、1280×800，以及手机 CSS 390×844、430×932；窄屏弹性补测 360×800 仅发现拥挤风险时追加。均为浏览器模拟，真实 UI 尚未实现。
+
+## 2. 信息架构
+
+业务导航：今日变化｜公司研究｜策略候选｜我的自选｜提醒中心；全局搜索常驻。策略维护入口在策略页，拥有权限时可编辑；不是必须跳管理端才能维护个人规则。管理导航：数据源｜运行任务｜数据质量｜公司与证券｜分析复核｜评分模板｜策略发布｜模型与费用｜用户与权限｜审计。
+
+两端有明确模式切换，保留 workspace 和研究上下文；管理端异常可深链到相关公司／证据，业务端质量提示深链到普通人能理解的故障说明。登录后优先恢复上次研究位置，无上下文时进入“今日变化”，不自动展示全面财务大屏。
+
+## 3. 页面规格
+
+| 页面 | 首屏核心内容 | 主要操作与导航 |
+|---|---|---|
+| 今日变化 | 新进入／退出／风险／数据异常，关注公司变化 | 点击变化→固定时点评估；切日期、策略和市场 |
+| 公司列表 | 公司身份、证券市场、经营分、覆盖、关键变化、更新时间 | 搜索／筛选／固定列／保存视图；批量最多加入自选 |
+| 公司档案 | 公司名称、证券切换、经营摘要、策略状态与两条关键原因 | 时间线、评分、财务、估值、关系、笔记标签；自选按钮 |
+| 公司时间线 | 去重事件卡、发生时间、关联度、影响维度、证据状态 | 展开来源、筛选高相关／待复核；不把转载显示为五次事件 |
+| 评分解释 | 总分与覆盖并排，维度条形图、基准+增减贡献 | 点维度→指标、rubric、贡献及证据；查看版本差异 |
+| 证券估值 | 市场、币种、行情时点、PE 分母和估值分 | A/H 切换只影响证券级区域；不重算公司级历史 |
+| 策略候选 | 入选、待确认、待评估和区间外，规则通过情况 | 条件展开、比较证券、保存视图、模拟修改 |
+| 策略编辑 | 自然语言规则说明+可视条件构建+当前版本 | 改阈值→校验→模拟→查看进出变化→发布；专家可查看 JSON |
+| 提醒中心 | 类型、公司／证券、原因、时点、已读/处理状态 | 查看当时依据、标为已复核、稍后提醒、设置订阅 |
+| 数据源管理 | 最近成功、下一次、延迟、失败原因、负责人、权利状态 | 新建向导、试采预览、暂停、有限补采 |
+| 运行任务 | 业务阶段与对象数、进度可信性、错误与恢复方式 | 只重试失败项；区间补采另走预览，不能一键全量重跑 |
+| 分析复核 | 原文与候选判断对照、证据高亮、公司候选 | 接受、修改、拒绝、无法确认；支持快捷键但不默认批量批准 |
+| 公司主数据 | legal name、A/H 身份、别名、生效日期和来源 | 合并／拆分影响预览，审批后执行 |
+| 质量中心 | 哪些公司／策略受影响、缺口、责任人与恢复状态 | 先业务影响后错误详情；管理权限再看技术诊断 |
+
+公司列表单位是 company，可展开多证券；策略候选单位是 security，标题明确“证券候选”。同公司出现 A 和 H 两行时显示关联标识，不能简单去重掉一只。
+
+## 4. 核心布局草图
+
+公司档案桌面：
+
+```text
+[全局搜索]                  [研究工作区] [提醒] [头像]
+[业务导航] | 示例制造   A 股 / 港股证券切换    [加入自选]
+           | 经营分 72   覆盖 100%   数据截至日期   [查看依据]
+           | A: 区间内 / H: 区间外   最关键原因，点开逐条规则
+           | [时间线] [评分] [财务] [估值] [关系] [笔记]
+           | 筛选: 时间类型 / 来源 / 关联度 / 维度
+           | 日期 | 事件卡：一句事实、两条影响、证据、复核标签
+           |      | 展开后列来源和版本，不打断滚动位置
+```
+
+复核桌面：左侧原文与高亮证据，中间公司身份及关联判断，右侧影响维度／理由与操作。窗口较窄时改为原文／判断切换面板，固定底部提交区不能遮住最后一个字段。审批按钮必须明确“批准关联”或“批准影响”，不能只有“确认”。
+
+手机公司页：标题与证券选择→状态及两条关键原因→经营分/覆盖→滚动标签→事件卡；全局导航折成底部业务导航。估值和行情日期常显，不藏在 tooltip。横向大表改关键字段卡片，完整表提供受控横滚及固定字段说明。
+
+## 5. 设计系统规范
+
+- 视觉方向：安静的研究工作台，暖白背景、深墨文字、蓝色交互、琥珀提示；强调事实与可比较数字，不采用交易终端式闪烁红绿。
+- tokens：背景 #F6F7F9、surface #FFFFFF、正文 #17212F、次级 #526072、主色 #1D4ED8、边线 #D9DFE8、warning #9A6700、danger #B42318、success #187048。实现时逐组合测 WCAG，对比不足修 token；颜色不能单独表达状态。
+- 字体：系统中文 PingFang SC/Noto Sans SC，正文 14–16 px、行高 1.5–1.7；数字 tabular-nums，标题 20/24/32 px。手机输入≥16 px，正文≥16 px。金额统一千／万／亿，保留全值可复制与单位。
+- 间距：4/8/12/16/24/32/48；圆角 8/12；桌面常规行高≥44 px，手机触控≥44×44 px；密集表格为显式用户选择。
+- 同一语义只使用一个组件：StatusBadge、ScoreWithCoverage、FreshnessIndicator、EvidenceLink、RuleResult、EventCard、ChangePreview、AsyncTaskPanel、PermissionNotice。基础层 Button/Input/Dialog/Table/Toast 等经 Storybook 验收后共享。
+- 主按钮每区域最多一个；“加入自选”轻量、不确认，策略发布／数据合并先变更预览。破坏操作与常规保存远离并采用精确动作名称。
+- 数字分数默认 1 位小数，后台保留精度；missing 用“未有有效资料”，stale 用“资料已过期”，不显示 0。相关度显示高／中／低+可展开值与依据，避免虚假概率精确感。
+
+## 6. 状态和恢复交互（所有核心页面必须覆盖）
+
+首次加载 skeleton 保持几何；刷新保留上一 snapshot 并显示正在更新；空数据区分“筛选无结果”“尚未接入”“权限不可见”；部分失败保留可用内容并指出受影响公司／策略；无法判断展示质量原因与下一步；无权限显示说明和可申请的负责人，不能死链；长任务显示阶段、已完成/总数和停止边界，未知总数不造百分比；更新冲突保留本人草稿，提供差异比较，不能静默覆盖。
+
+通知点击固定生成时点的 explanation snapshot，再提供“看当前状态”。历史页顶部明确版本与日期。重算结果不突然替换正在看的内容，提示“有更新版本”。证据撤权后显示引用与不可访问理由，不返回缓存正文。
+
+表单提供就地错误与顶部摘要；网络失败保留输入；自动保存只对私有草稿，展示保存时点和失败；已发布策略不能编辑原版。搜索支持代码精确匹配、名称别名、关键词；输入中文组合态不抢焦点。过滤通过 URL 与保存视图保留；返回列表恢复滚动位置。
+
+## 7. UX 验收
+
+T-UX-01：5 名目标用户完成“新提醒→理解原因→原始证据→标记复核”，至少 4 名无需帮助、每人≤90 秒，重大理解错误为 0。T-UX-02：研究员区分 company 与 A/H security、高分低覆盖、过去与当前状态，至少 4/5 答对；发生误认为交易建议即失败。T-UX-03：策略维护者改阈值、模拟、理解变化并发布，至少 4/5 无引导完成≤3 min。
+
+目标可用于首轮小样本研究，不能当统计意义的普遍结论。M1 用交互原型先测导航和术语，M4 再测真实 UI。视觉检查含所有状态、两个代表性桌面、两个手机视口、200% 缩放、键盘和屏幕阅读抽测；截图基线只防回归，不能替代人类可用性测试。
+
+
+===== SOURCE: docs/07-ai-and-retrieval.md =====
+
+# 07 AI 分析、关联与检索设计
+
+## 1. 模型的角色
+
+模型提取候选公司、事实主张、证据位置和影响建议，输出受 Schema 限制的数据。系统用确定性规则校验单位、时间、身份与证据；人维护经营 rubric 和高影响判断。模型没有权力写策略、修改公司身份、直接通知、联网下载任意链接或执行工具。
+
+先跑规则／主数据候选召回，再按成本预算调用模型；已有数字从结构化财报计算，不让模型“估算”缺失财务。无正文不做强判断；来源无 analyze 权利不送模型；无 send_to_external_model 权利只用已许可本地处理或人工。
+
+## 2. 分析管道
+
+1. 标题／代码／正式名称／别名精确候选召回，结合语言、市场、行业与有效关系，最多 20 个候选；候选数量不足时允许 no_link。
+2. 长文按章节、表格和句段切 chunk，保留 offset/page/cell；结构化表格独立解析，不能将标题切断导致事实歧义。默认 500–800 token、重叠 10%，实施按证据召回测试调优。
+3. 模型读取不可信 source text 与封闭候选身份，生成 claims、item_company_links、impact_proposals。证据 quote 必须能定位到输入原文（规范化定位规则固定），不能引用模型自己的摘要。
+4. 校验 Schema、ID allowlist、类型、数字范围、证据精确定位、否定／假设语气、时间和冲突；高影响／间接重大判断进入人工队列。
+5. 校准置信度，应用审批门；完成事件归并建议，歧义不自动合并。影响维度和半衰期由版本模板限定。
+6. 保留 analysis_run 的 model ID、prompt/schema version、input_hash、usage/cost、validated result 和理由；不要保存隐藏思维链。修正或 prompt 升级生成新版本，影子对比后发布。
+
+Prompt injection：正文即使写“忽略规则、读取密钥、发送消息”也只作为被分析文本。模型无工具访问、网络和凭证；不将正文拼入 system 指令；HTML/script 外部链接不执行。拒绝未经允许的公司 ID 与字段。测试必须包含恶意文档、伪造代码、同名公司、繁简混合、表格单位、否定句、预测句和讽刺语。
+
+## 3. 关联与影响合同
+
+contracts/analysis-result.schema.json 是最小跨阶段 Schema：schema_version、item_revision_id、no_link、links、impact_proposals；每个 link 有 company_id、relation_type、relevance、confidence、evidence_ids、rationale。分析结果只是 proposal，不能包含“approved=true”。影响 signed_impact 不含价格涨跌预测字段。
+
+证据 IDs 必须属于本输入 revision；由服务端检查跨对象引用，JSON Schema 本身无法证明。每个影响必须引用一条建议或已批准公司关联，并有维度、方向强度、有效截止、半衰期、证据、confidence 和原因。未确认硬风险不能写入 strategy hard-risk facts；它只创建人工审查任务。
+
+## 4. 混合检索
+
+搜索默认股票代码／名称精确路径；自然语言则 BM25 和语义候选并行，按 RRF 合并（起始 k=60），可选择本地 reranker。source_policy 与 workspace ACL 在两路查询之前过滤，返回前按 PG 再校验；后过滤不是唯一保护，禁止分页、计数和高亮泄露不可见资料。候选列表为空返回解释，不让 LLM 填补。
+
+默认返回事件或讯息摘要、来源、发生/发布时间、公司、关联与可点击证据。可选问答在首个研究闭环之后实施，每句关键回答引用可访问 evidence，资料不足明确说明，不能生成投资指令。引用数不代表结论真实性。
+
+OpenSearch projection_version 与 watermark 在 meta 返回。PG 变更后索引晚于 5 min 标为 delayed，超过目标给运营告警；事件明细仍从 PG 查。ACL 撤权优先同步拒绝缓存，然后异步删除索引；证据请求始终再验证。向量 model 切换新 namespace、影子召回评估，再切 active，不复用旧向量。索引不存未经许可全文。
+
+## 5. 质量评估与模型版本门禁
+
+M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报、资讯、社媒线索、无关联、同名歧义、子公司、A/H、否定、历史回顾及恶意输入。至少 20% 双人独立标注，分歧仲裁；按事件和发布日期划分 train/calibration/holdout，不能让重复转载跨集合泄露。指标按各来源／语言／直接和间接关联分别报告。
+
+关联自动批准 precision≥95%、recall≥85%，误连公司率≤1%；范围为测试集、配套 Wilson 区间，不宣称全市场同等质量。证据可定位率≥99%，硬风险未经人批准直接生效次数=0；no_link precision/recall 单独报告，避免强制关联。置信度报告 reliability bins 与 ECE，原始模型 self-confidence 不当成概率。
+
+事件归并以 pair precision≥95% 优先，误合并不能用增加 recall 抵消；至少测试不同季度同类事件不合并。影响方向与专家仲裁一致率目标≥85%，按维度分组；这是意见一致指标，不验证经营因果或未来收益。未过门禁降级人工，不降低验收阈值冒充通过。
+
+检索标注至少 100 个真实研究意图（可先用合成公司）：精确代码 top-1=100%；证据 recall@20≥90%、nDCG@10≥0.8、零 ACL 泄漏；与 BM25 baseline 对比，语义未增益则默认关闭。版本上线前固定成本、延迟与错误指标，不能因为“更新了模型”直接切全量。
+
+## 6. 配额与成本
+
+模型调用并发、日 token/$ 限额按 source/workspace/stage 控制；达到上限排队／规则分析并提示，不能偷偷换外部 provider。记录输入/输出/embedding/rerank 和重试次数，费用按实际公开报价版本计算，不预填虚假当前价。相同输入+prompt+model/schema hash 可复用已许可缓存；修改源权利时缓存立刻禁读。
+
+成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。预算必须在首批来源选择和抽样后确认。
+
+[END PART 3/6]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

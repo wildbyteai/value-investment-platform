@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build one local, self-contained GPT Pro review attachment; no network calls."""
+"""Build local review pack and copy/paste messages; no network calls."""
 import hashlib
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,3 +23,43 @@ for p in paths:
 output = ROOT / "review/REVIEW-PACK.md"
 output.write_text("".join(parts), encoding="utf-8")
 print(f"Built {len(paths)} source sections; {output.stat().st_size} bytes; SHA256={hashlib.sha256(output.read_bytes()).hexdigest()}")
+
+# Plain-text alternatives: no attachment and no repository access are required.
+source_paths = [p for p in paths if str(p.relative_to(ROOT)) not in {"review/GPT-PRO-PROMPT.md", "review/validation-result.json"}]
+sections = []
+for p in source_paths:
+    sections.append(f"\n\n===== SOURCE: {p.relative_to(ROOT)} =====\n\n" + p.read_text(encoding="utf-8"))
+instruction = (ROOT / "review/GPT-PRO-PROMPT.md").read_text(encoding="utf-8").split("## 完整提示词\n", 1)[1].strip()
+all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.2。\n"
+(ROOT / "review/PASTE-ALL.txt").write_text(all_text, encoding="utf-8")
+groups, group = [], ""
+for section in sections:
+    if group and len(group) + len(section) > 14000:
+        groups.append(group)
+        group = ""
+    group += section
+if group:
+    groups.append(group)
+links = []
+for index, group in enumerate(groups, 1):
+    start = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" if index == 1 else ""
+    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.2。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
+    name = f"PASTE-PART-{index:02}.txt"
+    body = start + f"\n[PART {index}/{len(groups)}]\n" + group + f"\n[END PART {index}/{len(groups)}]\n" + end
+    (ROOT / "review" / name).write_text(body, encoding="utf-8")
+    links.append(f"{index}. [{name}](./{name})：{len(body):,} 字符；直接复制全文作为一条消息。")
+help_text = """# 不附文件的 GPT Pro 评审方式
+
+## 优先：读取 GitHub
+
+复制 [完整提示词](./GPT-PRO-PROMPT.md)中“完整提示词”下的全部内容，直接发给 GPT Pro。提示词已经指定仓库与材料路径，不要求上传附件。该方式要求当前 GPT Pro 会话有权限读取这个私有仓库；链接本身不赋予权限。
+
+## 备用：正文粘贴
+
+没有 GitHub 读取能力时，打开 [PASTE-ALL.txt](./PASTE-ALL.txt)，复制全部正文发给 GPT Pro，里面已有提示词和完整业务／工程／合同／合成示例，无需另发提示词或附件。无需 GitHub 权限也可在本地打开同名文本。
+
+若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
+
+""" + "\n".join(links) + "\n\n这是同一 v0.1 的传递方式变化，未改变业务或工程设计。纯文本完整覆盖 README、领域词汇、实现规则、10份设计、ADR、2份配置、合同说明与3份Schema、3份合成例子；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+(ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
+print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")

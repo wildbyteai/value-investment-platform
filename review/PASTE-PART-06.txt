@@ -1,0 +1,411 @@
+
+[PART 6/6]
+
+
+===== SOURCE: contracts/strategy.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "strategy_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scoring_model_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "universe": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "CN_A",
+              "HK"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "exclude_sector_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "common_equity_only": {
+          "const": true
+        }
+      },
+      "required": [
+        "markets",
+        "exclude_sector_groups",
+        "common_equity_only"
+      ]
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minimum_coverage": {
+          "type": "string",
+          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+        },
+        "required_dimensions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "profit_quality",
+              "financial_resilience",
+              "business_model",
+              "governance",
+              "growth_sustainability"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "baseline_max_age_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "financial_max_announced_age_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "price_max_lag_sessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency_and_share_basis_required": {
+          "const": true
+        },
+        "only_approved_inputs": {
+          "const": true
+        }
+      },
+      "required": [
+        "minimum_coverage",
+        "required_dimensions",
+        "baseline_max_age_days",
+        "financial_max_announced_age_days",
+        "price_max_lag_sessions",
+        "currency_and_share_basis_required",
+        "only_approved_inputs"
+      ]
+    },
+    "hard_risk_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "confirmed_only": {
+          "const": true
+        },
+        "action": {
+          "const": "immediate_out_risk"
+        },
+        "risk_codes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "confirmed_fraud",
+              "going_concern_material",
+              "confirmed_debt_default",
+              "delisting_decision"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "confirmed_only",
+        "action",
+        "risk_codes"
+      ]
+    },
+    "enter": {
+      "$ref": "#/$defs/expression"
+    },
+    "retain": {
+      "$ref": "#/$defs/expression"
+    },
+    "state_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "initial_baseline_notify": {
+          "const": false
+        },
+        "enter_distinct_sessions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "exit_distinct_sessions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "session_clock": {
+          "const": "security_exchange_close"
+        },
+        "unknown_action": {
+          "const": "hold_last_confirmed_reset_pending"
+        },
+        "config_change_notify": {
+          "const": "summary_only"
+        },
+        "historical_notify": {
+          "const": false
+        }
+      },
+      "required": [
+        "initial_baseline_notify",
+        "enter_distinct_sessions",
+        "exit_distinct_sessions",
+        "session_clock",
+        "unknown_action",
+        "config_change_notify",
+        "historical_notify"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "strategy_key",
+    "version",
+    "name",
+    "description",
+    "scoring_model_ref",
+    "universe",
+    "quality_gates",
+    "hard_risk_policy",
+    "enter",
+    "retain",
+    "state_policy"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Restricted standard strategy configuration",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 30,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            }
+          },
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "enum": [
+                "company.quality_score",
+                "company.coverage",
+                "security.valuation_score",
+                "metrics.roe_ttm",
+                "metrics.cfo_profit_3y",
+                "metrics.net_debt_ebitda"
+              ]
+            },
+            "op": {
+              "enum": [
+                "gte",
+                "lte"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          },
+          "required": [
+            "field",
+            "op",
+            "value"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
+===== SOURCE: examples/analysis-proposal.json =====
+
+{
+  "schema_version": "1.0",
+  "item_revision_id": "00000000-0000-4000-8000-000000000002",
+  "no_link": false,
+  "links": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "relation_type": "direct",
+      "relevance": "0.95",
+      "confidence": "0.93",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成材料明确描述示例制造订单，不代表真实公司判断。"
+    }
+  ],
+  "impact_proposals": [
+    {
+      "company_id": "00000000-0000-4000-8000-000000000001",
+      "dimension": "growth_sustainability",
+      "signed_impact": "0.4",
+      "confidence": "0.8",
+      "half_life_days": 30,
+      "valid_until": "2026-12-31T00:00:00Z",
+      "evidence_ids": [
+        "00000000-0000-4000-8000-000000000003"
+      ],
+      "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+    }
+  ]
+}
+
+
+===== SOURCE: examples/job-event.json =====
+
+{
+  "event_id": "00000000-0000-4000-8000-000000000004",
+  "event_type": "AnalysisProposed",
+  "schema_version": "1.0",
+  "workspace_id": "00000000-0000-4000-8000-000000000005",
+  "entity_id": "00000000-0000-4000-8000-000000000002",
+  "entity_revision": "synthetic-r1",
+  "occurred_at": "2026-09-30T00:00:00Z",
+  "trace_id": "synthetic-trace-01",
+  "mode": "shadow",
+  "generation": 1,
+  "payload": {
+    "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+    "job_id": "00000000-0000-4000-8000-000000000007"
+  }
+}
+
+
+===== SOURCE: examples/state-machine-cases.json =====
+
+{
+  "synthetic": true,
+  "cases": [
+    {
+      "session": "s0",
+      "input": "enter_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": null
+    },
+    {
+      "session": "s1",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s1",
+      "input": "enter_true_recompute",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s2",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": "ENTER"
+    },
+    {
+      "session": "s3",
+      "input": "missing",
+      "confirmed": "IN",
+      "display": "UNKNOWN",
+      "notification": null
+    },
+    {
+      "session": "s4",
+      "input": "retain_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": null
+    },
+    {
+      "session": "s5",
+      "input": "retain_false",
+      "confirmed": "IN",
+      "display": "EXIT_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s6",
+      "input": "retain_false",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": "EXIT"
+    },
+    {
+      "session": "s7",
+      "input": "enter_true",
+      "confirmed": "OUT",
+      "display": "ENTER_PENDING",
+      "notification": null
+    },
+    {
+      "session": "s8",
+      "input": "enter_true",
+      "confirmed": "IN",
+      "display": "IN",
+      "notification": "ENTER"
+    },
+    {
+      "session": "s9",
+      "input": "approved_hard_risk",
+      "confirmed": "OUT",
+      "display": "OUT",
+      "notification": "RISK"
+    }
+  ]
+}
+
+[END PART 6/6]
+
+[REVIEW_MATERIALS_END]
+全部材料已发完，请现在开始完整评审并输出 v0.2。

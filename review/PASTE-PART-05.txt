@@ -1,0 +1,418 @@
+
+[PART 5/6]
+
+
+===== SOURCE: config/strategy-standard-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "strategy_key": "value-standard",
+  "version": 1,
+  "name": "标准价投候选 v1（非金融行业）",
+  "description": "人维护的示范筛选规则；研究提醒，不下单，不验证收益。",
+  "scoring_model_ref": "scoring-standard-v1",
+  "universe": {
+    "markets": [
+      "CN_A",
+      "HK"
+    ],
+    "exclude_sector_groups": [
+      "financials",
+      "real_estate",
+      "commodity_cyclicals"
+    ],
+    "common_equity_only": true
+  },
+  "quality_gates": {
+    "minimum_coverage": "0.80",
+    "required_dimensions": [
+      "profit_quality",
+      "financial_resilience",
+      "business_model"
+    ],
+    "baseline_max_age_days": 180,
+    "financial_max_announced_age_days": 180,
+    "price_max_lag_sessions": 1,
+    "currency_and_share_basis_required": true,
+    "only_approved_inputs": true
+  },
+  "hard_risk_policy": {
+    "confirmed_only": true,
+    "action": "immediate_out_risk",
+    "risk_codes": [
+      "confirmed_fraud",
+      "going_concern_material",
+      "confirmed_debt_default",
+      "delisting_decision"
+    ]
+  },
+  "state_policy": {
+    "initial_baseline_notify": false,
+    "enter_distinct_sessions": 2,
+    "exit_distinct_sessions": 2,
+    "session_clock": "security_exchange_close",
+    "unknown_action": "hold_last_confirmed_reset_pending",
+    "config_change_notify": "summary_only",
+    "historical_notify": false
+  },
+  "enter": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "70"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "60"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  },
+  "retain": {
+    "all": [
+      {
+        "field": "company.quality_score",
+        "op": "gte",
+        "value": "65"
+      },
+      {
+        "field": "company.coverage",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "security.valuation_score",
+        "op": "gte",
+        "value": "50"
+      },
+      {
+        "field": "metrics.roe_ttm",
+        "op": "gte",
+        "value": "0.10"
+      },
+      {
+        "field": "metrics.cfo_profit_3y",
+        "op": "gte",
+        "value": "0.80"
+      },
+      {
+        "field": "metrics.net_debt_ebitda",
+        "op": "lte",
+        "value": "2.0"
+      }
+    ]
+  }
+}
+
+
+===== SOURCE: contracts/README.md =====
+
+# 合同目录
+
+JSON Schema draft 2020-12；本阶段提供关键跨端对象的设计合同，完整 OpenAPI／物理 SQL 迁移在 M0 实施。禁止将合同存在解释为运行时已接入校验。
+
+- [strategy.schema.json](./strategy.schema.json)：受限 all/gte/lte AST，不接受任意代码、任意字段；深度≤5、最多30个叶节点由运行时语义校验补充。
+- [analysis-result.schema.json](./analysis-result.schema.json)：仅 unapproved proposal，关联与影响独立；no_link=true 时不能有 links 或影响。
+- [job-event.schema.json](./job-event.schema.json)：事件只传引用与版本，不能传正文或 secret。
+- [标准策略](../config/strategy-standard-v1.json) 与 [评分配置](../config/scoring-standard-v1.json)：初始数字真源；业务文档解释公式和规则含义。评分配置暂未提供完整 Schema，在 M0 同源 DTO 完成，当前材料工具核对其权重与基本数学条件。
+- [合成例子](../examples/analysis-proposal.json)、[任务例子](../examples/job-event.json)、[状态预期](../examples/state-machine-cases.json)：全为虚构，不含任何真实证券或业务记录。
+
+money/ratio/score 均采用十进制字符串；semantic validator 另外检查量纲、字段匹配、enter/retain滞回、业务权限、同workspace引用与 evidence ownership。UUID/date-time 的 format 需要运行时启用验证；不能以 JSON Schema 通过代替这些业务检查。Schema 允许更改配置参数，不意味着参数经过投资效果验证。
+
+本阶段工具用 Python 标准库做有限的合同形状、范围与示例一致检查，并逐文件检查 JSON 语法和 Schema 本地引用；没有安装完整 JSON Schema validator，正式 draft 2020-12 validation 属于 M0 未运行项。此限制在 validation-result 中明列，不能将文档检查说成业务验收。
+
+
+===== SOURCE: contracts/analysis-result.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "item_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "no_link": {
+      "type": "boolean"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relation_type": {
+            "enum": [
+              "direct",
+              "subsidiary",
+              "customer_supplier",
+              "competitor",
+              "industry_policy",
+              "indirect_theme"
+            ]
+          },
+          "relevance": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "relation_type",
+          "relevance",
+          "confidence",
+          "evidence_ids",
+          "rationale"
+        ]
+      },
+      "maxItems": 20
+    },
+    "impact_proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dimension": {
+            "enum": [
+              "profit_quality",
+              "financial_resilience",
+              "business_model",
+              "governance",
+              "growth_sustainability"
+            ]
+          },
+          "signed_impact": {
+            "type": "string",
+            "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "confidence": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "half_life_days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 730
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "dimension",
+          "signed_impact",
+          "confidence",
+          "half_life_days",
+          "valid_until",
+          "evidence_ids",
+          "rationale"
+        ]
+      },
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "schema_version",
+    "item_revision_id",
+    "no_link",
+    "links",
+    "impact_proposals"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unapproved analysis proposal",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "no_link": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "links": {
+            "maxItems": 0
+          },
+          "impact_proposals": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "links": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}
+
+
+===== SOURCE: contracts/job-event.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "ItemCaptured",
+        "ItemNormalized",
+        "AnalysisProposed",
+        "ReviewApproved",
+        "EventChanged",
+        "FundamentalChanged",
+        "ScoreCompleted",
+        "StrategyEvaluated",
+        "MembershipChanged",
+        "NotificationRequested",
+        "IndexRequested"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "backfill",
+        "replay",
+        "shadow",
+        "research_reconstruction"
+      ]
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_manifest_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "input_manifest_id",
+        "job_id"
+      ]
+    }
+  },
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "workspace_id",
+    "entity_id",
+    "entity_revision",
+    "occurred_at",
+    "trace_id",
+    "mode",
+    "generation",
+    "payload"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Durable job reference event"
+}
+
+[END PART 5/6]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

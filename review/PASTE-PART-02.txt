@@ -1,0 +1,183 @@
+
+[PART 2/6]
+
+
+===== SOURCE: docs/03-architecture.md =====
+
+# 03 工程架构与技术框架
+
+## 1. 架构选择
+
+模块化单体 + 分角色 Worker，单个版本化 API 与领域模型；无需先建立微服务平台。领域运算是确定性函数，模型分析与外部请求放到适配器。数据库为事实与业务状态真源，检索和向量是可重建投影；向量库不能承担公司身份、权限、评分历史和告警事务。
+
+```mermaid
+flowchart TB
+  U[业务端 / 管理端 React] --> API[FastAPI 应用]
+  API --> PG[(PostgreSQL 事实 版本 状态 Outbox)]
+  SCH[调度器] --> PG
+  PG --> RELAY[Outbox relay]
+  RELAY --> Q[Redis / Celery 提醒式任务队列]
+  Q --> CW[采集 Worker]
+  Q --> AW[解析 关联 AI Worker]
+  Q --> SW[评分与策略 Worker]
+  Q --> IW[索引 / 通知 Worker]
+  CW --> OBJ[(S3 对象存储 原始快照)]
+  CW --> PG
+  AW --> PG
+  AW --> MG[受控模型网关]
+  SW --> PG
+  IW --> OS[(OpenSearch 全文投影)]
+  IW --> V[(pgvector 热向量投影)]
+  API --> OS
+  API --> V
+```
+
+## 2. 技术栈提案与取舍
+
+| 层 | 建议 | 理由及限制 |
+|---|---|---|
+| 前端 | React + TypeScript + Vite + TanStack Router/Query/Table | 两端一套交互、URL 状态和表格；不用 SSR 承担私有后台 |
+| 设计系统 | Tailwind CSS tokens + Radix primitives + 自有 domain components | 一处维护焦点、表单、密度和语义颜色；不以库默认皮肤当完成 |
+| 图表 | Apache ECharts，文字表格等价输出 | 时间线与贡献图；避免雷达图成为唯一解释 |
+| 后端 | Python + FastAPI + Pydantic + SQLAlchemy + Alembic | 抓取与 AI 工具生态、类型合同和事务；领域逻辑不依赖框架 |
+| 事实库 | PostgreSQL，decimal、JSONB、分区与行级安全 | 原子状态／outbox、时点查询与版本，避免双真源 |
+| 异步 | Celery + Redis broker，Postgres job ledger / outbox | 适合中等规模；Redis 不是持久任务真源，丢队列可从 ledger 重建 |
+| 检索 | OpenSearch 中文分词 + 原生 BM25；pgvector 热语义 | 股票代码精确检索与全文是必需；向量选配并按需分层 |
+| 证据 | S3 兼容对象存储 | 哈希快照、保留权限；商业发行版／自建许可和费用上线前核实 |
+| 身份 | OIDC 适配器，开发隔离模拟身份 | 服务端验证 issuer/audience/expiry；不得把开发入口部署生产 |
+| 工程 | uv、pnpm、pytest、Ruff、mypy、Vitest、Playwright、Storybook | 锁版本、可复现、边界测试；不预填未来“最新版本” |
+| 部署 | OCI 容器；开发 Compose；生产容器平台／托管服务二选一 | 先预算和恢复能力后定主机，首期不强制 Kubernetes |
+
+版本须在实施选型时验证支持周期、兼容性及许可证，记录 lockfile/SBOM。此阶段未安装依赖，技术名不是已验证运行环境。
+
+## 3. 模块接口与责任
+
+- ingestion：计划、检查点、采集结果、原始对象提交，外部源通过 SourceAdapter 变化。
+- identity：公司、证券、别名和有效期关系图；唯一负责身份合并与拆分。
+- information：规范文本、证据定位、讯息修订和事件归并。
+- analysis：候选、模型结果、复核和已批准关联／影响；提交建议，不直接改策略状态。
+- fundamentals：财务、行情、FX 和公司行动规范化；输出有单位、有时间和质量标记的指标。
+- scoring：输入固定快照，返回维度、贡献、覆盖和解释；不读网络、不发送通知。
+- strategy：AST 校验、版本、确定性评估、状态转移；唯一拥有 membership。
+- notification：站内与 delivery，订阅和渠道；发送幂等，不能改判断。
+- search：全文／向量投影和 ACL 过滤，重建不改变业务真源。
+- governance：权限、审计、模型及源策略、成本账本。
+
+模块间只能调用公开应用接口或消费已版本化事件，不能互相更新私有表。初期一库按表责任分组，服务端事务可以跨本次必需的状态、审计和 outbox；不实施全量 event sourcing。
+
+## 4. 未来代码组织（目标，不是已存在实现）
+
+```text
+apps/web/src/{app,features,design-system}
+apps/api/src/{modules,platform}
+workers/src/{ingest,analysis,score,index,notify}
+packages/api-client/      # 从 OpenAPI 生成，不能手改
+contracts/               # Schema 与跨端事件合同
+config/                  # 标准策略与行业维度模板
+migrations/              # 版本化数据库迁移
+infra/                   # 配置模板，无真实密钥
+qa/                      # 合成场景、E2E、负载与演练
+```
+
+保持单一 monorepo；前端不复制规则计算，只显示后端 evaluation 的解释。Python 类型从 JSON Schema 或同一后端 DTO 导出，前端客户端从发布 OpenAPI 生成，CI 防漂移。所有钱和精确指标 API 用 decimal 字符串；百分比 decimal ratio，展示层做格式化。
+
+## 5. 处理及一致性
+
+外部抓取至少一次，持久化幂等键消重，后续每阶段 task ledger 唯一键 = stage+entity_revision+algorithm_version+mode。领域业务变更与 outbox 同事务。消息包含 ID／revision／trace，不放正文、凭证。消费者先按 ID 取得已提交输入，再领取租约、执行、提交输出和新 outbox；提交后 ACK。
+
+队列丢失由 sweeper 重新投递 ledger 的 due 任务；定时调度使用数据库唯一约束防止多 scheduler 重复创建。长任务用 lease+heartbeat；过期租约用 fencing generation 拒绝旧 worker 的迟到提交。禁止声称队列带来 exactly-once，保证业务效果幂等。
+
+对象存储上传与数据库不跨系统事务：临时对象→验证 hash→记录 revision/reference→标记对象 committed；孤儿在保留期后由带 dry-run 的清理流程处理。对象写成功、DB 失败必须能用相同内容 hash 重试；hash 不作为跨 workspace 可枚举 URL。
+
+评分 run 固定 source manifest 与算法版本。只发布 complete 的整组 snapshot；失败不替换当前成功版本。公司和证券关联 snapshot 通过 manifest 固定，不能混用一半新财报一半旧 FX。发布采用 expected_generation CAS，输入有新版本时旧 run 保留但不覆盖最新指针。
+
+## 6. 扩容与降级
+
+先以 10 万份合成讯息校准，达到 100 万、1,000 万量级分别测索引、查询、重建。财务／评分按时间和 workspace 分区，search 按月份 rollover，原始对象 lifecycle 按来源权利配置。热向量最多 90 天起步，pgvector 达瓶颈后再评估独立向量库；跨库迁移按相同 chunk ID 双写影子比较后切读，PG 仍是真源。
+
+全文故障：业务公司列表与时间线从 PG 使用结构化索引可用，搜索页面明确降级；语义故障退回全文；模型故障保留规范化证据和人工队列；行情源失败策略 UNKNOWN；通知故障留站内主记录。不能把采集失败显示成“无新闻”。
+
+不预先加入 Kafka、Temporal、多 Agent 协调、分布式图数据库。只有无法达到实际 SLO、工作流跨日人工恢复确实复杂或队列吞吐形成瓶颈，才用 ADR 决定升级。
+
+
+===== SOURCE: docs/04-data-design.md =====
+
+# 04 数据模型、时间与约束
+
+## 1. 数据分层
+
+对象存储保留获许可原文和快照，PostgreSQL 保存身份、结构化事实、已批准判断和状态；OpenSearch／向量库保存带 ACL 的可重建索引。每条派生结果能追到 source、item_revision、chunk/证据定位、分析版本、人工判断、评分快照和策略评估。
+
+关系图：workspace→source→ingestion_run→item→item_revision→evidence；item_revision↔event_revision；item_revision/event_revision↔company；company→security→price_bar；company→financial_fact/baseline→score_snapshot；security+score_snapshot+strategy_release→evaluation→membership_transition→notification→delivery。
+
+## 2. 表设计（逻辑结构；物理迁移在 M0 完成）
+
+所有 ID 为 UUID；金额、比例和精确指标 numeric，禁止 float 进入财务计算。审计时间 UTC timestamptz；原始时区与日期粒度保留。事实修订不能 UPDATE 内容；可变指针、任务租约、membership 与草稿是明确例外。
+
+| 表 | 核心字段／关系 | 唯一约束与写责任 |
+|---|---|---|
+| workspace / membership_user | workspace_id, user_id, capabilities, scope | workspace+user；governance |
+| source | workspace, name, adapter, policy_id, credential_ref, version, enabled | workspace+source_key；ingestion；secret 不入表 |
+| source_policy | allow_fetch/store/analyze/export, ACL, expiry, retention, approval_ref | source+version；批准后的权利版本不可变 |
+| source_schedule | source, partition, cron, timezone, generation, next_due | source+partition+generation；调度变更留审计 |
+| ingestion_run / checkpoint | source, partition, due_at, mode, manifest, cursor, holes | run(source,partition,due,generation)；checkpoint 乐观版本 |
+| raw_object | workspace, object_key, sha256, size, mime, policy, status | workspace+source+content_hash；保留 rights provenance |
+| information_item | source, external_id, canonical_url_hash, latest_revision_id | source+external_id；无 external_id 才用 source+URL hash |
+| item_revision | item, content_hash, object, normalized_hash, published_at, observed_at, parse_version, supersedes, status | item+content_hash+parse_version；一份内容可有不同解析修订 |
+| evidence | revision, locator_kind, start/end or cell, quote_hash, text, source_quality | revision+locator+quote_hash；不可把摘要当原文 |
+| company / company_alias | legal identity, market identifiers, alias language/context, valid range | 内部 company_id 稳定；同名不唯一 |
+| security | company, exchange, symbol, ISIN, share_class, currency, valid range | exchange+symbol+有效期不得重叠；跨市场不只按 ticker |
+| company_relation | from/to, type, ownership, valid range, known_at, evidence | 带有效期、版本和来源；合并／拆分留映射历史 |
+| analysis_run | revision, model/prompt/schema versions, input_hash, usage, decision | input+versions+mode；原始模型响应受控保留与脱敏 |
+| item_company_link | item_revision, company, type, relevance, confidence, evidence, status | revision+company+type+analysis_revision；approved 指针唯一 |
+| event / event_revision | event_id, action/object, event_time/range, claims, status, known_at, supersedes | 语义相似不能作为唯一键；人工可拆／合并 |
+| event_evidence | event_revision, item_revision, evidence, stance | event_revision+evidence；stance=support/refute/context |
+| event_company_impact | event_revision, company, dimension, signed_impact, relevance, confidence, half_life, valid_until, review | event_revision+company+dimension+decision_revision |
+| review_decision | subject_revision, action, reason, evidence, actor, expected_version | append-only；修正创建新决策，不改旧决定 |
+| financial_fact | company, metric, fiscal_period, report_type, consolidated, currency, unit, value, announced_at, observed_at, revision | company+metric+period+口径+source+revision |
+| price_bar / fx_rate / corporate_action | security/FX pair, market_session/effective_at, raw_close, currency, source, observed_at, revision | 同 source 同 session+revision；保留纠错和原始价格 |
+| baseline_dimension | company, dimension, score, rubric, evidence, valid range, known_at, absorbed_events | company+dimension+revision；明确已吸收 contribution IDs |
+| metric_snapshot | security, as_of, input_manifest, metric_version, values, quality | input_hash+version；decimal JSON 用字符串 |
+| score_snapshot / score_dimension / score_contribution | company, as_of, manifest, model_version, coverage, quality, baseline, contributions | company+input_hash+model_version；完整发布指针 CAS |
+| strategy / strategy_version / strategy_release | workspace, owner, config, hash, parent, approval, active_from | strategy+version；发布版本不可变且禁止修改 active 内容 |
+| strategy_evaluation | release, security, market_session, context_hash, rule_results, mode, known_at | release+security+session+context_hash+mode；不可覆写 |
+| strategy_membership | release, security, confirmed_state, display_state, pending_sessions, generation, evaluation | release+security；锁／CAS 是唯一状态写入口 |
+| membership_transition | membership, from/to, reason, evidence_snapshot, evaluation, transition_seq | membership+seq；事件唯一且 append-only |
+| subscription / notification / delivery | user, strategy/security, channels; transition/risk+recipient; attempt/status/provider_ref | delivery(notification,recipient,channel)；去重键永久保留到策略审计期限 |
+| job / outbox / inbox_dedupe | stage, entity_revision, mode, generation, lease, attempts; event_id | job 唯一业务键；inbox(consumer,event_id)；原子写 |
+| audit_event | actor, workspace, action, object_revision, request_id, before/after hash, reason | append-only；受控脱敏，不能保存 secret 值 |
+
+默认 workspace 私有，所有查询包含 workspace/ACL。市场公共主数据可复用全局只读层；只有获许可公共事实允许进入共享层，私有笔记、判断和策略不进入。关联表要求复合外键保证同 workspace，不能只依赖前端过滤。
+
+## 3. 时间语义与历史查询
+
+- event_time：现实发生时间；可能只有日期／时间范围，精度字段不可省略。
+- published_at/announced_at：来源公开发布时间；不能直接替代发生时间。
+- observed_at：系统第一次获得某修订的时间，不回填为旧发布日期。
+- valid_from/to：某经营关系或人工判断适用的业务区间，半开 [from,to)。
+- known_at：某结构化判断可供系统使用的最早时间，至少不早于全部输入 observed_at 和人工批准时间。
+- evaluation_as_of：研究所针对的市场时点；knowledge_cutoff：允许使用知识的截止时间；generated_at：实际运算完成时间。
+
+实时：evaluation_as_of≤knowledge_cutoff≤生成时点。无未来数据历史回放：知识可用时间≤当时 knowledge_cutoff，财报采用 announced_at 与 observed_at 同时满足的版本；晚到材料只能影响其系统实际知悉之后的状态。另提供 research_reconstruction 模式按当时公开时间重建，但明确“不代表系统当时已知”，默认不发送通知，禁止与 live 历史混合统计。
+
+后来修订的财报、别名、关系、复核不可穿越回去覆盖旧判断。历史快照固定算法、prompt、来源修订及 ACL 政策版本；重算生成新的 run。仅重放已有结构化产物能严格确定性；重新调用模型称为 reanalysis，不承诺相同输出。
+
+时间线默认事件发生时间；未知时显示“发布时间代用”，不假造顺序；可以切换“我何时得知”。同时间使用 stable event_id tie-breaker；筛选和游标查询固定 snapshot，新增数据提示刷新而不打乱阅读位置。
+
+## 4. 质量与新鲜度合同
+
+quality 状态 valid/missing/stale/conflicting/unsupported/pending_review/suspended，各有 reason_code 与 required_action。null 与“不适用”和“值为 0”不同。财务源优先次序由获许可来源合同确定，冲突不平均解决；货币不同不直接拼比率；累计季报需转单季时记录相减来源，TTM 用四季或年度+本年累计-去年同期，严防重复求和。
+
+行情新鲜度参照 exchange_calendar 与最后应有的 market_session，而不是距现在 24 小时；节假日和停牌独立处理。财务的 180 日仅为示范 maximum announced age，未来可按市场披露周期和指标类型配置。过期保留旧值用于解释，但 evaluation quality gate 不可使用。
+
+## 5. 关键索引和容量
+
+PG 索引：(workspace,company,event_time desc,event_id)、(workspace,security,market_session desc)、(company,metric,fiscal_period,known_at desc)、(release,security,as_of desc)、job(status,next_attempt)、outbox(published_at null)、audit(workspace,time)。策略列表从已完成 snapshot 的读模型分页，禁止前端逐行 N+1 获取评分。
+
+OpenSearch mapping：keyword company_id/security_id/source/ACL，date 时间，中文 analyzer 正文，title 较高权重；股票代码 keyword 优先精确命中，不分词；源权利／撤销 tombstone 同步所有投影。向量记录 chunk_id、embedding_model/version/dim、内容 hash、workspace、ACL、日期；不同 model namespace 禁止混算距离。
+
+数据保留期限由 source_policy 驱动：原文撤回或到期后关闭证据访问，删除受控投影并记录 tombstone；审计保留哈希／引用及“依据已不可访问”，不为重现违规保留全文。备份到期清理与恢复后再施加 tombstone 是合同的一部分。默认保留期限是待决定的运行配置，不强行永久存全部原文。
+
+[END PART 2/6]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

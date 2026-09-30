@@ -1,43 +1,68 @@
-# 价值投资策略管理系统 v0.1 · GPT Pro 整包评审材料
+你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.1 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.2 改进版。请使用中文。不需要我上传任何附件。
 
-日期：2026-09-30。设计为提案、系统尚未实现。只含本次新生成设计、合成例子及材料检查。
+### 材料读取方式
 
-请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。
+仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
 
-## 文件目录与 SHA-256
+1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
+2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…10 的全部文件、docs/adr/0001-architecture-and-truth.md、config/ 的两份配置、contracts/ 的说明及三份 Schema、examples/ 的三份合成例子。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
+3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
+4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
 
-| 文件 | SHA-256 |
-|---|---|
-| `README.md` | `64b1db8e1b1f0b9c3e14478673c561f229855e2772dce6a2f7a29ceb28aa82c9` |
-| `CONTEXT.md` | `e5d1504f91ebe202f1d514ee789799ae0c9542574ebd75931c953996897aee8d` |
-| `AGENTS.md` | `37b9364e8eda52e1f81b111e91e702ae058c3a2c66ab5bfa0471993720a65b6a` |
-| `docs/01-product-requirements.md` | `d1a5b3660e13423ae5c712e1d1b2d772d51eb12d11dc7580cae9fd721d79619d` |
-| `docs/02-business-design.md` | `729d7b3996ca5ef7edfd26ca48f468a6bf1b3240a4fa0d0d466ec9c442c6cddf` |
-| `docs/03-architecture.md` | `8e07a7cff9299651f0098f54b839b32a7a68f17c805ad6a12a1e495aceedf55d` |
-| `docs/04-data-design.md` | `21e24d6ad58082fb41968cd79fa38a06efe9231758bdeadb5a38151e0d84d51e` |
-| `docs/05-api-and-jobs.md` | `7ba5bdbfca7d0cada21aa1318864aec80c94dcdc3d5d449c24f70e13ab8e4516` |
-| `docs/06-ux-and-design-system.md` | `1002376822744d32ecdb82a56eae4b81773a06e080fd313cd26eac00128f3b65` |
-| `docs/07-ai-and-retrieval.md` | `2f8e894b7ae2423825548ceaa8b92f74d5426491bd79904b82813929edd2abaa` |
-| `docs/08-security-and-operations.md` | `0b490ff57c9b07d1db57be25694f19d34a3c8424f313e5341ae3f9519d78c8b8` |
-| `docs/09-delivery-plan.md` | `de4d37d9ff81961064369b1f2c27fb57eec07f3139ad6419052ebdc3f616dba4` |
-| `docs/10-acceptance.md` | `206bf7b62494c29ad381b4e090839d0a8cc691be1b5fdd7c9ce52eb1e4a4a8e9` |
-| `docs/adr/0001-architecture-and-truth.md` | `12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1` |
-| `config/scoring-standard-v1.json` | `316cce28979857ef98e6f74e3d5b1b1d8668601cac84a433678365f3f3c4c76f` |
-| `config/strategy-standard-v1.json` | `493730a89578ac94f8f391311e78b9432256493714ae164616b73ef866682cde` |
-| `contracts/README.md` | `ce775c8a35d15fa7e971ebbcea3d6d664b715f0022df5673ec74548545d1cb2b` |
-| `contracts/analysis-result.schema.json` | `3f1fe36006bd36a23fdbe43078840ae88b60318a991b84dbbab7b804869961f4` |
-| `contracts/job-event.schema.json` | `5413451ab535640271546b2544f13d2cfaa8f33a234b518e83eaef2ec04f215f` |
-| `contracts/strategy.schema.json` | `53fd4ae8c897045ed0c2050755c05c6868731ff3419d5d0ffa699f97a79f236a` |
-| `examples/analysis-proposal.json` | `d25a968addf37999ce43f75f4f469e12de81c99e5bc2c041009b496ecf597faa` |
-| `examples/job-event.json` | `d16ddd7b7eb29d6dcf4b2bf21df370816dc02fa7568f3f1c29a206c471bbe37c` |
-| `examples/state-machine-cases.json` | `eac51f3acbc2b821c8349b4e975a7f1ef805e6b990393d408fc107c03b9a1825` |
-| `review/GPT-PRO-PROMPT.md` | `6e2fcfbe3e29b2555a85c9088d3fe3893aef40468a463a303b4205a05d99cc13` |
-| `review/validation-result.json` | `2d5a80bd315b94ae75b1418d2f8bb06ccea0a95a61480cf42a1ed6ab6d8b5427` |
+### 我的目标与已确认范围
+
+我要构建一套价值投资研究与策略管理系统，首版覆盖 A 股和港股，最终有管理端和业务端：
+
+1. 从多个平台按指定要求定时采集，保存可信原始资料和结构化数据，建立全文/语义检索。
+2. 每条讯息关联零到多家公司，给出关联类型、关联度、置信度和可定位依据。
+3. 每家公司有去重的事件时间线，可以看其所有讯息、关联得分、影响和来源。
+4. 公司自身经营／商业模式有长期维度；事件对维度的影响与财务、证券价格/估值共同形成可解释的多维评分体系。
+5. 人维护价投策略，定义候选区间；公司对应证券进入区间时提醒，跌出时告警；缺数据、策略变更、历史重算与真实变化需区分。
+6. 工程规范严格、可测试、可恢复、可运维；前端逻辑高度符合人类思维，UI 一致、信息清楚、体验优秀。
+
+策略投资理论不是本项目主要难点。给一个可用的、明确口径的标准版本，后续人类维护自己的规则。请把主要精力放在全流程框架、工程落地和优秀产品体验，不扩张为自动交易、收益预测、投资组合执行或研究复杂量化策略。没有真实数据供应商、部署平台、预算或模型外传批准，不允许假装这些已经落实。
+
+### 评审要求
+
+完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把 v0.1 当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
+
+逐项挑战以下内容：
+
+- 业务闭环：采集→快照→规范化→公司关联→事件归并→维度贡献→公司评分→证券估值→策略状态→通知→人工纠错，是否有缺失或不可能实现的假设。
+- 领域模型：公司/证券、讯息/事件、关联度/置信度/影响、经营质量/估值/覆盖、策略评估/确认状态/通知是否互相混淆。A/H、多类股、母子关系、简称和证券身份是否准确。
+- 时间与金融数据：财报公告、发生/观察/知悉时间、修订、晚到、TTM、累计季度、FX、股本与公司行动、停牌和两地交易日历；历史评估是否泄漏未来知识。
+- 评分：重复新闻、同事实多次贡献、基准吸收、缺失维度、子覆盖、分母异常、事件衰减、强负面风险。数字与 JSON 配置是否一致，默认公式能否确定性实现。
+- 策略：受限 AST、三值逻辑、滞回、不同 session 确认、UNKNOWN恢复、基线、发布/回滚、风险优先级、历史重算静默；存在歧义就用反例推演，不以含糊“支持防抖”带过。
+- 一致性与恢复：业务状态/outbox 原子性、重复任务、lease fencing、慢结果、并发编辑、消息丢失、对象存储非原子提交、通知发送未知、索引重建。不能宣称不现实的端到端 exactly-once。
+- 采集与模型：来源权利、限制、成本、标注/校准、证据定位、prompt injection、人工复核能力与容量；外部平台能力和厂商现价需要独立核实并注明日期，未核实则标未验证。
+- 工程架构：选择是否适配小团队、类型合同是否单源、Schema 是否足够、API/数据/任务/模块所有权是否明确，索引和向量容量是否现实，安全/ACL/权限与秘密有无遗漏。
+- 产品体验：真实用户的研究路径、两端信息架构、A/H切换、日期/未知/低覆盖的理解、表格/图表、草稿与冲突、提醒与证据、键盘和移动阅读、设计系统所有状态。请产出具体页面规格与有测量方法的用户任务，不只说“简洁现代”。
+- 交付：里程碑、人员、依赖、成本估算、需求—设计—任务—验收追踪、CI/迁移/发布/回滚/UAT，是否足以让团队从第一个纵向切片开始开发。
+
+可以使用公开资料核实技术或金融口径，但不得外传本材料到其他公共服务，不得假装读取真实账号或数据库，不得自动创建仓库、部署或发送消息。禁止编造收益、数据质量、压测、模型性能或 UI 验收结果。v0.2 必须区分：已确认需求、保留的设计决策、你的改动提案、需要我决定的业务项、尚未实现/验证项。
+
+### 必须产出的结果
+
+A. 评审结论：是否可进入实施；按阻断/重要/建议给出问题清单。每个问题包含源文件与章节、具体反例、后果、修复方案与对应 R/W/T ID。无证据的担忧不要升级阻断。区分当前阶段设计缺口与将来实施验证，不用“产品还没实现”否定本次设计交付。
+
+B. v0.2 完整方案与详细设计：请直接输出完整修订内容，不能只给修改建议或一句“沿用原稿”。至少覆盖产品需求、业务、架构、数据、API/任务、UX、AI/检索、安全运维、实施计划、验收、标准配置与关键 JSON Schema。可以在一个整合文档里按原路径组织，以便我拆分落盘；大篇幅时先给完整主文和改动的合同文件，再通过后续消息给出其余完整章节，不把未输出部分声称已完成。保留所有已确认需求和稳定 IDs；新增 IDs 追加，不能悄悄删减范围。
+
+C. 至少 12 个跨模块反例推演：从具体输入／时间／并发条件开始，逐步写出应有事实、分数/unknown、策略状态、通知和恢复。至少包括：多公司/无关联、A/H、不同市场休假、停牌、财报修订、晚到、重复转述、来源冲突、缺失覆盖、UNKNOWN恢复、并发重算、策略发布、外部发送未知、权限撤销后恢复备份。可以合并相近场景，但每个要求有覆盖映射。
+
+D. 明确标准策略与评分的唯一数字真源，并检查示例、Schema、业务文档和验收序列一致。提供受限 AST 的语义规则、量纲、不适用行业、缺失数据和默认行为。不要把启发式 score 当收益概率。
+
+E. 一份可立即开始的首个开发切片任务书：边界、依赖、合成输入、模块/API/数据合同、页面、正常/失败/权限/恢复用例、通过条件、交付物和停止条件；后续里程碑以这个闭环递进。
+
+F. 不超过 8 个必须由我决定的问题，每题给推荐选择和业务影响；不影响当前方案的细节使用显式合理假设，不先停下来问几十个问题。
+
+G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影响哪些合同/测试、保留什么、仍未验证什么。评审阶段不授权实施，技术提案不得伪装为我的已确认决定。
+
+请先给关键判断，然后给完整结果。优先具体、可实施和可验证，避免空泛愿景和重复免责声明。如果发现 v0.1 有正确且足够的设计，保留并简要说明；只有带来明显业务或工程价值时才增加复杂度。
+
+[REVIEW_MATERIALS_BEGIN]
 
 
----
-
-# 文件：README.md
+===== SOURCE: README.md =====
 
 # 价值投资策略管理系统
 
@@ -90,9 +115,7 @@ python3 tools/build_review_pack.py
 工具只读设计文件、生成评审包与材料检查结果，不连接数据库或外部平台。校验不能替代系统验收。设计修改后重新生成整包；仓库不保存真实平台内容、持仓、密钥或账号资料。不声明开源许可，公开和实施另行决策。
 
 
----
-
-# 文件：CONTEXT.md
+===== SOURCE: CONTEXT.md =====
 
 # 价值投资研究与策略监控领域
 
@@ -137,9 +160,7 @@ python3 tools/build_review_pack.py
 **提醒／告警（Notification）**：由已确认状态转移或重大风险引起、面向订阅人的研究提示。避免：收益承诺、买卖指令。
 
 
----
-
-# 文件：AGENTS.md
+===== SOURCE: AGENTS.md =====
 
 # 价值投资系统实现协作规则
 
@@ -158,9 +179,7 @@ python3 tools/build_review_pack.py
 任务完成后更新本次影响的文档与验证证据；需要改变合同或阶段范围时先说明原因、风险和受影响对象。
 
 
----
-
-# 文件：docs/01-product-requirements.md
+===== SOURCE: docs/01-product-requirements.md =====
 
 # 01 产品需求与范围
 
@@ -228,9 +247,7 @@ D-01 首批供应商和合法数据权利；D-02 用户范围、部署地区和�
 这些决策不阻止文档交付，相关接入和生产实施必须在决定后进行。确认策略不是授权真实交易。
 
 
----
-
-# 文件：docs/02-business-design.md
+===== SOURCE: docs/02-business-design.md =====
 
 # 02 业务详细设计
 
@@ -339,9 +356,7 @@ PE TTM、PB、现金流收益率属于 security，不属于 company。行情、�
 示例公司“示例制造”持有 SYN-A 和 SYN-H 两个同权证券，均为合成 ID。已批准质量分 72、覆盖 1.0。A 证券 V=68，H 证券 V=45：A 的两个有效交易 session 满足进入条件后入选，H 在区间外。次日同一订单事件出现 5 篇转载，只计一个贡献；当财报吸收订单收入，撤去已吸收贡献。A 行情采集失效时显示待评估、保留 IN，不发退出。随后确认现金流及债务风险达到已批准硬风险条件，触发一条 RISK，保留证据链。完整演练用合成数据，不声称识别真实投资机会。
 
 
----
-
-# 文件：docs/03-architecture.md
+===== SOURCE: docs/03-architecture.md =====
 
 # 03 工程架构与技术框架
 
@@ -439,9 +454,7 @@ qa/                      # 合成场景、E2E、负载与演练
 不预先加入 Kafka、Temporal、多 Agent 协调、分布式图数据库。只有无法达到实际 SLO、工作流跨日人工恢复确实复杂或队列吞吐形成瓶颈，才用 ADR 决定升级。
 
 
----
-
-# 文件：docs/04-data-design.md
+===== SOURCE: docs/04-data-design.md =====
 
 # 04 数据模型、时间与约束
 
@@ -520,9 +533,7 @@ OpenSearch mapping：keyword company_id/security_id/source/ACL，date 时间，�
 数据保留期限由 source_policy 驱动：原文撤回或到期后关闭证据访问，删除受控投影并记录 tombstone；审计保留哈希／引用及“依据已不可访问”，不为重现违规保留全文。备份到期清理与恢复后再施加 tombstone 是合同的一部分。默认保留期限是待决定的运行配置，不强行永久存全部原文。
 
 
----
-
-# 文件：docs/05-api-and-jobs.md
+===== SOURCE: docs/05-api-and-jobs.md =====
 
 # 05 API、异步任务与并发合同
 
@@ -602,9 +613,7 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 前端只调用生成客户端；TanStack Query keys 包括 workspace、filters、snapshot，切换 workspace 清除敏感缓存。写成功按后端返回 revision 精确失效相关 query，不强制整页刷新。未知任务状态显示“等待更新”并提供 request_id。核心通知与任务更新可 SSE（只发 ID、质量／进度），断线退回有限轮询；SSE 不必保证消息持久性，刷新从事实库取得正确状态。
 
 
----
-
-# 文件：docs/06-ux-and-design-system.md
+===== SOURCE: docs/06-ux-and-design-system.md =====
 
 # 06 前端信息架构、交互与设计系统
 
@@ -685,9 +694,7 @@ T-UX-01：5 名目标用户完成“新提醒→理解原因→原始证据→�
 目标可用于首轮小样本研究，不能当统计意义的普遍结论。M1 用交互原型先测导航和术语，M4 再测真实 UI。视觉检查含所有状态、两个代表性桌面、两个手机视口、200% 缩放、键盘和屏幕阅读抽测；截图基线只防回归，不能替代人类可用性测试。
 
 
----
-
-# 文件：docs/07-ai-and-retrieval.md
+===== SOURCE: docs/07-ai-and-retrieval.md =====
 
 # 07 AI 分析、关联与检索设计
 
@@ -739,9 +746,7 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 成本估算公式：每日日分析成本 = N分析 × (平均输入token×输入单价 + 平均输出token×输出单价)；加 embedding、重试、运维、人审成本。默认先用廉价模型候选提取，高影响提升人工优先级；更强模型仅按获批准任务政策调用。预算必须在首批来源选择和抽样后确认。
 
 
----
-
-# 文件：docs/08-security-and-operations.md
+===== SOURCE: docs/08-security-and-operations.md =====
 
 # 08 安全、运维与可靠性
 
@@ -803,9 +808,7 @@ PG 定期全备+WAL、对象受权利约束版本备份，至少按季度隔离�
 发现任何 ACL 泄露、未来数据污染历史、重复实际发送、部分失败被显示为有效结果、无出处强影响生效、无权源可抓取／分析、开发身份入口在生产可用，都阻断上线。可选功能、更多数据库或全机型测试不阻断本次已定义 slice。
 
 
----
-
-# 文件：docs/09-delivery-plan.md
+===== SOURCE: docs/09-delivery-plan.md =====
 
 # 09 实施规划与工程规范
 
@@ -869,9 +872,7 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 先 50–100 家用户选定公司、两个市场、已许可数据源、少量内测人员；同时运行标准策略 shadow 和人工核验。达到 M5 出口才开启站内 live 状态提醒；外部发送独立授权。异常可逐源／逐策略关闭，不删历史。试运行记录是否实际符合研究流程，不用收益指标为首版流程验收背书。
 
 
----
-
-# 文件：docs/10-acceptance.md
+===== SOURCE: docs/10-acceptance.md =====
 
 # 10 验收矩阵与证据要求
 
@@ -940,9 +941,7 @@ T-UX-01、02、03 的用户任务与指标以 06 §7 为唯一详细定义。模
 数据库前确认服务器位置、环境、数据性质和作用域；真实源／通知只运行获授权最小验证并回读真实结构；UI 标明模拟或真机，性能标明数据量。正式签收至少产品/研究负责人、工程负责人共同确认本 slice 的 mandatory 项；可选增强不作为额外强制审查轮次。
 
 
----
-
-# 文件：docs/adr/0001-architecture-and-truth.md
+===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
 
 # 模块化单体与可重建检索投影
 
@@ -955,11 +954,8 @@ T-UX-01、02、03 的用户任务与指标以 06 §7 为唯一详细定义。模
 OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
 
 
----
+===== SOURCE: config/scoring-standard-v1.json =====
 
-# 文件：config/scoring-standard-v1.json
-
-```json
 {
   "schema_version": "1.0",
   "model_key": "scoring-standard-v1",
@@ -1048,14 +1044,10 @@ OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可
   "minimum_submetric_coverage": "0.80",
   "minimum_company_coverage": "0.80"
 }
-```
 
 
----
+===== SOURCE: config/strategy-standard-v1.json =====
 
-# 文件：config/strategy-standard-v1.json
-
-```json
 {
   "schema_version": "1.0",
   "strategy_key": "value-standard",
@@ -1176,12 +1168,9 @@ OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可
     ]
   }
 }
-```
 
 
----
-
-# 文件：contracts/README.md
+===== SOURCE: contracts/README.md =====
 
 # 合同目录
 
@@ -1198,11 +1187,8 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
 本阶段工具用 Python 标准库做有限的合同形状、范围与示例一致检查，并逐文件检查 JSON 语法和 Schema 本地引用；没有安装完整 JSON Schema validator，正式 draft 2020-12 validation 属于 M0 未运行项。此限制在 validation-result 中明列，不能将文档检查说成业务验收。
 
 
----
+===== SOURCE: contracts/analysis-result.schema.json =====
 
-# 文件：contracts/analysis-result.schema.json
-
-```json
 {
   "type": "object",
   "additionalProperties": false,
@@ -1372,14 +1358,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     }
   ]
 }
-```
 
 
----
+===== SOURCE: contracts/job-event.schema.json =====
 
-# 文件：contracts/job-event.schema.json
-
-```json
 {
   "type": "object",
   "additionalProperties": false,
@@ -1474,14 +1456,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Durable job reference event"
 }
-```
 
 
----
+===== SOURCE: contracts/strategy.schema.json =====
 
-# 文件：contracts/strategy.schema.json
-
-```json
 {
   "type": "object",
   "additionalProperties": false,
@@ -1741,14 +1719,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     }
   }
 }
-```
 
 
----
+===== SOURCE: examples/analysis-proposal.json =====
 
-# 文件：examples/analysis-proposal.json
-
-```json
 {
   "schema_version": "1.0",
   "item_revision_id": "00000000-0000-4000-8000-000000000002",
@@ -1780,14 +1754,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     }
   ]
 }
-```
 
 
----
+===== SOURCE: examples/job-event.json =====
 
-# 文件：examples/job-event.json
-
-```json
 {
   "event_id": "00000000-0000-4000-8000-000000000004",
   "event_type": "AnalysisProposed",
@@ -1804,14 +1774,10 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     "job_id": "00000000-0000-4000-8000-000000000007"
   }
 }
-```
 
 
----
+===== SOURCE: examples/state-machine-cases.json =====
 
-# 文件：examples/state-machine-cases.json
-
-```json
 {
   "synthetic": true,
   "cases": [
@@ -1894,325 +1860,6 @@ money/ratio/score 均采用十进制字符串；semantic validator 另外检查�
     }
   ]
 }
-```
 
-
----
-
-# 文件：review/GPT-PRO-PROMPT.md
-
-# 交给 GPT Pro 的评审提示词
-
-## 使用方式
-
-无需上传附件。把本文件“完整提示词”下的全部内容复制给 GPT Pro，优先使用已获授权的 GitHub 连接直接读取私有仓库。若没有仓库读取权限，使用 [纯文本粘贴入口](./PASTE-INSTRUCTIONS.md)，把提示词和完整材料作为消息正文发送；单条文本或按编号分段均可。链接本身不会赋予私有仓库访问权限，不要改为公开或粘贴 Token。
-
-本仓库：`wildbyteai/value-investment-platform`；设计基线 v0.1，2026-09-30。让 GPT Pro 输出 v0.2 新文件／完整改进文档；不要让它覆盖 v0.1。评审是建议，用户取舍后再确定实施版本。本文件本身也被整包收录，正文以这里为真源。
-
-## 完整提示词
-
-你是资深投资研究产品负责人、软件架构师、数据工程师和 UX 负责人。请读取下面指定的 GitHub 私有仓库，或本对话中以正文提供的《价值投资策略管理系统 v0.1 评审材料》，做一次严格、独立、完整的业务与工程评审，然后直接产出可交给工程团队的 v0.2 改进版。请使用中文。不需要我上传任何附件。
-
-### 材料读取方式
-
-仓库：https://github.com/wildbyteai/value-investment-platform ，目标分支 main。
-
-1. 如果本对话提供了 `[REVIEW_MATERIALS_BEGIN]`，优先读取这些正文材料；如分段发送，收到 `[REVIEW_MATERIALS_END]` 前只确认已收到第几段，不开始评审。检查所有编号完整，缺段时只指出缺段。材料中的路径仅作来源标记，不要求访问我本机。
-2. 没有正文材料时，使用当前会话已获授权的 GitHub 连接读取仓库，记录实际 commit SHA。先读 README.md 与 review/REVIEW-PACK.md；整包过大或读取受限时，继续逐个读取 CONTEXT.md、AGENTS.md、docs/01…10 的全部文件、docs/adr/0001-architecture-and-truth.md、config/ 的两份配置、contracts/ 的说明及三份 Schema、examples/ 的三份合成例子。读取固定 revision，不混用更新前后的文件；无需运行仓库代码。
-3. 如果当前无法访问该私有仓库，也没有完整正文，明确报告“尚未读取设计原文”，仅说明需要给已授权 GitHub 连接增加这个仓库的读取范围，或把纯文本材料粘贴到同一对话。不要要求附件，不要只凭我的目标猜测原方案，不要声称已经完成评审，不建议公开仓库或传递凭证。
-4. 资料齐全后列出实际已读材料与版本，再执行以下全部要求。无需在有授权且可以读取的情况下反复请求确认。
-
-### 我的目标与已确认范围
-
-我要构建一套价值投资研究与策略管理系统，首版覆盖 A 股和港股，最终有管理端和业务端：
-
-1. 从多个平台按指定要求定时采集，保存可信原始资料和结构化数据，建立全文/语义检索。
-2. 每条讯息关联零到多家公司，给出关联类型、关联度、置信度和可定位依据。
-3. 每家公司有去重的事件时间线，可以看其所有讯息、关联得分、影响和来源。
-4. 公司自身经营／商业模式有长期维度；事件对维度的影响与财务、证券价格/估值共同形成可解释的多维评分体系。
-5. 人维护价投策略，定义候选区间；公司对应证券进入区间时提醒，跌出时告警；缺数据、策略变更、历史重算与真实变化需区分。
-6. 工程规范严格、可测试、可恢复、可运维；前端逻辑高度符合人类思维，UI 一致、信息清楚、体验优秀。
-
-策略投资理论不是本项目主要难点。给一个可用的、明确口径的标准版本，后续人类维护自己的规则。请把主要精力放在全流程框架、工程落地和优秀产品体验，不扩张为自动交易、收益预测、投资组合执行或研究复杂量化策略。没有真实数据供应商、部署平台、预算或模型外传批准，不允许假装这些已经落实。
-
-### 评审要求
-
-完整阅读 GitHub 原文或消息正文中的全部材料。先建立材料目录与覆盖检查，指出无法读取或缺失的部分；不要仅凭 README 猜测。不要把 v0.1 当既定正确答案，不为了表示赞同只润色文字。也不要为表现专业堆微服务、Kafka、图数据库、多 Agent、复杂 DCF 或无需求框架。
-
-逐项挑战以下内容：
-
-- 业务闭环：采集→快照→规范化→公司关联→事件归并→维度贡献→公司评分→证券估值→策略状态→通知→人工纠错，是否有缺失或不可能实现的假设。
-- 领域模型：公司/证券、讯息/事件、关联度/置信度/影响、经营质量/估值/覆盖、策略评估/确认状态/通知是否互相混淆。A/H、多类股、母子关系、简称和证券身份是否准确。
-- 时间与金融数据：财报公告、发生/观察/知悉时间、修订、晚到、TTM、累计季度、FX、股本与公司行动、停牌和两地交易日历；历史评估是否泄漏未来知识。
-- 评分：重复新闻、同事实多次贡献、基准吸收、缺失维度、子覆盖、分母异常、事件衰减、强负面风险。数字与 JSON 配置是否一致，默认公式能否确定性实现。
-- 策略：受限 AST、三值逻辑、滞回、不同 session 确认、UNKNOWN恢复、基线、发布/回滚、风险优先级、历史重算静默；存在歧义就用反例推演，不以含糊“支持防抖”带过。
-- 一致性与恢复：业务状态/outbox 原子性、重复任务、lease fencing、慢结果、并发编辑、消息丢失、对象存储非原子提交、通知发送未知、索引重建。不能宣称不现实的端到端 exactly-once。
-- 采集与模型：来源权利、限制、成本、标注/校准、证据定位、prompt injection、人工复核能力与容量；外部平台能力和厂商现价需要独立核实并注明日期，未核实则标未验证。
-- 工程架构：选择是否适配小团队、类型合同是否单源、Schema 是否足够、API/数据/任务/模块所有权是否明确，索引和向量容量是否现实，安全/ACL/权限与秘密有无遗漏。
-- 产品体验：真实用户的研究路径、两端信息架构、A/H切换、日期/未知/低覆盖的理解、表格/图表、草稿与冲突、提醒与证据、键盘和移动阅读、设计系统所有状态。请产出具体页面规格与有测量方法的用户任务，不只说“简洁现代”。
-- 交付：里程碑、人员、依赖、成本估算、需求—设计—任务—验收追踪、CI/迁移/发布/回滚/UAT，是否足以让团队从第一个纵向切片开始开发。
-
-可以使用公开资料核实技术或金融口径，但不得外传本材料到其他公共服务，不得假装读取真实账号或数据库，不得自动创建仓库、部署或发送消息。禁止编造收益、数据质量、压测、模型性能或 UI 验收结果。v0.2 必须区分：已确认需求、保留的设计决策、你的改动提案、需要我决定的业务项、尚未实现/验证项。
-
-### 必须产出的结果
-
-A. 评审结论：是否可进入实施；按阻断/重要/建议给出问题清单。每个问题包含源文件与章节、具体反例、后果、修复方案与对应 R/W/T ID。无证据的担忧不要升级阻断。区分当前阶段设计缺口与将来实施验证，不用“产品还没实现”否定本次设计交付。
-
-B. v0.2 完整方案与详细设计：请直接输出完整修订内容，不能只给修改建议或一句“沿用原稿”。至少覆盖产品需求、业务、架构、数据、API/任务、UX、AI/检索、安全运维、实施计划、验收、标准配置与关键 JSON Schema。可以在一个整合文档里按原路径组织，以便我拆分落盘；大篇幅时先给完整主文和改动的合同文件，再通过后续消息给出其余完整章节，不把未输出部分声称已完成。保留所有已确认需求和稳定 IDs；新增 IDs 追加，不能悄悄删减范围。
-
-C. 至少 12 个跨模块反例推演：从具体输入／时间／并发条件开始，逐步写出应有事实、分数/unknown、策略状态、通知和恢复。至少包括：多公司/无关联、A/H、不同市场休假、停牌、财报修订、晚到、重复转述、来源冲突、缺失覆盖、UNKNOWN恢复、并发重算、策略发布、外部发送未知、权限撤销后恢复备份。可以合并相近场景，但每个要求有覆盖映射。
-
-D. 明确标准策略与评分的唯一数字真源，并检查示例、Schema、业务文档和验收序列一致。提供受限 AST 的语义规则、量纲、不适用行业、缺失数据和默认行为。不要把启发式 score 当收益概率。
-
-E. 一份可立即开始的首个开发切片任务书：边界、依赖、合成输入、模块/API/数据合同、页面、正常/失败/权限/恢复用例、通过条件、交付物和停止条件；后续里程碑以这个闭环递进。
-
-F. 不超过 8 个必须由我决定的问题，每题给推荐选择和业务影响；不影响当前方案的细节使用显式合理假设，不先停下来问几十个问题。
-
-G. v0.1→v0.2 变更账本与最终一致性检查：改什么、为何、影响哪些合同/测试、保留什么、仍未验证什么。评审阶段不授权实施，技术提案不得伪装为我的已确认决定。
-
-请先给关键判断，然后给完整结果。优先具体、可实施和可验证，避免空泛愿景和重复免责声明。如果发现 v0.1 有正确且足够的设计，保留并简要说明；只有带来明显业务或工程价值时才增加复杂度。
-
-
----
-
-# 文件：review/validation-result.json
-
-```json
-{
-  "design_version": "0.1",
-  "design_date": "2026-09-30",
-  "status": "passed",
-  "scope": "Offline material syntax, references, bounded semantic/config and synthetic expected-result checks",
-  "check_count": 182,
-  "checks": [
-    "JSON syntax: config/scoring-standard-v1.json",
-    "JSON syntax: config/strategy-standard-v1.json",
-    "JSON syntax: contracts/analysis-result.schema.json",
-    "JSON syntax: contracts/job-event.schema.json",
-    "JSON syntax: contracts/strategy.schema.json",
-    "JSON syntax: examples/analysis-proposal.json",
-    "JSON syntax: examples/job-event.json",
-    "JSON syntax: examples/state-machine-cases.json",
-    "Local link: README.md -> ./CONTEXT.md",
-    "Local link: README.md -> ./docs/01-product-requirements.md",
-    "Local link: README.md -> ./docs/02-business-design.md",
-    "Local link: README.md -> ./docs/03-architecture.md",
-    "Local link: README.md -> ./docs/04-data-design.md",
-    "Local link: README.md -> ./docs/05-api-and-jobs.md",
-    "Local link: README.md -> ./docs/06-ux-and-design-system.md",
-    "Local link: README.md -> ./docs/07-ai-and-retrieval.md",
-    "Local link: README.md -> ./docs/08-security-and-operations.md",
-    "Local link: README.md -> ./docs/09-delivery-plan.md",
-    "Local link: README.md -> ./docs/10-acceptance.md",
-    "Local link: README.md -> ./docs/adr/0001-architecture-and-truth.md",
-    "Local link: README.md -> ./config/strategy-standard-v1.json",
-    "Local link: README.md -> ./contracts/README.md",
-    "Local link: README.md -> ./review/GPT-PRO-PROMPT.md",
-    "Local link: README.md -> ./review/REVIEW-PACK.md",
-    "Local link: README.md -> ./review/PASTE-INSTRUCTIONS.md",
-    "Local link: contracts/README.md -> ./strategy.schema.json",
-    "Local link: contracts/README.md -> ./analysis-result.schema.json",
-    "Local link: contracts/README.md -> ./job-event.schema.json",
-    "Local link: contracts/README.md -> ../config/strategy-standard-v1.json",
-    "Local link: contracts/README.md -> ../config/scoring-standard-v1.json",
-    "Local link: contracts/README.md -> ../examples/analysis-proposal.json",
-    "Local link: contracts/README.md -> ../examples/job-event.json",
-    "Local link: contracts/README.md -> ../examples/state-machine-cases.json",
-    "Local link: review/GPT-PRO-PROMPT.md -> ./PASTE-INSTRUCTIONS.md",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./GPT-PRO-PROMPT.md",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-ALL.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-01.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-02.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-03.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-04.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-05.txt",
-    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-06.txt",
-    "Schema dialect: analysis-result.schema.json",
-    "Schema dialect: job-event.schema.json",
-    "Schema dialect: strategy.schema.json",
-    "Local-only schema ref: strategy.schema.json",
-    "Resolvable schema ref: strategy.schema.json:#/$defs/expression",
-    "Local-only schema ref: strategy.schema.json",
-    "Resolvable schema ref: strategy.schema.json:#/$defs/expression",
-    "Local-only schema ref: strategy.schema.json",
-    "Resolvable schema ref: strategy.schema.json:#/$defs/expression",
-    "Confirmed A-share and HK scope",
-    "Strategy scoring version reference",
-    "Dimension weights sum to 1",
-    "Required dimensions exist",
-    "Coverage configuration consistency",
-    "Baseline weights: profit_quality",
-    "Nonzero interpolation ranges: profit_quality",
-    "Baseline weights: financial_resilience",
-    "Nonzero interpolation ranges: financial_resilience",
-    "Bounded clause count: enter",
-    "No duplicate default rule fields: enter",
-    "Whitelisted default rule: enter:company.quality_score",
-    "Whitelisted default rule: enter:company.coverage",
-    "Whitelisted default rule: enter:security.valuation_score",
-    "Whitelisted default rule: enter:metrics.roe_ttm",
-    "Whitelisted default rule: enter:metrics.cfo_profit_3y",
-    "Whitelisted default rule: enter:metrics.net_debt_ebitda",
-    "Bounded clause count: retain",
-    "No duplicate default rule fields: retain",
-    "Whitelisted default rule: retain:company.quality_score",
-    "Whitelisted default rule: retain:company.coverage",
-    "Whitelisted default rule: retain:security.valuation_score",
-    "Whitelisted default rule: retain:metrics.roe_ttm",
-    "Whitelisted default rule: retain:metrics.cfo_profit_3y",
-    "Whitelisted default rule: retain:metrics.net_debt_ebitda",
-    "Enter/retain field parity",
-    "Enter/retain comparator parity: company.quality_score",
-    "Retain no stricter than enter: company.quality_score",
-    "Enter/retain comparator parity: company.coverage",
-    "Retain no stricter than enter: company.coverage",
-    "Enter/retain comparator parity: security.valuation_score",
-    "Retain no stricter than enter: security.valuation_score",
-    "Enter/retain comparator parity: metrics.roe_ttm",
-    "Retain no stricter than enter: metrics.roe_ttm",
-    "Enter/retain comparator parity: metrics.cfo_profit_3y",
-    "Retain no stricter than enter: metrics.cfo_profit_3y",
-    "Enter/retain comparator parity: metrics.net_debt_ebitda",
-    "Retain no stricter than enter: metrics.net_debt_ebitda",
-    "Default two distinct-session confirmation",
-    "Baseline/history notification silence",
-    "Hard risk requires confirmation",
-    "Synthetic linked proposal shape",
-    "Proposal link numeric range",
-    "Evidence required; analysis cannot self-approve",
-    "Impact refers to proposed company link",
-    "Impact dimension and range",
-    "Synthetic job is shadow/reference-only",
-    "State cases are synthetic",
-    "State scenario expected notification sequence (not engine execution)",
-    "Same-session expected count held",
-    "Unknown scenario preserves confirmed state",
-    "Requirement trace: R-01",
-    "Requirement trace: R-02",
-    "Requirement trace: R-03",
-    "Requirement trace: R-04",
-    "Requirement trace: R-05",
-    "Requirement trace: R-06",
-    "Requirement trace: R-07",
-    "Requirement trace: R-08",
-    "Requirement trace: R-09",
-    "Requirement trace: R-10",
-    "Requirement trace: R-11",
-    "Requirement trace: R-12",
-    "Requirement trace: R-13",
-    "Requirement trace: R-14",
-    "Acceptance scenario present: T-01",
-    "Acceptance scenario present: T-02",
-    "Acceptance scenario present: T-03",
-    "Acceptance scenario present: T-04",
-    "Acceptance scenario present: T-05",
-    "Acceptance scenario present: T-06",
-    "Acceptance scenario present: T-07",
-    "Acceptance scenario present: T-08",
-    "Acceptance scenario present: T-09",
-    "Acceptance scenario present: T-10",
-    "Acceptance scenario present: T-11",
-    "Acceptance scenario present: T-12",
-    "Acceptance scenario present: T-13",
-    "Acceptance scenario present: T-14",
-    "Acceptance scenario present: T-15",
-    "Acceptance scenario present: T-16",
-    "Acceptance scenario present: T-17",
-    "Acceptance scenario present: T-18",
-    "Acceptance scenario present: T-19",
-    "Acceptance scenario present: T-20",
-    "Acceptance scenario present: T-21",
-    "Acceptance scenario present: T-22",
-    "Acceptance scenario present: T-23",
-    "Acceptance scenario present: T-24",
-    "Work trace: W-01",
-    "Work trace: W-02",
-    "Work trace: W-03",
-    "Work trace: W-04",
-    "Work trace: W-05",
-    "Work trace: W-06",
-    "Work trace: W-07",
-    "Targeted credential-pattern scan: .gitignore",
-    "Targeted credential-pattern scan: AGENTS.md",
-    "Targeted credential-pattern scan: CONTEXT.md",
-    "Targeted credential-pattern scan: README.md",
-    "Targeted credential-pattern scan: config/scoring-standard-v1.json",
-    "Targeted credential-pattern scan: config/strategy-standard-v1.json",
-    "Targeted credential-pattern scan: contracts/README.md",
-    "Targeted credential-pattern scan: contracts/analysis-result.schema.json",
-    "Targeted credential-pattern scan: contracts/job-event.schema.json",
-    "Targeted credential-pattern scan: contracts/strategy.schema.json",
-    "Targeted credential-pattern scan: docs/01-product-requirements.md",
-    "Targeted credential-pattern scan: docs/02-business-design.md",
-    "Targeted credential-pattern scan: docs/03-architecture.md",
-    "Targeted credential-pattern scan: docs/04-data-design.md",
-    "Targeted credential-pattern scan: docs/05-api-and-jobs.md",
-    "Targeted credential-pattern scan: docs/06-ux-and-design-system.md",
-    "Targeted credential-pattern scan: docs/07-ai-and-retrieval.md",
-    "Targeted credential-pattern scan: docs/08-security-and-operations.md",
-    "Targeted credential-pattern scan: docs/09-delivery-plan.md",
-    "Targeted credential-pattern scan: docs/10-acceptance.md",
-    "Targeted credential-pattern scan: docs/adr/0001-architecture-and-truth.md",
-    "Targeted credential-pattern scan: examples/analysis-proposal.json",
-    "Targeted credential-pattern scan: examples/job-event.json",
-    "Targeted credential-pattern scan: examples/state-machine-cases.json",
-    "Targeted credential-pattern scan: review/GPT-PRO-PROMPT.md",
-    "Targeted credential-pattern scan: review/PASTE-ALL.txt",
-    "Targeted credential-pattern scan: review/PASTE-INSTRUCTIONS.md",
-    "Targeted credential-pattern scan: review/PASTE-PART-01.txt",
-    "Targeted credential-pattern scan: review/PASTE-PART-02.txt",
-    "Targeted credential-pattern scan: review/PASTE-PART-03.txt",
-    "Targeted credential-pattern scan: review/PASTE-PART-04.txt",
-    "Targeted credential-pattern scan: review/PASTE-PART-05.txt",
-    "Targeted credential-pattern scan: review/PASTE-PART-06.txt",
-    "Targeted credential-pattern scan: tools/build_review_pack.py",
-    "Targeted credential-pattern scan: tools/validate_design.py"
-  ],
-  "source_sha256": {
-    ".gitignore": "1763786ceb274eb8108e57ddad59f1dfbbc388a2330d35dc69a7b6a5b39a09f5",
-    "AGENTS.md": "37b9364e8eda52e1f81b111e91e702ae058c3a2c66ab5bfa0471993720a65b6a",
-    "CONTEXT.md": "e5d1504f91ebe202f1d514ee789799ae0c9542574ebd75931c953996897aee8d",
-    "README.md": "64b1db8e1b1f0b9c3e14478673c561f229855e2772dce6a2f7a29ceb28aa82c9",
-    "config/scoring-standard-v1.json": "316cce28979857ef98e6f74e3d5b1b1d8668601cac84a433678365f3f3c4c76f",
-    "config/strategy-standard-v1.json": "493730a89578ac94f8f391311e78b9432256493714ae164616b73ef866682cde",
-    "contracts/README.md": "ce775c8a35d15fa7e971ebbcea3d6d664b715f0022df5673ec74548545d1cb2b",
-    "contracts/analysis-result.schema.json": "3f1fe36006bd36a23fdbe43078840ae88b60318a991b84dbbab7b804869961f4",
-    "contracts/job-event.schema.json": "5413451ab535640271546b2544f13d2cfaa8f33a234b518e83eaef2ec04f215f",
-    "contracts/strategy.schema.json": "53fd4ae8c897045ed0c2050755c05c6868731ff3419d5d0ffa699f97a79f236a",
-    "docs/01-product-requirements.md": "d1a5b3660e13423ae5c712e1d1b2d772d51eb12d11dc7580cae9fd721d79619d",
-    "docs/02-business-design.md": "729d7b3996ca5ef7edfd26ca48f468a6bf1b3240a4fa0d0d466ec9c442c6cddf",
-    "docs/03-architecture.md": "8e07a7cff9299651f0098f54b839b32a7a68f17c805ad6a12a1e495aceedf55d",
-    "docs/04-data-design.md": "21e24d6ad58082fb41968cd79fa38a06efe9231758bdeadb5a38151e0d84d51e",
-    "docs/05-api-and-jobs.md": "7ba5bdbfca7d0cada21aa1318864aec80c94dcdc3d5d449c24f70e13ab8e4516",
-    "docs/06-ux-and-design-system.md": "1002376822744d32ecdb82a56eae4b81773a06e080fd313cd26eac00128f3b65",
-    "docs/07-ai-and-retrieval.md": "2f8e894b7ae2423825548ceaa8b92f74d5426491bd79904b82813929edd2abaa",
-    "docs/08-security-and-operations.md": "0b490ff57c9b07d1db57be25694f19d34a3c8424f313e5341ae3f9519d78c8b8",
-    "docs/09-delivery-plan.md": "de4d37d9ff81961064369b1f2c27fb57eec07f3139ad6419052ebdc3f616dba4",
-    "docs/10-acceptance.md": "206bf7b62494c29ad381b4e090839d0a8cc691be1b5fdd7c9ce52eb1e4a4a8e9",
-    "docs/adr/0001-architecture-and-truth.md": "12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1",
-    "examples/analysis-proposal.json": "d25a968addf37999ce43f75f4f469e12de81c99e5bc2c041009b496ecf597faa",
-    "examples/job-event.json": "d16ddd7b7eb29d6dcf4b2bf21df370816dc02fa7568f3f1c29a206c471bbe37c",
-    "examples/state-machine-cases.json": "eac51f3acbc2b821c8349b4e975a7f1ef805e6b990393d408fc107c03b9a1825",
-    "review/GPT-PRO-PROMPT.md": "6e2fcfbe3e29b2555a85c9088d3fe3893aef40468a463a303b4205a05d99cc13",
-    "review/PASTE-ALL.txt": "3677ea64b041eafa232f25af2a32b60bf003e08d1e3c5a8f2ef9d2d288e128db",
-    "review/PASTE-INSTRUCTIONS.md": "812078dbeb3bcd80d1ff4973492dd86c8bae7fdacc197ca58d575a706ca63a16",
-    "review/PASTE-PART-01.txt": "fc3f3350298d28dadd6d9d1b27d0458ff386b8809db28889f9299981a3ac8969",
-    "review/PASTE-PART-02.txt": "d1d2546538df7e70c75037753b25474f34420f29b82e25186e5beb9a48cd78b7",
-    "review/PASTE-PART-03.txt": "2a37af939287617afb623bae9f4efb9748b01d476994b20882468eca7e76a515",
-    "review/PASTE-PART-04.txt": "7163c29d0569fcd785a8568e53b1631938d8801481da3b6d08afb271a54c0cd3",
-    "review/PASTE-PART-05.txt": "59268ccb27931f0dc746eb31bf23821f96cc63cb1200e9dea4ca20386887b07a",
-    "review/PASTE-PART-06.txt": "f315ddbd30ace60d647a80eb77a555eb440845fa167b0032c80e122a9f1ed2da",
-    "tools/build_review_pack.py": "a911fc0baf1c83a7266ff6c943f9f67c3d9af485c7215961fd9c4fd7d03e97c0",
-    "tools/validate_design.py": "801df9f4286a86b9fe75185397c86f4523e737bfe2acda9816bce26b23e726c1"
-  },
-  "not_run": [
-    "Full draft-2020-12 JSON Schema validation",
-    "Runtime strategy/scoring/state-machine implementation tests",
-    "Database/API/source integration",
-    "Model/retrieval gold-set evaluation",
-    "Real UI, accessibility, device and user acceptance",
-    "Load/security/recovery exercises",
-    "External notification"
-  ]
-}
-```
+[REVIEW_MATERIALS_END]
+请现在开始完整评审并输出 v0.2。
