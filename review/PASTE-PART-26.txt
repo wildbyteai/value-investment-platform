@@ -1,102 +1,491 @@
 
-[PART 26/36]
+[PART 26/41]
 
 
-===== SOURCE: tools/v03_material_checks.py =====
+===== SOURCE: examples/information-intake.json =====
 
-"""Offline contract predicates and expected examples, never product acceptance."""
-import copy
-from decimal import Decimal
-from datetime import datetime
-from material_schema import validate
+{
+  "fixture_kind": "synthetic_design_only",
+  "entries": [
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-1",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：订单安排摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "news",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A3:G3"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成公告来源",
+          "url": "https://example.invalid/article/1",
+          "locator_kind": "unknown",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        },
+        {
+          "reference_key": "2",
+          "source_name": "合成行业栏目",
+          "url": "https://example.invalid/list",
+          "locator_kind": "list",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-2",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：管理层访谈",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "interview",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": "合成人物甲",
+        "person_role": "合成公司负责人",
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": {
+          "raw": "★★★★☆",
+          "scale": "stars"
+        }
+      },
+      "publication": {
+        "at": null,
+        "date": null,
+        "precision": "unknown",
+        "timezone": null,
+        "raw": "访谈日期含义未明确"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A4:G4"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-3",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：既有事件的市场反应",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "market_followup",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "part_of_day",
+        "timezone": null,
+        "raw": "2026-09-29 晚间"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A5:G5"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成报道，仅来源名称",
+          "url": null,
+          "locator_kind": "unknown",
+          "source_locator": null
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-4",
+      "content_kind": "agent_digest",
+      "title": "合成乙制造：公告摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "announcement",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A6:G6"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-5",
+      "content_kind": "agent_digest",
+      "title": "合成消费：新品趋势",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "industry_context",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A7:G7"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-6",
+      "content_kind": "agent_digest",
+      "title": "合成科技：机构观点",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "research_report",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A8:G8"
+      },
+      "source_references": []
+    }
+  ],
+  "result": {
+    "schema_version": "1.0",
+    "ingestion_run_id": "00000000-0000-4000-8000-000000000900",
+    "input_manifest_id": "00000000-0000-4000-8000-000000000902",
+    "raw_object_id": "00000000-0000-4000-8000-000000000903",
+    "report_revision_id": "00000000-0000-4000-8000-000000000901",
+    "adapter_ref": "local-fixture:report-v1",
+    "parse_version": "1.0",
+    "upstream_report_date": "2026-09-30",
+    "upstream_generated_at": "2026-09-30T04:20:00+08:00",
+    "upstream_timezone": "Asia/Shanghai",
+    "upstream_run_ref": null,
+    "reported_window": {
+      "start_raw": "2026-09-29 04:00",
+      "end_raw": "2026-09-30 04:00",
+      "timezone": "Asia/Shanghai"
+    },
+    "entry_results": [
+      {
+        "entry_key": "digest-1",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A3:G3"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000910",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-2",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A4:G4"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000911",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-3",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A5:G5"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000912",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-4",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A6:G6"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000913",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-5",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A7:G7"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000914",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-6",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A8:G8"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000915",
+        "error_code": null
+      },
+      {
+        "entry_key": "broken-7",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A9:G9"
+        },
+        "status": "failed",
+        "item_revision_id": null,
+        "error_code": "INVALID_ROW"
+      }
+    ],
+    "company_coverage": [
+      {
+        "company_label": "合成甲制造",
+        "company_id": null,
+        "reported_result": "has_updates",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A3:G8"
+        },
+        "note": "公司身份等待匹配，阅读不中断。"
+      },
+      {
+        "company_label": "合成观察主体",
+        "company_id": null,
+        "reported_result": "no_material_update",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A10"
+        },
+        "note": "上游报告称未发现重要更新。"
+      }
+    ],
+    "warnings": [
+      "合成窗口声明与实际跨度不一致，仅为演练"
+    ],
+    "generated_at": "2026-10-01T09:00:00+08:00"
+  },
+  "expected": {
+    "run_status": "partial",
+    "readable_entries": 6,
+    "no_news_events": 0,
+    "accepted_judgments_from_import": 0,
+    "price_bars_from_summary": 0,
+    "schema_checks_are_product_acceptance": false
+  },
+  "expected_read_response": {
+    "schema_version": "1.0",
+    "item_id": "00000000-0000-4000-8000-000000000920",
+    "revision_id": "00000000-0000-4000-8000-000000000910",
+    "title": "合成甲制造：订单安排摘要",
+    "content_kind": "agent_digest",
+    "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+    "reading_metadata": {
+      "schema_version": "1.0",
+      "material_type": "news",
+      "topics": [
+        "合成制造业"
+      ],
+      "person_name": null,
+      "person_role": null,
+      "summary_origin": "upstream_agent",
+      "generator_ref": null,
+      "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+      "watch_points": [
+        "查看后续交付安排"
+      ],
+      "source_reading_priority": null
+    },
+    "publication": {
+      "at": null,
+      "date": "2026-09-29",
+      "precision": "day",
+      "timezone": null,
+      "raw": "2026-09-29"
+    },
+    "observed_at": "2026-10-01T09:00:00+08:00",
+    "company_links": [],
+    "body_access": {
+      "state": "no_locator",
+      "url": null,
+      "target_revision_id": null
+    },
+    "reference_access": [
+      {
+        "reference_key": "1",
+        "source_name": "合成公告来源",
+        "locator_kind": "article",
+        "access": {
+          "state": "available",
+          "url": "https://example.invalid/article/1",
+          "target_revision_id": "00000000-0000-4000-8000-000000000930"
+        }
+      },
+      {
+        "reference_key": "2",
+        "source_name": "合成行业栏目",
+        "locator_kind": "list",
+        "access": {
+          "state": "not_acquired",
+          "url": "https://example.invalid/list",
+          "target_revision_id": null
+        }
+      },
+      {
+        "reference_key": "3",
+        "source_name": "不可访问合成来源",
+        "locator_kind": "unknown",
+        "access": {
+          "state": "restricted",
+          "url": null,
+          "target_revision_id": null
+        }
+      }
+    ],
+    "quality": "partial",
+    "reasons": [
+      "NO_ACCEPTED_COMPANY_LINK",
+      "ORIGINAL_PARTLY_UNAVAILABLE"
+    ]
+  }
+}
 
 
-def run(read, check, reject, resolve, bundle, scoring, canonical_hash):
-    # Shared typed payload copies cannot drift across the request and stored revision.
-    command_schema=read('contracts/override-command.schema.json')
-    human_schema=read('contracts/human-judgment.schema.json')
-    check(command_schema['$defs']['judgment']==human_schema['$defs']['judgment'], 'v03 typed request/revision judgment agreement')
-    decision_schema=read('contracts/review-decision.schema.json')
-    replacements=read('examples/v03-human-replacements.json')['cases']
-    for case in replacements:
-        cmd=case['request'];response=case['expected_response'];rev=response['revision'];dec=response['decision']
-        validate(cmd,command_schema);validate(rev,human_schema);validate(dec,decision_schema)
-        check(rev['judgment']==cmd['replacement'] and rev['slot_id']==cmd['slot_id']==dec['subject_slot'], 'v03 replacement value / slot: '+case['id'])
-        check(dec['subject_revision']==rev['revision_id'] and rev['previous_revision_id']!=rev['revision_id'] and dec['status']=='accepted' and dec['actor_kind']=='HUMAN', 'v03 immutable revision/decision references: '+case['id'])
-        match=case['headers']['If-Match'].rsplit('-', 1)[-1]
-        check(dec['supersedes_decision_id'] and response['slot_generation']==int(match)+1, 'v03 single If-Match CAS expectation: '+case['id'])
-        check(set(cmd['replacement']['value']['evidence_ids'])<=set(cmd['evidence_ids']), 'v03 replacement evidence bound: '+case['id'])
-        bad=copy.deepcopy(cmd);del bad['replacement'];reject(lambda:validate(bad,command_schema),'v03 replace without full value')
-        bad=copy.deepcopy(cmd);bad['subject_revision_id']=rev['previous_revision_id'];reject(lambda:validate(bad,command_schema),'v03 replace mixed with subject reference')
-    for action in ['accept','reject','pending','release']:
-        cmd=copy.deepcopy(replacements[0]['request']);del cmd['replacement'];cmd.update(action=action,subject_revision_id=replacements[0]['expected_response']['revision']['previous_revision_id'])
-        validate(cmd,command_schema);check(True,'v03 non-replacement action shape: '+action)
-        bad=copy.deepcopy(cmd);bad['replacement']=replacements[0]['request']['replacement'];reject(lambda:validate(bad,command_schema),'v03 non-replace carries replacement: '+action)
-    # Material target-resolution counterexamples. These predicates are not runtime DecisionService.
-    fixture=read('examples/v03-risk-targets.json');policy=read('config/risk-target-policy-v1.json')
-    risk_schema=read('contracts/analysis-result.schema.json')['properties']['risk_proposals']['items']
-    def targets(p):
-        validate(p,risk_schema)
-        if p['company_id']!=fixture['identity_fixture']['company_id']:raise ValueError('company outside candidates')
-        if p['target_kind'] not in policy['allowed_target_kinds'][p['risk_code']]:raise ValueError('risk kind')
-        securities=fixture['identity_fixture']['securities']
-        if p['target_kind']=='company':
-            if p['target_id']!=p['company_id']:raise ValueError('company target')
-            return [s['id'] for s in securities]
-        matches=[s['id'] for s in securities if s['id' if p['target_kind']=='security' else 'primary_listing_id']==p['target_id']]
-        if not matches:raise ValueError('target outside candidates')
-        return matches
-    a,b=fixture['proposals']
-    check(targets(a)==fixture['expected']['listing_risk_targets'],'v03 H listing-only expected resolution')
-    check(targets(b)==fixture['expected']['company_risk_targets'],'v03 company default expected resolution A/H')
-    check(set(targets(b))==set(targets(a))|set(targets(b)), 'v03 removal of listing risk leaves independent company risk set')
-    for changes,label in [({'target_kind':'company','target_id':a['company_id']},'delisting cannot broaden to company'),({'target_id':'00000000-0000-4000-8000-000000999999'},'target outside manifest'),({'company_id':'00000000-0000-4000-8000-000000999999'},'wrong parent company')]:
-        bad=copy.deepcopy(a);bad.update(changes);reject(lambda:targets(bad),'v03 '+label)
-    old=copy.deepcopy(a);del old['target_kind'];del old['target_id'];reject(lambda:validate(old,risk_schema),'v03 ambiguous company-only old risk rejected')
-    # Registry / inheritance / custom contribution whitelist shape and material semantics.
-    registry=read('config/dimensions-standard-v1.json');validate(registry,read('contracts/dimension-registry.schema.json'));check(True,'v03 registry shape')
-    custom=read('examples/v03-template-custom.json');templates=copy.deepcopy(bundle['templates'])+[custom]
-    resolved=resolve(custom['template_key'],templates)
-    check(sum(Decimal(v) for v in resolved['dimension_weights'].values())==1 and resolved['dimension_policies']['x_customer_retention']['event_policy']=={'enabled':True,'half_life_days':90},'v03 custom dimension resolved weight/event golden')
-    q=resolved['dimension_policies']['governance']['quality_policy']
-    check(q['freshness']['max_age_days']==90 and q['evidence_requirement']=='issuer_or_regulator_original','v03 complete policy patch golden')
-    check(scoring['dimension_policies']['governance']['quality_policy']['freshness']['max_age_days']==180,'v03 base 180-day policy unchanged')
-    check(120<180 and not 120<90 and not 90<90,'v03 120-day freshness / exact expiry boundary arithmetic, NOT runtime freshness')
-    check(min(365,180)==180,'v03 restrictive strategy age composition arithmetic')
-    for changes,label in [({'dimension':'x_not_registered'},'unknown custom dimension'),({'event_policy':{'enabled':True,'half_life_days':0}},'invalid event half-life'),({'disabled':True},'disabled mixed with patch')]:
-        ts=copy.deepcopy(templates);ts[-1]['patches'][-1].update(changes);reject(lambda:resolve(custom['template_key'],ts),'v03 '+label)
-    # Blueprint policy references are frozen: a different content hash cannot load silently.
-    bad=copy.deepcopy(templates);bad[0]['base_config_ref']['sha256']='0'*64;reject(lambda:resolve(custom['template_key'],bad),'v03 old parent hash not hot-replaced')
-    impact=copy.deepcopy(read('examples/analysis-proposal.json')['impact_proposals'][0]);impact.update(dimension='x_customer_retention',half_life_days=90)
-    impact_schema=read('contracts/analysis-result.schema.json')['properties']['impact_proposals']['items']
-    def allow(p,c):
-        validate(p,impact_schema)
-        if p['dimension'] not in c['dimension_weights']:raise ValueError('dimension not active')
-        event=c['dimension_policies'][p['dimension']]['event_policy']
-        if not event['enabled'] or p['half_life_days']!=event['half_life_days']:raise ValueError('event policy')
-    allow(impact,resolved);check(True,'v03 registered active custom impact material allowlist')
-    bad=copy.deepcopy(impact);bad['dimension']='x_not_registered';reject(lambda:allow(bad,resolved),'v03 unregistered impact')
-    bad=copy.deepcopy(impact);bad['half_life_days']=30;reject(lambda:allow(bad,resolved),'v03 model cannot alter event half-life')
-    ts=copy.deepcopy(templates);ts[-1]['patches'][-1]['event_policy']={'enabled':False};baseline_only=resolve(custom['template_key'],ts)
-    check(baseline_only['baselines']['x_customer_retention']==resolved['baselines']['x_customer_retention'],'v03 baseline-only retains baseline')
-    check('x_customer_retention' not in baseline_only['event_contribution']['half_life_calendar_days'],'v03 baseline-only no fictitious half-life')
-    reject(lambda:allow(impact,baseline_only),'v03 baseline-only refuses event proposal')
-    check(resolve('company-synthetic-manufacturer')['baselines']==scoring['baselines'],'v03 custom template does not mutate old standard chain')
-    # Only temporal boundary / command shape assertions. No seal/token or SQL execution exists.
-    seal=read('examples/v03-seal-command.json');validate(seal,read('contracts/evaluation-seal.schema.json'));check(True,'v03 seal command shape')
-    manifest=read('examples/v03-seal-manifest.json');manifest_schema=read('contracts/evaluation-input-manifest.schema.json')
-    validate(manifest,manifest_schema)
-    check(canonical_hash(manifest)==seal['manifest_sha256'] and manifest['manifest_id']==seal['manifest_id'], 'v03 frozen manifest hash/reference binding')
-    check(all(manifest[k]==seal[k] for k in ['release_id','security_id','primary_listing_id','market_session','evaluation_as_of','knowledge_cutoff']), 'v03 seal/manifest fixed context agreement')
-    bad=copy.deepcopy(manifest);del bad['inputs']['human_overrides'];reject(lambda:validate(bad,manifest_schema),'v03 manifest cannot omit input class')
-    bad=copy.deepcopy(manifest);bad['inputs']['price']['inputs']=[];reject(lambda:validate(bad,manifest_schema),'v03 valid price class without input')
-    bad=copy.deepcopy(manifest);bad['inputs']['price']={'quality':'missing','inputs':[],'reason_codes':[]};reject(lambda:validate(bad,manifest_schema),'v03 missing input without quality reason')
-    check(all(datetime.fromisoformat(i['known_at'])<=datetime.fromisoformat(manifest['knowledge_cutoff']) for g in manifest['inputs'].values() for i in g['inputs']), 'v03 manifest fixture does not include late known input')
-    cutoff=datetime.fromisoformat(seal['knowledge_cutoff']);asof=datetime.fromisoformat(seal['evaluation_as_of'])
-    check((cutoff-asof).total_seconds()==3600,'v03 seal fixture fixed 60 minute cutoff')
-    check(15<60 and 40<=60 and 50<=60 and 61>60 and 65>=60,'v03 +15/+40/+50/+60/+61/+65 boundary arithmetic; token/concurrency NOT RUN')
-    bad=copy.deepcopy(seal);bad['worker_now']='2026-09-30T09:20:00Z';reject(lambda:validate(bad,read('contracts/evaluation-seal.schema.json')),'v03 seal cannot replace cutoff with caller now')
+===== SOURCE: examples/job-event.json =====
 
-[END PART 26/36]
+{
+  "event_id": "00000000-0000-4000-8000-000000000004",
+  "event_type": "AnalysisProposed",
+  "schema_version": "2.0",
+  "workspace_id": "00000000-0000-4000-8000-000000000005",
+  "entity_id": "00000000-0000-4000-8000-000000000002",
+  "entity_revision": "synthetic-r1",
+  "occurred_at": "2026-09-30T00:00:00Z",
+  "trace_id": "synthetic-trace-01",
+  "mode": "shadow",
+  "generation": 1,
+  "payload": {
+    "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+    "job_id": "00000000-0000-4000-8000-000000000007"
+  },
+  "evaluation_context": {
+    "as_of": null,
+    "knowledge_cutoff": null,
+    "time_bucket": null,
+    "calendar_ref": null,
+    "template_resolution_hash": null,
+    "numeric_policy_ref": null,
+    "decision_policy_ref": null
+  }
+}
+
+[END PART 26/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

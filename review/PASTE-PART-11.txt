@@ -1,5 +1,5 @@
 
-[PART 11/36]
+[PART 11/41]
 
 
 ===== SOURCE: docs/16-prototype-and-design-trace.md =====
@@ -96,6 +96,70 @@
 
 三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
 
+## 7. 编码准备新增的资料阅读状态
+
+[intake.html](../prototype/intake.html)提供多来源摘要、原文已取得/未取得/不可访问、无链接、访谈评级/未知日期、无重要动态与部分解析失败五种状态。资料先可读，解读与有效判断分开。新增交互检查见review/design-detail/intake-prototype-checks.json；仍是原创合成原型，T-44…49产品验收未运行。主原型与历史终审证据保留，不改旧评分/策略交互。
+
+
+===== SOURCE: docs/17-coding-readiness.md =====
+
+# 17 编码前准备与开发交接
+
+2026-10-01 · v0.3。状态：**编码前设计准备已完成，可在实施授权后进入M0/W-08合成开发**。没有启动产品开发、建库/迁移、部署、真实数据接入或外部模型调用。用户本轮授权完成准备，并采纳资料接入补齐；不重复询问已确认需求，也不新增终审轮次。
+
+## 1. 已固定的业务范围与本轮变化
+
+业务确认仍以11为真源：A/H、多人五角色、三层模板、自动政策接受/人工有效覆盖、外部模型能力、无固定开发预算、通知后置。数值/时点/纠错以12为真源，原有T-01…43预期保持。原型真实公司名称只帮助理解；W-08公司、资料、价格和身份全部合成。
+
+本轮为资料接入增加摘要/阅读信息、文件血缘、资讯时间精度、一对多来源引用、批次输出清单和阅读独立分支。原因是已有日报产物能提供研究线索，却不能直接充当原文或有效评分判断。收益是先可读、再按需要补关键依据；影响为04/05/06/07/14/15与新增Schema、合成验收。未修改评分公式、阈值、策略状态、A/H口径或真实接入边界。没有六套日报表，没有新增消息系统/微服务/审核平台。
+
+准备交付：字段真源与生成字典；BF-01分支；InformationEntry/IngestionResult/InformationRead 1.0；资讯列表/详情接口与原文状态；合成资料夹具；阅读状态原型；下列开发顺序与验收；离线检查及工作树hash证据。
+
+## 2. 技术与依赖决策
+
+沿用模块化单体、React/TypeScript、FastAPI/Pydantic、SQLAlchemy/Alembic、PostgreSQL、ledger/outbox。M0目标运行线为Python 3.12、PostgreSQL 17、Node 24 LTS、pnpm 10；Redis 7.4/Celery 5用于合成后台与恢复场景。本阶段不安装这些运行依赖。M0第一次启动时固定patch版本/镜像digest和锁文件，验证实际兼容；生成锁文件和启动验证是实施任务，不伪称准备文档已证明运行可用。若这些目标线与当时实际依赖冲突，先说明具体影响，选择兼容受支持patch，不改变领域合同。
+
+使用项目自有最小骨架，选择性参考已审源码fastapi/full-stack-fastapi-template `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7`（MIT）；不整包照搬其Python≥3.14/SQLModel/密码认证依赖。生成客户端、组件模式和CI做法按本项目适配。研究证据见research/second-review.md，不重新比较一批框架。Refine/Prefect、OpenSearch、向量、真实OIDC、生产分区和通知均不作为W-08前置。
+
+开发环境仅本机项目隔离Compose，数据为原创合成；对象存储先本地适配器，与raw_object合同一致。mock身份和模型，clock/calendar可注入；模型适配器保留真实外部能力但本slice不外发。运行前验证服务实际位置/用途/数据分类，项目命名和端口避开已有服务；没有真实凭证和默认远程地址。数据库不可用/分类未知时只暂停相关启动。
+
+计划目录采用03 §4，按任务创建，不提前铺空模块。Schema是关键类型真源；API通过Pydantic发布OpenAPI并生成TS客户端。领域函数只接受固定输入，前端不计算分数或策略规则。
+
+## 3. W-08顺序与可检查交付
+
+每行都是可验收切片，不要求先建完整79表。具体字段以15目录为准，按实际写入路径建立；既定完整首slice能力不删减。
+
+| 子任务 | 依赖/范围 | 交付与真实验证 | R/W/T |
+|---|---|---|---|
+| W-08.1 运行基础 | 授权实施；核验项目隔离合成DB | web/API/worker、锁文件、最小schema、五角色mock、启动命令；一次有权限的业务写入与audit/outbox回读，越权拒绝 | W-01；R-11/12/17；T-14/20/29 |
+| W-08.2 资料先可读 | .1；固定文件与DTO | 合成Excel/直接资料适配器、report→entry血缘、来源引用、输入/输出manifest、资讯列表/摘要详情；原文状态与日期精度、部分失败重试、重复导入回读 | R-01/02/04/09/14；T-02/04/33/44…47 |
+| W-08.3 公司关联与研究 | .2；合成身份/关系 | no_link/歧义/多公司、关联AUTO政策、事件/事实归并，公司新闻与事件分开；重复与一行多事实回读 | R-03/04/16；T-03/05/06/48 |
+| W-08.4 有效判断与覆盖 | .3；既有proposal/decision合同 | impact/rubric/risk、人工替换/解除、冲突保留、证据定位、H挂牌与公司风险区别；修订/指针/依赖重算回读 | R-05/09/16；T-27/28/39/40/49 |
+| W-08.5 模板与A/H解释 | .4；冻结财务/价格/FX/股份 | 三层解析、完整维度及x_customer_retention、baseline/事件贡献、A/H估值；旧评分使用当时资料，缺数据明确 | R-05/06/15；T-07…10/25/26/34…38/41/42 |
+| W-08.6 策略到变化 | .5；session/calendar、seal | 模拟/发布、输入封存、相邻FINAL、ENTER/UNKNOWN/恢复/EXIT/RISK；版本/日期/理由一致及转移原子回读 | R-07/08；T-11…14/30/31/40/43 |
+| W-08.7 恢复与研究协作 | 按依赖可穿插.2…6 | 自选/笔记、失败洞与ledger恢复、丢ACK不重复、旧generation拒绝、历史纠错；合成备份/撤权恢复沿用原预期 | R-09/10/12；T-14/18/19/32/33/34 |
+| W-08.8 用户路径收口 | .2…7 | 真实运行页面连续路径、指定视口/键盘、按06进行用户任务验收；固定数据与预期不改，记录未通过/未运行项 | R-09/13/14；T-22/T-UX-01…04及13必选 |
+
+创建数据库迁移按生命周期：基础身份/run/raw/manifest→item/revision/observation/reference/evidence/身份→判断/事件→评分→策略→必要协作恢复表。source↔policy等循环按15策略处理；升级/降级使用合成数据验证，不修改远程库。列表采用PG读取，不依赖索引或评分完成；随后检索投影仍可扩展。
+
+## 4. 输入、预期和编码入口
+
+新增合成载荷在examples/information-intake.json；已有算法、财务、风险、覆盖、模板、封存黄金预期继续使用config/examples。真实参考Excel只留local-evidence，不成为Git夹具，不让开发自动扫描用户消息目录。W-08.2实施时从原创载荷生成小型Excel：表头在1/2/3行、同义列、公司分段/合并、文字URL/超链接、无链接；不需真实文件才能验证适配器。
+
+新增T-44…49见10，已有必选正常、失败、边界、权限、恢复出口见13。编码前这些是预期；材料检查只校验载荷形状与设计一致。开发阶段每项记录commit、实际环境/DB分类、fixture hash、命令/场景、expected/actual及回读，测试已写不是passed。
+
+计划开发命令合同（现在尚不存在，W-08.1实现）：`make dev-up`启动项目隔离依赖，`make migrate`运行Alembic，`make seed-synthetic`加载原创夹具，`make dev`启动web/API/worker，`make check-slice`执行受影响必选，`make dev-down`只停止本项目服务。禁止这些命令默认重置库或连接远程；合成重置另有显式目标。登录页面展示五角色合成身份，页面标演示环境。
+
+最先验证架构假设：一次跨业务/audit/outbox事务、同源客户端与资料列表、相同条目导入重试、日期/知识时间分离、ledger重投递。随后补原有seal/提交可见性、模板和数值等关键算法验证；不先做全量性能或可选平台。
+
+## 5. 当前出口与后置条件
+
+准备出口：范围/任务/合同/数据/页面状态/验收预期已齐；字段字典可生成，合成DTO检查通过，原型交互结果和hash可查，评审包已同步，无待确认的新增业务取舍。检查证据见[编码准备收口](../review/CODING-READINESS.md)。当前可交接合成开发，实际产品能力均未实现/未验证。
+
+后置于真实接入或生产：供应商具体fetch/store/analyze/export权利、真实OIDC/部署资源/保留期限、真实规则/质量运营负责人、运行容量/恢复实测、外部模型与后续通知渠道。它们属于既有D事项，不能冒充已落实，也不阻塞合成开发。不采购、不上传真实资料、不联网采集、不发通知或交易。
+
+下一步仅需用户明确启动开发即可按上述顺序实施，不再做一轮全套设计或外部终审。项目全过程继续以业务闭环、界面可理解性和最小充分验证为先。
+
 
 ===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
 
@@ -137,56 +201,6 @@ OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可
 
 本次只改项目结构、入口与交接，业务、配置和关键Schema不因迁移改变。设计仍v0.2；先冻结迁移后的Git revision，再进行第二轮业务/工程复审与GPT Pro交接，评审建议不自动改业务合同。
 
-
-===== SOURCE: research/open-source-shortlist.md =====
-
-# 开源框架初步候选与复用方向
-
-核查日期：2026-09-30。此页为本次只读调研的派生判断与导航，不保存第三方原文／代码；各来源以官方链接回查。已读官方GitHub仓库元数据和README；RQAlpha另外读取当前LICENSE。不是生产选型、兼容测试或法律结论，没有安装或运行候选项目。
-
-用户新增偏好：尽量寻找并复用成熟开源系统框架与策略框架。首期仍以完整研究流程、管理／业务两端、可维护规则和工程质量为目标，维持A股与港股范围，不新增交易执行需求。
-
-## 1. 系统侧
-
-| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
-|---|---|---|---|
-| [FastAPI Full Stack Template](https://github.com/fastapi/full-stack-fastapi-template) · [README](https://github.com/fastapi/full-stack-fastapi-template/blob/master/README.md) | MIT | FastAPI、React、PostgreSQL、生成客户端、Playwright、pytest、Compose与CI脚手架 | 优先评估工程起点；SQLModel vs 现有SQLAlchemy、JWT vs OIDC、部署与同域结构须作显式取舍，不直接继承未经审查的权限模型 |
-| [Refine Core](https://github.com/refinedev/refine) · [README](https://github.com/refinedev/refine/blob/main/README.md) | MIT（核心） | headless React CRUD、认证／权限provider、路由、网络与状态接口 | 优先评估管理端能力与复用hooks；研究业务端保持自己的任务流程与设计系统，避免和模板已有路由／数据状态体系重复 |
-| [Scrapy](https://github.com/scrapy/scrapy) · [README](https://github.com/scrapy/scrapy/blob/master/README.rst) | BSD-3-Clause | 网站结构化数据提取框架 | 有采集许可时作为SourceAdapter；API源不强行走网页爬虫；系统ledger、快照与outbox仍由应用维护 |
-| [Prefect](https://github.com/PrefectHQ/prefect) · [README](https://github.com/PrefectHQ/prefect/blob/main/README.md) | Apache-2.0（核心） | Python数据pipeline与工作流编排；另有Cloud服务 | 和Celery基线对照，按实际长流程/恢复需求择一；评估自托管与付费能力边界，不以编排替代领域事务和通知幂等 |
-
-## 2. 策略、研究与数据侧
-
-| 候选与官方来源 | 初查许可证* | 观察到的能力 | 本项目可评估的复用与边界 |
-|---|---|---|---|
-| [Qlib](https://github.com/microsoft/qlib) · [README](https://github.com/microsoft/qlib/blob/main/README.md) | MIT | 数据处理、研究workflow、模型、回测与评价工具 | 比较基础因子/研究接口与离线评估；机器学习、RL、自动研发不是本项目首期要求；A/H及point-in-time财务口径尚未核实 |
-| [LEAN](https://github.com/QuantConnect/Lean) · [README](https://github.com/QuantConnect/Lean/blob/master/readme.md) | Apache-2.0 | 事件驱动算法研究／交易引擎 | 比较证券/基本面/筛选与回放接口，不启用实盘交易；C#核心与Python服务集成、数据成本和A/H适配待验证 |
-| [RQAlpha](https://github.com/ricequant/rqalpha) · [LICENSE](https://github.com/ricequant/rqalpha/blob/master/LICENSE) · [README](https://github.com/ricequant/rqalpha/blob/master/README.rst) | 自定义限制，API为NOASSERTION | 可扩展Python回测／算法交易框架；README明确限非商业使用 | **许可未解决前不列为生产可直接复用候选**。当前LICENSE对非商业使用采用Apache2.0条件，商业使用须授权，法人／组织使用定义也受限制；不能简写为Apache2.0无限制。不会替用户联系授权方 |
-| [AKShare](https://github.com/akfamily/akshare) · [README/Statement](https://github.com/akfamily/akshare/blob/main/README.md) | MIT（代码） | 财经数据接口库，README说明接口可能撤销 | 作为接口与数据结构调研候选；README声明数据仅用于学术研究，代码许可不代表上游数据商用/存储/再分发权。生产先核实具体数据来源和权利，不能承诺数据可用性 |
-
-\*除RQAlpha读取LICENSE全文外，其余此处为GitHubAPI识别许可证及已读README，未审查完整依赖、插件、数据许可或商标；GPT Pro需回查精确tag/commit的许可文件，实施前做SBOM和许可核查。
-
-## 3. 维护观察及证据限度
-
-| 仓库 | 查询时默认分支 | 查询时pushed_at（UTC） | archived |
-|---|---|---|---|
-| fastapi/full-stack-fastapi-template | master | 2026-09-18T17:40:40Z | false |
-| refinedev/refine | main | 2026-09-10T12:56:35Z | false |
-| scrapy/scrapy | master | 2026-09-28T15:30:00Z | false |
-| PrefectHQ/prefect | main | 2026-09-30T03:12:13Z | false |
-| microsoft/qlib | main | 2026-09-22T05:57:23Z | false |
-| QuantConnect/Lean | master | 2026-09-29T21:10:46Z | false |
-| ricequant/rqalpha | master | 2026-09-28T03:17:24Z | false |
-| akfamily/akshare | main | 2026-09-30T06:31:13Z | false |
-
-以上仅证明当时未归档和有push记录，不能证明发布稳定、问题响应及时、安全或符合本项目SLO。未审查完整release/issue/security历史、代码接口、真实市场数据、point-in-time输入或端到端集成。候选发现不是PoC通过。
-
-## 4. 下一步选型合同
-
-先以v0.1最少依赖方案为对照，比较“直接复用/适配器复用/只参考/不采用”。系统优先评估全栈模板与管理端hooks，策略框架优先评估离线研究或基础指标适配，不成为实时状态第二真源。核心公司身份、双时间、事件去重、证据、人工版本、质量门、策略状态和通知事务仍需明确领域设计；框架不能自动提供这些正确性。
-
-最终矩阵必须记录revision、来源、许可证、维护证据、自托管/收费边界、A/H与单位/币种/股本/TTM/修订语义、集成与替换成本、最小验证以及R/W/T影响。推荐后由用户确定实施范围；本次不fork、安装、导入第三方代码或切换运行架构。
-
-[END PART 11/36]
+[END PART 11/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

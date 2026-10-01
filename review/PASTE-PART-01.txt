@@ -55,7 +55,7 @@
 
 [REVIEW_MATERIALS_BEGIN]
 
-[PART 1/36]
+[PART 1/41]
 
 
 ===== SOURCE: README.md =====
@@ -97,6 +97,7 @@
 | [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
 | [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
+| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 固定技术/任务/输入/验收与后置事项，实施授权后进入合成开发 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -135,6 +136,8 @@ python3 tools/build_review_pack.py
 
 可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
+编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
+
 
 ===== SOURCE: PROJECT.md =====
 
@@ -146,7 +149,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3编码前准备已完成，尚未启动M0/W-08；二轮设计与建模/表设计/交互原型细化成果保留。已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -182,6 +185,10 @@ python3 tools/build_review_pack.py
 原事项README、matter.yaml和各交付/回读文件完整保存在local-evidence/bytewatcher-origin；本机路径与迁移manifest位于local-evidence/migration，不提交GitHub。历史原文不覆写，其旧相对路径与阶段描述按当时commit解释，当前项目内容从Git历史读取。
 
 GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评审材料；真实业务资料、凭证和私人日志不上传。本轮迁移/评审未授权部署、采购、真实采集、真实模型调用、通知或交易。评审报告提出修改时仍区分建议与已采纳合同。
+
+## 2026-10-01 编码准备收口
+
+用户授权完成所有编码前准备；已采纳资料接入局部补齐，扩展item_revision、item_observation、ingestion_run输出引用，新增多来源引用表和三份固定DTO；资讯列表/摘要/原文状态、发布时间精度、BF-01阅读分支、原创合成示例与T-44…49已同步。编码任务、技术依赖、迁移/运行入口与后置事项以[17](./docs/17-coding-readiness.md)为交接入口，证据见[收口记录](./review/CODING-READINESS.md)。不重复终审，不改变评分/A-H/策略合同。真实资料继续仅保留local-evidence；本轮未编码产品、建库、部署或接入真实源。
 
 
 ===== SOURCE: CONTEXT.md =====
@@ -282,6 +289,8 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 
 历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
 
+编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。当前仅准备完成，产品仍未实施。
+
 
 ===== SOURCE: docs/01-product-requirements.md =====
 
@@ -353,6 +362,6 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 
 这些上线配置不阻止设计和合成开发；未核实能力/报价不当成事实。设计确认不等于真实接入、部署或交易授权。
 
-[END PART 1/36]
+[END PART 1/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -1,0 +1,74 @@
+{
+  "scope": "Synthetic local reading-state prototype only; NOT product T-44..49 acceptance",
+  "executed_at": "2026-10-01T04:48:40.920Z",
+  "revision_at_run": "75ec4c7dedfe9b2b516ed9ab96769b067b86910c",
+  "status": "passed",
+  "checks": [
+    {
+      "id": "PD-INTAKE-01",
+      "scenario": "摘要与上游解读/系统等待、多来源分别表达",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-02",
+      "scenario": "来源入口不假装已取正文",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-03",
+      "scenario": "没有来源网址仍可阅读",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-04",
+      "scenario": "访谈未知发布时间与阅读星级",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-05",
+      "scenario": "无动态说明独立于事件",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-06",
+      "scenario": "部分失败资料仍可阅读",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-WIDTH-1440",
+      "scenario": "五种状态布局宽度1440",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-WIDTH-1280",
+      "scenario": "五种状态布局宽度1280",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-WIDTH-390",
+      "scenario": "五种状态布局宽度390",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-WIDTH-430",
+      "scenario": "五种状态布局宽度430",
+      "status": "passed"
+    },
+    {
+      "id": "PD-INTAKE-07",
+      "scenario": "键盘可操作与本地无外发",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "prototype/intake.html": "1fa637c09e5020e34fd249d5d04d07bdf223cf2f2caee3bfdc2797d467dedba3",
+    "prototype/style.css": "db431672057b2dd2559a14aab27be687763089a4fc0d118b8afa6e07a1c2778c",
+    "tools/verify_intake_prototype.cjs": "9cc33df089cbcf077b883d38ed19c33d2649399f1c4961784dd8908a7c0532db"
+  },
+  "external_requests": [],
+  "console_errors": [],
+  "not_run": [
+    "Actual spreadsheet parsing/DB/API/RBAC/scoring",
+    "Real user/real device UX acceptance"
+  ]
+}

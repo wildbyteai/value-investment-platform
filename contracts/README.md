@@ -24,3 +24,7 @@ analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strateg
 新增[override-command](./override-command.schema.json)、[human-judgment](./human-judgment.schema.json)、[dimension-registry](./dimension-registry.schema.json)、[evaluation-seal](./evaluation-seal.schema.json)及[完整冻结manifest](./evaluation-input-manifest.schema.json)。review-decision只引用opaque UUID修订，不携带替换值；OverrideCommand的四类judgment与HumanRevision同形，材料工具检查同步。模型风险带target/有效期；维度ID形状扩大后还须manifest白名单校验。registry/模板政策及兼容半衰期映射由语义校验保持一致，类型通过不证明业务授权。
 
 新例子分别见examples/v03-human-replacements.json、v03-risk-targets.json、v03-template-custom.json和v03-seal-command.json；都是设计预期。v0.2探针仍绑定原commit/hash，不用当前Schema重写其观察。schema版本选择、旧风险消歧与不可回填规则见[V03-CHANGELOG](../review/V03-CHANGELOG.md)。
+
+编码准备新增：`information-entry.schema.json`（1.0，文件/直接资料解析条目的固定载荷）与`ingestion-result.schema.json`（1.0，运行后的不可变输出清单）。业务语义唯一位置为docs/04 §6，阅读接口为05 §7；`examples/information-intake.json`全部为原创合成示例，不含真实采集表内容。上游摘要/评级不得填入有效判断或行情。输入manifest与输出manifest分开，服务端生成知识时间。JSON Schema只验证形状，身份归属、日期/时区一致、引用目标正文/权限与结果计数需服务端语义验证；材料检查不等于运行产品。
+
+`information-read.schema.json`（1.0）固定资讯列表/详情共用响应字段；publication/reading_metadata与解析DTO保持一致，访问状态由服务端解析。形状检查包含不可访问目标不泄漏引用、原文available必须有确切目标修订。

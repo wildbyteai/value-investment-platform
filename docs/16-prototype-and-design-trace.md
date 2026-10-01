@@ -89,3 +89,7 @@
 09-29固定评分/A-H估值使用历史财务原文`byd-report-historical`（09-27发布/取得）；09-30的`byd-report`仍在新闻中作为后来更新。评分页后续订单/资本配置判断不作为该旧评分输入。修改区保留当前有效值和唯一的新值输入，去除重复新值摘要。策略发布固定版本/门槛，新评估等待，固定旧结果明确归发布1；公司研究对照也标发布1。发布新模板不强制更新旧策略。
 
 三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
+
+## 7. 编码准备新增的资料阅读状态
+
+[intake.html](../prototype/intake.html)提供多来源摘要、原文已取得/未取得/不可访问、无链接、访谈评级/未知日期、无重要动态与部分解析失败五种状态。资料先可读，解读与有效判断分开。新增交互检查见review/design-detail/intake-prototype-checks.json；仍是原创合成原型，T-44…49产品验收未运行。主原型与历史终审证据保留，不改旧评分/策略交互。

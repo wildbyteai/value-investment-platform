@@ -1,324 +1,456 @@
 
-[PART 21/36]
+[PART 21/41]
 
 
-===== SOURCE: contracts/scoring.schema.json =====
+===== SOURCE: contracts/ingestion-result.schema.json =====
 
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Resolved scoring configuration",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "3.0"
+      "const": "1.0"
     },
-    "model_key": {
+    "ingestion_run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "raw_object_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "report_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "adapter_ref": {
       "type": "string",
       "minLength": 1
     },
-    "version": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "metric_definition_ref": {
+    "parse_version": {
       "type": "string",
       "minLength": 1
     },
-    "numeric_policy_ref": {
-      "type": "string",
-      "minLength": 1
+    "upstream_report_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
     },
-    "rubric_catalog_ref": {
-      "type": "string",
-      "minLength": 1
+    "upstream_generated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
     },
-    "dimension_weights": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": {
-        "type": "string",
-        "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-      }
+    "upstream_timezone": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
-    "event_contribution": {
+    "upstream_run_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reported_window": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "scale": {
-          "type": "string",
-          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        "start_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "cap_per_dimension": {
-          "type": "string",
-          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        "end_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "half_life_calendar_days": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "integer",
-            "minimum": 1
-          }
-        },
-        "accepted_evidence_only": {
-          "const": true
-        },
-        "absorbed_events_excluded": {
-          "const": true
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
-        "scale",
-        "cap_per_dimension",
-        "half_life_calendar_days",
-        "accepted_evidence_only",
-        "absorbed_events_excluded"
+        "start_raw",
+        "end_raw",
+        "timezone"
       ]
     },
-    "valuation": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "metric": {
-          "type": "string",
-          "minLength": 1
-        },
-        "full_score_at": {
-          "type": "string",
-          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-        },
-        "zero_score_at": {
-          "type": "string",
-          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-        },
-        "invalid_if_nonpositive": {
-          "const": true
-        }
-      },
-      "required": [
-        "metric",
-        "full_score_at",
-        "zero_score_at",
-        "invalid_if_nonpositive"
-      ]
-    },
-    "baselines": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "method": {
-                "const": "weighted_metric_rubric"
-              },
-              "metrics": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "weight": {
-                      "type": "string",
-                      "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-                    },
-                    "zero_at": {
-                      "type": "string",
-                      "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                    },
-                    "full_at": {
-                      "type": "string",
-                      "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                    }
-                  },
-                  "required": [
-                    "key",
-                    "weight",
-                    "zero_at",
-                    "full_at"
-                  ]
-                },
-                "minItems": 1
-              }
-            },
-            "required": [
-              "method",
-              "metrics"
-            ]
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "method": {
-                "const": "accepted_evidence_rubric"
-              },
-              "rubric_ref": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": [
-              "method",
-              "rubric_ref"
-            ]
-          }
-        ]
-      }
-    },
-    "missing_submetric_policy": {
-      "const": "renormalize_valid_weights_and_report_subcoverage"
-    },
-    "minimum_submetric_coverage": {
-      "type": "string",
-      "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-    },
-    "minimum_company_coverage": {
-      "type": "string",
-      "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-    },
-    "dimension_registry_ref": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "path": {
-          "type": "string",
-          "minLength": 1
-        },
-        "sha256": {
-          "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
-        }
-      },
-      "required": [
-        "path",
-        "sha256"
-      ]
-    },
-    "dimension_policies": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": {
+    "entry_results": {
+      "type": "array",
+      "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "quality_policy": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "evidence_requirement": {
-                "enum": [
-                  "accessible_original",
-                  "issuer_or_regulator_original"
-                ]
-              },
-              "freshness": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "report_obligation"
-                      }
-                    },
-                    "required": [
-                      "kind"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "age_days"
-                      },
-                      "max_age_days": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 3650
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "max_age_days"
-                    ]
-                  }
-                ]
-              }
-            },
-            "required": [
-              "evidence_requirement",
-              "freshness"
-            ]
+          "entry_key": {
+            "type": "string",
+            "minLength": 1
           },
-          "event_policy": {
+          "locator": {
             "oneOf": [
               {
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                  "enabled": {
-                    "const": false
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
                   }
                 },
                 "required": [
-                  "enabled"
+                  "sheet",
+                  "range"
                 ]
               },
               {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": true
-                  },
-                  "half_life_days": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 730
-                  }
-                },
-                "required": [
-                  "enabled",
-                  "half_life_days"
-                ]
+                "type": "null"
               }
+            ]
+          },
+          "status": {
+            "enum": [
+              "imported",
+              "failed"
+            ]
+          },
+          "item_revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
         "required": [
-          "quality_policy",
-          "event_policy"
+          "entry_key",
+          "locator",
+          "status",
+          "item_revision_id",
+          "error_code"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "imported"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "error_code": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "null"
+                },
+                "error_code": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
         ]
       }
+    },
+    "company_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reported_result": {
+            "enum": [
+              "has_updates",
+              "no_material_update",
+              "unknown"
+            ]
+          },
+          "source_locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "company_label",
+          "company_id",
+          "reported_result",
+          "source_locator",
+          "note"
+        ]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [
     "schema_version",
-    "model_key",
-    "version",
-    "metric_definition_ref",
-    "numeric_policy_ref",
-    "rubric_catalog_ref",
-    "dimension_weights",
-    "event_contribution",
-    "valuation",
-    "baselines",
-    "missing_submetric_policy",
-    "minimum_submetric_coverage",
-    "minimum_company_coverage",
-    "dimension_registry_ref",
-    "dimension_policies"
-  ]
+    "ingestion_run_id",
+    "input_manifest_id",
+    "raw_object_id",
+    "report_revision_id",
+    "adapter_ref",
+    "parse_version",
+    "upstream_report_date",
+    "upstream_generated_at",
+    "upstream_timezone",
+    "upstream_run_ref",
+    "reported_window",
+    "entry_results",
+    "company_coverage",
+    "warnings",
+    "generated_at"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IngestionResult 1.0 — immutable parse output manifest"
 }
 
-[END PART 21/36]
+
+===== SOURCE: contracts/job-event.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "ItemCaptured",
+        "ItemNormalized",
+        "AnalysisProposed",
+        "ReviewApproved",
+        "EventChanged",
+        "FundamentalChanged",
+        "ScoreCompleted",
+        "StrategyEvaluated",
+        "MembershipChanged",
+        "NotificationRequested",
+        "IndexRequested",
+        "DecisionAccepted",
+        "DecisionOverridden",
+        "TemplatePublished",
+        "CorrectionRecorded"
+      ]
+    },
+    "schema_version": {
+      "const": "2.0"
+    },
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "backfill",
+        "replay",
+        "shadow",
+        "research_reconstruction"
+      ]
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_manifest_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "input_manifest_id",
+        "job_id"
+      ]
+    },
+    "evaluation_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "knowledge_cutoff": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "time_bucket": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "calendar_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template_resolution_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "numeric_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "as_of",
+        "knowledge_cutoff",
+        "time_bucket",
+        "calendar_ref",
+        "template_resolution_hash",
+        "numeric_policy_ref",
+        "decision_policy_ref"
+      ]
+    }
+  },
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "workspace_id",
+    "entity_id",
+    "entity_revision",
+    "occurred_at",
+    "trace_id",
+    "mode",
+    "generation",
+    "payload",
+    "evaluation_context"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Durable job reference event"
+}
+
+[END PART 21/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

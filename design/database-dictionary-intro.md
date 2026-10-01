@@ -46,6 +46,9 @@ erDiagram
     ITEM_REVISION ||--o{ ITEM_OBSERVATION : observed_content
     RAW_OBJECT ||--o{ ITEM_REVISION : original
     ITEM_REVISION ||--o{ EVIDENCE : locates
+    ITEM_REVISION ||--o{ ITEM_SOURCE_REFERENCE : cites
+    ITEM_REVISION o|--o{ ITEM_SOURCE_REFERENCE : acquired_target
+    ITEM_REVISION o|--o{ ITEM_REVISION : derived_entries
     COMPANY ||--o{ SECURITY : issues
     SECURITY ||--|{ LISTING : quotations
     COMPANY ||--o{ COMPANY_ALIAS : names
@@ -118,6 +121,8 @@ erDiagram
 | 历史更正 | 原记录保留+correction结果+当前必要reconciliation CAS+audit/outbox | 当时记录/更正说明可并列 | 旧generation不覆盖今天 |
 
 当前评分查询取 `score_current` 指针但校验其状态、当前判断/权限代次；历史页直接取固定snapshot。候选按release/security分页，时间线按company/event_time/id；自选按security保存、公司页可聚合显示。原型仅固定样例，不实现这些查询。
+
+资讯读取不依赖score/evaluation完成。item_revision保存摘要、固定reading_metadata、发布时间精度及文件父修订/位置；item_source_reference保存多来源与首次取得的目标修订。ingestion_run的input_manifest不回写解析结果，result_manifest指向不可变ingestion_result输出；每次item_observation关联实际run。具体语义见04 §6与information-entry/ingestion-result Schema。完整字段目录仍按切片落实，未建立数据库。
 
 ## 7. 本轮验证边界
 

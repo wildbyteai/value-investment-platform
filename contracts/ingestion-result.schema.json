@@ -1,0 +1,284 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "ingestion_run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "raw_object_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "report_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "adapter_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parse_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "upstream_report_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "upstream_generated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "upstream_timezone": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "upstream_run_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reported_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "end_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "start_raw",
+        "end_raw",
+        "timezone"
+      ]
+    },
+    "entry_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "imported",
+              "failed"
+            ]
+          },
+          "item_revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "entry_key",
+          "locator",
+          "status",
+          "item_revision_id",
+          "error_code"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "imported"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "error_code": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "null"
+                },
+                "error_code": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "company_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reported_result": {
+            "enum": [
+              "has_updates",
+              "no_material_update",
+              "unknown"
+            ]
+          },
+          "source_locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "company_label",
+          "company_id",
+          "reported_result",
+          "source_locator",
+          "note"
+        ]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "ingestion_run_id",
+    "input_manifest_id",
+    "raw_object_id",
+    "report_revision_id",
+    "adapter_ref",
+    "parse_version",
+    "upstream_report_date",
+    "upstream_generated_at",
+    "upstream_timezone",
+    "upstream_run_ref",
+    "reported_window",
+    "entry_results",
+    "company_coverage",
+    "warnings",
+    "generated_at"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IngestionResult 1.0 — immutable parse output manifest"
+}

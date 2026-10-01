@@ -1,249 +1,7058 @@
 
-[PART 34/36]
-
-
-===== SOURCE: review/DESIGN-DETAIL-REVIEW.md =====
-
-# v0.3 设计细化记录
-
-2026-10-01；起点HEAD `a16e334e76bfe7fc69200f2a96397693811e4c8e`，本轮为未提交工作树设计细化，实际输入hash见原型及材料报告。用户要求继续领域建模、数据库表设计、核心业务流程图和页面原型；未启动W-08产品开发。
-
-## 本轮产出与取舍
-
-- 14：领域聚合/责任、对象粒度、关系图、BF-01…05核心业务流程及R/W/T连接。
-- 15及design/database-catalog.json：字段级物理设计候选、三组ER图、PK/FK/唯一键/索引、可空与生命周期、写入事务/查询路径；目录由本地工具生成字典。完整目录不是M0一次建表的门槛。
-- 16及prototype/：研究/管理统一可点击原型，固定两公司/三证券；五角色演示，主线、A/H切换、覆盖、模板/策略预览发布和质量恢复。
-
-保持11/12、全部R-01…17/W-01…08/T-01…43与用户决定；不更改评分/风险/时间数字，不引入服务/框架或真实依赖。逻辑link/impact/rubric/risk选择同一个类型化修订根表，以视图展开，人工修订用独立lineage连AUTO/HUMAN旧值；这属于存储映射候选，不改公开Schema。解除覆盖清指针并记录独立动作，不新增公开accepted/rejected/pending枚举。通知表、索引物理设计和真实身份服务内部结构后置。
-
-## 已执行与未执行
-
-生成工具已检查表名/字段/FK目标/唯一键字段。浏览器原型检查见design-detail/prototype-checks.json与截图：导航、两类替换、冲突保留、预览失效、角色门禁、A/H对照、笔记转义、恢复/更正和四种视口。
-
-额外核对固定评分向量与templates-standard：示例制造沿用35/20/25/15/5%的企业权重，示例设备沿用30/20/25/15/10%的制造业权重，各自固定向量与Q一致；扩展模板草稿与已发布方案明确分开。
-
-第一次原型检查读取页面早于hashchange渲染完成，因此首项失败；保留[首轮检查](./design-detail/prototype-checks-attempt-01.json)，修正检查等待新页面渲染后重跑，当前结果见[最终检查](./design-detail/prototype-checks.json)。不把原型检查映射为产品测试通过。
-
-未执行DDL/数据库/API/worker/评分模板与规则引擎、真实RBAC/跨组织权限、模型/源、T-UX的5名用户计时、屏幕阅读/浏览器200%缩放/真机、容量或恢复演练。原型结果是固定合成对照，不用于投资判断。
-
-## 实施交接与当前重点
-
-下一轮先使用原型走“变化→依据→人工覆盖→三层模板→策略模拟/发布”，检查术语与操作是否适合研究。然后在明确产品实施范围内按13纵向建立必要表/API/页面，将物理候选转为迁移。PG版本、cutoff处未提交事务的可见性与知识watermark、实际生成客户端均留在实施验证，不预填通过。已有权限/保密/数据边界继续有效，无需重问已确定能力。
-
-## 2026-10-01追加：新闻原文、公司案例与中文文案
-
-本次从HEAD `0b8511b`及干净工作区开始。补齐用户指出的页面缺项：新增独立新闻资讯导航、公司内新闻资讯/研究事件标签；4篇固定演示资讯按发布时间倒序，支持公司/类型/日期筛选，正文分别关联标题、来源、三个时间、三段原文与高亮。订单公告和后续报道归为同一事件，保留两个原文入口；两家公司同名的财务更新不相互归并；原文返回和浏览器后退保留筛选，未知ID明确未找到。发生日期与报告期间不混用发布时间。
-
-展示案例改为比亚迪（002594/01211）与格力电器（000651）；正文、数值和行情全部虚构，顶部与逐篇原文明确标示，未查询真实信息。原H退市案例改为独立虚构公司/SYN-H，真实公司H股OUT案例仅因估值分不足；虚构风险修改不会使真实公司经营分快照进入重算。config/examples保持原合成合同样例，标准权重与评分向量不变；未改变R/W/T和11/12合同。主要界面用评分档位、资料有效期、连续交易日等中文表述。
-
-实际浏览器检查时间：`2026-10-01T00:51:10.263Z`，运行时HEAD见prototype-checks.json，实际工作树输入由source_sha256绑定。隔离无头系统Chrome、本地file页面、阻断HTTP：**65项通过**，无页面脚本错误和HTTP请求尝试。新增7组资讯场景与4视口新闻/原文布局检查；保留原编辑、角色入口、预览失效、评分向量和恢复等检查。检查工具中的显示文字更新不弱化原业务预期。
-
-已查看桌面资讯、公司页、手机资讯与原文截图。当前prototype-checks.json和截图记录本次结果，上一版结果可从`0b8511b`读取，首轮导航等待失败证据仍保留。新增截图：[桌面资讯](./design-detail/desktop-news.png)、[逐篇原文](./design-detail/desktop-original.png)、[手机资讯](./design-detail/mobile-news.png)、[手机原文](./design-detail/mobile-original.png)。
-
-06/16、prototype README、PROJECT和V03账本同步；材料检查另见validation-result.json。本次没有产品/数据库/API/worker、真实采集/模型/行情/部署或外部发送；没有真实来源网址，也未声明完成5名目标用户验收。
-
-## 2026-10-01追加：可理解性评审收口
-
-从`bc7cea3`干净工作区落实独立报告8项问题，逐项修改、证据和边界见[USABILITY-FIXES](./USABILITY-FIXES.md)。首页与公司先当前结论、具体A/H原因和下一步；历史值标日期；资讯与原文带有效判断；评分入口先已发布口径；编辑主动展开且复制原值；手机状态先于分数；自选明确证券。公司列表/自选同样回读修改后的等待状态，港股估值依据明确打开港股。
-
-2026-10-01T01:49:23.956Z本地浏览器检查73项通过，运行基线与工作树输入hash见prototype-checks.json；首次编辑冲突折叠失败证据保留。未执行产品/UAT，也没有业务合同或阶段扩张。GPT Pro提示与核心正文已按业务闭环/UI友好重写，终审尚未执行。
-
-## 2026-10-01追加：GPT Pro终审三项修正
-
-共享终审固定645ab64，未实际看到截图。用户授权后修正历史财务依据时点、删除重复新值摘要、固定策略发布门槛并把旧结果标发布1。当前会话本地复现后验证76项通过，新增PD-FINAL-01…03并查看相关截图；详见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。设计可收口，未启动产品开发或真实接入。
-
-
-===== SOURCE: review/USABILITY-REVIEW.md =====
-
-# 本地原型可理解性独立评审
-
-2026-10-01。评审者：独立 agent，gpt-6.1-sol / high。本轮只评审；以下改法均为提案，未修改原型、业务合同或验收标准。
-
-## 基线、证据和边界
-
-- 固定基线：`main`，HEAD `ca4167d3f0fd9c52c8b08a98f834f94dd3204b59`。开始时 `git status --short` 无输出，工作区干净。本次唯一新增交付是本文。
-- 先读项目入口 PROJECT、README、AGENTS，随后先看截图，再读 UX/业务设计和源码；没有先用详细设计文档替页面补充解释。
-- 已实际使用 `view_image` 查看：[桌面今日变化](design-detail/desktop-changes.png)、[桌面公司页](design-detail/desktop-company.png)、[桌面新闻](design-detail/desktop-news.png)、[桌面原文](design-detail/desktop-original.png)、[桌面模板](design-detail/desktop-template.png)、[手机首屏](design-detail/mobile-first-screen.png)、[手机新闻](design-detail/mobile-news.png)。手机首屏截图所在页面是比亚迪公司档案，不是今日变化。
-- 已核对 [index.html](../prototype/index.html)、[app.js](../prototype/app.js)、[style.css](../prototype/style.css)，以及 [06](../docs/06-ux-and-design-system.md)、[16](../docs/16-prototype-and-design-trace.md)、[01](../docs/01-product-requirements.md)、[11](../docs/11-templates-automation-and-roles.md)、CONTEXT。源码行号均指上述固定基线。
-- 视角：懂基本价值投资、第一次使用本系统的研究者。评审方法是截图冷读与源码走查，没有运行新一轮浏览器操作、服务、数据库或真实网络调用。源码中的导航目标是已观察到的实现，不冒充本轮实际点击结果。
-- 比亚迪 002594/01211、格力电器 000651 仅借用真实名称；新闻、财务、评分、价格都是虚构。SYN-H 风险演练是独立虚构对象。本报告不评价真实公司的投资价值。
-- 这是专家可理解性评审，不是目标用户测试。原有 65 项浏览器检查以及本轮发现均不能证明 T-UX-01…04 通过；没有计时、5 人理解测试或用户验收证据。
-
-## 总体判断
-
-**目前页面能让人看出“这里可以读公司资料”，但还不能让第一次使用者顺畅理解“系统已经替我判断了什么、今天哪件事最值得看、我接下来该做什么”。用户说看不懂，有充分的界面依据。**
-
-冷读时，新闻标题、发布时间、公司名称、逐篇“阅读原文”和高亮段落比较清楚。A/H 并列、资料缺口提示、真实名称与虚构材料分开，也有助于避免混淆。问题主要出在解释顺序：页面先呈现分数、状态、版本和配置，再要求读者自己拼出业务结论。原型覆盖了许多后台能力，但正常研究路径还没有形成一条容易复述的故事。
-
-| 第一次使用者要回答的问题 | 本轮观察与判断 |
-|---|---|
-| 系统用来做什么？ | 能猜到是公司研究工具；“把每个判断放回依据”强调可追溯，尚未明确“持续整理资料、检查经营质量和股票是否符合自己规则”。 |
-| 今天该看什么？ | 有“值得查看的变化”，但历史入选、当天缺价、虚构风险、规则变更并列；没有先说明比亚迪 A 股今天不能更新判断。 |
-| 分数与状态是什么意思？ | 知道经营和估值分开，却不知道 72 是否足够、68 是否表示便宜、“区间”是什么集合、100% 覆盖是否代表结论可靠。 |
-| 下一步做什么？ | 能打开原文；读完后的有效判断、需要复核的理由与规则解释分散，容易直接走到修改判断或模板草稿。 |
-
-这不要求删掉多人 RBAC、三层模板、外部模型或人工覆盖能力。最小改进是改变主次、文案和已有入口的去向，把配置与诊断保留在管理或高级入口。
-
-## 按影响排序的问题
-
-### 1. 首屏没有先交付一个能复述的研究结论
-
-**观察：** 今日变化副标题是“先看变化，再回到当时的规则和证据”；品牌副标题是“把每个判断放回依据”。公司页标题下面是“本例：经营分72.0；A股收盘价待补，港股估值条件未满足”。主卡为“公司经营质量”和“证券状态”，右侧“研究要点”主要解释系统组织方式，没有告诉用户这家公司现在值得注意什么。见桌面变化/公司截图；`index.html:7`、`app.js:65,78,85`。
-
-**判断与任务影响：** 用户需要先理解分数和状态词，才能理解本系统的用途。“有很多信息”已经展示，“系统替我整理出的结论”尚未展示。对第一次使用者这是最先发生的认知障碍。
-
-**最小改法提案：** 首页加一句用途说明：“持续整理你关注公司的资料，检查经营情况与各市场股票是否符合你的筛选规则。”每张公司摘要先用两句日常中文交付结论，例如“经营评分达到当前规则要求；A股今天缺收盘价，暂时不能作新判断。港股估值未达要求。”再显示数字与展开入口。最后指向一个已有的主要动作，例如“查看缺价说明”或“阅读本次订单依据”。不增加向导或新的业务能力。
-
-### 2. 历史入选和当前待评估挨在一起，旧估值又像当前结果
-
-**观察：** “今日变化”展示 09-28 至 09-30 固定窗口，第一条是 09-29 比亚迪“新入选”，第三条才是 09-30 缺价。公司页为“待评估 · 最后区间内”。源码中策略候选页对同一 002594 行仍输出估值 `68.0`、该待评估标签，以及关键原因“连续两个交易日符合条件”。公司页研究要点也输出“A股估值分68.0”，未在该数字旁注明是旧日期。`app.js:16,34,65,78,110`；16 §3 明确 09-29 评分/估值样例与 09-30 缺价分开。
-
-**判断与任务影响：** 读者可能得出“今天仍符合入选条件”的错误结论。一个标签写待评估、另一个原因写符合条件，无法靠读者的投资常识自行解决。这里先要修清语义，不能仅靠更多帮助文案。
-
-**最小改法提案：** 首页先陈述当前待处理情况，历史变化继续保留在带日期的记录区；固定演练窗口使用“演示期间变化”这样的标题。“待评估 · 最后区间内”拆成“今日：缺收盘价，待评估”与“上次确认：09-29，已入选”。待评估行把 `68.0` 写为“上次估值分68.0（09-29）”，关键原因改为当天缺价；不要用历史满足条件解释当天结果。保留历史不可变、缺数据不推进状态的既有合同。
-
-### 3. 数字很突出，分数的业务含义和适用口径很弱
-
-**观察：** 公司卡突出 `72.0` 与“覆盖100%”，只有“经营分看质量，覆盖度看资料是否齐全”。证券状态卡不显示适用策略的阈值。原文把 `+0.8`、`−0.2` 放进高亮段落，人工修改页给出“−1至+1”；评分档位仅给“0至4”。估值页突出分数，未直接说明分数方向。`app.js:23,80,85,87,101`。历史入选解释页才列出经营分 ≥70、估值分 ≥60，见 `app.js:69`。
-
-**判断与任务影响：** 这些数字属于不同尺度，读者可能把影响值当总分增减，把覆盖度当模型可信度，把高估值分当价格更贵。即使知道价投，也不等于知道本系统的评分规则。比亚迪72与格力76还不能脱离企业口径直接排名，11 §3已规定这一点。
-
-**最小改法提案：** 分数旁直接显示短解释和当前规则参照，例如“经营质量：72.0，达到本策略70分要求”“估值分：分数越高表示越符合本套估值条件，入选要求60”。注明资料/评估日期及所用规则。覆盖文案使用“所需评分资料覆盖100%；不是结论正确率”。影响值、档位在使用处展示既有定义的方向与档位锚点，详细口径再展开；不要求把后台算法全部放首屏。
-
-### 4. 新闻告诉我“处理到了哪一步”，没有告诉我“有效判断是什么”
-
-**观察：** 新闻卡写“研究进度：系统已判断，可由研究员修改”“与订单公告归为同一事件”，但卡片未展示有效判断的方向、维度或关键理由。原文右侧依旧只显示关联公司、研究事件、研究进度，然后提供“查看或修改影响”。公司页另有“研究事件”“评分解释”两个标签。`app.js:29,78–80,92`；桌面新闻/原文截图。
-
-**判断与任务影响：** 用户已经读懂“订单需交付验收”，仍不知道系统最终怎么理解这句话，以及为何需要修改。“研究事件”与“新闻资讯”的区别被解释成去重机制，尚未体现研究事件承接判断的作用。读者会在多个标签之间找结论。
-
-**最小改法提案：** 订单卡和原文旁显示一条可读的当前判断：“系统认为这件事对盈利有正向影响；理由……”。数值和是否人工修改作为次级信息。主要入口先叫“查看判断与依据”，修改动作留在详情中；财务材料没有独立事件影响时如实写“用于经营评分，尚无独立事件影响判断”。新闻和研究事件两种视图继续保留，但通过同一个判断入口连起来。
-
-### 5. “查看评分口径”实际把读者送进另一份待发布模板草稿
-
-**观察：** 公司经营质量卡的“查看评分口径”、研究要点的“查看评分规则”都链接 `#templates`。该页是“三层评分模板”，默认显示“合成企业草稿”，含客户留存扩展、90日龄期和模拟发布。公司当前评分是已发布五维方案，盈利权重35%；模板草稿显示盈利30%和六维合计100%。页面有说明两者不同，但读者必须自己分辨。`app.js:78,85,105`；桌面模板截图；16 §3明确这确实是另一份草稿。
-
-**判断与任务影响：** “读分数为什么是72”变成“学习继承与发布”。草稿权重可能被误认为当前72分的依据。后台能力在正确的业务阅读点出现得太早，也违背06“结论先、细节后”的体验目标。
-
-**最小改法提案：** “查看评分口径”先到当前公司的“评分解释”，直接显示形成当前分数的已发布规则、关键指标/档位、贡献和原文。已有“比较继承与覆盖”保留为高级入口，清楚标为“维护规则/查看草稿”。模板页先区分“当前生效规则”和“正在编辑的草稿”；不删除三层模板、不改变其发布流程。
-
-### 6. 演示故事混入测试说明，人工修改缺少容易理解的依据
-
-**观察：** 订单原文第2段写“这段原文用于比较系统影响值+0.8与研究员改为−0.2的理由”；第3段解释三种时间为什么不能互换。标题也使用“一份订单公告的研究示例”。+0.8→−0.2与档位3→1是预置演练，人工页默认准备修改为−0.2，却没有展示可据此选择该值的尺度/锚点。`app.js:14,23,101`；桌面原文截图。
-
-**判断与任务影响：** 合成原文不像材料、研究结论不像从材料得出，读者读到的是原型设计者的意图。“尚未全部转化为利润”可提示谨慎，却单独不足以让第一次使用者理解为什么已经变成负向−0.2。用户容易以为使用系统就是给任意数值，而不是核对证据后修正判断。
-
-**最小改法提案：** 保留醒目的虚构标识，把合成正文写成普通业务材料，时间分别放元信息；把测试目的移出正文。在同一已有示例中补清正向和负向判断各自的证据与评分定义，先展示当前有效判断，再由用户主动选择修改；预置负值只在明确的人工修改演练中出现。不为此增加新流程，也不把“未实现利润”直接等同为负面事实。
-
-### 7. 手机首屏最先看到大分数，关键证券结论在下方
-
-**观察：** 390×844公司首屏约前230px被演示条、品牌/身份、搜索、研究/管理切换占用；公司标题与自选后，经营质量卡完整显示，而证券状态只露出标题和A股代码，具体状态不在首屏。CSS将 `.split` 顺序堆叠为单列；公司函数先输出经营卡再输出证券卡。`style.css:1,3`、`app.js:85`；手机首屏截图。06 §4的手机顺序原本要求“状态及两条关键原因→经营分/覆盖”。
-
-**判断与任务影响：** 手机上的用户先看到72和100%，必须继续滚动才能知道今天缺价。布局适配成功不代表任务信息优先级成功。
-
-**最小改法提案：** 公司名下先放紧凑的A/H当前结论和关键原因，再放分数卡。演示身份切换和页面状态控件收进“演示设置”，手机全局搜索可收为明确搜索入口，保留使用能力。原型声明仍可见，不用隐藏安全或数据边界换空间；无需新增手机专用框架。
-
-### 8. 公司页“加入自选”实际只加入A股，按钮没有告知对象
-
-**观察：** 比亚迪页面名是公司，按钮为“已加入自选/加入自选”；源码始终操作 `c.securities[0].id`，即002594，而自选页写“按证券保存”。港股01211没有从这个按钮选择的机会。`app.js:85,112,144`；桌面/手机公司截图。
-
-**判断与任务影响：** 用户以为关注了“比亚迪”，实际上只关注A股。下一步动作的对象不清，也削弱页面努力解释的公司与A/H区别。
-
-**最小改法提案：** 将按钮写成“关注A股002594”，并在并列证券状态行提供相应的关注入口；或利用已有证券选择明确按钮当前作用对象。继续按证券保存，不改成公司级自选，也不增加二次确认。
-
-## 最优先调整：只做三件事
-
-1. **先让首页和公司页讲清当前结论。** 明确系统用途；用日常中文说A股缺价、港股未达要求；把历史入选和当前待评估分开，纠正候选页的旧估值/旧原因呈现。对应问题1、2、7。
-2. **让“看懂依据”成为一条连续路径。** 新闻/原文直接带出有效判断，分数解释显示当前已发布口径、阈值和日期；读解释的入口不跳到待发布模板。编辑、发布、后台诊断留在明确的高级入口。对应问题3、4、5。
-3. **用一家公司讲通一个可信的演示故事。** 比亚迪订单材料→系统为什么这样判断→研究者为何修正→何时影响当前分数与A/H状态；把测试术语移出正文，说明数值尺度，给关注按钮写明证券对象。对应问题6、8。
-
-这些是布局、文案、已有展示与链接的调整。无需为改善理解新增功能、框架或复杂向导，已确认业务能力继续完整保留。本轮不作实施授权。
-
-## 用比亚迪串起的阅读路径提案
-
-以下日期、数字和新闻均为已有虚构演示，不是新的真实研究结论；这是一种组织页面信息的提案。
-
-```text
-价值研究
-整理关注公司的资料，检查经营情况和股票是否符合你的规则。
-
-比亚迪 · 演示资料截至09-30
-经营评分达到本策略要求；订单收入仍需交付与验收。
-
-A股 002594：今天缺收盘价，暂时不能作新判断。
-            上次确认：09-29，已入选。
-港股 01211：估值分45，未达到本策略60分要求。
-
-[查看今天的缺价说明]   查看上次入选依据
-
-经营分72：达到本策略70分要求
-所需评分资料覆盖100%：表示资料齐全，不是结论正确率
-[为什么得到这个分数]
-
-最近研究：订单需交付和验收
-当前系统判断、关键理由、具体影响维度
-[查看判断与原文]       阅读其他新闻
-
-维护规则、人工修改、运行诊断 → 明确的进阶入口
-```
-
-日常使用时先回答“我今天能不能相信这里有一个新的判断”。比亚迪 A 股缺价，就先看缺价说明；想了解09-29为何入选，打开当时的固定依据，不拿它代替今天的判断。再看公司经营分为什么达到要求，沿具体维度找到财务资料或订单证据。读完订单后，查看系统当前怎样解释交付条件；有不同看法的研究员再修改判断，保存后清楚显示“判断已保存，分数与A/H评估正在更新”。没有异议的读者继续研究或关注明确的一只证券，不必进入规则草稿或管理员页面。
-
-## 后续验证边界
-
-上述提案尚未采纳或实施。改后优先让真实研究者独立回答“系统干什么、比亚迪A/H当前分别怎样、72/68/100%是什么意思、下一步去哪”，再用06现有T-UX任务检验连续路径。沿用既有验收要求，不增设全量评审前置，也不把本报告计为用户验收通过。
-
-
-===== SOURCE: review/USABILITY-FIXES.md =====
-
-# 可理解性评审处置与终审交接
-
-2026-10-01。用户授权落实独立评审、整理提交，并准备以业务闭环和UI友好为重点的GPT Pro终审提示词。本轮只修改设计、合成本地原型及验证材料，未启动产品开发。
-
-## 基线与采纳范围
-
-本轮开始于`main` / `bc7cea39b6627de7028fd2ce2f2a72d4c042c72b`，工作区干净。旧独立报告[USABILITY-REVIEW](./USABILITY-REVIEW.md)固定于`ca4167d3f0fd9c52c8b08a98f834f94dd3204b59`，全文保留；它提及的旧截图和行号须从该提交读取。当前截图为本轮新版，不用它们冒充旧版评审输入。
-
-采纳8项可理解性问题的最小改法：调整阅读顺序、短文案、现有链接去向和证券对象，不引入框架、审批或新业务能力。11/12、评分配置、风险范围及全部R/W/T保持原合同；档位解释取自既有标准配置。
-
-## 逐项处置
-
-| 旧发现 | 本轮改动 | 已执行原型核对 |
-|---|---|---|
-| 1 首屏先数字、缺研究结论 | 首页改“今日研究”，先说明用途、当前结论及主要动作，再显示演示期间历史；公司先结论和A/H原因 | PD-UX-01；桌面首页/公司截图 |
-| 2 旧入选/估值被当作当前 | 比亚迪A股明确09-30缺价待评估、上次09-29已入选；策略行68.0标09-29历史值，当前原因写缺价。人工修改后公司列表、自选及策略都显示等待新评估 | PD-UX-02/04；桌面策略截图 |
-| 3 尺度、覆盖含义不清 | 经营分/100、当前70阈值、日期、覆盖不是正确率；估值分方向和60阈值；影响值不是总分加减；资本配置0–4完整锚点 | PD-UX-03/05/06；PD-UI-07固定向量与配置对照 |
-| 4 新闻缺有效判断 | 订单资讯、事件及原文旁显示系统/人工方向、理由与影响值；财务材料如实显示用于评分、没有独立事件影响判断 | PD-UX-04/05；桌面资讯/原文/判断截图 |
-| 5 读分数却进入另一份草稿 | “为什么得到这个分数”直接进入该公司评分解释，先看已发布五维规则与证据；模板页先当前规则后待发布草稿，维护入口留在进阶区域 | PD-UX-03；桌面模板截图 |
-| 6 原文像测试脚本、默认负值缺依据 | 原文移除测试目的，订单材料加入延期备货、库存和资金占用成本；先读当前判断，主动展开修改，影响草稿复制当前值0.8、档位草稿复制当前档位3；研究者写理由后才能保存新值 | PD-UX-04/05；PD-UI-01/03 |
-| 7 手机关键状态靠后 | 公司结论、A股缺价原因及最近确认先于经营大分数；身份选择收进演示设置，声明仍可见 | PD-UX-08；390×844首屏截图 |
-| 8 公司自选暗中只选A股 | 每只证券都有明确市场/代码的关注按钮，A/H独立保存；港股“查看估值依据”直接选择港股，不沿用上次A股选择 | PD-UX-07；PD-UI-07 |
-
-示例主线是：比亚迪经营分达到已发布规则要求，但A股今天缺价；查看缺价后读订单与验收原文，核对系统的盈利判断，再查当前评分依据及港股估值。有不同意见的研究员主动展开修改并写理由；保存后判断已生效，新的经营分与证券评估尚未生成。格力的评分不受这次修改影响。
-
-真实名称/代码只用于帮助理解，资讯、财务、价格和评分均为虚构；SYN-H风险仍属于独立虚构公司。没有伪造真实外部新闻链接。全部评分/模拟仍是固定展示样例，没有前端策略计算。
-
-## 验证证据与界限
-
-[浏览器报告](./design-detail/prototype-checks.json)：`2026-10-01T01:49:23.956Z`，运行时HEAD为上述`bc7cea3`，`source_sha256`绑定实际未提交原型、工具与三份配置输入。隔离无头系统Chrome，本地file页面，HTTP阻断；**73项通过**，无页面脚本错误和HTTP请求尝试。原65项场景继续保留，新增PD-UX-01…08；覆盖1440/1280/390/430宽度的关键页、编辑冲突保留、预览失效、原文互链与自选。
-
-检查发现并修正：冲突重绘使编辑面板意外折叠；HTML数字输入不接受前导`+`而显示空值；档位草稿未复制当前档位；资本配置第4档说明不完整；港股依据入口未选择港股。新闻增加快捷入口后，原文互链断言限定至事件列表，仍要求每篇对应原文与返回保留。未更改业务预期来适配错误实现。保留[第一次失败记录](./design-detail/prototype-checks-ui-refine-attempt-01.json)；最终通过报告记录当前输入。
-
-本轮已实际查看[桌面首页](./design-detail/desktop-changes.png)、[公司](./design-detail/desktop-company.png)、[判断](./design-detail/desktop-judgment.png)、[策略](./design-detail/desktop-strategy.png)、[原文](./design-detail/desktop-original.png)、[手机首屏](./design-detail/mobile-first-screen.png)和[手机资讯](./design-detail/mobile-news.png)。手机首屏能看到公司结论及A股缺价，分数位于后面；截图检查不等于真实研究者已经看懂。
-
-材料检查另见[validation-result](./validation-result.json)，检查引用、配置、合成合同与输入hash。没有执行真实用户5人计时、T-UX验收、屏幕阅读/真机、产品数据库/API/worker、真实权限、评分/模板/策略引擎、真实源或模型、部署；不得把本轮通过数写成这些验收通过。
-
-06/16、原型README、PROJECT/README及V03账本同步；旧评审保持历史。此次取舍符合AGENTS的业务落地优先级，不以可选加固或更多评审阻塞设计收口。
-
-## GPT Pro终审入口
-
-[GPT-PRO-PROMPT](./GPT-PRO-PROMPT.md)先冷读页面、走业务主线、核查8项处置，再检查会影响结果的必要工程一致性；不要求重写全仓库、重新全量开源选型、穷举防御代码或增加审批/评审轮次。结论限于设计是否可收口，不能冒充上线验收。
-
-优先使用已授权私有GitHub读取并固定实际commit；无连接时用[核心正文](./FINAL-REVIEW-PASTE.txt)，完整[REVIEW-PACK](./REVIEW-PACK.md)按疑问查阅。正文不含截图像素，无法看图必须明确视觉未执行。**GPT Pro终审尚未执行，本轮只准备提示与材料，没有对外模型调用。** 产品开发与真实接入仍需要单独授权。
-
-## 后续终审状态（2026-10-01）
-
-上文是645ab64形成时的收口记录；随后用户提供GPT Pro终审共享页并授权修正三项。终审已取得，历史依据/新值显示/策略版本局部修正完成，见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。不把当前截图回填为旧评审实际输入，也不要求再次终审。
-
-[END PART 34/36]
+[PART 34/41]
+
+
+===== SOURCE: design/database-catalog.json =====
+
+{
+  "design_version": "0.3",
+  "date": "2026-10-01",
+  "status": "DESIGN_ONLY_NOT_EXECUTED",
+  "authority": [
+    "docs/04-data-design.md",
+    "docs/11-templates-automation-and-roles.md",
+    "docs/12-time-numerics-and-corrections.md"
+  ],
+  "physical_target": "PostgreSQL (version and migrations to be selected in authorized implementation)",
+  "table_defaults": {
+    "primary_key": "id",
+    "tenant_foreign_keys": "workspace-local refs use (workspace_id, ref_id) -> target(workspace_id,id), never id alone",
+    "created_at": "database actual clock",
+    "knowledge_sequence": "database-generated monotonic sequence, cannot backdate; exact cutoff watermark protocol must be verified in implementation",
+    "numeric": "numeric(38,12) amounts/ratios; numeric(15,12) scores; intermediate Python Decimal precision=50"
+  },
+  "tables": [
+    {
+      "name": "workspace",
+      "owner": "governance",
+      "lifecycle": "mutable",
+      "scope": "global",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "研究组织名称"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "active/suspended"
+        },
+        {
+          "name": "permission_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "撤权或授权变更提升版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "app_user",
+      "owner": "governance",
+      "lifecycle": "mutable",
+      "scope": "global",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "principal_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "身份提供方与subject组成的稳定身份"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "显示名称"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "active/disabled"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "principal_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "membership_user",
+      "owner": "governance",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "成员身份",
+          "references": "app_user.id"
+        },
+        {
+          "name": "roles",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "五角色ID集合；不混入评分权限"
+        },
+        {
+          "name": "capabilities",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "服务端按固定角色政策解析的有效能力"
+        },
+        {
+          "name": "role_policy_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "固定角色政策版本"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "角色修改If-Match"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "active/revoked"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "user_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "角色可兼任；最后管理员/可授予范围校验由治理服务承担",
+        "roles与capabilities同一次写入生成，客户端不能直接伪造capabilities"
+      ]
+    },
+    {
+      "name": "source",
+      "owner": "ingestion",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "组织内源标识"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "人可读名称"
+        },
+        {
+          "name": "adapter_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "适配器及版本"
+        },
+        {
+          "name": "credential_ref",
+          "type": "text",
+          "nullable": true,
+          "meaning": "凭证引用；不保存凭证"
+        },
+        {
+          "name": "current_policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "当前权利政策",
+          "references": "source_policy.id"
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "采集启用状态"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "运营负责人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "config",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "范围 频率 配额与解析设置；无秘密"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "编辑并发版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "source_policy",
+      "owner": "governance",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "适用来源",
+          "references": "source.id"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "发布版本"
+        },
+        {
+          "name": "allow_fetch",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "是否允许采集"
+        },
+        {
+          "name": "allow_store",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "是否允许保存"
+        },
+        {
+          "name": "allow_analyze",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "是否允许模型分析"
+        },
+        {
+          "name": "allow_export",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "是否允许导出"
+        },
+        {
+          "name": "visibility",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "基础ACL范围"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "权利到期"
+        },
+        {
+          "name": "retention_days",
+          "type": "integer",
+          "nullable": true,
+          "meaning": "运行前确定的期限；null不表示无限"
+        },
+        {
+          "name": "approval_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "授权依据引用"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "政策内容hash"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_id",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "四项权利分别检查；null期限为未配置，不能据此长期保存"
+      ]
+    },
+    {
+      "name": "source_schedule",
+      "owner": "ingestion",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "partition_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "市场/范围分区"
+        },
+        {
+          "name": "cron",
+          "type": "text",
+          "nullable": false,
+          "meaning": "计划表达式"
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false,
+          "meaning": "IANA时区"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "计划版本"
+        },
+        {
+          "name": "next_due_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "下次计划时间"
+        },
+        {
+          "name": "paused",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "暂停状态"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_id",
+          "partition_key",
+          "generation"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "ingestion_run",
+      "owner": "ingestion",
+      "lifecycle": "append_then_finalize",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "schedule_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "计划；手动合成导入可空",
+          "references": "source_schedule.id"
+        },
+        {
+          "name": "partition_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "范围分区"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "逻辑计划时点"
+        },
+        {
+          "name": "schedule_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "计划版本"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "meaning": "live/backfill/replay/shadow"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "queued/running/partial/succeeded/failed"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "输入范围及版本",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "实际完成时间"
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "nullable": true,
+          "meaning": "可诊断业务错误"
+        },
+        {
+          "name": "result_manifest_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "解析输出清单；结果产生后写入，不覆写输入；partial亦可有结果",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_id",
+          "partition_key",
+          "due_at",
+          "schedule_generation",
+          "mode"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,status,due_at"
+      ],
+      "rules": [
+        "input_manifest固定运行前输入；result_manifest.kind=ingestion_result，内容按ingestion-result 1.0；完成结果与条目引用对应",
+        "失败条目保留checkpoint.holes；成功条目可读，partial批次不跳过未解决洞；重试发布新不可变输出清单"
+      ]
+    },
+    {
+      "name": "checkpoint",
+      "owner": "ingestion",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "partition_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "范围分区"
+        },
+        {
+          "name": "cursor",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "最后完整持久化的游标"
+        },
+        {
+          "name": "holes",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "失败项及重试引用"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "并发版本"
+        },
+        {
+          "name": "last_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "最近运行",
+          "references": "ingestion_run.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_id",
+          "partition_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "本页材料未全部落盘不推进cursor；失败洞保留"
+      ]
+    },
+    {
+      "name": "raw_object",
+      "owner": "ingestion",
+      "lifecycle": "append_then_finalize",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "权利版本",
+          "references": "source_policy.id"
+        },
+        {
+          "name": "object_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "项目对象存储路径；不可枚举外部URL"
+        },
+        {
+          "name": "sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "原始字节hash"
+        },
+        {
+          "name": "size_bytes",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "非负字节数"
+        },
+        {
+          "name": "mime_type",
+          "type": "text",
+          "nullable": false,
+          "meaning": "媒体类型"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "temporary/committed/restricted/tombstoned"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "source_id",
+          "sha256"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "上传与DB非跨库事务；相同内容重试复用对象，清理检查活跃引用"
+      ]
+    },
+    {
+      "name": "information_item",
+      "owner": "information",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "nullable": true,
+          "meaning": "源提供的稳定ID"
+        },
+        {
+          "name": "canonical_url_hash",
+          "type": "char(64)",
+          "nullable": true,
+          "meaning": "无external_id时的去重URL hash"
+        },
+        {
+          "name": "latest_observation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前观察指针",
+          "references": "item_observation.id"
+        },
+        {
+          "name": "latest_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前内容修订指针",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "partial unique(workspace_id,source_id,external_id) WHERE external_id IS NOT NULL",
+        "partial unique(workspace_id,source_id,canonical_url_hash) WHERE external_id IS NULL",
+        "external_id与canonical_url_hash至少一项非空；指针必须属于本item"
+      ]
+    },
+    {
+      "name": "item_revision",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "材料",
+          "references": "information_item.id"
+        },
+        {
+          "name": "raw_object_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "metadata_only可无原文对象",
+          "references": "raw_object.id"
+        },
+        {
+          "name": "content_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "内容hash"
+        },
+        {
+          "name": "normalized_hash",
+          "type": "char(64)",
+          "nullable": true,
+          "meaning": "规范化文本hash"
+        },
+        {
+          "name": "parse_version",
+          "type": "text",
+          "nullable": false,
+          "meaning": "解析算法"
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "源发布时间；未知可空"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "首次获得此内容修订时间"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "meaning": "标题"
+        },
+        {
+          "name": "content_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "source_document/agent_report/agent_digest；材料性质不等于判断是否接受"
+        },
+        {
+          "name": "summary_text",
+          "type": "text",
+          "nullable": true,
+          "meaning": "阅读摘要，不冒充被引用原文"
+        },
+        {
+          "name": "reading_metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "information-entry 1.0 reading_metadata；资料类型/主题/人物/摘要来源/上游解读与观察点"
+        },
+        {
+          "name": "parent_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "派生条目的报告文件修订；直接来源可空",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "origin_locator",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "父文件sheet/单元格范围；information-entry 1.0 locator"
+        },
+        {
+          "name": "published_date",
+          "type": "date",
+          "nullable": true,
+          "meaning": "来源的民用发布日期；不伪造午夜瞬时"
+        },
+        {
+          "name": "published_precision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "instant/minute/day/part_of_day/unknown"
+        },
+        {
+          "name": "published_timezone",
+          "type": "text",
+          "nullable": true,
+          "meaning": "已知来源IANA时区；未知不推断"
+        },
+        {
+          "name": "published_time_raw",
+          "type": "text",
+          "nullable": true,
+          "meaning": "上游时间原始表述；访谈不明日期不得假定为发布时间"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "valid/metadata_only/conflicting/restricted"
+        },
+        {
+          "name": "supersedes_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "前一内容修订",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "item_id",
+          "content_hash",
+          "parse_version"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "新增载荷与时间字段按contracts/information-entry.schema.json和04 §6校验；分钟/瞬时须有带offset发布时间，day/part_of_day无published_at；unknown不补日期",
+        "agent_digest必须有parent_revision_id与origin_locator，父修订属于相同workspace且为agent_report；条目和报告复用raw_object",
+        "正文对象表示本材料本身：agent报告/摘要不等同引用文章；摘要不得作为发行人原文",
+        "parent_revision_id只能指已存在父修订；不可自指或形成循环；旧修订/摘要不可覆写"
+      ]
+    },
+    {
+      "name": "item_observation",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "材料",
+          "references": "information_item.id"
+        },
+        {
+          "name": "sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "每材料单调观察序号"
+        },
+        {
+          "name": "revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "本次看到的内容版本",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "本次真正获取时点"
+        },
+        {
+          "name": "previous_observation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "上一观察",
+          "references": "item_observation.id"
+        },
+        {
+          "name": "ingestion_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "此次获得资料的导入/采集批次",
+          "references": "ingestion_run.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "item_id",
+          "sequence"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "A→B→A三次sequence；revision属于同item，不以内容hash丢观察"
+      ]
+    },
+    {
+      "name": "item_source_reference",
+      "owner": "information",
+      "lifecycle": "append_then_resolve",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "引用所在摘要/资料修订",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "reference_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "本修订内稳定引用序号/键"
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "上游来源名称"
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": true,
+          "meaning": "来源入口，可缺失；不表示正文已取得"
+        },
+        {
+          "name": "locator_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "article/list/account/unknown；未核验时unknown"
+        },
+        {
+          "name": "source_locator",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "该来源在原文件中的位置；直接资料可空"
+        },
+        {
+          "name": "target_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "实际取得的来源正文修订；未知可空",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "item_revision_id",
+          "reference_key"
+        ]
+      ],
+      "indexes": [
+        "item_revision_id",
+        "target_revision_id WHERE target_revision_id IS NOT NULL"
+      ],
+      "rules": [
+        "来源描述/url/定位随所属修订固定；target_revision_id只允许null→确切正文修订，CAS提交解析结果与审计；重复相同绑定幂等",
+        "错误来源绑定通过新资料修订更正；目标修订必须是同workspace的source_document且实际有可定位正文；不得指向本摘要",
+        "正文访问仍校验目标来源政策；无权/撤权/未取得分别由读取时质量说明表达，不能向无权者泄露目标引用",
+        "未取得引用不用伪造空information_item；source名但无url可合法保留"
+      ]
+    },
+    {
+      "name": "evidence",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "原始修订",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "locator_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "text/table/observation"
+        },
+        {
+          "name": "locator",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "字符范围或sheet/row/column，含原单位"
+        },
+        {
+          "name": "quote_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "定位片段hash"
+        },
+        {
+          "name": "text_excerpt",
+          "type": "text",
+          "nullable": true,
+          "meaning": "获许可片段；不是模型摘要"
+        },
+        {
+          "name": "source_quality",
+          "type": "numeric(13,12)",
+          "nullable": false,
+          "meaning": "来源等级0到1"
+        },
+        {
+          "name": "policy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "权利版本",
+          "references": "source_policy.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "item_revision_id",
+          "locator",
+          "quote_hash"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "JSONB定位建立唯一键前规范化；正文受源权利代理访问"
+      ]
+    },
+    {
+      "name": "company",
+      "owner": "identity",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "legal_name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "经营主体名称"
+        },
+        {
+          "name": "legal_identity_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "法定身份类型和值；同名不同主体"
+        },
+        {
+          "name": "industry_code",
+          "type": "text",
+          "nullable": false,
+          "meaning": "当前唯一行业绑定"
+        },
+        {
+          "name": "identity_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "身份修订版本"
+        },
+        {
+          "name": "redirect_company_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "合并后当前指向；旧ID保留",
+          "references": "company.id"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "active/merged/unsupported"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "legal_identity_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "company_alias",
+      "owner": "identity",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "alias",
+          "type": "text",
+          "nullable": false,
+          "meaning": "别名，不全局唯一"
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": false,
+          "meaning": "语言"
+        },
+        {
+          "name": "context",
+          "type": "text",
+          "nullable": true,
+          "meaning": "市场/来源上下文"
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务生效"
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "半开结束"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "系统知悉"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "身份依据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,alias",
+        "workspace_id,company_id,valid_from"
+      ],
+      "rules": []
+    },
+    {
+      "name": "security",
+      "owner": "identity",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发行主体",
+          "references": "company.id"
+        },
+        {
+          "name": "security_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "内部工具标识；非报价代码"
+        },
+        {
+          "name": "isin",
+          "type": "text",
+          "nullable": true,
+          "meaning": "ISIN；合成资料可空"
+        },
+        {
+          "name": "share_class",
+          "type": "text",
+          "nullable": false,
+          "meaning": "A/H等权利类别"
+        },
+        {
+          "name": "primary_listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "当前主挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "生效"
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "结束"
+        },
+        {
+          "name": "identity_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "身份版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "security_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "listing",
+      "owner": "identity",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "exchange",
+          "type": "text",
+          "nullable": false,
+          "meaning": "交易所"
+        },
+        {
+          "name": "symbol",
+          "type": "text",
+          "nullable": false,
+          "meaning": "报价代码"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "meaning": "报价币种"
+        },
+        {
+          "name": "calendar_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定日历",
+          "references": "calendar_version.id"
+        },
+        {
+          "name": "close_policy_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "最终价格类别政策"
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "生效"
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "结束"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "知悉"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,exchange,symbol"
+      ],
+      "rules": [
+        "exchange+symbol的有效区间不得重叠；用PostgreSQL范围排斥约束（迁移时确认btree_gist）",
+        "主挂牌属于该security；release另冻结确切listing修订"
+      ]
+    },
+    {
+      "name": "company_relation",
+      "owner": "identity",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "from_company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "关系主体",
+          "references": "company.id"
+        },
+        {
+          "name": "to_company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "关系对象",
+          "references": "company.id"
+        },
+        {
+          "name": "relation_type",
+          "type": "text",
+          "nullable": false,
+          "meaning": "母子 客户 供应商等"
+        },
+        {
+          "name": "ownership_ratio",
+          "type": "numeric(13,12)",
+          "nullable": true,
+          "meaning": "持股比例"
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务生效"
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "业务结束"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "知悉"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "previous_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "前版本",
+          "references": "company_relation.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "identity_change",
+      "owner": "identity",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "meaning": "merge/split/correct"
+        },
+        {
+          "name": "preview_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "范围预览",
+          "references": "preview.id"
+        },
+        {
+          "name": "identity_manifest",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "旧/新主体及证券映射"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "meaning": "原因"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "操作人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "新身份版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "不批量覆写历史company_id；查询当前显式跳转"
+      ]
+    },
+    {
+      "name": "event",
+      "owner": "information",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "event_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "业务事件稳定ID"
+        },
+        {
+          "name": "current_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前修订",
+          "references": "event_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "event_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "event_revision",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "事件",
+          "references": "event.id"
+        },
+        {
+          "name": "claims",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "带支持/反驳的事实主张"
+        },
+        {
+          "name": "event_time",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "发生时间未知可空"
+        },
+        {
+          "name": "precision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "second/day/range/unknown"
+        },
+        {
+          "name": "source_timezone",
+          "type": "text",
+          "nullable": true,
+          "meaning": "日期粒度时区"
+        },
+        {
+          "name": "event_end_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "范围结束"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "知悉"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "valid/disputed/retracted"
+        },
+        {
+          "name": "supersedes_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "前修订",
+          "references": "event_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,event_time,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "event_evidence",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "event_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "事件修订",
+          "references": "event_revision.id"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "原文证据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "stance",
+          "type": "text",
+          "nullable": false,
+          "meaning": "support/refute/context"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "event_revision_id",
+          "evidence_id",
+          "stance"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "economic_fact",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "fact_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "规范对象+动作+时期/批次"
+        },
+        {
+          "name": "identity_details",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "归并依据与事实期间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "fact_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "语义相似不能作为唯一键；事实身份变更走显式归并/拆分修订"
+      ]
+    },
+    {
+      "name": "event_fact",
+      "owner": "information",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "event_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "事件修订",
+          "references": "event_revision.id"
+        },
+        {
+          "name": "economic_fact_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "经济事实",
+          "references": "economic_fact.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "event_revision_id",
+          "economic_fact_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "input_manifest",
+      "owner": "platform",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "analysis/scoring/evaluation/preview/ingestion / ingestion_result（解析输出）"
+        },
+        {
+          "name": "schema_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "对应Schema或固定内部DTO版本"
+        },
+        {
+          "name": "content",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "规范化完整输入修订、缺口、政策及算法"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "规范化字节hash"
+        },
+        {
+          "name": "evaluation_as_of",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "研究时点"
+        },
+        {
+          "name": "knowledge_cutoff",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "允许知识截止"
+        },
+        {
+          "name": "frozen_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际冻结时间"
+        },
+        {
+          "name": "cutoff_knowledge_sequence",
+          "type": "bigint",
+          "nullable": true,
+          "meaning": "数据库知识watermark"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "evaluation类别必须符合evaluation-input-manifest.Schema；实际字段不能只冻结价格",
+        "manifest的revision/hash可追溯，ACL仍按当前权限再检查"
+      ]
+    },
+    {
+      "name": "analysis_run",
+      "owner": "analysis",
+      "lifecycle": "append_then_finalize",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "材料",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "受限候选证据输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "model_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "模型适配器/版本"
+        },
+        {
+          "name": "prompt_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "提示词版本"
+        },
+        {
+          "name": "schema_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "proposal Schema版本"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "meaning": "live/shadow/reanalysis"
+        },
+        {
+          "name": "input_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "逻辑输入hash"
+        },
+        {
+          "name": "proposals",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "符合analysis-result的完整结果；未运行可空"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "queued/running/succeeded/failed"
+        },
+        {
+          "name": "usage",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "请求/token等用量，无秘密"
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "nullable": true,
+          "meaning": "失败说明"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "input_hash",
+          "model_ref",
+          "prompt_ref",
+          "schema_ref",
+          "mode"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "decision_slot",
+      "owner": "analysis",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "link/impact/rubric/risk"
+        },
+        {
+          "name": "slot_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "11§7规范自然键序列化；不得只用hash去重"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "研究主体",
+          "references": "company.id"
+        },
+        {
+          "name": "subject_identity",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "不可变自然键组成项"
+        },
+        {
+          "name": "current_decision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前有效决定",
+          "references": "review_decision.id"
+        },
+        {
+          "name": "override_valid_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "人工覆盖结束"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "唯一If-Match并发版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "kind",
+          "slot_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "subject_identity建立后不能改；换身份需新slot",
+        "跨记录归属校验：current_decision.slot_id等于本slot"
+      ]
+    },
+    {
+      "name": "judgment_revision",
+      "owner": "analysis",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "slot_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "判断问题",
+          "references": "decision_slot.id"
+        },
+        {
+          "name": "analysis_run_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "AUTO建议来源；人工可空",
+          "references": "analysis_run.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "link/impact/rubric/risk"
+        },
+        {
+          "name": "value",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "完整类型化值；按human-judgment相应分支或AUTO DTO"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "actor_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "AUTO/HUMAN"
+        },
+        {
+          "name": "actor_id",
+          "type": "text",
+          "nullable": false,
+          "meaning": "服务身份或用户身份"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务生效"
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "业务结束"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际知悉"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB生成单调知识序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,slot_id,known_at,id"
+      ],
+      "rules": [
+        "value形状/单位/身份/证据语义按11§7；kind与slot一致",
+        "同slot修订只改值不能换身份；系统时间不能由客户端回填"
+      ]
+    },
+    {
+      "name": "human_judgment_revision",
+      "owner": "analysis",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "judgment_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "完整人工值",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "previous_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "替换前的AUTO或HUMAN修订",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "操作者",
+          "references": "app_user.id"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "meaning": "修改原因"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "judgment_revision_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "id与judgment_revision_id相同，对应HumanJudgmentRevision.revision_id；只replace生成此行",
+        "previous可指AUTO根记录；两修订属于同slot，不限于人工链"
+      ]
+    },
+    {
+      "name": "judgment_evidence",
+      "owner": "analysis",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "judgment_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "判断",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "stance",
+          "type": "text",
+          "nullable": false,
+          "meaning": "support/refute/context"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "judgment_revision_id",
+          "evidence_id",
+          "stance"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "review_decision",
+      "owner": "analysis",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "slot_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "对应subject_slot",
+          "references": "decision_slot.id"
+        },
+        {
+          "name": "subject_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "对应subject_revision",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "accepted/rejected/pending；解除动作记录audit，不增改公开枚举"
+        },
+        {
+          "name": "actor_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "AUTO/HUMAN"
+        },
+        {
+          "name": "actor_id",
+          "type": "text",
+          "nullable": false,
+          "meaning": "服务身份/用户"
+        },
+        {
+          "name": "policy_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "固定政策版本"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "决定生效时点"
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "决定有效期"
+        },
+        {
+          "name": "supersedes_decision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "前决定",
+          "references": "review_decision.id"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "meaning": "理由"
+        },
+        {
+          "name": "evidence_ids",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "确切证据ID集合"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB实际知识序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,slot_id,known_at,id"
+      ],
+      "rules": [
+        "subject_revision归属slot；证据通过judgment_evidence及提交参数一致校验",
+        "解除覆盖仅追加audit/outbox并清有效指针，不虚构accepted决定；保留旧决定"
+      ]
+    },
+    {
+      "name": "risk_resolution",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "risk_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "kind=risk的根修订",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结策略发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "确切适用证券",
+          "references": "security.id"
+        },
+        {
+          "name": "primary_listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "policy_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "风险目标政策hash版本"
+        },
+        {
+          "name": "identity_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定身份版本",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际风险适用时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "risk_revision_id",
+          "release_id",
+          "security_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "target_kind/id从risk_revision视图取；H listing只适用匹配主挂牌",
+        "撤销确切slot+revision；release有公司级风险时不能因挂牌风险拒绝而解除"
+      ]
+    },
+    {
+      "name": "financial_fact",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "metric_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "指标注册ID"
+        },
+        {
+          "name": "period_start",
+          "type": "date",
+          "nullable": false,
+          "meaning": "财政期间开始"
+        },
+        {
+          "name": "period_end",
+          "type": "date",
+          "nullable": false,
+          "meaning": "财政期间结束"
+        },
+        {
+          "name": "report_type",
+          "type": "text",
+          "nullable": false,
+          "meaning": "annual/quarter/ytd/half_year"
+        },
+        {
+          "name": "consolidation_scope",
+          "type": "text",
+          "nullable": false,
+          "meaning": "consolidated/parent等"
+        },
+        {
+          "name": "profit_basis",
+          "type": "text",
+          "nullable": true,
+          "meaning": "合并/归母/普通股利润独立口径"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "meaning": "原币种"
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "nullable": false,
+          "meaning": "规范计量单位"
+        },
+        {
+          "name": "value",
+          "type": "numeric(38,12)",
+          "nullable": true,
+          "meaning": "缺失使用null与质量"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "valid/missing/conflicting/unsupported"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "原数据位置",
+          "references": "evidence.id"
+        },
+        {
+          "name": "source_revision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "源修订标识"
+        },
+        {
+          "name": "announced_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "公开时点"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "获取时点"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB知识序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "metric_key",
+          "period_start",
+          "period_end",
+          "report_type",
+          "consolidation_scope",
+          "profit_basis",
+          "source_id",
+          "source_revision"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,company_id,metric_key,period_end,observed_at,id"
+      ],
+      "rules": [
+        "profit_basis空时唯一键采用NULLS NOT DISTINCT或规范口径键，避免null导致重复",
+        "38,12为持久化设计；超范围明确invalid不截断；Python中间计算仍precision=50"
+      ]
+    },
+    {
+      "name": "report_obligation",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "market_board",
+          "type": "text",
+          "nullable": false,
+          "meaning": "市场及板块"
+        },
+        {
+          "name": "report_type",
+          "type": "text",
+          "nullable": false,
+          "meaning": "应披露类别"
+        },
+        {
+          "name": "required_period_end",
+          "type": "date",
+          "nullable": false,
+          "meaning": "应有期间"
+        },
+        {
+          "name": "fiscal_year_end",
+          "type": "text",
+          "nullable": false,
+          "meaning": "财年末规则"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "到期时间"
+        },
+        {
+          "name": "grace_seconds",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "批准宽限"
+        },
+        {
+          "name": "exception",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "例外与证据"
+        },
+        {
+          "name": "policy_ref",
+          "type": "text",
+          "nullable": false,
+          "meaning": "义务规则版本"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "依据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "获取时间"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "market_board",
+          "report_type",
+          "required_period_end",
+          "policy_ref"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "calendar_version",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "calendar_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "市场日历ID"
+        },
+        {
+          "name": "version",
+          "type": "text",
+          "nullable": false,
+          "meaning": "版本"
+        },
+        {
+          "name": "sessions",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "覆盖日期、expected时段、休市例外及来源"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "完整日历hash"
+        },
+        {
+          "name": "valid_start",
+          "type": "date",
+          "nullable": false,
+          "meaning": "覆盖开始"
+        },
+        {
+          "name": "valid_end",
+          "type": "date",
+          "nullable": false,
+          "meaning": "覆盖结束"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "calendar_key",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "price_bar",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "market_session",
+          "type": "date",
+          "nullable": false,
+          "meaning": "挂牌本地市场session"
+        },
+        {
+          "name": "raw_close",
+          "type": "numeric(38,12)",
+          "nullable": true,
+          "meaning": "原始收盘价；缺价null"
+        },
+        {
+          "name": "currency",
+          "type": "char(3)",
+          "nullable": false,
+          "meaning": "报价币种"
+        },
+        {
+          "name": "price_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "连续末值/CAS最终价/正式收盘等"
+        },
+        {
+          "name": "is_final",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "报价是否最终；不代表evaluation封存"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "行情来源",
+          "references": "source.id"
+        },
+        {
+          "name": "source_revision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "源修订"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "获取时点"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "listing_id",
+          "market_session",
+          "source_id",
+          "source_revision",
+          "price_kind"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,security_id,market_session,observed_at,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "fx_rate",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "base_currency",
+          "type": "char(3)",
+          "nullable": false,
+          "meaning": "基准币种"
+        },
+        {
+          "name": "quote_currency",
+          "type": "char(3)",
+          "nullable": false,
+          "meaning": "报价币种"
+        },
+        {
+          "name": "rate",
+          "type": "numeric(38,12)",
+          "nullable": false,
+          "meaning": "每单位base的quote"
+        },
+        {
+          "name": "as_of",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "汇率时点"
+        },
+        {
+          "name": "source_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "来源",
+          "references": "source.id"
+        },
+        {
+          "name": "source_revision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "修订"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "获取"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "base_currency",
+          "quote_currency",
+          "as_of",
+          "source_id",
+          "source_revision"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "rate>0；相反币对不是可直接互换值"
+      ]
+    },
+    {
+      "name": "corporate_action",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "特定证券动作；公司股本可空",
+          "references": "security.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "share_basis/split/dividend等"
+        },
+        {
+          "name": "share_basis",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "同权普通股数量、期间、权利类别与证据"
+        },
+        {
+          "name": "values",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "decimal字符串及单位，匹配metric-definition"
+        },
+        {
+          "name": "source_revision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "源修订"
+        },
+        {
+          "name": "evidence_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "依据",
+          "references": "evidence.id"
+        },
+        {
+          "name": "effective_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务生效"
+        },
+        {
+          "name": "observed_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "获取"
+        },
+        {
+          "name": "knowledge_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "DB序列"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "dimension_registry",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "registry_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "注册目录"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "版本"
+        },
+        {
+          "name": "content",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "dimension-registry.Schema完整目录"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "内容hash"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "registry_key",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "scoring_template",
+      "owner": "scoring",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "template_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "模板稳定标识"
+        },
+        {
+          "name": "level",
+          "type": "text",
+          "nullable": false,
+          "meaning": "base/industry/company"
+        },
+        {
+          "name": "scope",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "适用主体/行业"
+        },
+        {
+          "name": "current_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "最新发布提示指针，运行不按latest读取",
+          "references": "template_version.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "template_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "template_draft",
+      "owner": "scoring",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "template_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "模板",
+          "references": "scoring_template.id"
+        },
+        {
+          "name": "parent_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "base无父；其余固定父",
+          "references": "template_version.id"
+        },
+        {
+          "name": "base_config_ref",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "base完整评分配置引用"
+        },
+        {
+          "name": "patches",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "完整类型化patches"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "草稿If-Match"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "维护人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "editing/published/abandoned"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "template_version",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "template_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "模板",
+          "references": "scoring_template.id"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "发布序号"
+        },
+        {
+          "name": "parent_version_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "固定父版本",
+          "references": "template_version.id"
+        },
+        {
+          "name": "registry_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结注册目录",
+          "references": "dimension_registry.id"
+        },
+        {
+          "name": "content",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "scoring-template.Schema内容"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "整个模板hash"
+        },
+        {
+          "name": "published_by",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "真实发布时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "template_id",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "不跳层/跨组织/循环；范围匹配；parent hash与引用一致"
+      ]
+    },
+    {
+      "name": "effective_config",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "template_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "末层模板",
+          "references": "template_version.id"
+        },
+        {
+          "name": "parent_chain",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "全部固定父ID/version/hash"
+        },
+        {
+          "name": "resolved_config",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "完整EffectiveScoringConfig"
+        },
+        {
+          "name": "origin_map",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "逐字段来源"
+        },
+        {
+          "name": "resolution_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "含registry/rubric/metric/numeric/policy内容hash"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "resolution_hash"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "scoring_binding",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "effective_config_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结解析配置",
+          "references": "effective_config.id"
+        },
+        {
+          "name": "profile_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "首版standard；多方案需显式ID"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "发布绑定代次"
+        },
+        {
+          "name": "published_by",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "真实发布时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "profile_key",
+          "generation"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "baseline_dimension",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "dimension",
+          "type": "text",
+          "nullable": false,
+          "meaning": "冻结registry ID"
+        },
+        {
+          "name": "effective_config_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "口径",
+          "references": "effective_config.id"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "财务/rubric判断依据",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "score",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "0到100；缺失null"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "valid/missing/stale/conflicting/unsupported/pending_review"
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务起点"
+        },
+        {
+          "name": "valid_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "业务终点"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际可用时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,company_id,dimension,known_at,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "contribution_slot",
+      "owner": "scoring",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "economic_fact_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "经济事实",
+          "references": "economic_fact.id"
+        },
+        {
+          "name": "dimension",
+          "type": "text",
+          "nullable": false,
+          "meaning": "维度"
+        },
+        {
+          "name": "impact_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前接受影响；kind=impact",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "absorbed_by_baseline_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "已吸收的基准",
+          "references": "baseline_dimension.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "指针版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "economic_fact_id",
+          "dimension"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "新baseline与吸收指针同事务；一个经济事实只计一个有效贡献"
+      ]
+    },
+    {
+      "name": "baseline_absorption",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "baseline_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "新基准",
+          "references": "baseline_dimension.id"
+        },
+        {
+          "name": "contribution_slot_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "被吸收slot",
+          "references": "contribution_slot.id"
+        },
+        {
+          "name": "slot_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "被吸收版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "baseline_id",
+          "contribution_slot_id",
+          "slot_generation"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "score_snapshot",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "经营主体",
+          "references": "company.id"
+        },
+        {
+          "name": "as_of",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "评分时点"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所有固定依据",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "effective_config_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "解析配置",
+          "references": "effective_config.id"
+        },
+        {
+          "name": "input_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "含时点/政策的输入hash"
+        },
+        {
+          "name": "model_version",
+          "type": "text",
+          "nullable": false,
+          "meaning": "评分算法版本"
+        },
+        {
+          "name": "quality_score",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "Q，缺失null"
+        },
+        {
+          "name": "coverage",
+          "type": "numeric(13,12)",
+          "nullable": false,
+          "meaning": "0到1"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "质量状态"
+        },
+        {
+          "name": "required_source_ids",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "依赖来源集合"
+        },
+        {
+          "name": "permission_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "读取/发布时再校验当前权限版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "input_hash",
+          "model_version"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,company_id,as_of,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "score_dimension",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "score_snapshot_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "公司分",
+          "references": "score_snapshot.id"
+        },
+        {
+          "name": "dimension",
+          "type": "text",
+          "nullable": false,
+          "meaning": "维度"
+        },
+        {
+          "name": "weight",
+          "type": "numeric(13,12)",
+          "nullable": false,
+          "meaning": "权重"
+        },
+        {
+          "name": "baseline_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "有效基准",
+          "references": "baseline_dimension.id"
+        },
+        {
+          "name": "baseline_score",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "基准"
+        },
+        {
+          "name": "contribution_total",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "持久化贡献合计"
+        },
+        {
+          "name": "final_score",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "裁剪后维度分"
+        },
+        {
+          "name": "subcoverage",
+          "type": "numeric(13,12)",
+          "nullable": false,
+          "meaning": "子指标覆盖"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "质量"
+        },
+        {
+          "name": "origin",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "口径来源与指标/rubric解释"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "score_snapshot_id",
+          "dimension"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "score_contribution",
+      "owner": "scoring",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "score_dimension_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "维度输出",
+          "references": "score_dimension.id"
+        },
+        {
+          "name": "contribution_slot_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "事实贡献slot",
+          "references": "contribution_slot.id"
+        },
+        {
+          "name": "impact_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "确切影响判断",
+          "references": "judgment_revision.id"
+        },
+        {
+          "name": "value",
+          "type": "numeric(15,12)",
+          "nullable": false,
+          "meaning": "单事实贡献"
+        },
+        {
+          "name": "explanation",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "m/r/a/q/H/age及证据引用；decimal字符串"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "score_dimension_id",
+          "contribution_slot_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "metric_snapshot",
+      "owner": "fundamentals",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "as_of",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "估值时点"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "匹配财务/价格/FX/股本",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "input_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "输入hash"
+        },
+        {
+          "name": "metric_version",
+          "type": "text",
+          "nullable": false,
+          "meaning": "指标/数值版本"
+        },
+        {
+          "name": "values",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "规范decimal字符串及分母/单位"
+        },
+        {
+          "name": "valuation_score",
+          "type": "numeric(15,12)",
+          "nullable": true,
+          "meaning": "V，不有效null"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "valid/missing/stale/invalid/unsupported"
+        },
+        {
+          "name": "required_source_ids",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "依赖来源"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "security_id",
+          "input_hash",
+          "metric_version"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,security_id,as_of,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "score_current",
+      "owner": "scoring",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "profile_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "研究方案"
+        },
+        {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "最新成功完整评分",
+          "references": "score_snapshot.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "CAS版本"
+        },
+        {
+          "name": "recompute_status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "current/queued/running/failed/invalidated"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "company_id",
+          "profile_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "失败不覆盖成功快照；被拒/替换贡献后旧分只能作为历史解释，当前展示pending_review"
+      ]
+    },
+    {
+      "name": "strategy",
+      "owner": "strategy",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "strategy_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "组织内规则标识"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "名称"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "维护人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "meaning": "private/workspace"
+        },
+        {
+          "name": "active_release_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前发布指针",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "活动指针CAS版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "strategy_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "strategy_draft",
+      "owner": "strategy",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "strategy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "规则",
+          "references": "strategy.id"
+        },
+        {
+          "name": "parent_release_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "来源发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "config",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "strategy.Schema完整有类型AST"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "If-Match"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "维护人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "editing/published/abandoned"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "strategy_version",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "strategy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "规则",
+          "references": "strategy.id"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "不可变配置序号"
+        },
+        {
+          "name": "config",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "完整策略Schema"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "内容hash"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "strategy_id",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "preview",
+      "owner": "platform",
+      "lifecycle": "append_then_finalize",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "strategy/template/binding/identity/correction/retry"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "请求人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "subject_ref",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "草稿或业务目标及版本"
+        },
+        {
+          "name": "request_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "预览请求hash"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "result",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "受影响对象与前后变化；未完成可空"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "queued/running/ready/failed/consumed/expired"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "预览有效期"
+        },
+        {
+          "name": "consumed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "发布/确认时点"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "草稿/输入变化或权限撤销即不可发布；单项覆盖不依赖此表"
+      ]
+    },
+    {
+      "name": "strategy_release",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "strategy_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "规则",
+          "references": "strategy.id"
+        },
+        {
+          "name": "strategy_version_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定策略配置",
+          "references": "strategy_version.id"
+        },
+        {
+          "name": "release_number",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "发布序号"
+        },
+        {
+          "name": "preview_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "已完成且匹配的模拟",
+          "references": "preview.id"
+        },
+        {
+          "name": "parent_release_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "上次发布；回滚也新增",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "published_by",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "有权发布人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "active_from",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "生效时点"
+        },
+        {
+          "name": "binding_manifest_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "冻结所有公司配置与主挂牌清单"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "strategy_id",
+          "release_number"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "release_company_binding",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主体",
+          "references": "company.id"
+        },
+        {
+          "name": "scoring_binding_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定公司配置",
+          "references": "scoring_binding.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "release_id",
+          "company_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "release_security",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "监控证券",
+          "references": "security.id"
+        },
+        {
+          "name": "primary_listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结主挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "identity_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "冻结身份版本"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "release_id",
+          "security_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "evaluation_seal",
+      "owner": "strategy",
+      "lifecycle": "mutable_until_sealed",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "primary_listing_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "主挂牌",
+          "references": "listing.id"
+        },
+        {
+          "name": "market_session",
+          "type": "date",
+          "nullable": false,
+          "meaning": "市场session"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "meaning": "live/replay/shadow等隔离"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "meaning": "session_due/ready_to_seal/sealed；provisional为独立评估run"
+        },
+        {
+          "name": "planned_seal_cutoff",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "固定目标cutoff"
+        },
+        {
+          "name": "evaluation_as_of",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "市场最终时点"
+        },
+        {
+          "name": "manifest_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前冻结候选",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "char(64)",
+          "nullable": true,
+          "meaning": "候选内容hash"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "封存CAS版本"
+        },
+        {
+          "name": "worker_fence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "有效租约token"
+        },
+        {
+          "name": "sealed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "真实封存时间"
+        },
+        {
+          "name": "finalization_token",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "唯一token；sealed必须非空"
+        },
+        {
+          "name": "evaluation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "最终评估",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "application_status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "not_applied/applied/superseded/invalidated"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "release_id",
+          "security_id",
+          "market_session",
+          "mode"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "partial unique(workspace_id,finalization_token) WHERE finalization_token IS NOT NULL",
+        "cutoff之前不能sealed/token；sealed后冻结字段不可变，应用诊断可追加",
+        "provisional run不占最终键：本表session_due/ready_to_seal/sealed为封存slot；provisional状态在评估run中展示而非另建竞争slot"
+      ]
+    },
+    {
+      "name": "seal_candidate",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "seal_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "封存slot",
+          "references": "evaluation_seal.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "候选代次"
+        },
+        {
+          "name": "manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结manifest",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "worker_fence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "领租fence"
+        },
+        {
+          "name": "invalidated_reason",
+          "type": "text",
+          "nullable": true,
+          "meaning": "建立时已废弃的诊断；后续废弃以audit追加"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "seal_id",
+          "generation"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "重新冻结先CAS提升seal generation，旧manifest/candidate保留"
+      ]
+    },
+    {
+      "name": "strategy_evaluation",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "market_session",
+          "type": "date",
+          "nullable": false,
+          "meaning": "市场session"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "meaning": "live/shadow/replay/research_reconstruction"
+        },
+        {
+          "name": "is_provisional",
+          "type": "boolean",
+          "nullable": false,
+          "meaning": "是否仅临时展示"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "冻结输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "score_snapshot_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "经营分缺失可空",
+          "references": "score_snapshot.id"
+        },
+        {
+          "name": "metric_snapshot_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "估值缺失可空",
+          "references": "metric_snapshot.id"
+        },
+        {
+          "name": "context_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "含版本/时点的输入hash"
+        },
+        {
+          "name": "rule_results",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "逐条件true/false/unknown及原因"
+        },
+        {
+          "name": "quality",
+          "type": "text",
+          "nullable": false,
+          "meaning": "质量状态"
+        },
+        {
+          "name": "evaluation_as_of",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "研究时点"
+        },
+        {
+          "name": "knowledge_cutoff",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际允许知识截止"
+        },
+        {
+          "name": "generated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际完成时间"
+        },
+        {
+          "name": "risk_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "计算所见风险代次"
+        },
+        {
+          "name": "permission_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "权限代次"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "release_id",
+          "security_id",
+          "market_session",
+          "context_hash",
+          "mode",
+          "is_provisional"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "knowledge_cutoff<=generated_at；provisional不能引用未来目标cutoff作已知截止"
+      ]
+    },
+    {
+      "name": "strategy_membership",
+      "owner": "strategy",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "release_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发布",
+          "references": "strategy_release.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券",
+          "references": "security.id"
+        },
+        {
+          "name": "confirmed_state",
+          "type": "text",
+          "nullable": true,
+          "meaning": "IN/OUT；无基线null"
+        },
+        {
+          "name": "display_state",
+          "type": "text",
+          "nullable": false,
+          "meaning": "UNKNOWN/OUT/ENTER_PENDING/IN/EXIT_PENDING/SUSPENDED"
+        },
+        {
+          "name": "pending_sessions",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "明确相邻session ID集合"
+        },
+        {
+          "name": "last_applied_session",
+          "type": "date",
+          "nullable": true,
+          "meaning": "最后应用session"
+        },
+        {
+          "name": "finalization_token",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "最后普通封存token"
+        },
+        {
+          "name": "current_evaluation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前依据",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "状态CAS"
+        },
+        {
+          "name": "risk_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "当前风险版本"
+        },
+        {
+          "name": "transition_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "变化序号"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "release_id",
+          "security_id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,release_id,display_state"
+      ],
+      "rules": [
+        "所有写只由strategy服务；实时风险无需最终评估也可更新，变化有独立risk依据",
+        "行锁/CAS+fence+当前risk/ACL generation校验；不应用迟到session"
+      ]
+    },
+    {
+      "name": "membership_transition",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "membership_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "证券状态",
+          "references": "strategy_membership.id"
+        },
+        {
+          "name": "sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "该状态变化序号"
+        },
+        {
+          "name": "from_state",
+          "type": "text",
+          "nullable": true,
+          "meaning": "无初始基线可空"
+        },
+        {
+          "name": "to_state",
+          "type": "text",
+          "nullable": false,
+          "meaning": "目标状态"
+        },
+        {
+          "name": "reason_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "ENTER/EXIT/RISK/MISSING/CONFIG_CHANGE/CORRECTION"
+        },
+        {
+          "name": "basis_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "evaluation/risk/correction/config"
+        },
+        {
+          "name": "basis_ref",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "对应确切修订ID，含风险证据或更正ID"
+        },
+        {
+          "name": "evaluation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "实时风险可无收盘evaluation",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "explanation_snapshot",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "固定当时规则、状态、公司/证券/证据/缺口"
+        },
+        {
+          "name": "known_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "真正发生时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "membership_id",
+          "sequence"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "初始基线不产生ENTER/EXIT；风险退出不再重复生成EXIT",
+        "同basis业务唯一键由事务/幂等账本保证；普通状态变化同封存事务提交"
+      ]
+    },
+    {
+      "name": "correction_run",
+      "owner": "strategy",
+      "lifecycle": "append_then_finalize",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "preview_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "影响预览",
+          "references": "preview.id"
+        },
+        {
+          "name": "original_evaluation_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "原错误对象",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "anchor_evaluation_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "受影响窗口前锚点",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "window",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "受影响session及后续冻结输入"
+        },
+        {
+          "name": "replacement_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "合法替换依据",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "meaning": "原错误类别与原因"
+        },
+        {
+          "name": "expected_generation",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "当前状态CAS"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "queued/running/completed/failed/superseded"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "发起人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "correction_record",
+      "owner": "strategy",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "correction_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "更正运行",
+          "references": "correction_run.id"
+        },
+        {
+          "name": "original_evaluation_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "当时记录",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "replacement_evaluation_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "更正评估",
+          "references": "strategy_evaluation.id"
+        },
+        {
+          "name": "reconciliation",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "旧转移是否仍成立及当前影响说明"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "correction_run_id",
+          "original_evaluation_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "watchlist",
+      "owner": "research",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所有人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "自选名称"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "If-Match"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "watchlist_entry",
+      "owner": "research",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "watchlist_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "自选",
+          "references": "watchlist.id"
+        },
+        {
+          "name": "security_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "自选粒度证券",
+          "references": "security.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "watchlist_id",
+          "security_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "research_note",
+      "owner": "research",
+      "lifecycle": "mutable_with_revisions",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所有人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "company_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "研究公司",
+          "references": "company.id"
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "meaning": "private/workspace"
+        },
+        {
+          "name": "current_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "当前笔记",
+          "references": "note_revision.id"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "If-Match"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "note_revision",
+      "owner": "research",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "note_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "笔记",
+          "references": "research_note.id"
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false,
+          "meaning": "用户研究内容，非真实持仓"
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "修改者",
+          "references": "app_user.id"
+        },
+        {
+          "name": "revision_number",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "修订序号"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "note_id",
+          "revision_number"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "saved_view",
+      "owner": "research",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "owner_user_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所有人",
+          "references": "app_user.id"
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "meaning": "private/workspace"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "视图名"
+        },
+        {
+          "name": "filters",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "公司/策略筛选及排序"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "If-Match"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "job",
+      "owner": "platform",
+      "lifecycle": "mutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "stage",
+          "type": "text",
+          "nullable": false,
+          "meaning": "业务阶段"
+        },
+        {
+          "name": "logical_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "12§6完整规范键"
+        },
+        {
+          "name": "input_manifest_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "固定输入",
+          "references": "input_manifest.id"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "nullable": false,
+          "meaning": "live/backfill/replay/shadow等"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "due/running/succeeded/failed/dead"
+        },
+        {
+          "name": "next_attempt_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "下次重试"
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "已尝试次数"
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "租约结束"
+        },
+        {
+          "name": "worker_fence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "租约fence"
+        },
+        {
+          "name": "result_ref",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "输出修订/状态引用"
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "nullable": true,
+          "meaning": "失败诊断"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "logical_key"
+        ]
+      ],
+      "indexes": [
+        "status,next_attempt_at"
+      ],
+      "rules": []
+    },
+    {
+      "name": "outbox",
+      "owner": "platform",
+      "lifecycle": "append_then_delivered",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定事件ID"
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "nullable": false,
+          "meaning": "版本化领域事件"
+        },
+        {
+          "name": "schema_version",
+          "type": "text",
+          "nullable": false,
+          "meaning": "事件外壳版本"
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "只放受控对象引用，不放原文/密钥"
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "业务提交时间"
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "meaning": "已投递时间"
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "投递次数"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "event_id"
+        ]
+      ],
+      "indexes": [
+        "published_at WHERE published_at IS NULL"
+      ],
+      "rules": []
+    },
+    {
+      "name": "inbox_dedupe",
+      "owner": "platform",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "consumer_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "消费者及版本"
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "事件ID"
+        },
+        {
+          "name": "job_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "恢复账本",
+          "references": "job.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "consumer_key",
+          "event_id"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "idempotency_record",
+      "owner": "platform",
+      "lifecycle": "mutable_until_complete",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "actor_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "用户/服务身份"
+        },
+        {
+          "name": "route_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "固定端点与目标"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "请求键"
+        },
+        {
+          "name": "payload_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "请求内容hash"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "meaning": "reserved/completed"
+        },
+        {
+          "name": "response_ref",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "原201/结果引用"
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "默认保留7日提案"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "actor_key",
+          "route_key",
+          "idempotency_key"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "同键异payload为409；过期不能绕过长期业务唯一键"
+      ]
+    },
+    {
+      "name": "audit_event",
+      "owner": "governance",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "actor_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "操作身份"
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "meaning": "明确业务动作"
+        },
+        {
+          "name": "object_ref",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "对象及修订"
+        },
+        {
+          "name": "request_id",
+          "type": "text",
+          "nullable": false,
+          "meaning": "请求追踪"
+        },
+        {
+          "name": "before_after_hash",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "前后hash，无秘密值"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true,
+          "meaning": "业务理由"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ]
+      ],
+      "indexes": [
+        "workspace_id,created_at,id"
+      ],
+      "rules": []
+    },
+    {
+      "name": "model_policy",
+      "owner": "governance",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "policy_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "模型/审核政策标识"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false,
+          "meaning": "版本"
+        },
+        {
+          "name": "config",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "模型引用 校准/审核/受限候选政策；不含凭证"
+        },
+        {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "内容hash"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "policy_key",
+          "version"
+        ]
+      ],
+      "indexes": [],
+      "rules": []
+    },
+    {
+      "name": "revocation_receipt",
+      "owner": "governance",
+      "lifecycle": "immutable",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "journal_sequence",
+          "type": "bigint",
+          "nullable": false,
+          "meaning": "独立耐久journal序号"
+        },
+        {
+          "name": "scope_ref",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "撤销范围"
+        },
+        {
+          "name": "receipt_hash",
+          "type": "char(64)",
+          "nullable": false,
+          "meaning": "耐久receipt"
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "实际撤权时间"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "journal_sequence"
+        ]
+      ],
+      "indexes": [],
+      "rules": [
+        "只是独立journal的本库回执投影，不能充当恢复时最新真源；本轮不建外部存储"
+      ]
+    }
+  ],
+  "logical_views": [
+    {
+      "name": "item_company_link",
+      "root": "judgment_revision",
+      "filter": "kind=link",
+      "meaning": "从slot身份与value展开材料/事件关联；当前有效视图join decision_slot.current_decision"
+    },
+    {
+      "name": "event_company_impact",
+      "root": "judgment_revision",
+      "filter": "kind=impact",
+      "meaning": "完整signed_impact/confidence/H/economic_fact及证据；不重复存另一份可编辑值"
+    },
+    {
+      "name": "rubric_revision",
+      "root": "judgment_revision",
+      "filter": "kind=rubric",
+      "meaning": "完整criterion/period/grade/锚点修订；baseline由有效判断计算"
+    },
+    {
+      "name": "risk_revision",
+      "root": "judgment_revision",
+      "filter": "kind=risk",
+      "meaning": "完整target_kind/target_id/risk_code/economic_fact/有效期；传播另存risk_resolution"
+    },
+    {
+      "name": "frozen_manifest",
+      "root": "input_manifest",
+      "filter": "kind=evaluation",
+      "meaning": "满足evaluation-input-manifest.Schema的冻结内容"
+    }
+  ],
+  "deferred": [
+    "subscription/notification/delivery",
+    "OpenSearch/向量索引物理结构（可重建投影）",
+    "真实OIDC会话与secret store实现",
+    "生产分区/RLS策略/保留期限及实际独立journal介质"
+  ]
+}
+
+[END PART 34/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

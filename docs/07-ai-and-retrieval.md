@@ -51,3 +51,7 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 
 
 v0.3模型输入manifest除公司候选外，还固定有效security/listing候选和解析dimension/event policy allowlist。analysis Schema3.0支持受限x_ ID与风险target，语义服务验证候选归属、half_life与enabled、原始披露和目标传播；Schema通过不能授权模型扩大范围。模型输出的业务有效时间不改变系统known_at。11 §7/8/9为唯一覆盖、风险与维度合同；前端和检索不得另推传播规则。
+
+## 7. 外部Agent报告作为输入
+
+已有Agent文件按04 §6进入agent_report/agent_digest；reading_metadata中的解读与阅读评级不是analysis-result或accepted决策。规则解析先产出可读资料和受限公司候选；公司关联满足现有政策可AUTO接受；影响/rubric/risk继续遵守§1…3和11，不增加全部逐篇人审。可定位报告单元格只支持“上游报告这样说”，使用发行人原文的政策不能被报告来源冒充满足。报价或目标价不会直接写正式行情/财务。一个摘要多事实可分多个事件，重复摘要沿用经济事实归并。原文补取得使用真实observed_at，禁止回填旧评分依据。

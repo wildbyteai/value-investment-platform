@@ -1,371 +1,480 @@
 
-[PART 20/36]
+[PART 20/41]
 
 
-===== SOURCE: contracts/scoring-template.schema.json =====
+===== SOURCE: contracts/information-read.schema.json =====
 
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Pinned base / industry / company template",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0"
+      "const": "1.0"
     },
-    "template_key": {
+    "item_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "title": {
       "type": "string",
       "minLength": 1
     },
-    "version": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "level": {
+    "content_kind": {
       "enum": [
-        "base",
-        "industry",
-        "company"
+        "source_document",
+        "agent_report",
+        "agent_digest"
       ]
     },
-    "scope": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "all"
-            }
-          },
-          "required": [
-            "kind"
-          ]
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "industry"
-            },
-            "industry_key": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "kind",
-            "industry_key"
-          ]
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "company"
-            },
-            "company_id": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "required": [
-            "kind",
-            "company_id"
-          ]
-        }
+    "summary_text": {
+      "type": [
+        "string",
+        "null"
       ]
     },
-    "parent_ref": {
+    "reading_metadata": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "key": {
-          "type": "string",
-          "minLength": 1
+        "schema_version": {
+          "const": "1.0"
         },
-        "version": {
-          "type": "integer",
-          "minimum": 1
+        "material_type": {
+          "enum": [
+            "news",
+            "announcement",
+            "interview",
+            "research_report",
+            "market_followup",
+            "industry_context"
+          ]
         },
-        "sha256": {
-          "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "person_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "person_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary_origin": {
+          "enum": [
+            "upstream_agent",
+            "source_excerpt",
+            "system_generated",
+            "none"
+          ]
+        },
+        "generator_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "agent_commentary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "watch_points": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_reading_priority": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scale": {
+                  "enum": [
+                    "stars",
+                    "rank",
+                    "label"
+                  ]
+                }
+              },
+              "required": [
+                "raw",
+                "scale"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "key",
-        "version",
-        "sha256"
+        "schema_version",
+        "material_type",
+        "topics",
+        "person_name",
+        "person_role",
+        "summary_origin",
+        "generator_ref",
+        "agent_commentary",
+        "watch_points",
+        "source_reading_priority"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "summary_origin": {
+                "const": "system_generated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "generator_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
       ]
     },
-    "base_config_ref": {
+    "publication": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "path": {
-          "type": "string",
-          "minLength": 1
+        "at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
         },
-        "sha256": {
-          "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "precision": {
+          "enum": [
+            "instant",
+            "minute",
+            "day",
+            "part_of_day",
+            "unknown"
+          ]
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raw": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
-        "path",
-        "sha256"
+        "at",
+        "date",
+        "precision",
+        "timezone",
+        "raw"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "instant",
+                  "minute"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "day",
+                  "part_of_day"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "null"
+              },
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        }
       ]
     },
-    "patches": {
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "company_links": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "dimension": {
+          "company_id": {
             "type": "string",
-            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+            "format": "uuid"
           },
-          "weight": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "baseline": {
-            "oneOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "method": {
-                    "const": "weighted_metric_rubric"
-                  },
-                  "metrics": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "weight": {
-                          "type": "string",
-                          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-                        },
-                        "zero_at": {
-                          "type": "string",
-                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                        },
-                        "full_at": {
-                          "type": "string",
-                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "weight",
-                        "zero_at",
-                        "full_at"
-                      ]
-                    },
-                    "minItems": 1
-                  }
-                },
-                "required": [
-                  "method",
-                  "metrics"
-                ]
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "method": {
-                    "const": "accepted_evidence_rubric"
-                  },
-                  "rubric_ref": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "method",
-                  "rubric_ref"
-                ]
-              }
-            ]
-          },
-          "disabled": {
-            "type": "boolean"
-          },
-          "reason": {
+          "name": {
             "type": "string",
             "minLength": 1
-          },
-          "quality_policy": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "evidence_requirement": {
-                "enum": [
-                  "accessible_original",
-                  "issuer_or_regulator_original"
-                ]
-              },
-              "freshness": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "report_obligation"
-                      }
-                    },
-                    "required": [
-                      "kind"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "age_days"
-                      },
-                      "max_age_days": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 3650
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "max_age_days"
-                    ]
-                  }
-                ]
-              }
-            },
-            "required": [
-              "evidence_requirement",
-              "freshness"
-            ]
-          },
-          "event_policy": {
-            "oneOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": true
-                  },
-                  "half_life_days": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 730
-                  }
-                },
-                "required": [
-                  "enabled",
-                  "half_life_days"
-                ]
-              }
-            ]
           }
         },
         "required": [
-          "dimension",
-          "reason"
-        ],
-        "anyOf": [
-          {
-            "required": [
-              "weight"
-            ]
-          },
-          {
-            "required": [
-              "baseline"
-            ]
-          },
-          {
-            "required": [
-              "disabled"
-            ]
-          },
-          {
-            "required": [
-              "quality_policy"
-            ]
-          },
-          {
-            "required": [
-              "event_policy"
-            ]
-          }
+          "company_id",
+          "name"
         ]
+      }
+    },
+    "body_access": {
+      "$ref": "#/$defs/access"
+    },
+    "reference_access": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator_kind": {
+            "enum": [
+              "article",
+              "list",
+              "account",
+              "unknown"
+            ]
+          },
+          "access": {
+            "$ref": "#/$defs/access"
+          }
+        },
+        "required": [
+          "reference_key",
+          "source_name",
+          "locator_kind",
+          "access"
+        ]
+      }
+    },
+    "quality": {
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
       }
     }
   },
   "required": [
     "schema_version",
-    "template_key",
-    "version",
-    "level",
-    "scope",
-    "patches"
+    "item_id",
+    "revision_id",
+    "title",
+    "content_kind",
+    "summary_text",
+    "reading_metadata",
+    "publication",
+    "observed_at",
+    "company_links",
+    "body_access",
+    "reference_access",
+    "quality",
+    "reasons"
   ],
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "level": {
-            "const": "base"
+  "$defs": {
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "available",
+            "not_acquired",
+            "no_locator",
+            "restricted"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_revision_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "state",
+        "url",
+        "target_revision_id"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "available"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target_revision_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "not_acquired"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "target_revision_id": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "no_locator",
+                  "restricted"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "null"
+              },
+              "target_revision_id": {
+                "type": "null"
+              }
+            }
           }
         }
-      },
-      "then": {
-        "required": [
-          "base_config_ref"
-        ],
-        "not": {
-          "required": [
-            "parent_ref"
-          ]
-        }
-      },
-      "else": {
-        "required": [
-          "parent_ref"
-        ],
-        "not": {
-          "required": [
-            "base_config_ref"
-          ]
-        }
-      }
+      ]
     }
-  ]
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InformationRead 1.0 — common list/detail reading fields"
 }
 
-[END PART 20/36]
+[END PART 20/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -207,9 +207,11 @@ for d,v in scoring['dimension_policies'].items():
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/CODING-READINESS.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
+from intake_material_checks import run as run_intake_checks
+run_intake_checks(read,check,reject)
 revision=current_revision()
 binding=(f'source_sha256 binds the exact inputs used by this run; Git HEAD at run was {revision}; no remote delivery claimed'
          if revision else

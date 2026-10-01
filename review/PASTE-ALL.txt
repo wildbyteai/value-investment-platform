@@ -95,6 +95,7 @@
 | [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
 | [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
+| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 固定技术/任务/输入/验收与后置事项，实施授权后进入合成开发 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -133,6 +134,8 @@ python3 tools/build_review_pack.py
 
 可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
+编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
+
 
 ===== SOURCE: PROJECT.md =====
 
@@ -144,7 +147,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3编码前准备已完成，尚未启动M0/W-08；二轮设计与建模/表设计/交互原型细化成果保留。已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -180,6 +183,10 @@ python3 tools/build_review_pack.py
 原事项README、matter.yaml和各交付/回读文件完整保存在local-evidence/bytewatcher-origin；本机路径与迁移manifest位于local-evidence/migration，不提交GitHub。历史原文不覆写，其旧相对路径与阶段描述按当时commit解释，当前项目内容从Git历史读取。
 
 GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评审材料；真实业务资料、凭证和私人日志不上传。本轮迁移/评审未授权部署、采购、真实采集、真实模型调用、通知或交易。评审报告提出修改时仍区分建议与已采纳合同。
+
+## 2026-10-01 编码准备收口
+
+用户授权完成所有编码前准备；已采纳资料接入局部补齐，扩展item_revision、item_observation、ingestion_run输出引用，新增多来源引用表和三份固定DTO；资讯列表/摘要/原文状态、发布时间精度、BF-01阅读分支、原创合成示例与T-44…49已同步。编码任务、技术依赖、迁移/运行入口与后置事项以[17](./docs/17-coding-readiness.md)为交接入口，证据见[收口记录](./review/CODING-READINESS.md)。不重复终审，不改变评分/A-H/策略合同。真实资料继续仅保留local-evidence；本轮未编码产品、建库、部署或接入真实源。
 
 
 ===== SOURCE: CONTEXT.md =====
@@ -279,6 +286,8 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 当前边界以docs/11为准：多人RBAC、base/industry/company模板、允许外部模型接入、开发无固定预算门槛；通知后置，首版以membership_transition与固定解释为变化记录，不实现收件人/渠道。时点/数值/纠错以docs/12为准，首slice见13；不要以技术复杂为由收窄已确认能力。
 
 历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
+
+编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。当前仅准备完成，产品仍未实施。
 
 
 ===== SOURCE: docs/01-product-requirements.md =====
@@ -597,6 +606,7 @@ v0.3不新增服务或平台：analysis拥有类型化人工修订/slot、risk�
 | information_item | source, external_id, canonical_url_hash, latest_revision_id | source+external_id；无 external_id 才用 source+URL hash |
 | item_observation | item, observation_seq, revision_ref, observed_at, previous_observation | item+sequence；A→B→A保留三次观测；information |
 | item_revision | item, content_hash, object, normalized_hash, published_at, observed_at, parse_version, supersedes, status | item+content_hash+parse_version；一份内容可有不同解析修订 |
+| item_source_reference | item_revision、reference_key、source_name、url、locator_kind、target_revision | 一条摘要多来源；未取得正文可无target；描述固定，目标首次绑定CAS |
 | evidence | revision, locator_kind, start/end or cell, quote_hash, text, source_quality | revision+locator+quote_hash；不可把摘要当原文 |
 | company / company_alias | legal identity, market identifiers, alias language/context, valid range | 内部 company_id 稳定；同名不唯一 |
 | security | company, ISIN, share_class, primary_listing_id, valid range | 公司股权工具身份；A/H独立；identity |
@@ -675,6 +685,34 @@ risk解除引用确切revision，membership提交另校验risk generation；封�
 
 [15字段字典与ER](./15-database-dictionary.md)展开本逻辑模型。字段维护入口为design/database-catalog.json，按切片逐步落实；其中link/impact/rubric/risk采用共同judgment_revision根表和类型化逻辑视图，human链可指AUTO旧修订，有效指针仍只有decision_slot。数据库表/视图/约束与事务均尚未创建或验证，不把目录完整度作为M0一次性建表门槛。
 
+## 6. 资料接入与可阅读载荷（编码准备补齐）
+
+2026-10-01依据已确认的文件参考方案补齐；设计主干与11/12评分、自动审核、A/H时点合同不变。字段真源为design/database-catalog.json；解析DTO为[InformationEntry 1.0](../contracts/information-entry.schema.json)，批次输出为[IngestionResult 1.0](../contracts/ingestion-result.schema.json)，示例为[合成资料](../examples/information-intake.json)。以下拥有新增业务语义，Schema负责形状；API不另复制载荷定义。
+
+### 材料、摘要和原文
+
+content_kind为source_document、agent_report、agent_digest。报告文件是一份agent_report，解析条目是一份agent_digest，引用文章实际取得后是单独source_document。summary_text是阅读摘要；reading_metadata固定资料类型、主题、人物/头衔、summary_origin/generator_ref、上游解读、观察点和阅读星级/排名。system_generated摘要必须保留生成版本；上游解读与有效判断分别显示，不写用户research_note，不把阅读星级当公司质量分。
+
+agent_digest通过parent_revision_id+origin_locator定位报告sheet/range，共享父raw_object。文件中的单元格只证明报告原有表述，不能把二手摘要标为发行人原文。content_hash覆盖完整解析载荷、reading_metadata和引用描述，parse_version改变可产生新修订。observed_at由本系统真实取得时点产生，不能回填为报告日期、上游检索时间或源发布时间。
+
+每次item_observation记录ingestion_run_id；同文件导入采用source+上游稳定报告ID（有则用）或文件hash作为报告external_id，条目external_id=报告身份+sheet+条目位置（规范化序列化，parse_version不混入身份）。相同内容不同解析版本建立新revision；重试同批次不重复observation或条目提交。上游报告无稳定ID时，另一天/排版改变作为新材料，事件/事实层再关联，不能用标题或行号覆写旧材料。A→B→A观察合同保持不变，不能用“重复内容”丢掉新的真实观察。
+
+item_source_reference一条对应一个来源描述，包含source_name、可空url、article/list/account/unknown定位类型及原位置。路径猜测不等于原文核验，未确定为unknown。描述随所属item_revision固定；target_revision_id只允许null→已实际取得、可定位正文的同workspace source_document，CAS与现有审计同事务；同一绑定重试返回原结果。错误绑定通过新解析修订更正，不修改旧快照。没有链接或正文时不制造空information_item。目标权限读取时重新校验；目标已绑定也可能无权/撤权，不把ID或来源细节泄漏给不可见用户。报告的权利不自动授予引用来源的权利。
+
+### 资讯时间
+
+published_at仅用于真实可定位瞬时（instant/minute），要求明确来源时区及offset，日期与该时区的民用日一致。published_date保存上游日期，published_precision表达instant/minute/day/part_of_day/unknown；只有日期或“晚间”时published_at为空，保留published_time_raw，不补午夜/整点。分钟精度不宣称秒精度。无法确定IANA时区时保留原文与日期，不能凭电脑时区猜测；访谈“日期”含义不明则precision=unknown、date/at为空，原值保留raw。
+
+资讯列表默认分两组：已知发布日期按发布民用日倒序；同一天可定位瞬时的条目按瞬时倒序，不精确条目按stable item_id排列并标日期精度，不能声称它们先后已确定。未知发布日期放在“发布时间未明确”；可切time_basis=observed按取得瞬时倒序。跨时区精确瞬时换成读者显示时区的日分组，未知时区的仅日期标“来源日期、时区未明确”，不是严格全球先后。排序tuple、snapshot与组边界写入游标；published日期筛选按这个同源分组日，不把未知日期混入“今日”。事件时间线仍遵守§3，不能用这套资讯排序替换事件时间。
+
+### 批次输出与监控说明
+
+ingestion_run.input_manifest_id在运行前冻结输入/版本；解析输出另写input_manifest表kind=ingestion_result，run.result_manifest_id指向它。输出包含上游报告日期/生成时间/窗口、adapter/parse版本、文件/报告修订、成功revision引用、失败条目定位/原因及company_coverage。每次恢复产生新不可变输出清单，实际成功条目回读后决定succeeded/partial/failed；不把后产生的结果塞回输入或覆写旧输出。
+
+company_coverage.reported_result=has_updates/no_material_update/unknown，是上游报告的说明；与运行是否成功分开。候选公司ID未确认为空。窗口声明与实际跨度不符可记warning，不阻止其他有效条目阅读；无重要动态不产生经济事件。部分失败保留checkpoint.holes，成功条目可见，未解决洞不推进完整checkpoint。监控说明先用固定输出DTO，不增加单独coverage表。
+
+阅读解读与来源入口不要求先完成所有全文抓取/影响判断。需要参与评分的证据仍满足已有07/11政策；满足政策可AUTO接受，不追加逐篇人工审批。报价、研报目标价或原Agent解读不直接进入price_bar、财务事实或经营分。一个条目可涉及多个事实，重复材料各自保留，沿用economic_fact/contribution_slot防重复加分。
+
 
 ===== SOURCE: docs/05-api-and-jobs.md =====
 
@@ -702,6 +740,7 @@ REST /api/v1；完整 OpenAPI 由 M0 后端 DTO 生成，当前文档是详细�
 | GET /companies/{id}/scores | snapshot/as_of；维度、基准、贡献、缺口 | 解释与总分来自同一 snapshot |
 | GET /securities/{id}/valuation | snapshot/as_of；价格、FX、分母与质量 | A/H 独立、停牌/过期说明 |
 | GET /information/{id}/revisions/{revision} | 来源、证据、关联、事件 | metadata_only 不返回虚构正文 |
+| GET /information | company_id、topic、material_type、content_kind、published_from/to、time_basis、cursor | 新闻/摘要列表；发布时间未知单列，阅读不等待评分；详见§7 |
 | GET /events/{id} | 历史修订、支持／反驳来源、公司影响 | 权限过滤后仍显示“部分证据不可见” |
 | POST /search | q, company_ids,date range,types,mode,cursor | 精确／全文／语义，可降级；ACL 在检索前应用 |
 | GET /strategies | 本人／组织可见版本与区间数量 | 不泄露他人私有规则 |
@@ -761,6 +800,29 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 
 
 v0.3覆盖命令/201合成响应及预期持久化见11 §7与examples/v03-human-replacements.json。path slot是操作身份，body保留slot_id用于审计一致性；并发只用一个If-Match generation，服务端读取当前decision，不要求重复的expected decision/generation字段。普通覆盖端点不接受release动作，release端点只接受release。输入evidence_ids需包含新判断value中的全部证据。单项人工覆盖提交后直接返回影响和重算状态；preview仅用于批量、模板/策略发布和主数据合并等需要先比较影响的操作，绑定输入hash、slot generation、受影响证券及操作者。无权或过期预览不授权提交。内部seal命令非公开API，12 §8定义worker身份、冻结事务和提交原子性。
+
+## 7. 资讯阅读接口与文件适配器
+
+GET /information的过滤为company_id、topic、material_type、content_kind、published_from/to、time_basis=published|observed、cursor/limit；limit/ACL/snapshot沿用§1。公司筛选只使用有效已接受关联，歧义条目仍可在总体列表按候选/待关联说明阅读，不误挂公司。排序、未知发布时间和仅日期语义以04 §6为准。旧company timeline仍是聚合事件接口，新闻列表不能用它代替。
+
+列表记录返回item_id、revision_id、title、summary_text、content_kind、reading_metadata、publication、observed_at、可见公司关联、body_access、reference_access[]和quality/reasons；详情沿用GET /information/{id}/revisions/{revision}返回这些字段及可用证据、事件/判断、父文件定位。publication和reading_metadata直接来自InformationEntry同源类型；写入端不接受actor/observed_at/accepted。服务端生成原文访问状态，不要求前端推断：
+
+| 访问状态 | 页面表达/动作 | 语义 |
+|---|---|---|
+| available | 阅读原文（指确切target revision） | 实际已取得且当前可访问的source_document正文 |
+| not_acquired | 来源入口；原文尚未取得 | 只返回获许可可见的url，不返回虚构body |
+| no_locator | 暂无原文入口 | 只有来源名称，没有可用文章定位 |
+| restricted | 依据暂不可访问 | 当前不可见正文/目标不返回ID、URL或摘录；保留有权摘要可读范围 |
+
+body_access描述本材料自身正文：agent_digest默认无“新闻原文”，但可回查父报告；references各自描述被引用文章状态。同一摘要可能一条来源available、另一条not_acquired。资料详情始终分别展示摘要、上游Agent解读、系统有效判断、观察点；只有一个来源取得也不声称其他来源均核实。metadata_only与正文不可见保留§2现有语义。点击外部URL仅是阅读导航，后台不因页面打开自动下载。
+
+目标SourceAdapter接口：capture(scope, logical_context)返回批次/原文件；normalize(raw_object, parse_version)返回InformationEntry[]、逐条错误和上游报告元信息；publish_result产生IngestionResult并关联实际run。解析按配置处理表头偏移、同义列、公司分段、文本URL与超链接，用同一DTO；同义列如“链接/来源链接/原文链接”，但不凭列名认定网址为具体正文。结构明确时使用规则解析，不强制逐行LLM。
+
+批次输入固定本次文件范围、source/adapter/parse版本与模式；正文/摘要不放异步消息。继续复用ItemCaptured/ItemNormalized/IndexRequested，ItemNormalized可独立触发读取投影与analysis，不等待ScoreCompleted；公司关联可与影响分析独立决定。成功条目提交修订/观察/来源引用与outbox后即读可见；失败定位进入holes并产生partial输出；单条重试复用逻辑键，无全量重评或额外审核。
+
+生成客户端入口在M0实施：后端DTO从固定Schema生成/导出，OpenAPI含资讯列表、详情和参考访问状态，再生成TS客户端。当前只是接口合同，未声称已有HTTP端点或生成客户端。
+
+列表/详情共用字段已固定为[InformationRead 1.0](../contracts/information-read.schema.json)，阅读类型与解析DTO由材料检查核对同源。body_access/reference_access的state、可见url、target_revision_id均由后端返回；restricted/no_locator不返回目标ID或URL，available必须有确切目标修订。列表返回标准{data:InformationRead[],meta}，详情{data:InformationRead加可用body_text/evidence/events/decisions及parent locator,meta}；body_text只在本source_document正文available时返回，摘要页不虚构body。全文/父定位和判断属于既有详情合同，客户端按各自固定类型生成。合成expected_read_response是预期，不是HTTP回读。
 
 
 ===== SOURCE: docs/06-ux-and-design-system.md =====
@@ -876,6 +938,14 @@ T-UX-01增加完成+0.8→−0.2及grade3→1替换的任务样本；T-UX-02增�
 
 终审局部修正：评分/估值的“当时依据”必须符合该快照的发布时间与取得时间，后来更新单列；新值采用一个明确输入，避免摘要与输入矛盾。策略发布后的当前版本/门槛与结果所属版本一致，新结果未生成时显示等待，旧结果独立标版本和日期；草稿编辑不热改已发布值。见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)，不新增审批或产品验收门槛。
 
+## 8. Agent摘要与来源入口的阅读状态
+
+新闻卡片先显示标题、发布时间精度、行业/公司、摘要和“Agent整理”标记；摘要页顺序为发生了什么→涉及谁→原Agent解读（明确来源）→来源入口/原文→后续观察点。系统有效判断独立展示，未形成时写“尚无影响判断”，不把上游文字标成系统已接受。人物观点有姓名、头衔、场合；阅读星级只用来排序。
+
+有摘要无原文可正常阅读；有多个来源分别显示。已取得正文才用“阅读原文”，只有网址用“来源入口”，没有链接写“暂无原文入口”。来源权限不足时不泄漏目标ID/网址/正文。公司无更新写“本次采集未发现重要更新”；解析失败写“部分资料未解析”，两者不混为一条无消息新闻。观察点先是研究文字，不创建提醒/自动任务。
+
+已知发布时间、仅日期、未知时间、关联待明确、评分待更新、部分来源不可用分别有就地说明，资料阅读不等待评分。筛选/返回位置沿用已有新闻导航，时间排序以04 §6为准。合成状态原型见[资料接入阅读演示](../prototype/intake.html)；它不读取真实文件、不连接API、不运行模型/评分或下载原文。
+
 
 ===== SOURCE: docs/07-ai-and-retrieval.md =====
 
@@ -932,6 +1002,10 @@ M2 建立至少 1,000 个中／繁／英文混合标注样本：公告、财报�
 
 
 v0.3模型输入manifest除公司候选外，还固定有效security/listing候选和解析dimension/event policy allowlist。analysis Schema3.0支持受限x_ ID与风险target，语义服务验证候选归属、half_life与enabled、原始披露和目标传播；Schema通过不能授权模型扩大范围。模型输出的业务有效时间不改变系统known_at。11 §7/8/9为唯一覆盖、风险与维度合同；前端和检索不得另推传播规则。
+
+## 7. 外部Agent报告作为输入
+
+已有Agent文件按04 §6进入agent_report/agent_digest；reading_metadata中的解读与阅读评级不是analysis-result或accepted决策。规则解析先产出可读资料和受限公司候选；公司关联满足现有政策可AUTO接受；影响/rubric/risk继续遵守§1…3和11，不增加全部逐篇人审。可定位报告单元格只支持“上游报告这样说”，使用发行人原文的政策不能被报告来源冒充满足。报价或目标价不会直接写正式行情/财务。一个摘要多事实可分多个事件，重复摘要沿用经济事实归并。原文补取得使用真实observed_at，禁止回填旧评分依据。
 
 
 ===== SOURCE: docs/08-security-and-operations.md =====
@@ -1078,6 +1152,10 @@ PR 需写触发条件、前后行为、数据／权限／通知影响、必要�
 
 2026-10-01用户明确先做建模、字段级表设计、核心业务流程与页面原型。14/15/16是本阶段成果，review/DESIGN-DETAIL-REVIEW.md记录检查与未验证项。先按原型核对真实研究路径；有界主路径清楚后再按实施授权进入M0/W-08，不要求先设计穷尽所有表/异常或新增外部评审。15的完整目录按纵向步骤落实，不一次构建全部治理设施。
 
+## 编码前准备完成后的入口
+
+准备范围与依赖/数据/页面/验收已经整理为[17编码交接](./17-coding-readiness.md)。M0/W-08按八个连续子任务实施，不先铺满全部表；W-08.2首先走通合成文件到资讯阅读，再接公司判断/评分/策略。InformationEntry/IngestionResult及T-44…49补齐接入产物合同，既有业务范围与必选测试保持。当前仅完成准备，未开始M0/W-08；源供应商、生产环境与真实通知不成为合成开发前置。
+
 
 ===== SOURCE: docs/10-acceptance.md =====
 
@@ -1183,6 +1261,19 @@ W-08覆盖各模块的最小代表场景，完整需求追踪仍由对应W-01…
 | T-43 | +15最终价、−5公告+40 observed/+50 decision/+60 cutoff/+65生成；双worker、崩溃/失ACK、缺价、+61知识、新风险/撤权 | +15仅provisional；+60同manifest含+40/+50，+65真实generated_at且token唯一仅一次应用；+61不回填；缺价UNKNOWN，cutoff不延长；权限/旧fence拒绝；实时新风险不被普通评估清除 | R-06/08/12，W-05/08，12 §8，T-14/31/38 |
 
 需求映射补充：R-03→T-39；R-05→T-39/41/42；R-06→T-40/43；R-08→T-40/43；R-09→T-39/T-UX-01/02；R-11/12→T-39/40/43权限/恢复；R-15→T-41/42；R-16→T-39…42。原R/W/T不更号不弱化。
+
+## 8. 资料接入与阅读补齐（未来产品验收）
+
+| ID | 输入/动作 | 必须观察的结果 | 追踪 |
+|---|---|---|---|
+| T-44 | 表头1/2/3行、同义列、公司分段、超链接/文本URL、重复导入、一个条目失败后重试 | 明确范围正确解析；同批次同条目不重复revision/observation；partial成功可读、洞保留，恢复新输出不覆写旧清单 | R-01/02/12，W-08.2；T-02/33 |
+| T-45 | 一摘要多来源、栏目链接、无URL、原文已取得/尚未取得/不可访问；返回筛选 | 摘要、上游解读、有效判断分开；逐来源正确按钮/说明；无虚构body，权限不足不泄漏目标；筛选与位置保留 | R-02/04/09/11/14，W-08.2；T-15/22 |
+| T-46 | 日/晚间/分钟/未知时区、访谈不明日期、发生时间不同于发布、后来取得原文 | 精度/raw/时区准确，无补午夜；未知日期单列，取得排序正确；observed_at真实，不穿越旧评分/事件时间 | R-02/04/06，W-08.2/5；T-04/07 |
+| T-47 | 上游无重要动态、监控窗口冲突、全部失败/部分失败 | 无动态是批次说明，0经济事件；run状态由实际结果定，与上游结论不同；输入manifest未改，输出清单保留warning/失败定位 | R-01/04/10/12，W-08.2 |
+| T-48 | 多报告同事项、同一行多个事实、星级、原Agent解读与混合行情 | 每份材料保留，按事实去重贡献；一行可多事件；星级只作阅读，解读不直写accepted，摘要报价不写price_bar | R-02/03/05/06，W-08.3/5；T-03/34 |
+| T-49 | 资料已解析但模型/评分队列尚未完成；关联有效/歧义；有效判断后计算完成 | 全局资料先可读；已接受关联可进入公司新闻，歧义不误挂；仅受影响判断/评分等待，完成后显示真实结果与依据 | R-03/04/09/14/16，W-08.2…4；T-05/27 |
+
+这些是固定验收预期，尚未执行产品测试。合成载荷/设计原型检查分别在编码准备证据中记录，不能标记T-44…49 passed。既有必选合同/测试不删减，真实源上线权利与环境仍后置。
 
 
 ===== SOURCE: docs/11-templates-automation-and-roles.md =====
@@ -1449,6 +1540,12 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 
 具体经营维度基础/事件贡献和价格/财务分母到估值分的解释，沿用02/05的既有明细合同，在开发切片形成真实结果后展示；不是再次修改全套设计的前置。终审与原型修正证据见[处置记录](../review/GPT-PRO-FINAL-DISPOSITION.md)，不冒充上述产品验收通过。
 
+## 9. 编码准备补入的资料阅读路径
+
+执行顺序与依赖见[17编码交接](./17-coding-readiness.md)。W-08先合成导入→资讯摘要/来源入口→公司关联→必要证据与有效判断→评分/策略，不让资料阅读等待整个分析链。fixtures增加原创报告、六种资料类型、多来源/栏目/无网址、仅日期/晚间/未知日期、无重要动态和一条解析失败；实际Excel生成属于W-08.2实施，不读取私人目录。
+
+正常预期：摘要已可读、判断尚未生效时有明确标签；实际取得原文才能阅读确切正文，旧快照不被新取得材料替换。关键失败：部分失败成功条目仍可读，holes与partial输出可诊断，重试同条目不重复；未知时间不伪造，评级/解读/摘要价格不直接写评分/行情。T-44…49与原有必选一并验证，材料检查不签收产品。输入和解析输出manifest分开，解析输出生成后固定。
+
 
 ===== SOURCE: docs/14-domain-and-business-flows.md =====
 
@@ -1506,11 +1603,14 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    A[数据管理员配置合成源与范围] --> B[保存原文 内容修订与观察]
-    B --> C[抽取证据 确定公司候选]
+    A[数据管理员配置合成源与范围] --> B[保存直接资料或Agent报告 修订与观察]
+    B --> X[解析摘要 来源引用 时间精度及文件位置]
+    X --> Y[新闻列表与摘要详情 先可阅读]
+    X --> C[抽取证据 确定公司候选]
     C --> D[模型产出关联 影响 rubric 风险建议]
     D --> E{DecisionService按政策判断}
     E -->|accepted| F[记录有效判断与事件时间线]
+    E -->|关联accepted| Z[公司资料列表 不等待影响或评分]
     E -->|pending或rejected| G[显示理由与可处理事项]
     G --> H[研究员回查证据并作人工判断]
     H --> F
@@ -1526,6 +1626,8 @@ flowchart TD
 ```
 
 pending只阻止受影响输入生效，不暂停整个源；no_link是正常业务结果。首版生成变化记录，通知投递后置。
+
+BF-01同时支持直接来源与已有Agent文件产物。规则解析完成即发布可读资料；关联/影响分别按已有政策处理。摘要引用的原文后续按需要取得，首次取得时间照实记录；没有原文不妨碍摘要阅读。上游解读、星级与摘要行情不直接写有效判断、经营分或price_bar。无重要动态进入批次输出说明，不生成事件。源文件失败项保留洞，成功条目继续可读；不以材料行数定义事件数或贡献数。数据合同见04 §6，接口见05 §7。
 
 ## 4. 自动判断与人工覆盖（BF-02）
 
@@ -1689,6 +1791,9 @@ erDiagram
     ITEM_REVISION ||--o{ ITEM_OBSERVATION : observed_content
     RAW_OBJECT ||--o{ ITEM_REVISION : original
     ITEM_REVISION ||--o{ EVIDENCE : locates
+    ITEM_REVISION ||--o{ ITEM_SOURCE_REFERENCE : cites
+    ITEM_REVISION o|--o{ ITEM_SOURCE_REFERENCE : acquired_target
+    ITEM_REVISION o|--o{ ITEM_REVISION : derived_entries
     COMPANY ||--o{ SECURITY : issues
     SECURITY ||--|{ LISTING : quotations
     COMPANY ||--o{ COMPANY_ALIAS : names
@@ -1761,6 +1866,8 @@ erDiagram
 | 历史更正 | 原记录保留+correction结果+当前必要reconciliation CAS+audit/outbox | 当时记录/更正说明可并列 | 旧generation不覆盖今天 |
 
 当前评分查询取 `score_current` 指针但校验其状态、当前判断/权限代次；历史页直接取固定snapshot。候选按release/security分页，时间线按company/event_time/id；自选按security保存、公司页可聚合显示。原型仅固定样例，不实现这些查询。
+
+资讯读取不依赖score/evaluation完成。item_revision保存摘要、固定reading_metadata、发布时间精度及文件父修订/位置；item_source_reference保存多来源与首次取得的目标修订。ingestion_run的input_manifest不回写解析结果，result_manifest指向不可变ingestion_result输出；每次item_observation关联实际run。具体语义见04 §6与information-entry/ingestion-result Schema。完整字段目录仍按切片落实，未建立数据库。
 
 ## 7. 本轮验证边界
 
@@ -1900,11 +2007,15 @@ erDiagram
 | `input_manifest_id` | `uuid` | 否 | 输入范围及版本；→ `input_manifest.id` |
 | `completed_at` | `timestamptz` | 是 | 实际完成时间 |
 | `error_code` | `text` | 是 | 可诊断业务错误 |
+| `result_manifest_id` | `uuid` | 是 | 解析输出清单；结果产生后写入，不覆写输入；partial亦可有结果；→ `input_manifest.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,partition_key,due_at,schedule_generation,mode)`。
 
 查询索引：`workspace_id,status,due_at`。
+
+- input_manifest固定运行前输入；result_manifest.kind=ingestion_result，内容按ingestion-result 1.0；完成结果与条目引用对应
+- 失败条目保留checkpoint.holes；成功条目可读，partial批次不跳过未解决洞；重试发布新不可变输出清单
 
 ### checkpoint
 
@@ -1984,11 +2095,25 @@ erDiagram
 | `published_at` | `timestamptz` | 是 | 源发布时间；未知可空 |
 | `observed_at` | `timestamptz` | 否 | 首次获得此内容修订时间 |
 | `title` | `text` | 否 | 标题 |
+| `content_kind` | `text` | 否 | source_document/agent_report/agent_digest；材料性质不等于判断是否接受 |
+| `summary_text` | `text` | 是 | 阅读摘要，不冒充被引用原文 |
+| `reading_metadata` | `jsonb` | 否 | information-entry 1.0 reading_metadata；资料类型/主题/人物/摘要来源/上游解读与观察点 |
+| `parent_revision_id` | `uuid` | 是 | 派生条目的报告文件修订；直接来源可空；→ `item_revision.id` |
+| `origin_locator` | `jsonb` | 是 | 父文件sheet/单元格范围；information-entry 1.0 locator |
+| `published_date` | `date` | 是 | 来源的民用发布日期；不伪造午夜瞬时 |
+| `published_precision` | `text` | 否 | instant/minute/day/part_of_day/unknown |
+| `published_timezone` | `text` | 是 | 已知来源IANA时区；未知不推断 |
+| `published_time_raw` | `text` | 是 | 上游时间原始表述；访谈不明日期不得假定为发布时间 |
 | `status` | `text` | 否 | valid/metadata_only/conflicting/restricted |
 | `supersedes_id` | `uuid` | 是 | 前一内容修订；→ `item_revision.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,content_hash,parse_version)`。
+
+- 新增载荷与时间字段按contracts/information-entry.schema.json和04 §6校验；分钟/瞬时须有带offset发布时间，day/part_of_day无published_at；unknown不补日期
+- agent_digest必须有parent_revision_id与origin_locator，父修订属于相同workspace且为agent_report；条目和报告复用raw_object
+- 正文对象表示本材料本身：agent报告/摘要不等同引用文章；摘要不得作为发行人原文
+- parent_revision_id只能指已存在父修订；不可自指或形成循环；旧修订/摘要不可覆写
 
 ### item_observation
 
@@ -2003,11 +2128,38 @@ erDiagram
 | `revision_id` | `uuid` | 否 | 本次看到的内容版本；→ `item_revision.id` |
 | `observed_at` | `timestamptz` | 否 | 本次真正获取时点 |
 | `previous_observation_id` | `uuid` | 是 | 上一观察；→ `item_observation.id` |
+| `ingestion_run_id` | `uuid` | 否 | 此次获得资料的导入/采集批次；→ `ingestion_run.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,sequence)`。
 
 - A→B→A三次sequence；revision属于同item，不以内容hash丢观察
+
+### item_source_reference
+
+责任：information；生命周期：`append_then_resolve`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_revision_id` | `uuid` | 否 | 引用所在摘要/资料修订；→ `item_revision.id` |
+| `reference_key` | `text` | 否 | 本修订内稳定引用序号/键 |
+| `source_name` | `text` | 否 | 上游来源名称 |
+| `url` | `text` | 是 | 来源入口，可缺失；不表示正文已取得 |
+| `locator_kind` | `text` | 否 | article/list/account/unknown；未核验时unknown |
+| `source_locator` | `jsonb` | 是 | 该来源在原文件中的位置；直接资料可空 |
+| `target_revision_id` | `uuid` | 是 | 实际取得的来源正文修订；未知可空；→ `item_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_revision_id,reference_key)`。
+
+查询索引：`item_revision_id`；`target_revision_id WHERE target_revision_id IS NOT NULL`。
+
+- 来源描述/url/定位随所属修订固定；target_revision_id只允许null→确切正文修订，CAS提交解析结果与审计；重复相同绑定幂等
+- 错误来源绑定通过新资料修订更正；目标修订必须是同workspace的source_document且实际有可定位正文；不得指向本摘要
+- 正文访问仍校验目标来源政策；无权/撤权/未取得分别由读取时质量说明表达，不能向无权者泄露目标引用
+- 未取得引用不用伪造空information_item；source名但无url可合法保留
 
 ### evidence
 
@@ -2248,7 +2400,7 @@ erDiagram
 |---|---|---|---|
 | `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
 | `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
-| `kind` | `text` | 否 | analysis/scoring/evaluation/preview/ingestion |
+| `kind` | `text` | 否 | analysis/scoring/evaluation/preview/ingestion / ingestion_result（解析输出） |
 | `schema_ref` | `text` | 否 | 对应Schema或固定内部DTO版本 |
 | `content` | `jsonb` | 否 | 规范化完整输入修订、缺口、政策及算法 |
 | `content_sha256` | `char(64)` | 否 | 规范化字节hash |
@@ -3459,6 +3611,70 @@ erDiagram
 09-29固定评分/A-H估值使用历史财务原文`byd-report-historical`（09-27发布/取得）；09-30的`byd-report`仍在新闻中作为后来更新。评分页后续订单/资本配置判断不作为该旧评分输入。修改区保留当前有效值和唯一的新值输入，去除重复新值摘要。策略发布固定版本/门槛，新评估等待，固定旧结果明确归发布1；公司研究对照也标发布1。发布新模板不强制更新旧策略。
 
 三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
+
+## 7. 编码准备新增的资料阅读状态
+
+[intake.html](../prototype/intake.html)提供多来源摘要、原文已取得/未取得/不可访问、无链接、访谈评级/未知日期、无重要动态与部分解析失败五种状态。资料先可读，解读与有效判断分开。新增交互检查见review/design-detail/intake-prototype-checks.json；仍是原创合成原型，T-44…49产品验收未运行。主原型与历史终审证据保留，不改旧评分/策略交互。
+
+
+===== SOURCE: docs/17-coding-readiness.md =====
+
+# 17 编码前准备与开发交接
+
+2026-10-01 · v0.3。状态：**编码前设计准备已完成，可在实施授权后进入M0/W-08合成开发**。没有启动产品开发、建库/迁移、部署、真实数据接入或外部模型调用。用户本轮授权完成准备，并采纳资料接入补齐；不重复询问已确认需求，也不新增终审轮次。
+
+## 1. 已固定的业务范围与本轮变化
+
+业务确认仍以11为真源：A/H、多人五角色、三层模板、自动政策接受/人工有效覆盖、外部模型能力、无固定开发预算、通知后置。数值/时点/纠错以12为真源，原有T-01…43预期保持。原型真实公司名称只帮助理解；W-08公司、资料、价格和身份全部合成。
+
+本轮为资料接入增加摘要/阅读信息、文件血缘、资讯时间精度、一对多来源引用、批次输出清单和阅读独立分支。原因是已有日报产物能提供研究线索，却不能直接充当原文或有效评分判断。收益是先可读、再按需要补关键依据；影响为04/05/06/07/14/15与新增Schema、合成验收。未修改评分公式、阈值、策略状态、A/H口径或真实接入边界。没有六套日报表，没有新增消息系统/微服务/审核平台。
+
+准备交付：字段真源与生成字典；BF-01分支；InformationEntry/IngestionResult/InformationRead 1.0；资讯列表/详情接口与原文状态；合成资料夹具；阅读状态原型；下列开发顺序与验收；离线检查及工作树hash证据。
+
+## 2. 技术与依赖决策
+
+沿用模块化单体、React/TypeScript、FastAPI/Pydantic、SQLAlchemy/Alembic、PostgreSQL、ledger/outbox。M0目标运行线为Python 3.12、PostgreSQL 17、Node 24 LTS、pnpm 10；Redis 7.4/Celery 5用于合成后台与恢复场景。本阶段不安装这些运行依赖。M0第一次启动时固定patch版本/镜像digest和锁文件，验证实际兼容；生成锁文件和启动验证是实施任务，不伪称准备文档已证明运行可用。若这些目标线与当时实际依赖冲突，先说明具体影响，选择兼容受支持patch，不改变领域合同。
+
+使用项目自有最小骨架，选择性参考已审源码fastapi/full-stack-fastapi-template `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7`（MIT）；不整包照搬其Python≥3.14/SQLModel/密码认证依赖。生成客户端、组件模式和CI做法按本项目适配。研究证据见research/second-review.md，不重新比较一批框架。Refine/Prefect、OpenSearch、向量、真实OIDC、生产分区和通知均不作为W-08前置。
+
+开发环境仅本机项目隔离Compose，数据为原创合成；对象存储先本地适配器，与raw_object合同一致。mock身份和模型，clock/calendar可注入；模型适配器保留真实外部能力但本slice不外发。运行前验证服务实际位置/用途/数据分类，项目命名和端口避开已有服务；没有真实凭证和默认远程地址。数据库不可用/分类未知时只暂停相关启动。
+
+计划目录采用03 §4，按任务创建，不提前铺空模块。Schema是关键类型真源；API通过Pydantic发布OpenAPI并生成TS客户端。领域函数只接受固定输入，前端不计算分数或策略规则。
+
+## 3. W-08顺序与可检查交付
+
+每行都是可验收切片，不要求先建完整79表。具体字段以15目录为准，按实际写入路径建立；既定完整首slice能力不删减。
+
+| 子任务 | 依赖/范围 | 交付与真实验证 | R/W/T |
+|---|---|---|---|
+| W-08.1 运行基础 | 授权实施；核验项目隔离合成DB | web/API/worker、锁文件、最小schema、五角色mock、启动命令；一次有权限的业务写入与audit/outbox回读，越权拒绝 | W-01；R-11/12/17；T-14/20/29 |
+| W-08.2 资料先可读 | .1；固定文件与DTO | 合成Excel/直接资料适配器、report→entry血缘、来源引用、输入/输出manifest、资讯列表/摘要详情；原文状态与日期精度、部分失败重试、重复导入回读 | R-01/02/04/09/14；T-02/04/33/44…47 |
+| W-08.3 公司关联与研究 | .2；合成身份/关系 | no_link/歧义/多公司、关联AUTO政策、事件/事实归并，公司新闻与事件分开；重复与一行多事实回读 | R-03/04/16；T-03/05/06/48 |
+| W-08.4 有效判断与覆盖 | .3；既有proposal/decision合同 | impact/rubric/risk、人工替换/解除、冲突保留、证据定位、H挂牌与公司风险区别；修订/指针/依赖重算回读 | R-05/09/16；T-27/28/39/40/49 |
+| W-08.5 模板与A/H解释 | .4；冻结财务/价格/FX/股份 | 三层解析、完整维度及x_customer_retention、baseline/事件贡献、A/H估值；旧评分使用当时资料，缺数据明确 | R-05/06/15；T-07…10/25/26/34…38/41/42 |
+| W-08.6 策略到变化 | .5；session/calendar、seal | 模拟/发布、输入封存、相邻FINAL、ENTER/UNKNOWN/恢复/EXIT/RISK；版本/日期/理由一致及转移原子回读 | R-07/08；T-11…14/30/31/40/43 |
+| W-08.7 恢复与研究协作 | 按依赖可穿插.2…6 | 自选/笔记、失败洞与ledger恢复、丢ACK不重复、旧generation拒绝、历史纠错；合成备份/撤权恢复沿用原预期 | R-09/10/12；T-14/18/19/32/33/34 |
+| W-08.8 用户路径收口 | .2…7 | 真实运行页面连续路径、指定视口/键盘、按06进行用户任务验收；固定数据与预期不改，记录未通过/未运行项 | R-09/13/14；T-22/T-UX-01…04及13必选 |
+
+创建数据库迁移按生命周期：基础身份/run/raw/manifest→item/revision/observation/reference/evidence/身份→判断/事件→评分→策略→必要协作恢复表。source↔policy等循环按15策略处理；升级/降级使用合成数据验证，不修改远程库。列表采用PG读取，不依赖索引或评分完成；随后检索投影仍可扩展。
+
+## 4. 输入、预期和编码入口
+
+新增合成载荷在examples/information-intake.json；已有算法、财务、风险、覆盖、模板、封存黄金预期继续使用config/examples。真实参考Excel只留local-evidence，不成为Git夹具，不让开发自动扫描用户消息目录。W-08.2实施时从原创载荷生成小型Excel：表头在1/2/3行、同义列、公司分段/合并、文字URL/超链接、无链接；不需真实文件才能验证适配器。
+
+新增T-44…49见10，已有必选正常、失败、边界、权限、恢复出口见13。编码前这些是预期；材料检查只校验载荷形状与设计一致。开发阶段每项记录commit、实际环境/DB分类、fixture hash、命令/场景、expected/actual及回读，测试已写不是passed。
+
+计划开发命令合同（现在尚不存在，W-08.1实现）：`make dev-up`启动项目隔离依赖，`make migrate`运行Alembic，`make seed-synthetic`加载原创夹具，`make dev`启动web/API/worker，`make check-slice`执行受影响必选，`make dev-down`只停止本项目服务。禁止这些命令默认重置库或连接远程；合成重置另有显式目标。登录页面展示五角色合成身份，页面标演示环境。
+
+最先验证架构假设：一次跨业务/audit/outbox事务、同源客户端与资料列表、相同条目导入重试、日期/知识时间分离、ledger重投递。随后补原有seal/提交可见性、模板和数值等关键算法验证；不先做全量性能或可选平台。
+
+## 5. 当前出口与后置条件
+
+准备出口：范围/任务/合同/数据/页面状态/验收预期已齐；字段字典可生成，合成DTO检查通过，原型交互结果和hash可查，评审包已同步，无待确认的新增业务取舍。检查证据见[编码准备收口](../review/CODING-READINESS.md)。当前可交接合成开发，实际产品能力均未实现/未验证。
+
+后置于真实接入或生产：供应商具体fetch/store/analyze/export权利、真实OIDC/部署资源/保留期限、真实规则/质量运营负责人、运行容量/恢复实测、外部模型与后续通知渠道。它们属于既有D事项，不能冒充已落实，也不阻塞合成开发。不采购、不上传真实资料、不联网采集、不发通知或交易。
+
+下一步仅需用户明确启动开发即可按上述顺序实施，不再做一轮全套设计或外部终审。项目全过程继续以业务闭环、界面可理解性和最小充分验证为先。
 
 
 ===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
@@ -4698,6 +4914,10 @@ analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strateg
 新增[override-command](./override-command.schema.json)、[human-judgment](./human-judgment.schema.json)、[dimension-registry](./dimension-registry.schema.json)、[evaluation-seal](./evaluation-seal.schema.json)及[完整冻结manifest](./evaluation-input-manifest.schema.json)。review-decision只引用opaque UUID修订，不携带替换值；OverrideCommand的四类judgment与HumanRevision同形，材料工具检查同步。模型风险带target/有效期；维度ID形状扩大后还须manifest白名单校验。registry/模板政策及兼容半衰期映射由语义校验保持一致，类型通过不证明业务授权。
 
 新例子分别见examples/v03-human-replacements.json、v03-risk-targets.json、v03-template-custom.json和v03-seal-command.json；都是设计预期。v0.2探针仍绑定原commit/hash，不用当前Schema重写其观察。schema版本选择、旧风险消歧与不可回填规则见[V03-CHANGELOG](../review/V03-CHANGELOG.md)。
+
+编码准备新增：`information-entry.schema.json`（1.0，文件/直接资料解析条目的固定载荷）与`ingestion-result.schema.json`（1.0，运行后的不可变输出清单）。业务语义唯一位置为docs/04 §6，阅读接口为05 §7；`examples/information-intake.json`全部为原创合成示例，不含真实采集表内容。上游摘要/评级不得填入有效判断或行情。输入manifest与输出manifest分开，服务端生成知识时间。JSON Schema只验证形状，身份归属、日期/时区一致、引用目标正文/权限与结果计数需服务端语义验证；材料检查不等于运行产品。
+
+`information-read.schema.json`（1.0）固定资讯列表/详情共用响应字段；publication/reading_metadata与解析DTO保持一致，访问状态由服务端解析。形状检查包含不可访问目标不泄漏引用、原文available必须有确切目标修订。
 
 
 ===== SOURCE: contracts/analysis-result.schema.json =====
@@ -7003,6 +7223,1204 @@ analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strateg
 }
 
 
+===== SOURCE: contracts/information-entry.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "entry_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_kind": {
+      "enum": [
+        "source_document",
+        "agent_report",
+        "agent_digest"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reading_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "material_type": {
+          "enum": [
+            "news",
+            "announcement",
+            "interview",
+            "research_report",
+            "market_followup",
+            "industry_context"
+          ]
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "person_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "person_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary_origin": {
+          "enum": [
+            "upstream_agent",
+            "source_excerpt",
+            "system_generated",
+            "none"
+          ]
+        },
+        "generator_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "agent_commentary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "watch_points": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_reading_priority": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scale": {
+                  "enum": [
+                    "stars",
+                    "rank",
+                    "label"
+                  ]
+                }
+              },
+              "required": [
+                "raw",
+                "scale"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "material_type",
+        "topics",
+        "person_name",
+        "person_role",
+        "summary_origin",
+        "generator_ref",
+        "agent_commentary",
+        "watch_points",
+        "source_reading_priority"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "summary_origin": {
+                "const": "system_generated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "generator_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "precision": {
+          "enum": [
+            "instant",
+            "minute",
+            "day",
+            "part_of_day",
+            "unknown"
+          ]
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "at",
+        "date",
+        "precision",
+        "timezone",
+        "raw"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "instant",
+                  "minute"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "day",
+                  "part_of_day"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "null"
+              },
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "parent_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "origin_locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sheet": {
+              "type": "string",
+              "minLength": 1
+            },
+            "range": {
+              "type": "string",
+              "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+            }
+          },
+          "required": [
+            "sheet",
+            "range"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locator_kind": {
+            "enum": [
+              "article",
+              "list",
+              "account",
+              "unknown"
+            ]
+          },
+          "source_locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "reference_key",
+          "source_name",
+          "url",
+          "locator_kind",
+          "source_locator"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "entry_key",
+    "content_kind",
+    "title",
+    "summary_text",
+    "reading_metadata",
+    "publication",
+    "parent_revision_id",
+    "origin_locator",
+    "source_references"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "content_kind": {
+            "const": "agent_digest"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "parent_revision_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "origin_locator": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "sheet": {
+                "type": "string",
+                "minLength": 1
+              },
+              "range": {
+                "type": "string",
+                "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+              }
+            },
+            "required": [
+              "sheet",
+              "range"
+            ]
+          },
+          "reading_metadata": {
+            "properties": {
+              "summary_origin": {
+                "const": "upstream_agent"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InformationEntry 1.0 — parser output, not accepted judgment",
+  "description": "发布与取得时间不同；服务端生成item/revision/observed_at；跨记录身份/权限/时区语义见docs/04 §6。"
+}
+
+
+===== SOURCE: contracts/information-read.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_kind": {
+      "enum": [
+        "source_document",
+        "agent_report",
+        "agent_digest"
+      ]
+    },
+    "summary_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reading_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "material_type": {
+          "enum": [
+            "news",
+            "announcement",
+            "interview",
+            "research_report",
+            "market_followup",
+            "industry_context"
+          ]
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "person_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "person_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary_origin": {
+          "enum": [
+            "upstream_agent",
+            "source_excerpt",
+            "system_generated",
+            "none"
+          ]
+        },
+        "generator_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "agent_commentary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "watch_points": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_reading_priority": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "raw": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scale": {
+                  "enum": [
+                    "stars",
+                    "rank",
+                    "label"
+                  ]
+                }
+              },
+              "required": [
+                "raw",
+                "scale"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "material_type",
+        "topics",
+        "person_name",
+        "person_role",
+        "summary_origin",
+        "generator_ref",
+        "agent_commentary",
+        "watch_points",
+        "source_reading_priority"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "summary_origin": {
+                "const": "system_generated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "generator_ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "precision": {
+          "enum": [
+            "instant",
+            "minute",
+            "day",
+            "part_of_day",
+            "unknown"
+          ]
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "at",
+        "date",
+        "precision",
+        "timezone",
+        "raw"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "instant",
+                  "minute"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "timezone": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "enum": [
+                  "day",
+                  "part_of_day"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "precision": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "date": {
+                "type": "null"
+              },
+              "at": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "company_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "company_id",
+          "name"
+        ]
+      }
+    },
+    "body_access": {
+      "$ref": "#/$defs/access"
+    },
+    "reference_access": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator_kind": {
+            "enum": [
+              "article",
+              "list",
+              "account",
+              "unknown"
+            ]
+          },
+          "access": {
+            "$ref": "#/$defs/access"
+          }
+        },
+        "required": [
+          "reference_key",
+          "source_name",
+          "locator_kind",
+          "access"
+        ]
+      }
+    },
+    "quality": {
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "item_id",
+    "revision_id",
+    "title",
+    "content_kind",
+    "summary_text",
+    "reading_metadata",
+    "publication",
+    "observed_at",
+    "company_links",
+    "body_access",
+    "reference_access",
+    "quality",
+    "reasons"
+  ],
+  "$defs": {
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "available",
+            "not_acquired",
+            "no_locator",
+            "restricted"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_revision_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "state",
+        "url",
+        "target_revision_id"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "available"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target_revision_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "not_acquired"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "target_revision_id": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "no_locator",
+                  "restricted"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "url": {
+                "type": "null"
+              },
+              "target_revision_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InformationRead 1.0 — common list/detail reading fields"
+}
+
+
+===== SOURCE: contracts/ingestion-result.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "ingestion_run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "input_manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "raw_object_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "report_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "adapter_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parse_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "upstream_report_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "upstream_generated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "upstream_timezone": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "upstream_run_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reported_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "end_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "start_raw",
+        "end_raw",
+        "timezone"
+      ]
+    },
+    "entry_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "imported",
+              "failed"
+            ]
+          },
+          "item_revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "entry_key",
+          "locator",
+          "status",
+          "item_revision_id",
+          "error_code"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "imported"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "error_code": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "item_revision_id": {
+                  "type": "null"
+                },
+                "error_code": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "company_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "company_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reported_result": {
+            "enum": [
+              "has_updates",
+              "no_material_update",
+              "unknown"
+            ]
+          },
+          "source_locator": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "sheet": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "range": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+[1-9][0-9]*(:[A-Z]+[1-9][0-9]*)?$"
+                  }
+                },
+                "required": [
+                  "sheet",
+                  "range"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "company_label",
+          "company_id",
+          "reported_result",
+          "source_locator",
+          "note"
+        ]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "ingestion_run_id",
+    "input_manifest_id",
+    "raw_object_id",
+    "report_revision_id",
+    "adapter_ref",
+    "parse_version",
+    "upstream_report_date",
+    "upstream_generated_at",
+    "upstream_timezone",
+    "upstream_run_ref",
+    "reported_window",
+    "entry_results",
+    "company_coverage",
+    "warnings",
+    "generated_at"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IngestionResult 1.0 — immutable parse output manifest"
+}
+
+
 ===== SOURCE: contracts/job-event.schema.json =====
 
 {
@@ -8760,6 +10178,462 @@ analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strateg
 }
 
 
+===== SOURCE: examples/information-intake.json =====
+
+{
+  "fixture_kind": "synthetic_design_only",
+  "entries": [
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-1",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：订单安排摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "news",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A3:G3"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成公告来源",
+          "url": "https://example.invalid/article/1",
+          "locator_kind": "unknown",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        },
+        {
+          "reference_key": "2",
+          "source_name": "合成行业栏目",
+          "url": "https://example.invalid/list",
+          "locator_kind": "list",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-2",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：管理层访谈",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "interview",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": "合成人物甲",
+        "person_role": "合成公司负责人",
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": {
+          "raw": "★★★★☆",
+          "scale": "stars"
+        }
+      },
+      "publication": {
+        "at": null,
+        "date": null,
+        "precision": "unknown",
+        "timezone": null,
+        "raw": "访谈日期含义未明确"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A4:G4"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-3",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：既有事件的市场反应",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "market_followup",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "part_of_day",
+        "timezone": null,
+        "raw": "2026-09-29 晚间"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A5:G5"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成报道，仅来源名称",
+          "url": null,
+          "locator_kind": "unknown",
+          "source_locator": null
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-4",
+      "content_kind": "agent_digest",
+      "title": "合成乙制造：公告摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "announcement",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A6:G6"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-5",
+      "content_kind": "agent_digest",
+      "title": "合成消费：新品趋势",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "industry_context",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A7:G7"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-6",
+      "content_kind": "agent_digest",
+      "title": "合成科技：机构观点",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "research_report",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A8:G8"
+      },
+      "source_references": []
+    }
+  ],
+  "result": {
+    "schema_version": "1.0",
+    "ingestion_run_id": "00000000-0000-4000-8000-000000000900",
+    "input_manifest_id": "00000000-0000-4000-8000-000000000902",
+    "raw_object_id": "00000000-0000-4000-8000-000000000903",
+    "report_revision_id": "00000000-0000-4000-8000-000000000901",
+    "adapter_ref": "local-fixture:report-v1",
+    "parse_version": "1.0",
+    "upstream_report_date": "2026-09-30",
+    "upstream_generated_at": "2026-09-30T04:20:00+08:00",
+    "upstream_timezone": "Asia/Shanghai",
+    "upstream_run_ref": null,
+    "reported_window": {
+      "start_raw": "2026-09-29 04:00",
+      "end_raw": "2026-09-30 04:00",
+      "timezone": "Asia/Shanghai"
+    },
+    "entry_results": [
+      {
+        "entry_key": "digest-1",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A3:G3"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000910",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-2",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A4:G4"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000911",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-3",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A5:G5"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000912",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-4",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A6:G6"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000913",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-5",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A7:G7"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000914",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-6",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A8:G8"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000915",
+        "error_code": null
+      },
+      {
+        "entry_key": "broken-7",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A9:G9"
+        },
+        "status": "failed",
+        "item_revision_id": null,
+        "error_code": "INVALID_ROW"
+      }
+    ],
+    "company_coverage": [
+      {
+        "company_label": "合成甲制造",
+        "company_id": null,
+        "reported_result": "has_updates",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A3:G8"
+        },
+        "note": "公司身份等待匹配，阅读不中断。"
+      },
+      {
+        "company_label": "合成观察主体",
+        "company_id": null,
+        "reported_result": "no_material_update",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A10"
+        },
+        "note": "上游报告称未发现重要更新。"
+      }
+    ],
+    "warnings": [
+      "合成窗口声明与实际跨度不一致，仅为演练"
+    ],
+    "generated_at": "2026-10-01T09:00:00+08:00"
+  },
+  "expected": {
+    "run_status": "partial",
+    "readable_entries": 6,
+    "no_news_events": 0,
+    "accepted_judgments_from_import": 0,
+    "price_bars_from_summary": 0,
+    "schema_checks_are_product_acceptance": false
+  },
+  "expected_read_response": {
+    "schema_version": "1.0",
+    "item_id": "00000000-0000-4000-8000-000000000920",
+    "revision_id": "00000000-0000-4000-8000-000000000910",
+    "title": "合成甲制造：订单安排摘要",
+    "content_kind": "agent_digest",
+    "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+    "reading_metadata": {
+      "schema_version": "1.0",
+      "material_type": "news",
+      "topics": [
+        "合成制造业"
+      ],
+      "person_name": null,
+      "person_role": null,
+      "summary_origin": "upstream_agent",
+      "generator_ref": null,
+      "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+      "watch_points": [
+        "查看后续交付安排"
+      ],
+      "source_reading_priority": null
+    },
+    "publication": {
+      "at": null,
+      "date": "2026-09-29",
+      "precision": "day",
+      "timezone": null,
+      "raw": "2026-09-29"
+    },
+    "observed_at": "2026-10-01T09:00:00+08:00",
+    "company_links": [],
+    "body_access": {
+      "state": "no_locator",
+      "url": null,
+      "target_revision_id": null
+    },
+    "reference_access": [
+      {
+        "reference_key": "1",
+        "source_name": "合成公告来源",
+        "locator_kind": "article",
+        "access": {
+          "state": "available",
+          "url": "https://example.invalid/article/1",
+          "target_revision_id": "00000000-0000-4000-8000-000000000930"
+        }
+      },
+      {
+        "reference_key": "2",
+        "source_name": "合成行业栏目",
+        "locator_kind": "list",
+        "access": {
+          "state": "not_acquired",
+          "url": "https://example.invalid/list",
+          "target_revision_id": null
+        }
+      },
+      {
+        "reference_key": "3",
+        "source_name": "不可访问合成来源",
+        "locator_kind": "unknown",
+        "access": {
+          "state": "restricted",
+          "url": null,
+          "target_revision_id": null
+        }
+      }
+    ],
+    "quality": "partial",
+    "reasons": [
+      "NO_ACCEPTED_COMPANY_LINK",
+      "ORIGINAL_PARTLY_UNAVAILABLE"
+    ]
+  }
+}
+
+
 ===== SOURCE: examples/job-event.json =====
 
 {
@@ -9482,7 +11356,7 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
+paths.extend([ROOT / "review/CODING-READINESS.md", ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
@@ -9515,8 +11389,8 @@ final_names = [
     "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md", "review/GPT-PRO-FINAL-DISPOSITION.md",
     "docs/01-product-requirements.md", "docs/06-ux-and-design-system.md",
     "docs/11-templates-automation-and-roles.md", "docs/12-time-numerics-and-corrections.md",
-    "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md",
-    "prototype/README.md", "prototype/index.html", "prototype/app.js", "prototype/style.css",
+    "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md", "docs/17-coding-readiness.md", "review/CODING-READINESS.md",
+    "prototype/README.md", "prototype/intake.html", "prototype/index.html", "prototype/app.js", "prototype/style.css",
     "config/scoring-standard-v1.json", "config/strategy-standard-v1.json", "config/rubrics-standard-v1.json",
     "review/design-detail/prototype-checks.json",
 ]
@@ -9560,6 +11434,76 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 """ + "\n".join(links) + "\n\n这些是当前v0.3的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
 (ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
 print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")
+
+
+===== SOURCE: tools/intake_material_checks.py =====
+
+"""Offline DTO and catalog consistency checks; no workbook parser or product execution."""
+import copy
+from datetime import date, datetime
+from urllib.parse import urlsplit
+from material_schema import validate
+
+
+def run(read, check, reject):
+    entry_schema = read('contracts/information-entry.schema.json')
+    result_schema = read('contracts/ingestion-result.schema.json')
+    fixture = read('examples/information-intake.json')
+    catalog = {t['name']: t for t in read('design/database-catalog.json')['tables']}
+    entries = fixture['entries']
+    result = fixture['result']
+    def entry_contract(entry):
+        validate(entry, entry_schema)
+        publication = entry['publication']
+        if publication['date']:
+            date.fromisoformat(publication['date'])
+        if len({r['reference_key'] for r in entry['source_references']}) != len(entry['source_references']):
+            raise ValueError('duplicate reference key')
+        for reference in entry['source_references']:
+            if reference['url']:
+                url = urlsplit(reference['url'])
+                if url.scheme not in ('http', 'https') or not url.hostname:
+                    raise ValueError('invalid source URL')
+    for entry in entries:
+        entry_contract(entry)
+        check(True, 'Intake DTO shape/date/reference semantics: ' + entry['entry_key'])
+    validate(result, result_schema)
+    check(True, 'Intake output manifest shape')
+    check(len({e['entry_key'] for e in entries}) == len(entries), 'Intake entry keys unique')
+    imported = {e['entry_key'] for e in result['entry_results'] if e['status'] == 'imported'}
+    check(imported == {e['entry_key'] for e in entries}, 'Intake output references every synthetic entry')
+    check(len(imported) == fixture['expected']['readable_entries'] and any(e['status'] == 'failed' for e in result['entry_results']), 'Intake partial fixture accounting')
+    check(all(e['parent_revision_id'] == result['report_revision_id'] for e in entries), 'Intake report lineage agreement')
+    check(fixture['expected']['accepted_judgments_from_import'] == fixture['expected']['price_bars_from_summary'] == fixture['expected']['no_news_events'] == 0, 'Intake fixed business expectations, NOT execution results')
+    checks = [('accepted field', lambda e: e.update(accepted=True)),
+              ('publication midnight invented for day', lambda e: e['publication'].update(at='2026-09-29T00:00:00+08:00')),
+              ('invalid civil date', lambda e: e['publication'].update(date='2026-02-30')),
+              ('digest without report', lambda e: e.update(parent_revision_id=None)),
+              ('duplicate reference', lambda e: e['source_references'].append(copy.deepcopy(e['source_references'][0]))),
+              ('summary grading field', lambda e: e['reading_metadata'].update(company_score='80'))]
+    for label, mutate in checks:
+        bad = copy.deepcopy(entries[0]); mutate(bad)
+        reject(lambda: entry_contract(bad), 'Intake rejects ' + label)
+    bad = copy.deepcopy(result); bad['entry_results'][-1]['item_revision_id'] = entries[0]['parent_revision_id']
+    reject(lambda: validate(bad, result_schema), 'Intake failed output cannot claim imported revision')
+    instant = copy.deepcopy(entries[0]); instant['publication'].update(at='2026-09-29T18:30:00+08:00', precision='minute', timezone='Asia/Shanghai')
+    entry_contract(instant); check(True, 'Intake minute precision supported')
+    unknown = copy.deepcopy(entries[1]); unknown['publication']['date'] = '2026-09-29'
+    reject(lambda: entry_contract(unknown), 'Intake unknown publication cannot invent date')
+    check({'summary_text','content_kind','reading_metadata','parent_revision_id','origin_locator','published_date','published_precision','published_timezone','published_time_raw'} <= {c['name'] for c in catalog['item_revision']['columns']}, 'Intake reading/time fields in authoritative catalog')
+    check(next(c for c in catalog['ingestion_run']['columns'] if c['name']=='result_manifest_id')['references']=='input_manifest.id', 'Intake output manifest FK')
+    check(next(c for c in catalog['item_observation']['columns'] if c['name']=='ingestion_run_id')['references']=='ingestion_run.id', 'Intake observed batch FK')
+    check(['workspace_id','item_revision_id','reference_key'] in catalog['item_source_reference']['unique_keys'], 'Intake multiple-source identity')
+
+    read_schema = read('contracts/information-read.schema.json')
+    response = fixture['expected_read_response']
+    validate(response, read_schema); check(True, 'Intake common list/detail response shape')
+    check(read_schema['properties']['reading_metadata'] == entry_schema['properties']['reading_metadata'] and read_schema['properties']['publication'] == entry_schema['properties']['publication'], 'Intake parser/read shared types agree')
+    check(response['revision_id'] == result['entry_results'][0]['item_revision_id'], 'Intake read response is fixed imported revision')
+    bad = copy.deepcopy(response); bad['reference_access'][-1]['access']['url'] = 'https://example.invalid/private'
+    reject(lambda: validate(bad, read_schema), 'Intake restricted response cannot leak target URL')
+    bad = copy.deepcopy(response); bad['reference_access'][0]['access']['target_revision_id'] = None
+    reject(lambda: validate(bad, read_schema), 'Intake available original requires actual target revision')
 
 
 ===== SOURCE: tools/material_schema.py =====
@@ -10031,9 +11975,11 @@ for d,v in scoring['dimension_policies'].items():
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/CODING-READINESS.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
+from intake_material_checks import run as run_intake_checks
+run_intake_checks(read,check,reject)
 revision=current_revision()
 binding=(f'source_sha256 binds the exact inputs used by this run; Git HEAD at run was {revision}; no remote delivery claimed'
          if revision else
@@ -10041,6 +11987,30 @@ binding=(f'source_sha256 binds the exact inputs used by this run; Git HEAD at ru
 report={'design_version':'0.3','design_date':'2026-10-01','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_at_run':revision,'revision_binding':binding,'status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
+
+
+===== SOURCE: tools/verify_intake_prototype.cjs =====
+
+#!/usr/bin/env node
+/* Local design-state checks only. No real file intake, APIs, model, or scoring. */
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto'),cp=require('node:child_process');
+const root=path.resolve(__dirname,'..'),{chromium}=require(process.argv[2]||'playwright');
+(async()=>{let browser;const checks=[],requests=[],errors=[];const executedAt=new Date().toISOString();try{
+ browser=await chromium.launch({headless:true,chromiumSandbox:true,args:['--disable-gpu'],...(process.argv[3]?{executablePath:process.argv[3]}:{})});
+ const ctx=await browser.newContext({viewport:{width:1440,height:900}});await ctx.route(/^https?:/,r=>{requests.push(r.request().url());return r.abort();});const page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('file://'+path.join(root,'prototype/intake.html'));
+ const check=async(id,scenario,fn)=>{try{await fn();checks.push({id,scenario,status:'passed'});}catch(e){checks.push({id,scenario,status:'failed',error:e.message});throw e;}};
+ const text=()=>page.locator('#intake-main').innerText();
+ await check('PD-INTAKE-01','摘要与上游解读/系统等待、多来源分别表达',async()=>{assert.match(await text(),/原Agent解读/);assert.match(await text(),/尚无影响判断/);assert.match(await text(),/具体文章原文尚未取得/);assert.equal(await page.getByRole('button',{name:'阅读原文',exact:true}).count(),1);await page.getByRole('button',{name:'阅读原文',exact:true}).click();assert.equal(await page.locator('#intake-dialog').evaluate(d=>d.open),true);assert.match(await page.locator('#dialog-text').innerText(),/客户验收/);await page.getByRole('button',{name:'关闭',exact:true}).click();});
+ await check('PD-INTAKE-02','来源入口不假装已取正文',async()=>{await page.getByRole('button',{name:'来源入口',exact:true}).click();assert.match(await page.locator('#dialog-text').innerText(),/具体原文尚未取得/);await page.keyboard.press('Escape');assert.equal(await page.locator('#intake-dialog').evaluate(d=>d.open),false);});
+ await check('PD-INTAKE-03','没有来源网址仍可阅读',async()=>{await page.locator('#intake-case').selectOption('missing');assert.match(await text(),/暂无原文入口/);assert.match(await text(),/合成订单/);assert.equal(await page.getByRole('button',{name:'阅读原文',exact:true}).count(),0);});
+ await check('PD-INTAKE-04','访谈未知发布时间与阅读星级',async()=>{await page.locator('#intake-case').selectOption('interview');assert.match(await text(),/发布时间未明确/);assert.match(await text(),/不是公司评分/);assert.match(await text(),/未当作新闻发布时间/);});
+ await check('PD-INTAKE-05','无动态说明独立于事件',async()=>{await page.locator('#intake-case').selectOption('coverage');assert.match(await text(),/本次采集未发现重要更新/);assert.match(await text(),/不产生零影响事件/);});
+ await check('PD-INTAKE-06','部分失败资料仍可阅读',async()=>{await page.locator('#intake-case').selectOption('partial');assert.match(await text(),/6条成功资料可以阅读，1条尚未解析/);assert.match(await text(),/A9:G9/);assert.match(await text(),/合成订单/);});
+ for(const width of [1440,1280,390,430]){await check('PD-INTAKE-WIDTH-'+width,'五种状态布局宽度'+width,async()=>{await page.setViewportSize({width,height:900});for(const value of ['sources','missing','interview','coverage','partial']){await page.locator('#intake-case').selectOption(value);const size=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:innerWidth}));assert.ok(size.scroll<=size.width+1,JSON.stringify(size));}});}
+ await check('PD-INTAKE-07','键盘可操作与本地无外发',async()=>{await page.locator('#intake-case').selectOption('sources');await page.getByRole('button',{name:'阅读原文',exact:true}).focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#intake-dialog').evaluate(d=>d.open),true);await page.keyboard.press('Escape');assert.equal(await page.locator('#intake-dialog').evaluate(d=>d.open),false);assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);});
+ await page.setViewportSize({width:1440,height:900});await page.locator('#intake-case').selectOption('sources');await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(150);await page.screenshot({path:path.join(root,'review/design-detail/intake-desktop.png')});await page.setViewportSize({width:390,height:844});await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(150);await page.screenshot({path:path.join(root,'review/design-detail/intake-mobile.png')});
+ }catch(e){process.exitCode=1;console.error(e.message);}finally{if(browser)await browser.close();const hashes=Object.fromEntries(['prototype/intake.html','prototype/style.css','tools/verify_intake_prototype.cjs'].map(p=>[p,crypto.createHash('sha256').update(fs.readFileSync(path.join(root,p))).digest('hex')]));fs.writeFileSync(path.join(root,'review/design-detail/intake-prototype-checks.json'),JSON.stringify({scope:'Synthetic local reading-state prototype only; NOT product T-44..49 acceptance',executed_at:executedAt,revision_at_run:cp.execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),status:process.exitCode?'failed':'passed',checks,source_sha256:hashes,external_requests:requests,console_errors:errors,not_run:['Actual spreadsheet parsing/DB/API/RBAC/scoring','Real user/real device UX acceptance']},null,2)+'\n');console.log(process.exitCode?'FAILED':'PASS',checks.length,'intake prototype checks');}})();
 
 
 ===== SOURCE: tools/verify_prototype.cjs =====
@@ -10765,6 +12735,13 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
           "meaning": "可诊断业务错误"
         },
         {
+          "name": "result_manifest_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "解析输出清单；结果产生后写入，不覆写输入；partial亦可有结果",
+          "references": "input_manifest.id"
+        },
+        {
           "name": "created_at",
           "type": "timestamptz",
           "nullable": false,
@@ -10791,7 +12768,10 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
       "indexes": [
         "workspace_id,status,due_at"
       ],
-      "rules": []
+      "rules": [
+        "input_manifest固定运行前输入；result_manifest.kind=ingestion_result，内容按ingestion-result 1.0；完成结果与条目引用对应",
+        "失败条目保留checkpoint.holes；成功条目可读，partial批次不跳过未解决洞；重试发布新不可变输出清单"
+      ]
     },
     {
       "name": "checkpoint",
@@ -11110,6 +13090,61 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
           "meaning": "标题"
         },
         {
+          "name": "content_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "source_document/agent_report/agent_digest；材料性质不等于判断是否接受"
+        },
+        {
+          "name": "summary_text",
+          "type": "text",
+          "nullable": true,
+          "meaning": "阅读摘要，不冒充被引用原文"
+        },
+        {
+          "name": "reading_metadata",
+          "type": "jsonb",
+          "nullable": false,
+          "meaning": "information-entry 1.0 reading_metadata；资料类型/主题/人物/摘要来源/上游解读与观察点"
+        },
+        {
+          "name": "parent_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "派生条目的报告文件修订；直接来源可空",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "origin_locator",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "父文件sheet/单元格范围；information-entry 1.0 locator"
+        },
+        {
+          "name": "published_date",
+          "type": "date",
+          "nullable": true,
+          "meaning": "来源的民用发布日期；不伪造午夜瞬时"
+        },
+        {
+          "name": "published_precision",
+          "type": "text",
+          "nullable": false,
+          "meaning": "instant/minute/day/part_of_day/unknown"
+        },
+        {
+          "name": "published_timezone",
+          "type": "text",
+          "nullable": true,
+          "meaning": "已知来源IANA时区；未知不推断"
+        },
+        {
+          "name": "published_time_raw",
+          "type": "text",
+          "nullable": true,
+          "meaning": "上游时间原始表述；访谈不明日期不得假定为发布时间"
+        },
+        {
           "name": "status",
           "type": "text",
           "nullable": false,
@@ -11145,7 +13180,12 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
         ]
       ],
       "indexes": [],
-      "rules": []
+      "rules": [
+        "新增载荷与时间字段按contracts/information-entry.schema.json和04 §6校验；分钟/瞬时须有带offset发布时间，day/part_of_day无published_at；unknown不补日期",
+        "agent_digest必须有parent_revision_id与origin_locator，父修订属于相同workspace且为agent_report；条目和报告复用raw_object",
+        "正文对象表示本材料本身：agent报告/摘要不等同引用文章；摘要不得作为发行人原文",
+        "parent_revision_id只能指已存在父修订；不可自指或形成循环；旧修订/摘要不可覆写"
+      ]
     },
     {
       "name": "item_observation",
@@ -11200,6 +13240,13 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
           "references": "item_observation.id"
         },
         {
+          "name": "ingestion_run_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "此次获得资料的导入/采集批次",
+          "references": "ingestion_run.id"
+        },
+        {
           "name": "created_at",
           "type": "timestamptz",
           "nullable": false,
@@ -11223,6 +13270,101 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
       "indexes": [],
       "rules": [
         "A→B→A三次sequence；revision属于同item，不以内容hash丢观察"
+      ]
+    },
+    {
+      "name": "item_source_reference",
+      "owner": "information",
+      "lifecycle": "append_then_resolve",
+      "scope": "workspace",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "稳定记录ID；服务端生成"
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "所属研究组织",
+          "references": "workspace.id"
+        },
+        {
+          "name": "item_revision_id",
+          "type": "uuid",
+          "nullable": false,
+          "meaning": "引用所在摘要/资料修订",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "reference_key",
+          "type": "text",
+          "nullable": false,
+          "meaning": "本修订内稳定引用序号/键"
+        },
+        {
+          "name": "source_name",
+          "type": "text",
+          "nullable": false,
+          "meaning": "上游来源名称"
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": true,
+          "meaning": "来源入口，可缺失；不表示正文已取得"
+        },
+        {
+          "name": "locator_kind",
+          "type": "text",
+          "nullable": false,
+          "meaning": "article/list/account/unknown；未核验时unknown"
+        },
+        {
+          "name": "source_locator",
+          "type": "jsonb",
+          "nullable": true,
+          "meaning": "该来源在原文件中的位置；直接资料可空"
+        },
+        {
+          "name": "target_revision_id",
+          "type": "uuid",
+          "nullable": true,
+          "meaning": "实际取得的来源正文修订；未知可空",
+          "references": "item_revision.id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "meaning": "数据库实际写入时间；不接受调用者回填"
+        }
+      ],
+      "unique_keys": [
+        [
+          "id"
+        ],
+        [
+          "workspace_id",
+          "id"
+        ],
+        [
+          "workspace_id",
+          "item_revision_id",
+          "reference_key"
+        ]
+      ],
+      "indexes": [
+        "item_revision_id",
+        "target_revision_id WHERE target_revision_id IS NOT NULL"
+      ],
+      "rules": [
+        "来源描述/url/定位随所属修订固定；target_revision_id只允许null→确切正文修订，CAS提交解析结果与审计；重复相同绑定幂等",
+        "错误来源绑定通过新资料修订更正；目标修订必须是同workspace的source_document且实际有可定位正文；不得指向本摘要",
+        "正文访问仍校验目标来源政策；无权/撤权/未取得分别由读取时质量说明表达，不能向无权者泄露目标引用",
+        "未取得引用不用伪造空information_item；source名但无url可合法保留"
       ]
     },
     {
@@ -12209,7 +14351,7 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
           "name": "kind",
           "type": "text",
           "nullable": false,
-          "meaning": "analysis/scoring/evaluation/preview/ingestion"
+          "meaning": "analysis/scoring/evaluation/preview/ingestion / ingestion_result（解析输出）"
         },
         {
           "name": "schema_ref",
@@ -17120,6 +19262,9 @@ erDiagram
     ITEM_REVISION ||--o{ ITEM_OBSERVATION : observed_content
     RAW_OBJECT ||--o{ ITEM_REVISION : original
     ITEM_REVISION ||--o{ EVIDENCE : locates
+    ITEM_REVISION ||--o{ ITEM_SOURCE_REFERENCE : cites
+    ITEM_REVISION o|--o{ ITEM_SOURCE_REFERENCE : acquired_target
+    ITEM_REVISION o|--o{ ITEM_REVISION : derived_entries
     COMPANY ||--o{ SECURITY : issues
     SECURITY ||--|{ LISTING : quotations
     COMPANY ||--o{ COMPANY_ALIAS : names
@@ -17193,6 +19338,8 @@ erDiagram
 
 当前评分查询取 `score_current` 指针但校验其状态、当前判断/权限代次；历史页直接取固定snapshot。候选按release/security分页，时间线按company/event_time/id；自选按security保存、公司页可聚合显示。原型仅固定样例，不实现这些查询。
 
+资讯读取不依赖score/evaluation完成。item_revision保存摘要、固定reading_metadata、发布时间精度及文件父修订/位置；item_source_reference保存多来源与首次取得的目标修订。ingestion_run的input_manifest不回写解析结果，result_manifest指向不可变ingestion_result输出；每次item_observation关联实际run。具体语义见04 §6与information-entry/ingestion-result Schema。完整字段目录仍按切片落实，未建立数据库。
+
 ## 7. 本轮验证边界
 
 字段目录已覆盖逻辑对象和核心页面写入；引用存在性/字段唯一性/唯一键字段检查由生成工具执行。未连接数据库，未生成或执行DDL，不报告FK/索引/事务/锁/权限实际通过。实现时将字段设计转为Alembic迁移，按切片执行既有T测试；生产类型容量/索引性能由真实工作负载确认。
@@ -17212,6 +19359,39 @@ erDiagram
 <dialog id="dialog"><div id="dialog-content"></div><button class="secondary" id="close-dialog">关闭</button></dialog>
 <script src="app.js"></script>
 </body></html>
+
+
+===== SOURCE: prototype/intake.html =====
+
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>资料阅读状态 · 价值研究原型</title><link rel="stylesheet" href="style.css"><style>
+body{padding:24px;max-width:1100px;margin:auto}main{padding:16px 0}p{margin:8px 0}h3{margin-top:12px}.intake-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.intake-actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}label{display:block}select{width:100%;max-width:420px}h1{font-size:28px}section{margin:16px 0}.citation{padding:12px 0;border-bottom:1px solid #ddd}.intake-date{color:#666}.intake-note{font-size:14px;color:#666}dialog{max-width:600px;width:calc(100% - 32px);border:1px solid #ccc;border-radius:12px;padding:24px}@media(max-width:700px){body{padding:16px}.intake-grid{grid-template-columns:1fr}h1{font-size:24px}}
+</style></head>
+<body>
+<a href="index.html#news">返回新闻资讯原型</a>
+<h1>一条新闻，先看懂再判断</h1>
+<p>本地合成阅读状态演示。比亚迪仅为名称案例，消息、解读、人物、日期与来源全部虚构，不读取参考Excel。</p>
+<label for="intake-case">查看资料状态</label>
+<select id="intake-case"><option value="sources">摘要有多个来源</option><option value="missing">摘要没有原文入口</option><option value="interview">企业家观点，发布时间未明确</option><option value="coverage">本次监控未发现重要更新</option><option value="partial">部分条目未解析</option></select>
+<main id="intake-main" aria-live="polite"></main>
+<dialog id="intake-dialog"><h2 id="dialog-title">合成原文</h2><p id="dialog-text"></p><button id="close-dialog" type="button">关闭</button></dialog>
+<script>
+'use strict';
+const main=document.querySelector('#intake-main'),select=document.querySelector('#intake-case'),dialog=document.querySelector('#intake-dialog');
+const intakeHeading=(title,date)=>`<h2>${title}</h2><p class="intake-date">${date}</p>`;
+const summary=`<section class="panel"><div class="panel-body"><h3>发生了什么</h3><p>合成订单安排增加业务机会，收入仍取决于交付与验收。</p><p><strong>涉及公司：</strong>比亚迪 · 名称演示</p><h3>原Agent解读</h3><p>建议关注执行成本。这里是上游整理者的观点，尚未成为本系统的有效影响判断。</p><h3>接下来观察什么</h3><p>后续交付安排，以及客户验收是否完成。</p></div></section>`;
+const judgment=`<section class="panel"><div class="panel-body"><h3>系统判断</h3><p>尚无影响判断，评分待更新。摘要阅读已可用，不需等待计算。</p></div></section>`;
+function render(){
+ const v=select.value;
+ if(v==='coverage'){main.innerHTML=intakeHeading('公司监控说明','合成批次：09-30')+'<section class="panel"><div class="panel-body"><h3>本次采集未发现重要更新</h3><p>这是上游报告的监控说明，不表示现实没有事件，也不产生零影响事件或自动调整评分。</p><p class="intake-note">报告窗口有差异提示，资料仍可阅读。</p></div></section>';return;}
+ if(v==='partial'){main.innerHTML=intakeHeading('资料已部分整理','合成批次：09-30')+'<p role="status">6条成功资料可以阅读，1条尚未解析；运行状态：部分完成。</p>'+summary+'<section class="panel"><div class="panel-body"><h3>失败项</h3><p>合成日报 A9:G9 · 行格式不匹配，等待数据运营重试这一项。</p><p class="intake-note">“部分资料未解析”与“未发现重要更新”是不同状态。</p></div></section>';return;}
+ if(v==='interview'){main.innerHTML=intakeHeading('合成访谈：如何看待长期投入','发布时间未明确 · 系统取得：10-01 09:00')+'<section class="panel"><div class="panel-body"><p>合成人物甲 · 比亚迪负责人（完全虚构）</p><p>访谈摘要：投入应与交付能力匹配，持续观察现金回报。</p><p>阅读价值：★★★★☆ · 只用于资料排序，不是公司评分。</p><p>原表日期含义未明确，未当作新闻发布时间。</p><button type="button" data-source="interview">来源入口</button></div></section>'+judgment;return;}
+ const sources=v==='missing'?'<p>暂无原文入口；上游报告只有来源名称。</p>':`<div class="citation"><strong>合成公告来源</strong><p>已取得一份具体正文，可阅读；不表示其他来源已核实。</p><button type="button" data-original>阅读原文</button></div><div class="citation"><strong>合成行业栏目</strong><p>这是栏目入口，具体文章原文尚未取得。</p><button type="button" data-source="list">来源入口</button></div><div class="citation"><strong>另一个合成来源</strong><p>依据暂不可访问；不显示不可见网址或正文。</p></div>`;
+ main.innerHTML=intakeHeading('比亚迪：订单执行条件摘要（演示）','发布：09-29（仅日期，时区未明确） · 系统取得：10-01 09:00')+'<p>Agent整理 · 摘要来自合成报告；不是新闻原文。</p><div class="intake-grid"><div>'+summary+judgment+'</div><section class="panel"><div class="panel-body"><h3>依据在哪里</h3>'+sources+'<p class="intake-note">报告位置：合成日报 A3:G3</p></div></section></div>';
+}
+select.addEventListener('change',render);main.addEventListener('click',e=>{if(e.target.matches('[data-original]')){document.querySelector('#dialog-title').textContent='合成公告原文';document.querySelector('#dialog-text').textContent='本地虚构公告：新增订单按阶段交付，收入确认以客户验收为条件，执行成本仍需关注。本演示不抓取网络原文。';dialog.showModal();}else if(e.target.matches('[data-source]')){document.querySelector('#dialog-title').textContent='来源入口演示';document.querySelector('#dialog-text').textContent='正式产品打开获许可来源的网址；此原型不外发请求，具体原文尚未取得。';dialog.showModal();}});document.querySelector('#close-dialog').addEventListener('click',()=>dialog.close());render();
+</script></body></html>
 
 
 ===== SOURCE: prototype/style.css =====
@@ -17458,6 +19638,33 @@ render();
 修改影响时草稿初始为当前值+0.8；只有主动修改后才是−0.2等新值。原文提供订单机会与延期库存/资金占用成本，正负方向的依据在独立判断区说明，不把测试脚本写进原文。经营分、影响值、评分档位属于不同尺度。
 
 终审三项修正：09-29评分和A/H估值使用09-27已取得的历史财务原文；09-30更新与订单后续研究不充当旧评分输入。修改区只保留一个新值输入，保存后回读。策略发布固定新版本/门槛，新结果等待，旧结果明确发布1；继续编辑草稿不改变已发布值。处置与证据见[终审记录](../review/GPT-PRO-FINAL-DISPOSITION.md)。
+
+编码准备补齐的[资料阅读状态](./intake.html)单独演示：多来源摘要、仅日期、已取得/未取得/不可访问原文、无入口、访谈阅读评级、无重要动态与部分解析失败。沿用共享样式，全部原创合成内容，不访问真实文件或外部网址；原型不执行解析/评分/权限或数据库逻辑。
+
+
+===== SOURCE: review/CODING-READINESS.md =====
+
+# 编码准备收口记录
+
+2026-10-01。基线75ec4c7dedfe9b2b516ed9ab96769b067b86910c。本轮为用户授权的编码前准备：正式设计与交接更新，产品没有启动。
+
+资料接入补齐已写入04/05/06/07/14、字段真源与生成15、三份1.0 Schema、原创合成示例、T-44…49、17开发交接。新增阅读状态原型不处理真实文件、不调用API/模型/评分、不下载链接。真实参考输入及本地分析留在local-evidence，本轮Git材料不包含原表内容或网址。
+
+字段生成和材料检查已通过，新增阅读状态原型11项交互/四视口检查通过，未观察到页面脚本错误或HTTP请求。检查输入以各报告source_sha256绑定当次工作树，运行时HEAD为上述基线；最终提交包含这些输入。编码前准备可以收口；启动实施、运行依赖锁定和实际DB分类核验属于M0，不是本轮已经完成的事实。11/12已确认业务合同不变，供应商/生产/真实模型与通知事项仍按阶段后置，不增加可选终审轮次。
+
+编码入口与任务/依赖/停止条件以[17](../docs/17-coding-readiness.md)为准。历史终审与主原型检查保留，新增原型证据单独记录；真实产品T-01…49和T-UX签收未运行。
+
+
+## 验证记录
+
+- `python3 tools/render_database_design.py`：生成79表、801字段设计字典；字段/FK目标/唯一键字段引用检查通过；没有SQL。
+- `python3 tools/validate_design.py`：当前材料检查通过，精确检查数和输入hash见[结果](./validation-result.json)。新增DTO正例/负例和目录一致性检查是离线材料验证，不是运行适配器。
+- `node tools/verify_intake_prototype.cjs <bundled Playwright> <Chrome>`：独立无头浏览器、HTTP拦截、本地file页面；11项合成阅读交互和1440/1280/390/430宽度检查通过。结果见[报告](./design-detail/intake-prototype-checks.json)，截图为桌面/手机首屏；不是目标用户测试。
+- 原型首轮脚本名与浏览器全局`top`冲突导致页面未渲染，已改为局部名称并复验；第二轮原生select的Home键行为不符测试假定，改用真实按钮Enter/Escape验证键盘交互，未声称原生select全平台测试。失败报告保留为intake-prototype-failure.json、intake-prototype-failure-02.json。
+- `python3 tools/build_review_pack.py`：同步整包及文本备用入口，包含编码交接；不发送外部评审，不包含local-evidence或真实Excel。
+- `git diff --check`及目录生成回读通过；本轮只包含文档、Schema、原创合成示例、设计原型与检查工具。
+
+未执行：完整draft-2020-12标准库验证、产品编码、实际解析/DB/API/worker/RBAC/评分/策略/事务/恢复测试、真实源与模型、真实用户/设备UAT、部署与通知。材料检查器只覆盖实际使用的保守Schema子集；标准Schema验证器集成与OpenAPI客户端生成属于M0，不因本地未装该库新增准备门槛。
 
 
 ===== SOURCE: review/V02-CHANGELOG.md =====

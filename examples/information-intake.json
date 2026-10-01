@@ -1,0 +1,452 @@
+{
+  "fixture_kind": "synthetic_design_only",
+  "entries": [
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-1",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：订单安排摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "news",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A3:G3"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成公告来源",
+          "url": "https://example.invalid/article/1",
+          "locator_kind": "unknown",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        },
+        {
+          "reference_key": "2",
+          "source_name": "合成行业栏目",
+          "url": "https://example.invalid/list",
+          "locator_kind": "list",
+          "source_locator": {
+            "sheet": "合成日报",
+            "range": "F3"
+          }
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-2",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：管理层访谈",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "interview",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": "合成人物甲",
+        "person_role": "合成公司负责人",
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": {
+          "raw": "★★★★☆",
+          "scale": "stars"
+        }
+      },
+      "publication": {
+        "at": null,
+        "date": null,
+        "precision": "unknown",
+        "timezone": null,
+        "raw": "访谈日期含义未明确"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A4:G4"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-3",
+      "content_kind": "agent_digest",
+      "title": "合成甲制造：既有事件的市场反应",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "market_followup",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "part_of_day",
+        "timezone": null,
+        "raw": "2026-09-29 晚间"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A5:G5"
+      },
+      "source_references": [
+        {
+          "reference_key": "1",
+          "source_name": "合成报道，仅来源名称",
+          "url": null,
+          "locator_kind": "unknown",
+          "source_locator": null
+        }
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-4",
+      "content_kind": "agent_digest",
+      "title": "合成乙制造：公告摘要",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "announcement",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A6:G6"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-5",
+      "content_kind": "agent_digest",
+      "title": "合成消费：新品趋势",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "industry_context",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A7:G7"
+      },
+      "source_references": []
+    },
+    {
+      "schema_version": "1.0",
+      "entry_key": "digest-6",
+      "content_kind": "agent_digest",
+      "title": "合成科技：机构观点",
+      "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+      "reading_metadata": {
+        "schema_version": "1.0",
+        "material_type": "research_report",
+        "topics": [
+          "合成制造业"
+        ],
+        "person_name": null,
+        "person_role": null,
+        "summary_origin": "upstream_agent",
+        "generator_ref": null,
+        "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+        "watch_points": [
+          "查看后续交付安排"
+        ],
+        "source_reading_priority": null
+      },
+      "publication": {
+        "at": null,
+        "date": "2026-09-29",
+        "precision": "day",
+        "timezone": null,
+        "raw": "2026-09-29"
+      },
+      "parent_revision_id": "00000000-0000-4000-8000-000000000901",
+      "origin_locator": {
+        "sheet": "合成日报",
+        "range": "A8:G8"
+      },
+      "source_references": []
+    }
+  ],
+  "result": {
+    "schema_version": "1.0",
+    "ingestion_run_id": "00000000-0000-4000-8000-000000000900",
+    "input_manifest_id": "00000000-0000-4000-8000-000000000902",
+    "raw_object_id": "00000000-0000-4000-8000-000000000903",
+    "report_revision_id": "00000000-0000-4000-8000-000000000901",
+    "adapter_ref": "local-fixture:report-v1",
+    "parse_version": "1.0",
+    "upstream_report_date": "2026-09-30",
+    "upstream_generated_at": "2026-09-30T04:20:00+08:00",
+    "upstream_timezone": "Asia/Shanghai",
+    "upstream_run_ref": null,
+    "reported_window": {
+      "start_raw": "2026-09-29 04:00",
+      "end_raw": "2026-09-30 04:00",
+      "timezone": "Asia/Shanghai"
+    },
+    "entry_results": [
+      {
+        "entry_key": "digest-1",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A3:G3"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000910",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-2",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A4:G4"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000911",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-3",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A5:G5"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000912",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-4",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A6:G6"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000913",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-5",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A7:G7"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000914",
+        "error_code": null
+      },
+      {
+        "entry_key": "digest-6",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A8:G8"
+        },
+        "status": "imported",
+        "item_revision_id": "00000000-0000-4000-8000-000000000915",
+        "error_code": null
+      },
+      {
+        "entry_key": "broken-7",
+        "locator": {
+          "sheet": "合成日报",
+          "range": "A9:G9"
+        },
+        "status": "failed",
+        "item_revision_id": null,
+        "error_code": "INVALID_ROW"
+      }
+    ],
+    "company_coverage": [
+      {
+        "company_label": "合成甲制造",
+        "company_id": null,
+        "reported_result": "has_updates",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A3:G8"
+        },
+        "note": "公司身份等待匹配，阅读不中断。"
+      },
+      {
+        "company_label": "合成观察主体",
+        "company_id": null,
+        "reported_result": "no_material_update",
+        "source_locator": {
+          "sheet": "合成日报",
+          "range": "A10"
+        },
+        "note": "上游报告称未发现重要更新。"
+      }
+    ],
+    "warnings": [
+      "合成窗口声明与实际跨度不一致，仅为演练"
+    ],
+    "generated_at": "2026-10-01T09:00:00+08:00"
+  },
+  "expected": {
+    "run_status": "partial",
+    "readable_entries": 6,
+    "no_news_events": 0,
+    "accepted_judgments_from_import": 0,
+    "price_bars_from_summary": 0,
+    "schema_checks_are_product_acceptance": false
+  },
+  "expected_read_response": {
+    "schema_version": "1.0",
+    "item_id": "00000000-0000-4000-8000-000000000920",
+    "revision_id": "00000000-0000-4000-8000-000000000910",
+    "title": "合成甲制造：订单安排摘要",
+    "content_kind": "agent_digest",
+    "summary_text": "合成资料：新增订单以交付和验收为条件，仅供设计演练。",
+    "reading_metadata": {
+      "schema_version": "1.0",
+      "material_type": "news",
+      "topics": [
+        "合成制造业"
+      ],
+      "person_name": null,
+      "person_role": null,
+      "summary_origin": "upstream_agent",
+      "generator_ref": null,
+      "agent_commentary": "合成解读：关注执行成本；不是已生效影响判断。",
+      "watch_points": [
+        "查看后续交付安排"
+      ],
+      "source_reading_priority": null
+    },
+    "publication": {
+      "at": null,
+      "date": "2026-09-29",
+      "precision": "day",
+      "timezone": null,
+      "raw": "2026-09-29"
+    },
+    "observed_at": "2026-10-01T09:00:00+08:00",
+    "company_links": [],
+    "body_access": {
+      "state": "no_locator",
+      "url": null,
+      "target_revision_id": null
+    },
+    "reference_access": [
+      {
+        "reference_key": "1",
+        "source_name": "合成公告来源",
+        "locator_kind": "article",
+        "access": {
+          "state": "available",
+          "url": "https://example.invalid/article/1",
+          "target_revision_id": "00000000-0000-4000-8000-000000000930"
+        }
+      },
+      {
+        "reference_key": "2",
+        "source_name": "合成行业栏目",
+        "locator_kind": "list",
+        "access": {
+          "state": "not_acquired",
+          "url": "https://example.invalid/list",
+          "target_revision_id": null
+        }
+      },
+      {
+        "reference_key": "3",
+        "source_name": "不可访问合成来源",
+        "locator_kind": "unknown",
+        "access": {
+          "state": "restricted",
+          "url": null,
+          "target_revision_id": null
+        }
+      }
+    ],
+    "quality": "partial",
+    "reasons": [
+      "NO_ACCEPTED_COMPANY_LINK",
+      "ORIGINAL_PARTLY_UNAVAILABLE"
+    ]
+  }
+}

@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
+paths.extend([ROOT / "review/CODING-READINESS.md", ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
@@ -39,8 +39,8 @@ final_names = [
     "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md", "review/GPT-PRO-FINAL-DISPOSITION.md",
     "docs/01-product-requirements.md", "docs/06-ux-and-design-system.md",
     "docs/11-templates-automation-and-roles.md", "docs/12-time-numerics-and-corrections.md",
-    "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md",
-    "prototype/README.md", "prototype/index.html", "prototype/app.js", "prototype/style.css",
+    "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md", "docs/17-coding-readiness.md", "review/CODING-READINESS.md",
+    "prototype/README.md", "prototype/intake.html", "prototype/index.html", "prototype/app.js", "prototype/style.css",
     "config/scoring-standard-v1.json", "config/strategy-standard-v1.json", "config/rubrics-standard-v1.json",
     "review/design-detail/prototype-checks.json",
 ]

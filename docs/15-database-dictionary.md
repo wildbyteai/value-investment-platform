@@ -46,6 +46,9 @@ erDiagram
     ITEM_REVISION ||--o{ ITEM_OBSERVATION : observed_content
     RAW_OBJECT ||--o{ ITEM_REVISION : original
     ITEM_REVISION ||--o{ EVIDENCE : locates
+    ITEM_REVISION ||--o{ ITEM_SOURCE_REFERENCE : cites
+    ITEM_REVISION o|--o{ ITEM_SOURCE_REFERENCE : acquired_target
+    ITEM_REVISION o|--o{ ITEM_REVISION : derived_entries
     COMPANY ||--o{ SECURITY : issues
     SECURITY ||--|{ LISTING : quotations
     COMPANY ||--o{ COMPANY_ALIAS : names
@@ -118,6 +121,8 @@ erDiagram
 | 历史更正 | 原记录保留+correction结果+当前必要reconciliation CAS+audit/outbox | 当时记录/更正说明可并列 | 旧generation不覆盖今天 |
 
 当前评分查询取 `score_current` 指针但校验其状态、当前判断/权限代次；历史页直接取固定snapshot。候选按release/security分页，时间线按company/event_time/id；自选按security保存、公司页可聚合显示。原型仅固定样例，不实现这些查询。
+
+资讯读取不依赖score/evaluation完成。item_revision保存摘要、固定reading_metadata、发布时间精度及文件父修订/位置；item_source_reference保存多来源与首次取得的目标修订。ingestion_run的input_manifest不回写解析结果，result_manifest指向不可变ingestion_result输出；每次item_observation关联实际run。具体语义见04 §6与information-entry/ingestion-result Schema。完整字段目录仍按切片落实，未建立数据库。
 
 ## 7. 本轮验证边界
 
@@ -257,11 +262,15 @@ erDiagram
 | `input_manifest_id` | `uuid` | 否 | 输入范围及版本；→ `input_manifest.id` |
 | `completed_at` | `timestamptz` | 是 | 实际完成时间 |
 | `error_code` | `text` | 是 | 可诊断业务错误 |
+| `result_manifest_id` | `uuid` | 是 | 解析输出清单；结果产生后写入，不覆写输入；partial亦可有结果；→ `input_manifest.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,partition_key,due_at,schedule_generation,mode)`。
 
 查询索引：`workspace_id,status,due_at`。
+
+- input_manifest固定运行前输入；result_manifest.kind=ingestion_result，内容按ingestion-result 1.0；完成结果与条目引用对应
+- 失败条目保留checkpoint.holes；成功条目可读，partial批次不跳过未解决洞；重试发布新不可变输出清单
 
 ### checkpoint
 
@@ -341,11 +350,25 @@ erDiagram
 | `published_at` | `timestamptz` | 是 | 源发布时间；未知可空 |
 | `observed_at` | `timestamptz` | 否 | 首次获得此内容修订时间 |
 | `title` | `text` | 否 | 标题 |
+| `content_kind` | `text` | 否 | source_document/agent_report/agent_digest；材料性质不等于判断是否接受 |
+| `summary_text` | `text` | 是 | 阅读摘要，不冒充被引用原文 |
+| `reading_metadata` | `jsonb` | 否 | information-entry 1.0 reading_metadata；资料类型/主题/人物/摘要来源/上游解读与观察点 |
+| `parent_revision_id` | `uuid` | 是 | 派生条目的报告文件修订；直接来源可空；→ `item_revision.id` |
+| `origin_locator` | `jsonb` | 是 | 父文件sheet/单元格范围；information-entry 1.0 locator |
+| `published_date` | `date` | 是 | 来源的民用发布日期；不伪造午夜瞬时 |
+| `published_precision` | `text` | 否 | instant/minute/day/part_of_day/unknown |
+| `published_timezone` | `text` | 是 | 已知来源IANA时区；未知不推断 |
+| `published_time_raw` | `text` | 是 | 上游时间原始表述；访谈不明日期不得假定为发布时间 |
 | `status` | `text` | 否 | valid/metadata_only/conflicting/restricted |
 | `supersedes_id` | `uuid` | 是 | 前一内容修订；→ `item_revision.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,content_hash,parse_version)`。
+
+- 新增载荷与时间字段按contracts/information-entry.schema.json和04 §6校验；分钟/瞬时须有带offset发布时间，day/part_of_day无published_at；unknown不补日期
+- agent_digest必须有parent_revision_id与origin_locator，父修订属于相同workspace且为agent_report；条目和报告复用raw_object
+- 正文对象表示本材料本身：agent报告/摘要不等同引用文章；摘要不得作为发行人原文
+- parent_revision_id只能指已存在父修订；不可自指或形成循环；旧修订/摘要不可覆写
 
 ### item_observation
 
@@ -360,11 +383,38 @@ erDiagram
 | `revision_id` | `uuid` | 否 | 本次看到的内容版本；→ `item_revision.id` |
 | `observed_at` | `timestamptz` | 否 | 本次真正获取时点 |
 | `previous_observation_id` | `uuid` | 是 | 上一观察；→ `item_observation.id` |
+| `ingestion_run_id` | `uuid` | 否 | 此次获得资料的导入/采集批次；→ `ingestion_run.id` |
 | `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
 唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,sequence)`。
 
 - A→B→A三次sequence；revision属于同item，不以内容hash丢观察
+
+### item_source_reference
+
+责任：information；生命周期：`append_then_resolve`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_revision_id` | `uuid` | 否 | 引用所在摘要/资料修订；→ `item_revision.id` |
+| `reference_key` | `text` | 否 | 本修订内稳定引用序号/键 |
+| `source_name` | `text` | 否 | 上游来源名称 |
+| `url` | `text` | 是 | 来源入口，可缺失；不表示正文已取得 |
+| `locator_kind` | `text` | 否 | article/list/account/unknown；未核验时unknown |
+| `source_locator` | `jsonb` | 是 | 该来源在原文件中的位置；直接资料可空 |
+| `target_revision_id` | `uuid` | 是 | 实际取得的来源正文修订；未知可空；→ `item_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_revision_id,reference_key)`。
+
+查询索引：`item_revision_id`；`target_revision_id WHERE target_revision_id IS NOT NULL`。
+
+- 来源描述/url/定位随所属修订固定；target_revision_id只允许null→确切正文修订，CAS提交解析结果与审计；重复相同绑定幂等
+- 错误来源绑定通过新资料修订更正；目标修订必须是同workspace的source_document且实际有可定位正文；不得指向本摘要
+- 正文访问仍校验目标来源政策；无权/撤权/未取得分别由读取时质量说明表达，不能向无权者泄露目标引用
+- 未取得引用不用伪造空information_item；source名但无url可合法保留
 
 ### evidence
 
@@ -605,7 +655,7 @@ erDiagram
 |---|---|---|---|
 | `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
 | `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
-| `kind` | `text` | 否 | analysis/scoring/evaluation/preview/ingestion |
+| `kind` | `text` | 否 | analysis/scoring/evaluation/preview/ingestion / ingestion_result（解析输出） |
 | `schema_ref` | `text` | 否 | 对应Schema或固定内部DTO版本 |
 | `content` | `jsonb` | 否 | 规范化完整输入修订、缺口、政策及算法 |
 | `content_sha256` | `char(64)` | 否 | 规范化字节hash |

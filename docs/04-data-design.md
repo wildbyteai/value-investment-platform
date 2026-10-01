@@ -21,6 +21,7 @@
 | information_item | source, external_id, canonical_url_hash, latest_revision_id | source+external_id；无 external_id 才用 source+URL hash |
 | item_observation | item, observation_seq, revision_ref, observed_at, previous_observation | item+sequence；A→B→A保留三次观测；information |
 | item_revision | item, content_hash, object, normalized_hash, published_at, observed_at, parse_version, supersedes, status | item+content_hash+parse_version；一份内容可有不同解析修订 |
+| item_source_reference | item_revision、reference_key、source_name、url、locator_kind、target_revision | 一条摘要多来源；未取得正文可无target；描述固定，目标首次绑定CAS |
 | evidence | revision, locator_kind, start/end or cell, quote_hash, text, source_quality | revision+locator+quote_hash；不可把摘要当原文 |
 | company / company_alias | legal identity, market identifiers, alias language/context, valid range | 内部 company_id 稳定；同名不唯一 |
 | security | company, ISIN, share_class, primary_listing_id, valid range | 公司股权工具身份；A/H独立；identity |
@@ -98,3 +99,31 @@ risk解除引用确切revision，membership提交另校验risk generation；封�
 ## 7. 字段级物理设计候选
 
 [15字段字典与ER](./15-database-dictionary.md)展开本逻辑模型。字段维护入口为design/database-catalog.json，按切片逐步落实；其中link/impact/rubric/risk采用共同judgment_revision根表和类型化逻辑视图，human链可指AUTO旧修订，有效指针仍只有decision_slot。数据库表/视图/约束与事务均尚未创建或验证，不把目录完整度作为M0一次性建表门槛。
+
+## 6. 资料接入与可阅读载荷（编码准备补齐）
+
+2026-10-01依据已确认的文件参考方案补齐；设计主干与11/12评分、自动审核、A/H时点合同不变。字段真源为design/database-catalog.json；解析DTO为[InformationEntry 1.0](../contracts/information-entry.schema.json)，批次输出为[IngestionResult 1.0](../contracts/ingestion-result.schema.json)，示例为[合成资料](../examples/information-intake.json)。以下拥有新增业务语义，Schema负责形状；API不另复制载荷定义。
+
+### 材料、摘要和原文
+
+content_kind为source_document、agent_report、agent_digest。报告文件是一份agent_report，解析条目是一份agent_digest，引用文章实际取得后是单独source_document。summary_text是阅读摘要；reading_metadata固定资料类型、主题、人物/头衔、summary_origin/generator_ref、上游解读、观察点和阅读星级/排名。system_generated摘要必须保留生成版本；上游解读与有效判断分别显示，不写用户research_note，不把阅读星级当公司质量分。
+
+agent_digest通过parent_revision_id+origin_locator定位报告sheet/range，共享父raw_object。文件中的单元格只证明报告原有表述，不能把二手摘要标为发行人原文。content_hash覆盖完整解析载荷、reading_metadata和引用描述，parse_version改变可产生新修订。observed_at由本系统真实取得时点产生，不能回填为报告日期、上游检索时间或源发布时间。
+
+每次item_observation记录ingestion_run_id；同文件导入采用source+上游稳定报告ID（有则用）或文件hash作为报告external_id，条目external_id=报告身份+sheet+条目位置（规范化序列化，parse_version不混入身份）。相同内容不同解析版本建立新revision；重试同批次不重复observation或条目提交。上游报告无稳定ID时，另一天/排版改变作为新材料，事件/事实层再关联，不能用标题或行号覆写旧材料。A→B→A观察合同保持不变，不能用“重复内容”丢掉新的真实观察。
+
+item_source_reference一条对应一个来源描述，包含source_name、可空url、article/list/account/unknown定位类型及原位置。路径猜测不等于原文核验，未确定为unknown。描述随所属item_revision固定；target_revision_id只允许null→已实际取得、可定位正文的同workspace source_document，CAS与现有审计同事务；同一绑定重试返回原结果。错误绑定通过新解析修订更正，不修改旧快照。没有链接或正文时不制造空information_item。目标权限读取时重新校验；目标已绑定也可能无权/撤权，不把ID或来源细节泄漏给不可见用户。报告的权利不自动授予引用来源的权利。
+
+### 资讯时间
+
+published_at仅用于真实可定位瞬时（instant/minute），要求明确来源时区及offset，日期与该时区的民用日一致。published_date保存上游日期，published_precision表达instant/minute/day/part_of_day/unknown；只有日期或“晚间”时published_at为空，保留published_time_raw，不补午夜/整点。分钟精度不宣称秒精度。无法确定IANA时区时保留原文与日期，不能凭电脑时区猜测；访谈“日期”含义不明则precision=unknown、date/at为空，原值保留raw。
+
+资讯列表默认分两组：已知发布日期按发布民用日倒序；同一天可定位瞬时的条目按瞬时倒序，不精确条目按stable item_id排列并标日期精度，不能声称它们先后已确定。未知发布日期放在“发布时间未明确”；可切time_basis=observed按取得瞬时倒序。跨时区精确瞬时换成读者显示时区的日分组，未知时区的仅日期标“来源日期、时区未明确”，不是严格全球先后。排序tuple、snapshot与组边界写入游标；published日期筛选按这个同源分组日，不把未知日期混入“今日”。事件时间线仍遵守§3，不能用这套资讯排序替换事件时间。
+
+### 批次输出与监控说明
+
+ingestion_run.input_manifest_id在运行前冻结输入/版本；解析输出另写input_manifest表kind=ingestion_result，run.result_manifest_id指向它。输出包含上游报告日期/生成时间/窗口、adapter/parse版本、文件/报告修订、成功revision引用、失败条目定位/原因及company_coverage。每次恢复产生新不可变输出清单，实际成功条目回读后决定succeeded/partial/failed；不把后产生的结果塞回输入或覆写旧输出。
+
+company_coverage.reported_result=has_updates/no_material_update/unknown，是上游报告的说明；与运行是否成功分开。候选公司ID未确认为空。窗口声明与实际跨度不符可记warning，不阻止其他有效条目阅读；无重要动态不产生经济事件。部分失败保留checkpoint.holes，成功条目可见，未解决洞不推进完整checkpoint。监控说明先用固定输出DTO，不增加单独coverage表。
+
+阅读解读与来源入口不要求先完成所有全文抓取/影响判断。需要参与评分的证据仍满足已有07/11政策；满足政策可AUTO接受，不追加逐篇人工审批。报价、研报目标价或原Agent解读不直接进入price_bar、财务事实或经营分。一个条目可涉及多个事实，重复材料各自保留，沿用economic_fact/contribution_slot防重复加分。

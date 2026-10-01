@@ -22,6 +22,7 @@ REST /api/v1；完整 OpenAPI 由 M0 后端 DTO 生成，当前文档是详细�
 | GET /companies/{id}/scores | snapshot/as_of；维度、基准、贡献、缺口 | 解释与总分来自同一 snapshot |
 | GET /securities/{id}/valuation | snapshot/as_of；价格、FX、分母与质量 | A/H 独立、停牌/过期说明 |
 | GET /information/{id}/revisions/{revision} | 来源、证据、关联、事件 | metadata_only 不返回虚构正文 |
+| GET /information | company_id、topic、material_type、content_kind、published_from/to、time_basis、cursor | 新闻/摘要列表；发布时间未知单列，阅读不等待评分；详见§7 |
 | GET /events/{id} | 历史修订、支持／反驳来源、公司影响 | 权限过滤后仍显示“部分证据不可见” |
 | POST /search | q, company_ids,date range,types,mode,cursor | 精确／全文／语义，可降级；ACL 在检索前应用 |
 | GET /strategies | 本人／组织可见版本与区间数量 | 不泄露他人私有规则 |
@@ -81,3 +82,26 @@ merge-preview 展示证券、别名、事件、评分和策略影响；confirm �
 
 
 v0.3覆盖命令/201合成响应及预期持久化见11 §7与examples/v03-human-replacements.json。path slot是操作身份，body保留slot_id用于审计一致性；并发只用一个If-Match generation，服务端读取当前decision，不要求重复的expected decision/generation字段。普通覆盖端点不接受release动作，release端点只接受release。输入evidence_ids需包含新判断value中的全部证据。单项人工覆盖提交后直接返回影响和重算状态；preview仅用于批量、模板/策略发布和主数据合并等需要先比较影响的操作，绑定输入hash、slot generation、受影响证券及操作者。无权或过期预览不授权提交。内部seal命令非公开API，12 §8定义worker身份、冻结事务和提交原子性。
+
+## 7. 资讯阅读接口与文件适配器
+
+GET /information的过滤为company_id、topic、material_type、content_kind、published_from/to、time_basis=published|observed、cursor/limit；limit/ACL/snapshot沿用§1。公司筛选只使用有效已接受关联，歧义条目仍可在总体列表按候选/待关联说明阅读，不误挂公司。排序、未知发布时间和仅日期语义以04 §6为准。旧company timeline仍是聚合事件接口，新闻列表不能用它代替。
+
+列表记录返回item_id、revision_id、title、summary_text、content_kind、reading_metadata、publication、observed_at、可见公司关联、body_access、reference_access[]和quality/reasons；详情沿用GET /information/{id}/revisions/{revision}返回这些字段及可用证据、事件/判断、父文件定位。publication和reading_metadata直接来自InformationEntry同源类型；写入端不接受actor/observed_at/accepted。服务端生成原文访问状态，不要求前端推断：
+
+| 访问状态 | 页面表达/动作 | 语义 |
+|---|---|---|
+| available | 阅读原文（指确切target revision） | 实际已取得且当前可访问的source_document正文 |
+| not_acquired | 来源入口；原文尚未取得 | 只返回获许可可见的url，不返回虚构body |
+| no_locator | 暂无原文入口 | 只有来源名称，没有可用文章定位 |
+| restricted | 依据暂不可访问 | 当前不可见正文/目标不返回ID、URL或摘录；保留有权摘要可读范围 |
+
+body_access描述本材料自身正文：agent_digest默认无“新闻原文”，但可回查父报告；references各自描述被引用文章状态。同一摘要可能一条来源available、另一条not_acquired。资料详情始终分别展示摘要、上游Agent解读、系统有效判断、观察点；只有一个来源取得也不声称其他来源均核实。metadata_only与正文不可见保留§2现有语义。点击外部URL仅是阅读导航，后台不因页面打开自动下载。
+
+目标SourceAdapter接口：capture(scope, logical_context)返回批次/原文件；normalize(raw_object, parse_version)返回InformationEntry[]、逐条错误和上游报告元信息；publish_result产生IngestionResult并关联实际run。解析按配置处理表头偏移、同义列、公司分段、文本URL与超链接，用同一DTO；同义列如“链接/来源链接/原文链接”，但不凭列名认定网址为具体正文。结构明确时使用规则解析，不强制逐行LLM。
+
+批次输入固定本次文件范围、source/adapter/parse版本与模式；正文/摘要不放异步消息。继续复用ItemCaptured/ItemNormalized/IndexRequested，ItemNormalized可独立触发读取投影与analysis，不等待ScoreCompleted；公司关联可与影响分析独立决定。成功条目提交修订/观察/来源引用与outbox后即读可见；失败定位进入holes并产生partial输出；单条重试复用逻辑键，无全量重评或额外审核。
+
+生成客户端入口在M0实施：后端DTO从固定Schema生成/导出，OpenAPI含资讯列表、详情和参考访问状态，再生成TS客户端。当前只是接口合同，未声称已有HTTP端点或生成客户端。
+
+列表/详情共用字段已固定为[InformationRead 1.0](../contracts/information-read.schema.json)，阅读类型与解析DTO由材料检查核对同源。body_access/reference_access的state、可见url、target_revision_id均由后端返回；restricted/no_locator不返回目标ID或URL，available必须有确切目标修订。列表返回标准{data:InformationRead[],meta}，详情{data:InformationRead加可用body_text/evidence/events/decisions及parent locator,meta}；body_text只在本source_document正文available时返回，摘要页不虚构body。全文/父定位和判断属于既有详情合同，客户端按各自固定类型生成。合成expected_read_response是预期，不是HTTP回读。

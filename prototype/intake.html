@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>资料阅读状态 · 价值研究原型</title><link rel="stylesheet" href="style.css"><style>
+body{padding:24px;max-width:1100px;margin:auto}main{padding:16px 0}p{margin:8px 0}h3{margin-top:12px}.intake-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.intake-actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}label{display:block}select{width:100%;max-width:420px}h1{font-size:28px}section{margin:16px 0}.citation{padding:12px 0;border-bottom:1px solid #ddd}.intake-date{color:#666}.intake-note{font-size:14px;color:#666}dialog{max-width:600px;width:calc(100% - 32px);border:1px solid #ccc;border-radius:12px;padding:24px}@media(max-width:700px){body{padding:16px}.intake-grid{grid-template-columns:1fr}h1{font-size:24px}}
+</style></head>
+<body>
+<a href="index.html#news">返回新闻资讯原型</a>
+<h1>一条新闻，先看懂再判断</h1>
+<p>本地合成阅读状态演示。比亚迪仅为名称案例，消息、解读、人物、日期与来源全部虚构，不读取参考Excel。</p>
+<label for="intake-case">查看资料状态</label>
+<select id="intake-case"><option value="sources">摘要有多个来源</option><option value="missing">摘要没有原文入口</option><option value="interview">企业家观点，发布时间未明确</option><option value="coverage">本次监控未发现重要更新</option><option value="partial">部分条目未解析</option></select>
+<main id="intake-main" aria-live="polite"></main>
+<dialog id="intake-dialog"><h2 id="dialog-title">合成原文</h2><p id="dialog-text"></p><button id="close-dialog" type="button">关闭</button></dialog>
+<script>
+'use strict';
+const main=document.querySelector('#intake-main'),select=document.querySelector('#intake-case'),dialog=document.querySelector('#intake-dialog');
+const intakeHeading=(title,date)=>`<h2>${title}</h2><p class="intake-date">${date}</p>`;
+const summary=`<section class="panel"><div class="panel-body"><h3>发生了什么</h3><p>合成订单安排增加业务机会，收入仍取决于交付与验收。</p><p><strong>涉及公司：</strong>比亚迪 · 名称演示</p><h3>原Agent解读</h3><p>建议关注执行成本。这里是上游整理者的观点，尚未成为本系统的有效影响判断。</p><h3>接下来观察什么</h3><p>后续交付安排，以及客户验收是否完成。</p></div></section>`;
+const judgment=`<section class="panel"><div class="panel-body"><h3>系统判断</h3><p>尚无影响判断，评分待更新。摘要阅读已可用，不需等待计算。</p></div></section>`;
+function render(){
+ const v=select.value;
+ if(v==='coverage'){main.innerHTML=intakeHeading('公司监控说明','合成批次：09-30')+'<section class="panel"><div class="panel-body"><h3>本次采集未发现重要更新</h3><p>这是上游报告的监控说明，不表示现实没有事件，也不产生零影响事件或自动调整评分。</p><p class="intake-note">报告窗口有差异提示，资料仍可阅读。</p></div></section>';return;}
+ if(v==='partial'){main.innerHTML=intakeHeading('资料已部分整理','合成批次：09-30')+'<p role="status">6条成功资料可以阅读，1条尚未解析；运行状态：部分完成。</p>'+summary+'<section class="panel"><div class="panel-body"><h3>失败项</h3><p>合成日报 A9:G9 · 行格式不匹配，等待数据运营重试这一项。</p><p class="intake-note">“部分资料未解析”与“未发现重要更新”是不同状态。</p></div></section>';return;}
+ if(v==='interview'){main.innerHTML=intakeHeading('合成访谈：如何看待长期投入','发布时间未明确 · 系统取得：10-01 09:00')+'<section class="panel"><div class="panel-body"><p>合成人物甲 · 比亚迪负责人（完全虚构）</p><p>访谈摘要：投入应与交付能力匹配，持续观察现金回报。</p><p>阅读价值：★★★★☆ · 只用于资料排序，不是公司评分。</p><p>原表日期含义未明确，未当作新闻发布时间。</p><button type="button" data-source="interview">来源入口</button></div></section>'+judgment;return;}
+ const sources=v==='missing'?'<p>暂无原文入口；上游报告只有来源名称。</p>':`<div class="citation"><strong>合成公告来源</strong><p>已取得一份具体正文，可阅读；不表示其他来源已核实。</p><button type="button" data-original>阅读原文</button></div><div class="citation"><strong>合成行业栏目</strong><p>这是栏目入口，具体文章原文尚未取得。</p><button type="button" data-source="list">来源入口</button></div><div class="citation"><strong>另一个合成来源</strong><p>依据暂不可访问；不显示不可见网址或正文。</p></div>`;
+ main.innerHTML=intakeHeading('比亚迪：订单执行条件摘要（演示）','发布：09-29（仅日期，时区未明确） · 系统取得：10-01 09:00')+'<p>Agent整理 · 摘要来自合成报告；不是新闻原文。</p><div class="intake-grid"><div>'+summary+judgment+'</div><section class="panel"><div class="panel-body"><h3>依据在哪里</h3>'+sources+'<p class="intake-note">报告位置：合成日报 A3:G3</p></div></section></div>';
+}
+select.addEventListener('change',render);main.addEventListener('click',e=>{if(e.target.matches('[data-original]')){document.querySelector('#dialog-title').textContent='合成公告原文';document.querySelector('#dialog-text').textContent='本地虚构公告：新增订单按阶段交付，收入确认以客户验收为条件，执行成本仍需关注。本演示不抓取网络原文。';dialog.showModal();}else if(e.target.matches('[data-source]')){document.querySelector('#dialog-title').textContent='来源入口演示';document.querySelector('#dialog-text').textContent='正式产品打开获许可来源的网址；此原型不外发请求，具体原文尚未取得。';dialog.showModal();}});document.querySelector('#close-dialog').addEventListener('click',()=>dialog.close());render();
+</script></body></html>

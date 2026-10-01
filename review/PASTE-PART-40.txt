@@ -1,0 +1,213 @@
+
+[PART 40/41]
+
+
+===== SOURCE: review/GPT-PRO-FINAL-DISPOSITION.md =====
+
+# GPT Pro终审与三项处置
+
+2026-10-01。用户提供[GPT Pro终审共享页](https://chatgpt.com/s/t_6abdc2f859f48191ab077c491f9f24c0)，随后授权修正三项问题、复验与提交。Pro固定读取`645ab645b7d69066bb2a21bee3ceca045ebce838`；本轮从该提交、干净工作区开始，仍属于设计与本地合成原型。
+
+## 终审结论与证据范围
+
+Pro结论为“修正少量关键问题后可收口”：业务主线、能力范围和当前页面方向基本成立，不需要重做设计；优先处理历史依据日期、修改的新值显示、策略发布后的版本对应关系。分数明细不足列为下一步优化，不作为设计收口前置，没有新的业务决定需要用户确认。
+
+Pro明确实际看到截图为0/9，仅依据文案、源码、导航及合同判断，未运行浏览器、产品或用户任务；不算视觉冷读通过。当前会话已只读取得共享页并在本地复现三项：09-29评分打开09-30发布/取得的原文；输入−0.2/档位1时摘要仍显示0.8/档位3；发布75门槛后页头为发布2、正文仍为70。原分享HTML、原评审正文与来源hash保留在本机`local-evidence/gpt-pro-final/`，不入Git；本文件为整理后的项目处置记录，不能解析的共享页内部filecite不冒充独立引用。
+
+## 最小修正与结果
+
+| 发现 | 已采纳修正 | 通过证据 |
+|---|---|---|
+| F-PRO-01 历史结果指向后来资料 | 新增09-27发布并取得的合成财务原文，绑定比亚迪09-29评分和A/H估值；保留09-30原文为后来更新。订单资料在09-29收盘后取得，明确属于后续研究，不冒充旧评分输入。格力仍引用当时取得的自己的原文 | PD-FINAL-01检查历史原文身份及发布时间/取得时间，A/H分别点击，往返和后来更新；PD-NEWS-05保留跨公司原文检查 |
+| F-PRO-02 新值摘要落后于输入 | 删除重复“准备修改为”摘要，只有一个带标签的新值输入；当前有效值继续只读。保存值取自该输入，影响−0.2与档位1各自回读。无确认弹窗或新审批 | PD-FINAL-02；原PD-UI-01/02/03、PD-UX-04保留保存、冲突保留、人工方向及依赖等待 |
+| F-PRO-03 策略发布混用版本 | 发布时固定版本和门槛；当前规则显示发布2/75，新版结果显示等待评估；旧表明确为发布1历史结果，保留70门槛和日期。再次编辑草稿不更改已发布75；历史解释仍引用发布1。公司研究的固定对照明确发布1 | PD-FINAL-03；PD-UI-05保留旧预览失效、再模拟与发布 |
+
+没有实现实际评分/策略引擎，也没有生成虚构的新规则计算结果。策略模拟仍使用发布1的09-29固定输入对照草稿；发布后只展示门槛已生效和结果等待。模板发布不强制改变旧策略冻结口径，沿用既有11/12合同。
+
+本轮没有改配置数字、Schema、数据库表或R/W/T业务预期；在[13](../docs/13-first-slice.md)现有任务中补入三条可检查预期，不增加新的评审、审批或框架门槛。
+
+## 验证与设计收口
+
+[原型检查](./design-detail/prototype-checks.json)执行于`2026-10-01T02:30:10.067Z`，运行时HEAD为`645ab64`，`source_sha256`绑定实际修改后的工作树。隔离无头系统Chrome、本地file原型、HTTP阻断；**76项通过**，无页面脚本错误与HTTP请求尝试。新增PD-FINAL-01…03，原73项业务交互与代表视口继续通过。材料检查另见[validation-result](./validation-result.json)，两份报告不代替产品验收。
+
+当前会话实际查看[历史评分依据](./design-detail/desktop-score-evidence.png)、[修改区](./design-detail/desktop-judgment-edit.png)、[发布后的策略](./design-detail/desktop-strategy-published.png)和[手机首屏](./design-detail/mobile-first-screen.png)。当前值和唯一新值输入区分清楚；发布后75门槛、等待提示、发布1历史表分区明确；手机公司结论及A股缺价继续先于大分数。这里是当前会话的截图核对，不能回填为Pro实际看过截图或目标用户验收。
+
+**本轮三项修正完成，v0.3设计可收口，进入后续开发准备。** 不再把可选详细评分解释、更多安全防御或追加终审列为前置。下一步优化是首个开发切片展示一项经营分的基础/贡献和一只证券的价格/分母/估值映射，沿用已有接口合同。
+
+仍未执行5名目标用户理解/计时、真机/读屏、产品DB/API/worker、真实权限、计算引擎、真实源/模型或部署。本轮授权没有启动W-08产品开发，也没有实际再调用Pro；后续实施和真实接入按既有范围另行授权。
+
+
+===== SOURCE: review/ROUND-2-PROBES.json =====
+
+{
+  "baseline_commit": "1b16f381a8742b910cdaa8ba5b928a32857a5b69",
+  "executed_at": "2026-09-30T15:09:44.364840+00:00",
+  "method": "Existing conservative material_schema.validate; eight synthetic shape observations, NOT full draft-2020-12 validation or product tests",
+  "source_sha256": {
+    "contracts/review-decision.schema.json": "04768e3b8d4f123dfe88afa1ef4e6a86343394ccf6370f7b905df20848879b0b",
+    "contracts/analysis-result.schema.json": "def05c6c2a563b82f98d0713f7172d53e2ba6fcc42146f474957cea2e893a7df",
+    "contracts/scoring-template.schema.json": "40f936015179660f6ffe3e189d92f7116b6ee7a38e71238756a9426bc6799bf2",
+    "contracts/scoring.schema.json": "121be579c10aec6c8981488edb44b5f8188b22c034bd4323c51e78ba76eee60b",
+    "examples/human-override.json": "5beb97d90389975d083f8db587e80281458d0010a39edc32ed667147340a3590",
+    "examples/analysis-proposal.json": "43d0e83ce5a4d9b4e3c854c09e91d3c08109ef2215f54d502085738fd77d02b3",
+    "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a"
+  },
+  "status": "expected_observations_matched",
+  "case_count": 8,
+  "cases": [
+    {
+      "case": "F01 existing human rejection",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ]
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F01 decision with replacement value",
+      "input": {
+        "schema_version": "1.0",
+        "decision_id": "00000000-0000-4000-8000-000000000011",
+        "subject_slot": "synthetic-company:fact-01:profit_quality",
+        "subject_revision": "synthetic-impact-r2",
+        "status": "rejected",
+        "actor_kind": "HUMAN",
+        "actor_id": "synthetic-researcher",
+        "policy_ref": "auto-review-standard-v1",
+        "input_manifest_id": "00000000-0000-4000-8000-000000000006",
+        "known_at": "2026-09-30T02:00:00Z",
+        "valid_until": "2026-10-30T00:00:00Z",
+        "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
+        "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "replacement_value": {
+          "signed_impact": "-0.2"
+        }
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F02 company-only delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F02 security-targeted delisting",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "risk_code": "delisting_decision",
+        "confidence": "0.99",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "synthetic one-listing delisting",
+        "security_id": "00000000-0000-4000-8000-000000000002"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F03 existing template weight patch",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F03 template freshness policy",
+      "input": {
+        "dimension": "business_model",
+        "reason": "synthetic freshness customization",
+        "weight": "0.25",
+        "freshness_policy_ref": "synthetic-freshness-90d"
+      },
+      "observed": "rejected: extra property",
+      "expected_observation": "rejected: extra property"
+    },
+    {
+      "case": "F04 existing impact dimension",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "growth_sustainability",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "accepted",
+      "expected_observation": "accepted"
+    },
+    {
+      "case": "F04 custom dimension impact",
+      "input": {
+        "company_id": "00000000-0000-4000-8000-000000000001",
+        "dimension": "x_customer_retention",
+        "signed_impact": "0.4",
+        "confidence": "0.8",
+        "half_life_days": 30,
+        "valid_until": "2026-12-31T00:00:00Z",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000000003"
+        ],
+        "rationale": "合成订单线索，仍待批准且不能重复计算转载。"
+      },
+      "observed": "rejected: enum mismatch",
+      "expected_observation": "rejected: enum mismatch"
+    }
+  ]
+}
+
+
+===== SOURCE: review/ROUND-2-REQUEST.md =====
+
+# 第二轮GPT Pro评审请求
+
+项目已独立管理，迁移前后v0.2业务合同未变。迁移后的冻结基线是`1b16f381a8742b910cdaa8ba5b928a32857a5b69`。ROUND-2-REVIEW/PROBES是该固定v0.2基线的历史报告。当前工作树v0.3已在设计层处置F01…05，见V03-CHANGELOG，尚未实施/验证产品；独立评审须核查这些处置，不默认通过。
+
+实际输入请以发起消息指定的完整commit为准；未指定则先读取main一次并解析完整SHA，随后所有文件固定该SHA，不混版本。无需附件或本机路径。
+
+1. 读取PROJECT/README、[ROUND-2-REVIEW.md](./ROUND-2-REVIEW.md)、[ROUND-2-PROBES.json](./ROUND-2-PROBES.json)，读取V03-CHANGELOG和V03-COUNTEREXAMPLES，再按[GPT-PRO-PROMPT.md](./GPT-PRO-PROMPT.md)完整读取设计原文。
+2. 独立判断F01/F02是否真实影响人工编辑与风险传播；F03/F04是否需要policy/dimension注册合同；F05要尊重docs/04已有cutoff≤generated_at，不能误报当前允许提前封存。
+3. 对每项给accepted/rejected/modified/deferred及证据、理由和修订内容；新发现另编号。继续完整检查金融口径、状态、权限、恢复、UX与开源复用，不限于五项。
+4. 保留docs/11已确认需求。输出完整v0.3主文、改动合同/配置/示例、实施任务书和追踪账本，全部在对话正文交付。不得只提供附件、虚构下载链接或声称文件已入仓库。
+5. 评审可给具体方案，不修改GitHub、不运行真实模型/来源、不部署或通知。不可读私有仓库时诚实说明缺失读取范围，不要求公开仓库或传Token。
+
+本请求准备完成不代表GPT Pro已运行。外部评审完成后由本项目归档其实际正文/来源，先复核再采纳设计，不把建议当用户确认或产品验收。
+
+[END PART 40/41]
+
+本段结束，材料尚未发完，请只确认已收到，不开始评审。

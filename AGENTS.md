@@ -30,3 +30,5 @@
 当前边界以docs/11为准：多人RBAC、base/industry/company模板、允许外部模型接入、开发无固定预算门槛；通知后置，首版以membership_transition与固定解释为变化记录，不实现收件人/渠道。时点/数值/纠错以docs/12为准，首slice见13；不要以技术复杂为由收窄已确认能力。
 
 历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
+
+编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。当前仅准备完成，产品仍未实施。

@@ -57,7 +57,7 @@
 本正文包含终审核心材料与原型源码，不包含截图像素，不能据此声称已看过视觉效果。需要具体工程合同可从私有仓库或REVIEW-PACK另查。材料按文件SHA绑定当前工作树，运行报告中的Git HEAD是运行时基线。
 
 
-===== SOURCE: PROJECT.md | SHA256: 75525aa0ef34f0d281fe082b451dc39c44c5a7384aaf0bf7804114788f5781e8 =====
+===== SOURCE: PROJECT.md | SHA256: 71b0d7b2f161671155dfa1b487dbf9252944749b53ce7370504ebc1f11370446 =====
 
 # 独立项目管理入口
 
@@ -67,7 +67,7 @@
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3编码前准备已完成，尚未启动M0/W-08；二轮设计与建模/表设计/交互原型细化成果保留。已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -104,8 +104,12 @@
 
 GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评审材料；真实业务资料、凭证和私人日志不上传。本轮迁移/评审未授权部署、采购、真实采集、真实模型调用、通知或交易。评审报告提出修改时仍区分建议与已采纳合同。
 
+## 2026-10-01 编码准备收口
 
-===== SOURCE: README.md | SHA256: 387f6cd2f73d6ebdb6fd4f471050bd5da8a9d98ca7cd4acdfd2be7ef68bce6e1 =====
+用户授权完成所有编码前准备；已采纳资料接入局部补齐，扩展item_revision、item_observation、ingestion_run输出引用，新增多来源引用表和三份固定DTO；资讯列表/摘要/原文状态、发布时间精度、BF-01阅读分支、原创合成示例与T-44…49已同步。编码任务、技术依赖、迁移/运行入口与后置事项以[17](./docs/17-coding-readiness.md)为交接入口，证据见[收口记录](./review/CODING-READINESS.md)。不重复终审，不改变评分/A-H/策略合同。真实资料继续仅保留local-evidence；本轮未编码产品、建库、部署或接入真实源。
+
+
+===== SOURCE: README.md | SHA256: f23dd36d5f1efbc424699117a93528892feabe392af2fb78f0233a9a4cd5d41f =====
 
 # 价值投资策略管理系统
 
@@ -144,6 +148,7 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 | [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
 | [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
+| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 固定技术/任务/输入/验收与后置事项，实施授权后进入合成开发 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -182,8 +187,10 @@ python3 tools/build_review_pack.py
 
 可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
+编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
 
-===== SOURCE: AGENTS.md | SHA256: 93ae52e67ec01a89a038cb97fa99de92c5540c2d25b41d321b8ecfe355e01ffe =====
+
+===== SOURCE: AGENTS.md | SHA256: 2fae14d0fd755b070984c1452b7287750bb063ff7bd957da924efec0c6236ff0 =====
 
 # 价值投资系统独立项目执行规则
 
@@ -217,6 +224,8 @@ python3 tools/build_review_pack.py
 当前边界以docs/11为准：多人RBAC、base/industry/company模板、允许外部模型接入、开发无固定预算门槛；通知后置，首版以membership_transition与固定解释为变化记录，不实现收件人/渠道。时点/数值/纠错以docs/12为准，首slice见13；不要以技术复杂为由收窄已确认能力。
 
 历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
+
+编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。当前仅准备完成，产品仍未实施。
 
 
 ===== SOURCE: CONTEXT.md | SHA256: 2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6 =====
@@ -580,7 +589,7 @@ Pro明确实际看到截图为0/9，仅依据文案、源码、导航及合同�
 这些上线配置不阻止设计和合成开发；未核实能力/报价不当成事实。设计确认不等于真实接入、部署或交易授权。
 
 
-===== SOURCE: docs/06-ux-and-design-system.md | SHA256: f2279bf21b686c46186dc731d83e362279528d5f5d4e6958f2670fa28a5a0762 =====
+===== SOURCE: docs/06-ux-and-design-system.md | SHA256: e701a5258f49035677f3f8cc3135b5290b9ea6ae3a6d01ecb07649b2fd74b397 =====
 
 # 06 前端信息架构、交互与设计系统
 
@@ -692,6 +701,14 @@ T-UX-01增加完成+0.8→−0.2及grade3→1替换的任务样本；T-UX-02增�
 原文写业务资料，系统/人工判断和测试目的独立展示；不以“收入尚未实现”自动推出负面判断。本例原文额外提供延期库存/资金占用成本，允许研究者对偏正面的系统判断提出有依据的修正；分数仍为固定演示。手机首屏先出现结论与A股缺价，身份演示设置折叠但保持可访问。正常阅读不需学习内部状态机。尚未执行5名真实用户的计时/理解测试，不将本次改动宣称用户验收通过。
 
 终审局部修正：评分/估值的“当时依据”必须符合该快照的发布时间与取得时间，后来更新单列；新值采用一个明确输入，避免摘要与输入矛盾。策略发布后的当前版本/门槛与结果所属版本一致，新结果未生成时显示等待，旧结果独立标版本和日期；草稿编辑不热改已发布值。见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)，不新增审批或产品验收门槛。
+
+## 8. Agent摘要与来源入口的阅读状态
+
+新闻卡片先显示标题、发布时间精度、行业/公司、摘要和“Agent整理”标记；摘要页顺序为发生了什么→涉及谁→原Agent解读（明确来源）→来源入口/原文→后续观察点。系统有效判断独立展示，未形成时写“尚无影响判断”，不把上游文字标成系统已接受。人物观点有姓名、头衔、场合；阅读星级只用来排序。
+
+有摘要无原文可正常阅读；有多个来源分别显示。已取得正文才用“阅读原文”，只有网址用“来源入口”，没有链接写“暂无原文入口”。来源权限不足时不泄漏目标ID/网址/正文。公司无更新写“本次采集未发现重要更新”；解析失败写“部分资料未解析”，两者不混为一条无消息新闻。观察点先是研究文字，不创建提醒/自动任务。
+
+已知发布时间、仅日期、未知时间、关联待明确、评分待更新、部分来源不可用分别有就地说明，资料阅读不等待评分。筛选/返回位置沿用已有新闻导航，时间排序以04 §6为准。合成状态原型见[资料接入阅读演示](../prototype/intake.html)；它不读取真实文件、不连接API、不运行模型/评分或下载原文。
 
 
 ===== SOURCE: docs/11-templates-automation-and-roles.md | SHA256: 771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de =====
@@ -891,7 +908,7 @@ strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定
 固定推演（T-43）：以本证券最终市场时点为+0；+15价已is_final只能provisional；一份published=−5min公告+40 observed、+50判断生效→在+60冻结时可用；+60生成manifest，+65实际完成则generated_at=+65，唯一封存且仅一次计数。+61才known的判断不进入此manifest；收盘后新公告也不因+60前observed进入本收盘。缺价封存UNKNOWN清pending；重试不把cutoff延到+70。状态/原子性是设计合同，尚无worker/数据库运行证据。
 
 
-===== SOURCE: docs/13-first-slice.md | SHA256: 40542d2dde0f2f696c00e3798caf34c8fd56fc761a25cafa93716c10363205d2 =====
+===== SOURCE: docs/13-first-slice.md | SHA256: f5d91c54267f7fd24e9099166156d2f122346fe1e7eeae4cbe23ace2a8f0134b =====
 
 # 13 首个开发切片任务书
 
@@ -958,8 +975,14 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 
 具体经营维度基础/事件贡献和价格/财务分母到估值分的解释，沿用02/05的既有明细合同，在开发切片形成真实结果后展示；不是再次修改全套设计的前置。终审与原型修正证据见[处置记录](../review/GPT-PRO-FINAL-DISPOSITION.md)，不冒充上述产品验收通过。
 
+## 9. 编码准备补入的资料阅读路径
 
-===== SOURCE: docs/14-domain-and-business-flows.md | SHA256: 24af2cc30a801d5575c9dfe11e4e1003c5583988f18c265b771c3a994a437724 =====
+执行顺序与依赖见[17编码交接](./17-coding-readiness.md)。W-08先合成导入→资讯摘要/来源入口→公司关联→必要证据与有效判断→评分/策略，不让资料阅读等待整个分析链。fixtures增加原创报告、六种资料类型、多来源/栏目/无网址、仅日期/晚间/未知日期、无重要动态和一条解析失败；实际Excel生成属于W-08.2实施，不读取私人目录。
+
+正常预期：摘要已可读、判断尚未生效时有明确标签；实际取得原文才能阅读确切正文，旧快照不被新取得材料替换。关键失败：部分失败成功条目仍可读，holes与partial输出可诊断，重试同条目不重复；未知时间不伪造，评级/解读/摘要价格不直接写评分/行情。T-44…49与原有必选一并验证，材料检查不签收产品。输入和解析输出manifest分开，解析输出生成后固定。
+
+
+===== SOURCE: docs/14-domain-and-business-flows.md | SHA256: b04deadb9e217ad06139bd6766ea0359966c7938623e4344ef53bdfe451a8a62 =====
 
 # 14 领域模型与核心业务流程
 
@@ -1015,11 +1038,14 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    A[数据管理员配置合成源与范围] --> B[保存原文 内容修订与观察]
-    B --> C[抽取证据 确定公司候选]
+    A[数据管理员配置合成源与范围] --> B[保存直接资料或Agent报告 修订与观察]
+    B --> X[解析摘要 来源引用 时间精度及文件位置]
+    X --> Y[新闻列表与摘要详情 先可阅读]
+    X --> C[抽取证据 确定公司候选]
     C --> D[模型产出关联 影响 rubric 风险建议]
     D --> E{DecisionService按政策判断}
     E -->|accepted| F[记录有效判断与事件时间线]
+    E -->|关联accepted| Z[公司资料列表 不等待影响或评分]
     E -->|pending或rejected| G[显示理由与可处理事项]
     G --> H[研究员回查证据并作人工判断]
     H --> F
@@ -1035,6 +1061,8 @@ flowchart TD
 ```
 
 pending只阻止受影响输入生效，不暂停整个源；no_link是正常业务结果。首版生成变化记录，通知投递后置。
+
+BF-01同时支持直接来源与已有Agent文件产物。规则解析完成即发布可读资料；关联/影响分别按已有政策处理。摘要引用的原文后续按需要取得，首次取得时间照实记录；没有原文不妨碍摘要阅读。上游解读、星级与摘要行情不直接写有效判断、经营分或price_bar。无重要动态进入批次输出说明，不生成事件。源文件失败项保留洞，成功条目继续可读；不以材料行数定义事件数或贡献数。数据合同见04 §6，接口见05 §7。
 
 ## 4. 自动判断与人工覆盖（BF-02）
 
@@ -1148,7 +1176,7 @@ flowchart TD
 下一步表字段细化见[15](./15-database-dictionary.md)，页面交互与原型出口见[16](./16-prototype-and-design-trace.md)。本轮流程图可供设计核对，尚不是实际运行证据。
 
 
-===== SOURCE: docs/16-prototype-and-design-trace.md | SHA256: 8b6d37bede760407e78451c1d39c27b276f003b75723460f1428ad435369701c =====
+===== SOURCE: docs/16-prototype-and-design-trace.md | SHA256: fb0a5be0bfe399be42863e5a0a9c6da46298e75ab6c62f9a0d1563bf956966c9 =====
 
 # 16 页面原型、设计连接与核对任务
 
@@ -1242,8 +1270,97 @@ flowchart TD
 
 三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
 
+## 7. 编码准备新增的资料阅读状态
 
-===== SOURCE: prototype/README.md | SHA256: eb9e2c3328ac8c53b731a80db31f7c80e8c3075c18dab1eddce55121cd6d515a =====
+[intake.html](../prototype/intake.html)提供多来源摘要、原文已取得/未取得/不可访问、无链接、访谈评级/未知日期、无重要动态与部分解析失败五种状态。资料先可读，解读与有效判断分开。新增交互检查见review/design-detail/intake-prototype-checks.json；仍是原创合成原型，T-44…49产品验收未运行。主原型与历史终审证据保留，不改旧评分/策略交互。
+
+
+===== SOURCE: docs/17-coding-readiness.md | SHA256: dd1ddde98cd72ff7fab69acc0760649bc12966fd8fd0a1f3c48ca26fd532d30e =====
+
+# 17 编码前准备与开发交接
+
+2026-10-01 · v0.3。状态：**编码前设计准备已完成，可在实施授权后进入M0/W-08合成开发**。没有启动产品开发、建库/迁移、部署、真实数据接入或外部模型调用。用户本轮授权完成准备，并采纳资料接入补齐；不重复询问已确认需求，也不新增终审轮次。
+
+## 1. 已固定的业务范围与本轮变化
+
+业务确认仍以11为真源：A/H、多人五角色、三层模板、自动政策接受/人工有效覆盖、外部模型能力、无固定开发预算、通知后置。数值/时点/纠错以12为真源，原有T-01…43预期保持。原型真实公司名称只帮助理解；W-08公司、资料、价格和身份全部合成。
+
+本轮为资料接入增加摘要/阅读信息、文件血缘、资讯时间精度、一对多来源引用、批次输出清单和阅读独立分支。原因是已有日报产物能提供研究线索，却不能直接充当原文或有效评分判断。收益是先可读、再按需要补关键依据；影响为04/05/06/07/14/15与新增Schema、合成验收。未修改评分公式、阈值、策略状态、A/H口径或真实接入边界。没有六套日报表，没有新增消息系统/微服务/审核平台。
+
+准备交付：字段真源与生成字典；BF-01分支；InformationEntry/IngestionResult/InformationRead 1.0；资讯列表/详情接口与原文状态；合成资料夹具；阅读状态原型；下列开发顺序与验收；离线检查及工作树hash证据。
+
+## 2. 技术与依赖决策
+
+沿用模块化单体、React/TypeScript、FastAPI/Pydantic、SQLAlchemy/Alembic、PostgreSQL、ledger/outbox。M0目标运行线为Python 3.12、PostgreSQL 17、Node 24 LTS、pnpm 10；Redis 7.4/Celery 5用于合成后台与恢复场景。本阶段不安装这些运行依赖。M0第一次启动时固定patch版本/镜像digest和锁文件，验证实际兼容；生成锁文件和启动验证是实施任务，不伪称准备文档已证明运行可用。若这些目标线与当时实际依赖冲突，先说明具体影响，选择兼容受支持patch，不改变领域合同。
+
+使用项目自有最小骨架，选择性参考已审源码fastapi/full-stack-fastapi-template `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7`（MIT）；不整包照搬其Python≥3.14/SQLModel/密码认证依赖。生成客户端、组件模式和CI做法按本项目适配。研究证据见research/second-review.md，不重新比较一批框架。Refine/Prefect、OpenSearch、向量、真实OIDC、生产分区和通知均不作为W-08前置。
+
+开发环境仅本机项目隔离Compose，数据为原创合成；对象存储先本地适配器，与raw_object合同一致。mock身份和模型，clock/calendar可注入；模型适配器保留真实外部能力但本slice不外发。运行前验证服务实际位置/用途/数据分类，项目命名和端口避开已有服务；没有真实凭证和默认远程地址。数据库不可用/分类未知时只暂停相关启动。
+
+计划目录采用03 §4，按任务创建，不提前铺空模块。Schema是关键类型真源；API通过Pydantic发布OpenAPI并生成TS客户端。领域函数只接受固定输入，前端不计算分数或策略规则。
+
+## 3. W-08顺序与可检查交付
+
+每行都是可验收切片，不要求先建完整79表。具体字段以15目录为准，按实际写入路径建立；既定完整首slice能力不删减。
+
+| 子任务 | 依赖/范围 | 交付与真实验证 | R/W/T |
+|---|---|---|---|
+| W-08.1 运行基础 | 授权实施；核验项目隔离合成DB | web/API/worker、锁文件、最小schema、五角色mock、启动命令；一次有权限的业务写入与audit/outbox回读，越权拒绝 | W-01；R-11/12/17；T-14/20/29 |
+| W-08.2 资料先可读 | .1；固定文件与DTO | 合成Excel/直接资料适配器、report→entry血缘、来源引用、输入/输出manifest、资讯列表/摘要详情；原文状态与日期精度、部分失败重试、重复导入回读 | R-01/02/04/09/14；T-02/04/33/44…47 |
+| W-08.3 公司关联与研究 | .2；合成身份/关系 | no_link/歧义/多公司、关联AUTO政策、事件/事实归并，公司新闻与事件分开；重复与一行多事实回读 | R-03/04/16；T-03/05/06/48 |
+| W-08.4 有效判断与覆盖 | .3；既有proposal/decision合同 | impact/rubric/risk、人工替换/解除、冲突保留、证据定位、H挂牌与公司风险区别；修订/指针/依赖重算回读 | R-05/09/16；T-27/28/39/40/49 |
+| W-08.5 模板与A/H解释 | .4；冻结财务/价格/FX/股份 | 三层解析、完整维度及x_customer_retention、baseline/事件贡献、A/H估值；旧评分使用当时资料，缺数据明确 | R-05/06/15；T-07…10/25/26/34…38/41/42 |
+| W-08.6 策略到变化 | .5；session/calendar、seal | 模拟/发布、输入封存、相邻FINAL、ENTER/UNKNOWN/恢复/EXIT/RISK；版本/日期/理由一致及转移原子回读 | R-07/08；T-11…14/30/31/40/43 |
+| W-08.7 恢复与研究协作 | 按依赖可穿插.2…6 | 自选/笔记、失败洞与ledger恢复、丢ACK不重复、旧generation拒绝、历史纠错；合成备份/撤权恢复沿用原预期 | R-09/10/12；T-14/18/19/32/33/34 |
+| W-08.8 用户路径收口 | .2…7 | 真实运行页面连续路径、指定视口/键盘、按06进行用户任务验收；固定数据与预期不改，记录未通过/未运行项 | R-09/13/14；T-22/T-UX-01…04及13必选 |
+
+创建数据库迁移按生命周期：基础身份/run/raw/manifest→item/revision/observation/reference/evidence/身份→判断/事件→评分→策略→必要协作恢复表。source↔policy等循环按15策略处理；升级/降级使用合成数据验证，不修改远程库。列表采用PG读取，不依赖索引或评分完成；随后检索投影仍可扩展。
+
+## 4. 输入、预期和编码入口
+
+新增合成载荷在examples/information-intake.json；已有算法、财务、风险、覆盖、模板、封存黄金预期继续使用config/examples。真实参考Excel只留local-evidence，不成为Git夹具，不让开发自动扫描用户消息目录。W-08.2实施时从原创载荷生成小型Excel：表头在1/2/3行、同义列、公司分段/合并、文字URL/超链接、无链接；不需真实文件才能验证适配器。
+
+新增T-44…49见10，已有必选正常、失败、边界、权限、恢复出口见13。编码前这些是预期；材料检查只校验载荷形状与设计一致。开发阶段每项记录commit、实际环境/DB分类、fixture hash、命令/场景、expected/actual及回读，测试已写不是passed。
+
+计划开发命令合同（现在尚不存在，W-08.1实现）：`make dev-up`启动项目隔离依赖，`make migrate`运行Alembic，`make seed-synthetic`加载原创夹具，`make dev`启动web/API/worker，`make check-slice`执行受影响必选，`make dev-down`只停止本项目服务。禁止这些命令默认重置库或连接远程；合成重置另有显式目标。登录页面展示五角色合成身份，页面标演示环境。
+
+最先验证架构假设：一次跨业务/audit/outbox事务、同源客户端与资料列表、相同条目导入重试、日期/知识时间分离、ledger重投递。随后补原有seal/提交可见性、模板和数值等关键算法验证；不先做全量性能或可选平台。
+
+## 5. 当前出口与后置条件
+
+准备出口：范围/任务/合同/数据/页面状态/验收预期已齐；字段字典可生成，合成DTO检查通过，原型交互结果和hash可查，评审包已同步，无待确认的新增业务取舍。检查证据见[编码准备收口](../review/CODING-READINESS.md)。当前可交接合成开发，实际产品能力均未实现/未验证。
+
+后置于真实接入或生产：供应商具体fetch/store/analyze/export权利、真实OIDC/部署资源/保留期限、真实规则/质量运营负责人、运行容量/恢复实测、外部模型与后续通知渠道。它们属于既有D事项，不能冒充已落实，也不阻塞合成开发。不采购、不上传真实资料、不联网采集、不发通知或交易。
+
+下一步仅需用户明确启动开发即可按上述顺序实施，不再做一轮全套设计或外部终审。项目全过程继续以业务闭环、界面可理解性和最小充分验证为先。
+
+
+===== SOURCE: review/CODING-READINESS.md | SHA256: 7f0ff965bc640c15e5d3bb66a80df705a8f0b1d6575da408e22eb17323ed6934 =====
+
+# 编码准备收口记录
+
+2026-10-01。基线75ec4c7dedfe9b2b516ed9ab96769b067b86910c。本轮为用户授权的编码前准备：正式设计与交接更新，产品没有启动。
+
+资料接入补齐已写入04/05/06/07/14、字段真源与生成15、三份1.0 Schema、原创合成示例、T-44…49、17开发交接。新增阅读状态原型不处理真实文件、不调用API/模型/评分、不下载链接。真实参考输入及本地分析留在local-evidence，本轮Git材料不包含原表内容或网址。
+
+字段生成和材料检查已通过，新增阅读状态原型11项交互/四视口检查通过，未观察到页面脚本错误或HTTP请求。检查输入以各报告source_sha256绑定当次工作树，运行时HEAD为上述基线；最终提交包含这些输入。编码前准备可以收口；启动实施、运行依赖锁定和实际DB分类核验属于M0，不是本轮已经完成的事实。11/12已确认业务合同不变，供应商/生产/真实模型与通知事项仍按阶段后置，不增加可选终审轮次。
+
+编码入口与任务/依赖/停止条件以[17](../docs/17-coding-readiness.md)为准。历史终审与主原型检查保留，新增原型证据单独记录；真实产品T-01…49和T-UX签收未运行。
+
+
+## 验证记录
+
+- `python3 tools/render_database_design.py`：生成79表、801字段设计字典；字段/FK目标/唯一键字段引用检查通过；没有SQL。
+- `python3 tools/validate_design.py`：当前材料检查通过，精确检查数和输入hash见[结果](./validation-result.json)。新增DTO正例/负例和目录一致性检查是离线材料验证，不是运行适配器。
+- `node tools/verify_intake_prototype.cjs <bundled Playwright> <Chrome>`：独立无头浏览器、HTTP拦截、本地file页面；11项合成阅读交互和1440/1280/390/430宽度检查通过。结果见[报告](./design-detail/intake-prototype-checks.json)，截图为桌面/手机首屏；不是目标用户测试。
+- 原型首轮脚本名与浏览器全局`top`冲突导致页面未渲染，已改为局部名称并复验；第二轮原生select的Home键行为不符测试假定，改用真实按钮Enter/Escape验证键盘交互，未声称原生select全平台测试。失败报告保留为intake-prototype-failure.json、intake-prototype-failure-02.json。
+- `python3 tools/build_review_pack.py`：同步整包及文本备用入口，包含编码交接；不发送外部评审，不包含local-evidence或真实Excel。
+- `git diff --check`及目录生成回读通过；本轮只包含文档、Schema、原创合成示例、设计原型与检查工具。
+
+未执行：完整draft-2020-12标准库验证、产品编码、实际解析/DB/API/worker/RBAC/评分/策略/事务/恢复测试、真实源与模型、真实用户/设备UAT、部署与通知。材料检查器只覆盖实际使用的保守Schema子集；标准Schema验证器集成与OpenAPI客户端生成属于M0，不因本地未装该库新增准备门槛。
+
+
+===== SOURCE: prototype/README.md | SHA256: ce6e837ee74be2baffea0dfe754b76593546dcec6d75bcf924e2d90c6b0eaf61 =====
 
 # 价值研究交互原型
 
@@ -1262,6 +1379,41 @@ flowchart TD
 修改影响时草稿初始为当前值+0.8；只有主动修改后才是−0.2等新值。原文提供订单机会与延期库存/资金占用成本，正负方向的依据在独立判断区说明，不把测试脚本写进原文。经营分、影响值、评分档位属于不同尺度。
 
 终审三项修正：09-29评分和A/H估值使用09-27已取得的历史财务原文；09-30更新与订单后续研究不充当旧评分输入。修改区只保留一个新值输入，保存后回读。策略发布固定新版本/门槛，新结果等待，旧结果明确发布1；继续编辑草稿不改变已发布值。处置与证据见[终审记录](../review/GPT-PRO-FINAL-DISPOSITION.md)。
+
+编码准备补齐的[资料阅读状态](./intake.html)单独演示：多来源摘要、仅日期、已取得/未取得/不可访问原文、无入口、访谈阅读评级、无重要动态与部分解析失败。沿用共享样式，全部原创合成内容，不访问真实文件或外部网址；原型不执行解析/评分/权限或数据库逻辑。
+
+
+===== SOURCE: prototype/intake.html | SHA256: 1fa637c09e5020e34fd249d5d04d07bdf223cf2f2caee3bfdc2797d467dedba3 =====
+
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>资料阅读状态 · 价值研究原型</title><link rel="stylesheet" href="style.css"><style>
+body{padding:24px;max-width:1100px;margin:auto}main{padding:16px 0}p{margin:8px 0}h3{margin-top:12px}.intake-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.intake-actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}label{display:block}select{width:100%;max-width:420px}h1{font-size:28px}section{margin:16px 0}.citation{padding:12px 0;border-bottom:1px solid #ddd}.intake-date{color:#666}.intake-note{font-size:14px;color:#666}dialog{max-width:600px;width:calc(100% - 32px);border:1px solid #ccc;border-radius:12px;padding:24px}@media(max-width:700px){body{padding:16px}.intake-grid{grid-template-columns:1fr}h1{font-size:24px}}
+</style></head>
+<body>
+<a href="index.html#news">返回新闻资讯原型</a>
+<h1>一条新闻，先看懂再判断</h1>
+<p>本地合成阅读状态演示。比亚迪仅为名称案例，消息、解读、人物、日期与来源全部虚构，不读取参考Excel。</p>
+<label for="intake-case">查看资料状态</label>
+<select id="intake-case"><option value="sources">摘要有多个来源</option><option value="missing">摘要没有原文入口</option><option value="interview">企业家观点，发布时间未明确</option><option value="coverage">本次监控未发现重要更新</option><option value="partial">部分条目未解析</option></select>
+<main id="intake-main" aria-live="polite"></main>
+<dialog id="intake-dialog"><h2 id="dialog-title">合成原文</h2><p id="dialog-text"></p><button id="close-dialog" type="button">关闭</button></dialog>
+<script>
+'use strict';
+const main=document.querySelector('#intake-main'),select=document.querySelector('#intake-case'),dialog=document.querySelector('#intake-dialog');
+const intakeHeading=(title,date)=>`<h2>${title}</h2><p class="intake-date">${date}</p>`;
+const summary=`<section class="panel"><div class="panel-body"><h3>发生了什么</h3><p>合成订单安排增加业务机会，收入仍取决于交付与验收。</p><p><strong>涉及公司：</strong>比亚迪 · 名称演示</p><h3>原Agent解读</h3><p>建议关注执行成本。这里是上游整理者的观点，尚未成为本系统的有效影响判断。</p><h3>接下来观察什么</h3><p>后续交付安排，以及客户验收是否完成。</p></div></section>`;
+const judgment=`<section class="panel"><div class="panel-body"><h3>系统判断</h3><p>尚无影响判断，评分待更新。摘要阅读已可用，不需等待计算。</p></div></section>`;
+function render(){
+ const v=select.value;
+ if(v==='coverage'){main.innerHTML=intakeHeading('公司监控说明','合成批次：09-30')+'<section class="panel"><div class="panel-body"><h3>本次采集未发现重要更新</h3><p>这是上游报告的监控说明，不表示现实没有事件，也不产生零影响事件或自动调整评分。</p><p class="intake-note">报告窗口有差异提示，资料仍可阅读。</p></div></section>';return;}
+ if(v==='partial'){main.innerHTML=intakeHeading('资料已部分整理','合成批次：09-30')+'<p role="status">6条成功资料可以阅读，1条尚未解析；运行状态：部分完成。</p>'+summary+'<section class="panel"><div class="panel-body"><h3>失败项</h3><p>合成日报 A9:G9 · 行格式不匹配，等待数据运营重试这一项。</p><p class="intake-note">“部分资料未解析”与“未发现重要更新”是不同状态。</p></div></section>';return;}
+ if(v==='interview'){main.innerHTML=intakeHeading('合成访谈：如何看待长期投入','发布时间未明确 · 系统取得：10-01 09:00')+'<section class="panel"><div class="panel-body"><p>合成人物甲 · 比亚迪负责人（完全虚构）</p><p>访谈摘要：投入应与交付能力匹配，持续观察现金回报。</p><p>阅读价值：★★★★☆ · 只用于资料排序，不是公司评分。</p><p>原表日期含义未明确，未当作新闻发布时间。</p><button type="button" data-source="interview">来源入口</button></div></section>'+judgment;return;}
+ const sources=v==='missing'?'<p>暂无原文入口；上游报告只有来源名称。</p>':`<div class="citation"><strong>合成公告来源</strong><p>已取得一份具体正文，可阅读；不表示其他来源已核实。</p><button type="button" data-original>阅读原文</button></div><div class="citation"><strong>合成行业栏目</strong><p>这是栏目入口，具体文章原文尚未取得。</p><button type="button" data-source="list">来源入口</button></div><div class="citation"><strong>另一个合成来源</strong><p>依据暂不可访问；不显示不可见网址或正文。</p></div>`;
+ main.innerHTML=intakeHeading('比亚迪：订单执行条件摘要（演示）','发布：09-29（仅日期，时区未明确） · 系统取得：10-01 09:00')+'<p>Agent整理 · 摘要来自合成报告；不是新闻原文。</p><div class="intake-grid"><div>'+summary+judgment+'</div><section class="panel"><div class="panel-body"><h3>依据在哪里</h3>'+sources+'<p class="intake-note">报告位置：合成日报 A3:G3</p></div></section></div>';
+}
+select.addEventListener('change',render);main.addEventListener('click',e=>{if(e.target.matches('[data-original]')){document.querySelector('#dialog-title').textContent='合成公告原文';document.querySelector('#dialog-text').textContent='本地虚构公告：新增订单按阶段交付，收入确认以客户验收为条件，执行成本仍需关注。本演示不抓取网络原文。';dialog.showModal();}else if(e.target.matches('[data-source]')){document.querySelector('#dialog-title').textContent='来源入口演示';document.querySelector('#dialog-text').textContent='正式产品打开获许可来源的网址；此原型不外发请求，具体原文尚未取得。';dialog.showModal();}});document.querySelector('#close-dialog').addEventListener('click',()=>dialog.close());render();
+</script></body></html>
 
 
 ===== SOURCE: prototype/index.html | SHA256: 429897f22ab455f8f432e7588df21ff980b62e023be27c15dfe0bee3ea0a9953 =====

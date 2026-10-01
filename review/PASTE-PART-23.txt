@@ -1,301 +1,371 @@
 
-[PART 23/36]
+[PART 23/41]
 
 
-===== SOURCE: examples/v03-human-replacements.json =====
+===== SOURCE: contracts/scoring-template.schema.json =====
 
 {
-  "synthetic": true,
-  "status": "design_expectations_not_runtime_results",
-  "cases": [
-    {
-      "id": "T-39-impact",
-      "headers": {
-        "If-Match": "slot-generation-4",
-        "Idempotency-Key": "synthetic-replace-impact"
-      },
-      "previous_value": "0.8",
-      "replacement_value": "-0.2",
-      "request": {
-        "schema_version": "1.0",
-        "action": "replace",
-        "slot_id": "00000000-0000-4000-8000-000000000020",
-        "replacement": {
-          "subject_kind": "impact",
-          "value": {
-            "company_id": "00000000-0000-4000-8000-000000000001",
-            "dimension": "profit_quality",
-            "signed_impact": "-0.2",
-            "confidence": "0.95",
-            "half_life_days": 90,
-            "valid_until": "2026-10-30T00:00:00Z",
-            "evidence_ids": [
-              "00000000-0000-4000-8000-000000000003"
-            ],
-            "rationale": "合成原文中的新增成本削弱盈利质量，人工修订方向为负。",
-            "economic_fact_id": "00000000-0000-4000-8000-000000000030",
-            "event_time": "2026-09-29T00:00:00Z",
-            "effective_from": "2026-09-30T02:00:00Z"
-          }
-        },
-        "override_valid_until": "2026-10-30T00:00:00Z",
-        "reason": "合成人工修订，保留原判断与证据",
-        "evidence_ids": [
-          "00000000-0000-4000-8000-000000000003"
-        ]
-      },
-      "expected_response": {
-        "status": 201,
-        "revision": {
-          "schema_version": "1.0",
-          "revision_id": "00000000-0000-4000-8000-000000000040",
-          "slot_id": "00000000-0000-4000-8000-000000000020",
-          "previous_revision_id": "00000000-0000-4000-8000-000000000021",
-          "actor_id": "00000000-0000-4000-8000-000000000050",
-          "created_at": "2026-09-30T02:00:00Z",
-          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
-          "judgment": {
-            "subject_kind": "impact",
-            "value": {
-              "company_id": "00000000-0000-4000-8000-000000000001",
-              "dimension": "profit_quality",
-              "signed_impact": "-0.2",
-              "confidence": "0.95",
-              "half_life_days": 90,
-              "valid_until": "2026-10-30T00:00:00Z",
-              "evidence_ids": [
-                "00000000-0000-4000-8000-000000000003"
-              ],
-              "rationale": "合成原文中的新增成本削弱盈利质量，人工修订方向为负。",
-              "economic_fact_id": "00000000-0000-4000-8000-000000000030",
-              "event_time": "2026-09-29T00:00:00Z",
-              "effective_from": "2026-09-30T02:00:00Z"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pinned base / industry / company template",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "template_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "level": {
+      "enum": [
+        "base",
+        "industry",
+        "company"
+      ]
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "all"
             }
-          }
-        },
-        "decision": {
-          "schema_version": "2.0",
-          "decision_id": "00000000-0000-4000-8000-000000000060",
-          "subject_slot": "00000000-0000-4000-8000-000000000020",
-          "subject_revision": "00000000-0000-4000-8000-000000000040",
-          "status": "accepted",
-          "actor_kind": "HUMAN",
-          "actor_id": "synthetic-researcher",
-          "policy_ref": "auto-review-standard-v1",
-          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
-          "known_at": "2026-09-30T02:00:00Z",
-          "valid_until": "2026-10-30T00:00:00Z",
-          "supersedes_decision_id": "00000000-0000-4000-8000-000000000010",
-          "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
-          "evidence_ids": [
-            "00000000-0000-4000-8000-000000000003"
+          },
+          "required": [
+            "kind"
           ]
         },
-        "slot_generation": 5
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "industry"
+            },
+            "industry_key": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "industry_key"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "company"
+            },
+            "company_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "required": [
+            "kind",
+            "company_id"
+          ]
+        }
+      ]
+    },
+    "parent_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
       },
-      "expected_persistence": {
-        "append": [
-          "human_judgment_revision",
-          "review_decision",
-          "audit_event",
-          "outbox"
+      "required": [
+        "key",
+        "version",
+        "sha256"
+      ]
+    },
+    "base_config_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
+          },
+          "weight": {
+            "type": "string",
+            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+          },
+          "baseline": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "method": {
+                    "const": "weighted_metric_rubric"
+                  },
+                  "metrics": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "weight": {
+                          "type": "string",
+                          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
+                        },
+                        "zero_at": {
+                          "type": "string",
+                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                        },
+                        "full_at": {
+                          "type": "string",
+                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "weight",
+                        "zero_at",
+                        "full_at"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "method",
+                  "metrics"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "method": {
+                    "const": "accepted_evidence_rubric"
+                  },
+                  "rubric_ref": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "method",
+                  "rubric_ref"
+                ]
+              }
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "quality_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "evidence_requirement": {
+                "enum": [
+                  "accessible_original",
+                  "issuer_or_regulator_original"
+                ]
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "report_obligation"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "age_days"
+                      },
+                      "max_age_days": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3650
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "max_age_days"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "evidence_requirement",
+              "freshness"
+            ]
+          },
+          "event_policy": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "enabled": {
+                    "const": true
+                  },
+                  "half_life_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 730
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "half_life_days"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "dimension",
+          "reason"
         ],
-        "cas_slot_generation": [
-          4,
-          5
-        ],
-        "old_revision_unchanged": true,
-        "recompute_security_ids": [
-          "00000000-0000-4000-8000-000000000101",
-          "00000000-0000-4000-8000-000000000102"
+        "anyOf": [
+          {
+            "required": [
+              "weight"
+            ]
+          },
+          {
+            "required": [
+              "baseline"
+            ]
+          },
+          {
+            "required": [
+              "disabled"
+            ]
+          },
+          {
+            "required": [
+              "quality_policy"
+            ]
+          },
+          {
+            "required": [
+              "event_policy"
+            ]
+          }
         ]
       }
-    },
+    }
+  },
+  "required": [
+    "schema_version",
+    "template_key",
+    "version",
+    "level",
+    "scope",
+    "patches"
+  ],
+  "allOf": [
     {
-      "id": "T-39-rubric",
-      "headers": {
-        "If-Match": "slot-generation-4",
-        "Idempotency-Key": "synthetic-replace-rubric"
-      },
-      "previous_value": 3,
-      "replacement_value": 1,
-      "request": {
-        "schema_version": "1.0",
-        "action": "replace",
-        "slot_id": "00000000-0000-4000-8000-000000000024",
-        "replacement": {
-          "subject_kind": "rubric",
-          "value": {
-            "company_id": "00000000-0000-4000-8000-000000000001",
-            "rubric_ref": "business-model-v1",
-            "criterion_key": "pricing_power",
-            "grade": 1,
-            "confidence": "0.95",
-            "evidence_ids": [
-              "00000000-0000-4000-8000-000000000003"
-            ],
-            "rationale": "合成证据显示提价后客户流失，原定价权档位3依据不成立，改为档位1。",
-            "valid_until": "2026-10-30T00:00:00Z",
-            "effective_from": "2026-09-30T02:00:00Z",
-            "period": {
-              "start": "2026-01-01T00:00:00Z",
-              "end": "2027-01-01T00:00:00Z"
-            }
+      "if": {
+        "properties": {
+          "level": {
+            "const": "base"
           }
-        },
-        "override_valid_until": "2026-10-30T00:00:00Z",
-        "reason": "合成人工修订，保留原判断与证据",
-        "evidence_ids": [
-          "00000000-0000-4000-8000-000000000003"
-        ]
+        }
       },
-      "expected_response": {
-        "status": 201,
-        "revision": {
-          "schema_version": "1.0",
-          "revision_id": "00000000-0000-4000-8000-000000000041",
-          "slot_id": "00000000-0000-4000-8000-000000000024",
-          "previous_revision_id": "00000000-0000-4000-8000-000000000022",
-          "actor_id": "00000000-0000-4000-8000-000000000050",
-          "created_at": "2026-09-30T02:00:00Z",
-          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
-          "judgment": {
-            "subject_kind": "rubric",
-            "value": {
-              "company_id": "00000000-0000-4000-8000-000000000001",
-              "rubric_ref": "business-model-v1",
-              "criterion_key": "pricing_power",
-              "grade": 1,
-              "confidence": "0.95",
-              "evidence_ids": [
-                "00000000-0000-4000-8000-000000000003"
-              ],
-              "rationale": "合成证据显示提价后客户流失，原定价权档位3依据不成立，改为档位1。",
-              "valid_until": "2026-10-30T00:00:00Z",
-              "effective_from": "2026-09-30T02:00:00Z",
-              "period": {
-                "start": "2026-01-01T00:00:00Z",
-                "end": "2027-01-01T00:00:00Z"
-              }
-            }
-          }
-        },
-        "decision": {
-          "schema_version": "2.0",
-          "decision_id": "00000000-0000-4000-8000-000000000061",
-          "subject_slot": "00000000-0000-4000-8000-000000000024",
-          "subject_revision": "00000000-0000-4000-8000-000000000041",
-          "status": "accepted",
-          "actor_kind": "HUMAN",
-          "actor_id": "synthetic-researcher",
-          "policy_ref": "auto-review-standard-v1",
-          "input_manifest_id": "00000000-0000-4000-8000-000000000006",
-          "known_at": "2026-09-30T02:00:00Z",
-          "valid_until": "2026-10-30T00:00:00Z",
-          "supersedes_decision_id": "00000000-0000-4000-8000-000000000014",
-          "reason": "人工覆盖合成影响，后续自动重跑不得替换有效覆盖",
-          "evidence_ids": [
-            "00000000-0000-4000-8000-000000000003"
+      "then": {
+        "required": [
+          "base_config_ref"
+        ],
+        "not": {
+          "required": [
+            "parent_ref"
           ]
-        },
-        "slot_generation": 5
+        }
       },
-      "expected_persistence": {
-        "append": [
-          "human_judgment_revision",
-          "review_decision",
-          "audit_event",
-          "outbox"
+      "else": {
+        "required": [
+          "parent_ref"
         ],
-        "cas_slot_generation": [
-          4,
-          5
-        ],
-        "old_revision_unchanged": true,
-        "recompute_security_ids": [
-          "00000000-0000-4000-8000-000000000101",
-          "00000000-0000-4000-8000-000000000102"
-        ]
+        "not": {
+          "required": [
+            "base_config_ref"
+          ]
+        }
       }
     }
   ]
 }
 
-
-===== SOURCE: examples/v03-risk-targets.json =====
-
-{
-  "synthetic": true,
-  "proposals": [
-    {
-      "company_id": "00000000-0000-4000-8000-000000000001",
-      "risk_code": "delisting_decision",
-      "target_kind": "listing",
-      "target_id": "00000000-0000-4000-8000-000000000202",
-      "confidence": "0.99",
-      "effective_from": "2026-09-30T02:00:00Z",
-      "valid_until": null,
-      "evidence_ids": [
-        "00000000-0000-4000-8000-000000000003"
-      ],
-      "rationale": "合成原始披露支持本目标，非真实投资判断"
-    },
-    {
-      "company_id": "00000000-0000-4000-8000-000000000001",
-      "risk_code": "confirmed_debt_default",
-      "target_kind": "company",
-      "target_id": "00000000-0000-4000-8000-000000000001",
-      "confidence": "0.99",
-      "effective_from": "2026-09-30T02:00:00Z",
-      "valid_until": null,
-      "evidence_ids": [
-        "00000000-0000-4000-8000-000000000003"
-      ],
-      "rationale": "合成原始披露支持本目标，非真实投资判断"
-    }
-  ],
-  "identity_fixture": {
-    "company_id": "00000000-0000-4000-8000-000000000001",
-    "securities": [
-      {
-        "id": "00000000-0000-4000-8000-000000000101",
-        "primary_listing_id": "00000000-0000-4000-8000-000000000201"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000102",
-        "primary_listing_id": "00000000-0000-4000-8000-000000000202"
-      }
-    ]
-  },
-  "expected": {
-    "listing_risk_targets": [
-      "00000000-0000-4000-8000-000000000102"
-    ],
-    "company_risk_targets": [
-      "00000000-0000-4000-8000-000000000101",
-      "00000000-0000-4000-8000-000000000102"
-    ],
-    "reject_listing_risk_keeps_company_risk": true
-  },
-  "runtime_status": "not_run"
-}
-
-
-===== SOURCE: examples/v03-seal-command.json =====
-
-{
-  "schema_version": "1.0",
-  "release_id": "00000000-0000-4000-8000-000000000070",
-  "security_id": "00000000-0000-4000-8000-000000000102",
-  "primary_listing_id": "00000000-0000-4000-8000-000000000202",
-  "market_session": "synthetic-s1",
-  "evaluation_as_of": "2026-09-30T08:10:00Z",
-  "knowledge_cutoff": "2026-09-30T09:10:00Z",
-  "expected_generation": 4,
-  "manifest_id": "00000000-0000-4000-8000-000000000080",
-  "manifest_sha256": "b94233fdea35bf8c64966278ae6e052f4c6ab5ad222e3ddbcdc00b905f94337f"
-}
-
-[END PART 23/36]
+[END PART 23/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

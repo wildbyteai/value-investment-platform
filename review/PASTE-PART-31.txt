@@ -1,26 +1,231 @@
 
-[PART 31/36]
+[PART 31/41]
 
 
-===== SOURCE: prototype/style.css =====
+===== SOURCE: tools/validate_design.py =====
 
-:root{--bg:#F6F7F9;--surface:#fff;--text:#17212F;--muted:#526072;--blue:#1D4ED8;--border:#D9DFE8;--amber:#9A6700;--red:#B42318;--green:#187048;--space:24px;--radius:8px;font-family:'PingFang SC','Noto Sans SC',sans-serif;color:var(--text);background:var(--bg);font-size:14px;line-height:1.65}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit;color:inherit}button,a,input,select,textarea{outline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--blue)}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}button{cursor:pointer;border:1px solid transparent;background:transparent;min-height:40px;padding:8px 14px;border-radius:6px}button:disabled{cursor:not-allowed;opacity:.6}input,select,textarea{border:1px solid var(--border);border-radius:6px;background:white;padding:9px 12px;max-width:100%}textarea{resize:vertical;min-height:90px;width:100%}h1,h2,h3,p{margin:0}h1{font-size:28px;letter-spacing:-.04em;line-height:1.4;font-weight:650}h2{font-size:18px;font-weight:600}h3{font-size:15px;font-weight:600}small{font-size:12px}strong{font-weight:600}.skip{position:absolute;left:12px;top:-60px;z-index:20;background:white;padding:12px}.skip:focus{top:10px}.prototype-bar{display:flex;align-items:center;justify-content:space-between;background:#e9eef8;color:#304467;padding:4px 28px;font-size:12px;min-height:36px}.prototype-bar button{min-height:28px;font-size:12px}.topbar{display:flex;align-items:center;gap:40px;padding:18px 28px;background:var(--surface);border-bottom:1px solid var(--border);min-height:86px}.brand{display:flex;align-items:center;gap:12px;color:var(--text);font-size:20px;font-weight:600;flex-shrink:0}.brand:hover{text-decoration:none}.brand small{display:block;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:.05em}.brand-mark{display:grid;place-items:center;background:var(--text);color:white;width:38px;height:38px;border-radius:7px;font-family:serif;font-size:25px}.search{display:flex;align-items:center;gap:10px;flex:1;max-width:360px}.search span{font-size:25px}.search input{width:100%;border:none;background:var(--bg)}.header-context{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted);font-size:12px}.header-context label{display:flex;align-items:center;gap:8px}.header-context select{font-size:12px;padding:6px}.separator{height:18px;border-left:1px solid var(--border)}.layout{display:grid;grid-template-columns:205px minmax(0,1fr);min-height:calc(100vh - 122px)}aside{border-right:1px solid var(--border);background:#fbfcfd;padding:24px 16px;display:flex;flex-direction:column}.mode-switch{display:flex;background:#edf0f5;padding:3px;border-radius:7px;margin-bottom:22px}.mode-switch button{width:50%;min-height:34px;padding:4px}.mode-switch .selected{background:white;box-shadow:0 1px 3px #17212f16}.nav-link{display:flex;align-items:center;gap:13px;min-height:44px;padding:9px 13px;margin-bottom:4px;border-radius:6px;color:var(--muted)}.nav-link.active{color:var(--blue);background:#e9efff;font-weight:600}.nav-link:hover{text-decoration:none;background:#eef2f8}.nav-icon{width:18px;color:#7b879a;text-align:center}.sidebar-note{margin-top:auto;padding:60px 10px 10px;font-size:11px;color:var(--muted)}.sidebar-note p{margin-top:8px}.dot{display:inline-block;background:var(--green);width:6px;height:6px;border-radius:50%;margin-right:4px}main{padding:30px 38px 50px;max-width:1600px;width:100%;min-width:0}.page-header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px}.page-header p{color:var(--muted);margin-top:6px}.page-header .actions{margin-top:3px}.breadcrumb{margin-bottom:15px;font-size:12px;color:var(--muted)}.primary{background:var(--blue);color:#fff}.primary:hover{background:#163fae}.secondary{background:white;border-color:var(--border)}.secondary:hover{background:#f0f3f8}.danger{color:var(--red);border-color:#e3b3ad;background:#fff}.text-button{color:var(--blue);padding-left:0;padding-right:0}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.filters label{color:var(--muted);font-size:12px}.filter-button{min-height:34px;font-size:12px;padding:5px 12px;background:white;border-color:var(--border)}.filter-button.active{border-color:var(--blue);color:var(--blue);background:#eff4ff}.quiet{color:var(--muted);font-size:12px}.summary-line{display:flex;gap:0;padding:22px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:24px}.summary-line>div{flex:1;padding:0 24px;border-right:1px solid var(--border)}.summary-line>div:first-child{padding-left:0}.summary-line>div:last-child{border:0}.summary-line strong{font-size:30px;font-variant-numeric:tabular-nums;letter-spacing:-.03em}.summary-line span{display:block;color:var(--muted);font-size:12px}.panel{background:white;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}.panel-head{padding:18px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);gap:12px}.panel-body{padding:22px}.panel-head p{color:var(--muted);font-size:12px;margin-top:3px}.change-row{display:grid;grid-template-columns:95px minmax(140px,.75fr) minmax(200px,1.7fr) auto;gap:22px;align-items:center;padding:20px 22px;border-bottom:1px solid #edf0f4}.change-row:last-child{border:0}.change-row:hover{background:#fafbfe}.change-row h3{margin-bottom:4px}.change-row p{font-size:12px;color:var(--muted)}.change-row .date{font-size:12px;color:var(--muted)}.badge{display:inline-flex;align-items:center;gap:5px;border:1px solid;padding:2px 8px;border-radius:4px;font-size:11px;white-space:nowrap}.badge.green{color:var(--green);background:#eff8f3;border-color:#badbcc}.badge.red{color:var(--red);background:#fdf2f1;border-color:#edc3bf}.badge.amber{color:var(--amber);background:#fff8e8;border-color:#ebd49c}.badge.blue{color:var(--blue);background:#eff4ff;border-color:#c7d7fb}.badge.gray{color:var(--muted);background:#f5f7fa;border-color:var(--border)}.notice{display:flex;align-items:flex-start;gap:12px;border:1px solid #ead49e;background:#fff9ed;padding:14px 18px;border-radius:6px;margin-bottom:20px}.notice p{font-size:12px;color:#735d2c}.notice.info{background:#eff4ff;border-color:#c7d7fb}.notice.info p{color:#304f8e}.notice.error{background:#fff1f0;border-color:#edc3bf}.notice.error p{color:var(--red)}.notice button{margin-left:auto;flex-shrink:0}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;text-align:left;font-size:13px}th{font-weight:500;color:var(--muted);background:#fafbfd;font-size:11px;padding:12px 20px;white-space:nowrap}td{padding:16px 20px;border-top:1px solid #edf0f4;vertical-align:middle}td.number{font-variant-numeric:tabular-nums;font-size:16px}td p{font-size:11px;color:var(--muted)}.split{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px}.wide-split{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px}.company-identity{display:flex;align-items:center;gap:15px}.company-monogram{background:#e9eef6;color:#354766;border:1px solid var(--border);width:48px;height:48px;border-radius:9px;display:grid;place-items:center;font-size:22px;font-family:serif}.company-identity small{display:block;color:var(--muted);margin-top:3px}.tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);margin-bottom:22px;overflow-x:auto}.tabs button{padding:10px 1px;border-radius:0;white-space:nowrap;border-bottom:2px solid transparent;min-height:44px;color:var(--muted)}.tabs button.active{border-bottom-color:var(--blue);color:var(--blue);font-weight:600}.score-overview{display:flex;gap:28px;align-items:center}.score-number{font-size:48px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.05em}.score-overview p{color:var(--muted);font-size:12px;margin:4px 0}.timeline-row{display:grid;grid-template-columns:84px 1fr;gap:20px;padding:24px 0;border-bottom:1px solid var(--border)}.timeline-row:first-child{padding-top:0}.timeline-row:last-child{border:0}.time-label{font-size:12px;color:var(--muted)}.timeline-row h3{font-size:16px;margin-bottom:5px}.timeline-row p{color:var(--muted);margin-bottom:10px}.timeline-row .actions{margin-top:12px}.reason-list{margin:12px 0 0;padding:0;list-style:none}.reason-list li{padding:12px 0;border-bottom:1px solid var(--border);font-size:13px}.reason-list li:last-child{border:0}.reason-list span{display:block;color:var(--muted);font-size:11px;margin-top:4px}.dimension-row{display:grid;grid-template-columns:120px 1fr 55px;gap:15px;align-items:center;margin:16px 0}.bar{height:7px;background:#eef1f5;border-radius:3px;overflow:hidden}.bar i{height:100%;display:block;background:#607fac;border-radius:3px}.dimension-row .value{text-align:right;font-variant-numeric:tabular-nums}.document{font-size:15px;line-height:1.9;max-width:700px}.document p{margin:18px 0}.document mark{background:#fff0b6;padding:2px 3px}.document-meta{font-size:12px;color:var(--muted);margin:15px 0;padding-bottom:20px;border-bottom:1px solid var(--border)}.definition{display:grid;grid-template-columns:110px 1fr;gap:10px;margin:12px 0}.definition dt{color:var(--muted)}.definition dd{margin:0}.form-group{margin-bottom:18px}.form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:6px}.form-group small{display:block;color:var(--muted);margin-top:5px}.value-compare{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:18px 0}.value-box{background:var(--bg);padding:16px;border-radius:6px}.value-box span{display:block;color:var(--muted);font-size:12px}.value-box strong{font-size:27px;display:block;font-variant-numeric:tabular-nums}.form-error{color:var(--red);font-size:12px;margin:10px 0}.steps{display:flex;flex-wrap:wrap;gap:20px;margin:20px 0}.step{border-left:2px solid var(--border);padding-left:14px;flex:1;min-width:130px}.step.active{border-color:var(--blue)}.step strong{display:block}.step span{font-size:11px;color:var(--muted)}.empty{padding:60px 24px;text-align:center}.empty h2{margin-bottom:8px}.empty p{color:var(--muted);max-width:460px;margin:0 auto 20px}.skeleton{height:18px;border-radius:4px;background:#e8ecf2;margin:18px 0}.skeleton.large{height:100px}.preview-diff{display:flex;gap:16px;margin:15px 0;align-items:center}.preview-diff strong{font-size:22px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.checkbox-list{display:flex;flex-direction:column;gap:12px;margin:16px 0}.checkbox-list label{display:flex;align-items:center;gap:8px}.checkbox-list input{width:18px;height:18px}.demo-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px;margin-top:28px;border:1px dashed var(--border);font-size:11px;color:var(--muted);border-radius:6px}.demo-controls select{font-size:11px;padding:5px 8px}.table-link{font-weight:600}.footnote{color:var(--muted);font-size:11px;margin:10px 0}.legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:15px 0}.history-label{display:inline-flex;font-size:11px;border:1px solid var(--border);padding:4px 10px;border-radius:4px;background:white}.inline-stats{display:flex;gap:20px;margin:14px 0;font-size:12px;color:var(--muted)}.inline-stats strong{font-size:17px;color:var(--text);display:block}.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.role-card{padding:18px;border:1px solid var(--border);border-radius:6px}.role-card p{font-size:12px;color:var(--muted);margin-top:5px}.mobile-bottom{display:none}.mono{font-variant-numeric:tabular-nums}.spacer{height:16px}.back{display:inline-block;margin-bottom:14px}.panel-body>.actions{margin-top:15px}#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;background:var(--text);color:white;border-radius:7px;z-index:30;max-width:90%;display:none}dialog{border:1px solid var(--border);border-radius:12px;max-width:720px;width:90%;padding:28px;color:var(--text)}dialog::backdrop{background:#17212f66}dialog h2{margin-bottom:15px}dialog #close-dialog{margin-top:20px}.company-row-actions button{padding:4px 8px;min-height:32px}.focus-note{border-left:3px solid var(--blue);padding:12px 18px;background:#f0f5ff;margin:20px 0}.flow-link{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.flow-link a{border:1px solid var(--border);padding:5px 10px;border-radius:5px;font-size:12px;background:white}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}@media(max-width:1150px){.topbar{gap:22px}.header-context>span,.separator{display:none}main{padding:26px}.layout{grid-template-columns:175px minmax(0,1fr)}.change-row{gap:14px;grid-template-columns:80px .8fr 1.4fr auto}.split{grid-template-columns:minmax(0,1fr)}.wide-split{grid-template-columns:minmax(0,1fr) 250px}}@media(max-width:750px){:root{font-size:16px}.prototype-bar{padding:5px 14px;font-size:10px}.prototype-bar span{max-width:80%}.topbar{padding:14px;gap:12px;flex-wrap:wrap}.brand{font-size:18px}.brand small{display:none}.search{order:3;width:100%;max-width:none;flex-basis:100%}.header-context{font-size:11px}.header-context label{font-size:0}.header-context select{font-size:11px;max-width:165px}.layout{display:block}.layout>aside{padding:8px 14px;display:block;border-right:0;border-bottom:1px solid var(--border)}.mode-switch{max-width:180px;margin:0 0 5px}.mode-switch button{font-size:12px}.sidebar-note{display:none}nav{display:flex;overflow-x:auto;gap:4px}.nav-link{flex-shrink:0;font-size:12px;padding:8px 10px;margin:0;min-height:44px}.nav-icon{display:none}main{padding:22px 16px 36px}.page-header{gap:12px;flex-wrap:wrap;margin-bottom:20px}h1{font-size:24px}h2{font-size:18px}.page-header p{font-size:13px}.summary-line{gap:0;flex-wrap:wrap;padding:15px 0}.summary-line>div{padding:0 12px}.summary-line strong{font-size:25px}.summary-line span{font-size:11px}.change-row{display:flex;flex-wrap:wrap;padding:18px;gap:12px}.change-row .date{width:100%}.change-row>div:nth-child(3){flex-basis:100%}.change-row>a{margin-left:auto}.split,.wide-split,.form-grid,.role-grid{grid-template-columns:minmax(0,1fr)}.toolbar{align-items:flex-start;flex-direction:column}.panel-head,.panel-body{padding:16px}.panel-head{flex-wrap:wrap}td,th{padding:12px 14px}.timeline-row{grid-template-columns:70px minmax(0,1fr);gap:12px}.timeline-row h3{font-size:16px}.timeline-row p{font-size:16px}.tabs{gap:18px}.tabs button{font-size:14px}.score-number{font-size:40px}.dimension-row{grid-template-columns:105px minmax(0,1fr) 40px;gap:8px;font-size:13px}.value-compare{gap:12px}.actions button{min-height:44px}.notice{flex-wrap:wrap}.notice button{margin-left:0}.definition{grid-template-columns:90px minmax(0,1fr);font-size:13px}input,textarea{font-size:16px}.document{font-size:16px}.demo-controls{font-size:11px}.breadcrumb{font-size:11px}.filters select{font-size:13px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+#!/usr/bin/env python3
+"""Offline v0.3 material checks. This does NOT execute the proposed application."""
+import copy
+import hashlib
+import json
+import re
+import subprocess
+from datetime import datetime, timezone
+from decimal import Decimal, localcontext, ROUND_HALF_EVEN
+from pathlib import Path
+from urllib.parse import unquote
+from material_schema import validate, MaterialError
 
-@media(max-width:750px){body[data-mode="business"] nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:5px 10px;z-index:10;justify-content:space-around;box-shadow:0 -2px 8px #17212f08}body[data-mode="business"] .nav-link{flex:1;justify-content:center;min-height:48px}body[data-mode="business"] main{padding-bottom:100px}}
+ROOT=Path(__file__).resolve().parents[1]
+checks=[]
+def check(ok,name):
+    if not ok:raise AssertionError(name)
+    checks.append(name)
+def read(path):return json.loads((ROOT/path).read_text())
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def canonical_hash(value):return hashlib.sha256((json.dumps(value,ensure_ascii=False,indent=2)+'\n').encode()).hexdigest()
+def current_revision():
+    try:
+        return subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,check=True,capture_output=True,text=True).stdout.strip()
+    except (OSError,subprocess.CalledProcessError):
+        return None
+def reject(fn,name):
+    try:fn()
+    except (MaterialError,ValueError,AssertionError,KeyError):checks.append('Negative: '+name)
+    else:raise AssertionError('Expected rejection: '+name)
 
-/* News uses publication time; research events retain their own occurrence dates. */
-.news-row{display:grid;grid-template-columns:100px minmax(0,1fr);gap:24px;padding:24px 26px;border-bottom:1px solid var(--border)}
-.news-row:last-child{border-bottom:0}.news-date{font-size:20px;line-height:1.3;font-variant-numeric:tabular-nums;color:var(--text)}
-.news-date span{display:block;color:var(--muted);font-size:12px;margin-top:6px}.news-content{min-width:0}.news-meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:10px}
-.news-content h3{font-size:18px;line-height:1.55;margin-bottom:8px}.news-content h3 a{color:var(--text)}.news-content h3 a:hover{color:var(--blue)}
-.news-content p{font-size:14px;line-height:1.7;color:var(--muted);max-width:66ch}.news-research{display:flex;gap:6px 20px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}.news-content .actions{margin-top:14px;font-size:13px}
-.panel-body>.news-row{padding-left:0;padding-right:0}.panel-body>.news-row:first-child{padding-top:0}.panel-body>.news-row:last-child{padding-bottom:0}.demo-source-note{padding:12px 16px;border-left:3px solid var(--amber);background:#fff9ed;font-size:13px;color:#735d2c}
-@media(max-width:750px){.news-row{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px 16px}.news-date{font-size:16px;display:flex;align-items:baseline;gap:10px}.news-date span{display:inline;margin:0}.news-content p{font-size:16px}.news-content h3{font-size:18px}.news-filters select{max-width:160px}body[data-mode="business"] nav{padding:5px 4px;gap:0}body[data-mode="business"] .nav-link{padding:8px 2px;font-size:12px;min-width:0}.document-meta dd{overflow-wrap:anywhere}}
+for pattern in ['config/*.json','contracts/*.json','examples/*.json','design/*.json']:
+    for p in sorted(ROOT.glob(pattern)):
+        json.loads(p.read_text());check(True,f'JSON syntax: {p.relative_to(ROOT)}')
+for p in sorted(ROOT.rglob('*.md')):
+    if p.name=='REVIEW-PACK.md' or '.git' in p.parts or 'local-evidence' in p.parts:continue
+    for dest in re.findall(r'(?<!!)\[[^\]]+\]\(([^\s)]+)\)',p.read_text()):
+        if '://' in dest or dest.startswith('#'):continue
+        target=unquote(dest.split('#')[0]);check((p.parent/target).exists(),f'Local link: {p.relative_to(ROOT)} -> {target}')
+for p in sorted(ROOT.glob('contracts/*.schema.json')):
+    s=json.loads(p.read_text());check(s.get('$schema')=='https://json-schema.org/draft/2020-12/schema',f'Schema dialect: {p.name}')
+    def inspect(v):
+        if isinstance(v,dict):
+            if '$ref' in v:
+                ref=v['$ref'];check(ref.startswith('#/'),f'Local-only schema ref: {p.name}')
+                t=s
+                for seg in ref[2:].split('/'):t=t[seg.replace('~1','/').replace('~0','~')]
+                check(isinstance(t,dict),f'Resolvable schema ref: {p.name}:{ref}')
+            for child in v.values():inspect(child)
+        elif isinstance(v,list):
+            for child in v:inspect(child)
+    inspect(s)
 
-.research-summary{border:1px solid #c7d7fb;border-left:4px solid var(--blue);background:#f2f6ff;padding:22px 24px;margin-bottom:20px;border-radius:8px}.research-summary h2{margin:8px 0;font-size:23px;line-height:1.5}.research-summary p{color:var(--muted);max-width:66ch}.research-summary .actions{margin-top:16px}.research-summary .actions>a:first-child{background:var(--blue);color:white;border-radius:5px;padding:9px 14px;min-height:44px;display:flex;align-items:center}
-.security-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.security-card{min-width:0}.security-card .toolbar{margin-bottom:8px;align-items:flex-start}.security-card p{color:var(--text);margin-bottom:8px}.security-card small{color:var(--muted)}.security-card .actions{margin-top:12px}.judgment-summary{border-left:2px solid #b8c9eb;padding:8px 12px;margin:14px 0;background:#f6f8fc}.judgment-summary p{margin:5px 0}.judgment-summary small{display:block;color:var(--muted);font-size:12px}.advanced{border-top:1px solid var(--border);padding:16px 0;margin-top:16px}.advanced>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;color:var(--blue);font-weight:600}.advanced[open]>summary{margin-bottom:16px}.advanced p{margin:10px 0}.section-heading{margin:25px 0 12px}.score-explainer{margin-bottom:20px;color:var(--muted)}.valuation-current{margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:16px}.valuation-current p{margin:10px 0}.valuation-current small{color:var(--muted)}.strategy-maintenance{margin:24px 0}.demo-settings{position:relative;font-size:12px;white-space:nowrap}.demo-settings>summary{cursor:pointer;min-height:44px;align-content:center}.demo-settings[open] label{display:block;position:absolute;right:0;top:44px;z-index:20;background:white;border:1px solid var(--border);padding:12px;box-shadow:0 8px 24px #17212f18;font-size:12px}
-@media(max-width:750px){.topbar{flex-wrap:nowrap;position:relative}.topbar .search{order:initial;flex-basis:initial;width:auto;flex:1;max-width:none;padding:0;border:0;background:none}.topbar .search>span{display:none}.topbar .search input{width:100%;min-width:0;font-size:13px;background:var(--bg);padding:10px 8px}.topbar .brand{font-size:16px;flex-shrink:0}.topbar .brand-mark{width:30px;height:30px;font-size:21px}.header-context>summary{font-size:11px}.research-summary{padding:16px;margin-bottom:16px}.research-summary h2{font-size:20px;margin:6px 0}.research-summary p{font-size:14px}.research-summary .quiet{font-size:11px}.security-grid{grid-template-columns:minmax(0,1fr);gap:18px}.security-card+.security-card{border-top:1px solid var(--border);padding-top:18px}.security-card .toolbar{flex-direction:row;flex-wrap:wrap}.security-card p{font-size:14px}.security-card .actions{font-size:13px}.current-securities .panel-head{padding:12px 16px}.judgment-summary p{font-size:14px}.layout>aside{padding:6px 14px}.mode-switch{margin-bottom:0}.page-header{margin-bottom:14px}main{padding-top:16px}.research-summary .actions{gap:8px}.research-summary .actions>a{font-size:13px}.score-overview{gap:18px}.score-overview strong{font-size:14px}.news-content .judgment-summary p{font-size:14px}.topbar{padding:10px 14px;gap:10px}}
+pairs=[('config/strategy-standard-v1.json','strategy.schema.json'),('config/scoring-standard-v1.json','scoring.schema.json'),('examples/analysis-proposal.json','analysis-result.schema.json'),('examples/job-event.json','job-event.schema.json'),('examples/auto-decision.json','review-decision.schema.json'),('examples/human-override.json','review-decision.schema.json')]
+for filename,schemafile in pairs:
+    value,s=read(filename),read('contracts/'+schemafile);validate(value,s);check(True,f'Limited Schema fixture validation: {filename}')
+    bad=copy.deepcopy(value);bad['unexpected_material_field']=True
+    reject(lambda:validate(bad,s),filename+' extra field')
+    bad=copy.deepcopy(value);del bad[s['required'][0]]
+    reject(lambda:validate(bad,s),filename+' missing required field')
 
-[END PART 31/36]
+strategy=read('config/strategy-standard-v1.json');scoring=read('config/scoring-standard-v1.json');metrics=read('config/metric-definitions-v2.json')['metrics'];rubrics=read('config/rubrics-standard-v1.json')['rubrics']
+all_rubrics={**rubrics,**read('config/rubrics-synthetic-v03.json')['rubrics']}
+registry=read('config/dimensions-standard-v1.json');registry_entries={x['dimension']:x for x in registry['entries']}
+check(len(registry_entries)==len(registry['entries']),'Unique registered dimension IDs')
+check(scoring['dimension_registry_ref']['sha256']==sha(ROOT/scoring['dimension_registry_ref']['path']),'Pinned dimension registry content hash')
+check(strategy['universe']['markets']==['CN_A','HK'],'Confirmed A/H scope')
+check(strategy['scoring_model_ref']==scoring['model_key'],'Strategy scoring reference')
+check(scoring['metric_definition_ref']=='metric-definitions-v2','Corrected metric-definition version')
+check(scoring['numeric_policy_ref']==read('config/numeric-policy-v1.json')['policy_key'],'Numeric policy reference')
+check(sum(Decimal(v) for v in scoring['dimension_weights'].values())==1,'Base dimension weights sum to 1')
+check(strategy['quality_gates']['minimum_coverage']==scoring['minimum_company_coverage']=='0.80','Coverage consistency')
+check('financial_max_announced_age_days' not in strategy['quality_gates'],'Removed uniform announcement age')
+check(strategy['quality_gates']['price_max_lag_sessions']==0,'No stale close advances FINAL confirmation')
+for dim,b in scoring['baselines'].items():
+    if 'metrics' in b:
+        check(sum(Decimal(x['weight']) for x in b['metrics'])==1,f'Submetric weights: {dim}')
+        check(all(x['key'] in metrics and Decimal(x['zero_at'])!=Decimal(x['full_at']) for x in b['metrics']),f'Metric registry / ranges: {dim}')
+    else:check(b['rubric_ref'] in rubrics and b['method']=='accepted_evidence_rubric',f'AUTO/HUMAN rubric ref: {dim}')
+check(sum(len(v['criteria']) for v in rubrics.values())==11,'Eleven rubric criteria supplied')
+for name,r in rubrics.items():
+    check(all(len(c['anchors'])==5 and all(c['anchors']) for c in r['criteria']),f'Five evidence anchors: {name}')
+    check(r['minimum_criterion_coverage']=='0.80',f'Rubric coverage: {name}')
+
+fields=set(read('contracts/strategy.schema.json')['$defs']['expression']['oneOf'][1]['properties']['field']['enum'])
+for mode in ['enter','retain']:
+    clauses=strategy[mode]['all'];check(0<len(clauses)<=30 and len({x['field'] for x in clauses})==len(clauses),f'Bounded unique default clauses: {mode}')
+    for clause in clauses:
+        check(clause['field'] in fields and clause['op'] in {'gte','lte'},f'Whitelisted rule: {mode}:{clause["field"]}');Decimal(clause['value'])
+a={x['field']:x for x in strategy['enter']['all']};b={x['field']:x for x in strategy['retain']['all']};check(set(a)==set(b),'Enter/retain field parity')
+for f,e in a.items():
+    v,w=Decimal(e['value']),Decimal(b[f]['value']);check(e['op']==b[f]['op'] and (v>=w if e['op']=='gte' else v<=w),f'Retain no stricter than enter: {f}')
+p=strategy['state_policy'];check(p['enter_distinct_sessions']==p['exit_distinct_sessions']==2 and p['require_adjacent_expected_sessions'] and p['final_price_required'],'Two adjacent expected FINAL sessions')
+check(p['notification_phase']=='deferred' and not p['initial_baseline_notify'] and not p['historical_notify'],'Notifications deferred, baseline/history quiet')
+
+# Material resolver: demonstrates the specified inheritance semantics; it is not application implementation.
+bundle=read('config/templates-standard-v1.json');tplschema=read('contracts/scoring-template.schema.json')
+for t in bundle['templates']:validate(t,tplschema);check(True,'Limited template shape: '+t['template_key'])
+def resolve(key,templates=None,stack=()):
+    templates=templates or bundle['templates'];bykey={t['template_key']:t for t in templates}
+    if len(bykey)!=len(templates):raise ValueError('duplicate template key')
+    t=bykey[key]
+    validate(t,tplschema)
+    if t['scope']['kind'] != {'base':'all','industry':'industry','company':'company'}[t['level']]:raise ValueError('scope/level mismatch')
+    if key in stack:raise ValueError('cycle')
+    if t['level']=='base':
+        if t['base_config_ref']['sha256']!=sha(ROOT/t['base_config_ref']['path']):raise ValueError('base hash')
+        c=copy.deepcopy(read(t['base_config_ref']['path']))
+        if c['dimension_registry_ref']['sha256']!=sha(ROOT/c['dimension_registry_ref']['path']):raise ValueError('registry hash')
+    else:
+        parent=bykey[t['parent_ref']['key']]
+        if t['parent_ref']['version']!=parent['version'] or t['parent_ref']['sha256']!=canonical_hash(parent):raise ValueError('parent version/hash')
+        if (parent['level'],t['level']) not in {('base','industry'),('industry','company')}:raise ValueError('level')
+        c=resolve(parent['template_key'],templates,stack+(key,))
+    seen=set()
+    for patch in t['patches']:
+        d=patch['dimension']
+        if d in seen:raise ValueError('duplicate patch')
+        seen.add(d)
+        if d not in registry_entries:raise ValueError('unregistered dimension')
+        if t['level']=='industry' and t['scope']['industry_key'] not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
+        if t['level']=='company':
+            industry=bykey[t['parent_ref']['key']]['scope']['industry_key']
+            if industry not in registry_entries[d]['applicable_industries']:raise ValueError('inapplicable dimension')
+        if patch.get('disabled'):
+            if set(patch)-{'dimension','reason','disabled'}:raise ValueError('mixed disable')
+            c['dimension_weights'].pop(d,None);c['baselines'].pop(d,None);c['dimension_policies'].pop(d,None)
+        else:
+            if d not in c['dimension_weights'] and not(d.startswith('x_') and 'weight' in patch and 'baseline' in patch):raise ValueError('unregistered new dimension')
+            if d not in c['dimension_policies']:c['dimension_policies'][d]={k:copy.deepcopy(registry_entries[d][k]) for k in ['quality_policy','event_policy']}
+            if 'weight' in patch:c['dimension_weights'][d]=patch['weight']
+            if 'baseline' in patch:c['baselines'][d]=copy.deepcopy(patch['baseline'])
+            for key in ['quality_policy','event_policy']:
+                if key in patch:c['dimension_policies'][d][key]=copy.deepcopy(patch[key])
+    if sum(Decimal(x) for x in c['dimension_weights'].values())!=1:raise ValueError('weight sum')
+    if set(c['baselines'])!=set(c['dimension_weights']):raise ValueError('dimensions/weights')
+    if not set(strategy['quality_gates']['required_dimensions'])<=set(c['baselines']):raise ValueError('required disabled')
+    if set(c['dimension_policies'])!=set(c['baselines']):raise ValueError('policies/dimensions')
+    c['event_contribution']['half_life_calendar_days']={d:v['event_policy']['half_life_days'] for d,v in c['dimension_policies'].items() if v['event_policy']['enabled']}
+    validate(c,read('contracts/scoring.schema.json'))
+    for d,base in c['baselines'].items():
+        if base['method'] not in registry_entries[d]['allowed_baseline_methods']:raise ValueError('baseline method')
+        freshness=c['dimension_policies'][d]['quality_policy']['freshness']['kind']
+        if (base['method']=='weighted_metric_rubric')!=(freshness=='report_obligation'):raise ValueError('freshness method')
+        validate(base,read('contracts/scoring.schema.json')['properties']['baselines']['additionalProperties'])
+        if 'metrics' in base and (sum(Decimal(x['weight']) for x in base['metrics'])!=1 or any(Decimal(x['zero_at'])==Decimal(x['full_at']) for x in base['metrics'])):raise ValueError('submetric weights/range')
+        if 'metrics' in base and not all(x['key'] in metrics for x in base['metrics']):raise ValueError('unknown metric')
+        if 'rubric_ref' in base and base['rubric_ref'] not in all_rubrics:raise ValueError('unknown rubric')
+    return c
+industry=resolve('industry-manufacturing');company=resolve('company-synthetic-manufacturer')
+check(industry['dimension_weights']['profit_quality']=='0.30','Industry override golden value')
+check(company['dimension_weights']=={'profit_quality':'0.35','financial_resilience':'0.20','business_model':'0.25','governance':'0.15','growth_sustainability':'0.05'},'Company override full golden weights')
+check(company['baselines']==scoring['baselines'],'Unchanged baselines inherited')
+for label,mutator in [
+('bad parent hash',lambda ts:ts[-1]['parent_ref'].update(sha256='0'*64)),
+('weight sum invalid',lambda ts:ts[-1]['patches'][0].update(weight='0.99')),
+('duplicate patch',lambda ts:ts[-1]['patches'].append(copy.deepcopy(ts[-1]['patches'][0]))),
+('disable required dimension',lambda ts:ts[-1]['patches'].append({'dimension':'business_model','disabled':True,'reason':'negative'})),
+('unknown metric',lambda ts:ts[-1]['patches'][0].update(baseline={'method':'weighted_metric_rubric','metrics':[{'key':'unknown','weight':'1','zero_at':'0','full_at':'1'}]})),
+('wrong scope',lambda ts:ts[-1].update(scope={'kind':'all'})),
+('jump level',lambda ts:ts[-1]['parent_ref'].update(key=ts[0]['template_key'],version=1,sha256=canonical_hash(ts[0]))),
+]:
+    bad=copy.deepcopy(bundle['templates']);mutator(bad);reject(lambda:resolve('company-synthetic-manufacturer',bad),label)
+
+policy=read('config/auto-review-policy-v1.json');roles=read('config/roles-standard-v1.json')['roles']
+check(policy['risk_target_policy_ref']['sha256']==sha(ROOT/policy['risk_target_policy_ref']['path']),'Pinned risk target policy hash')
+check(policy['hard_risk']['allow_auto_accept'] and not policy['template_and_strategy_auto_publish'],'AUTO risk allowed, templates/strategy human-published')
+check(policy['human_override_precedence']=='until_released_or_expired' and policy['on_override_expiry']=='reevaluate_current_legal_inputs','Human override precedence/expiry')
+check(set(roles)=={'viewer','researcher','strategy_manager','data_admin','system_admin'},'Five confirmed roles')
+check('analysis.override' in roles['researcher'] and 'strategy.publish' not in roles['researcher'],'Researcher override but no publish')
+check('template.publish' in roles['strategy_manager'] and 'source.manage' not in roles['strategy_manager'],'Strategy manager boundaries')
+check('role.assign' not in roles['data_admin'] and 'analysis.override' not in roles['viewer'],'Data admin / viewer boundaries')
+check('strategy.publish' not in roles['system_admin'] and 'analysis.override' not in roles['system_admin'],'System admin no implicit business authority')
+proposal=read('examples/analysis-proposal.json')
+for link in proposal['links']:check(bool(link['evidence_ids']) and 'approved' not in link,'Model proposal cannot self-approve')
+for impact in proposal['impact_proposals']:check(impact['company_id'] in {x['company_id'] for x in proposal['links']} and impact['dimension'] in scoring['dimension_weights'],'Impact link/dimension exists')
+auto=read('examples/auto-decision.json');human=read('examples/human-override.json')
+check(auto['actor_kind']=='AUTO' and auto['status']=='accepted','Independent AUTO decision example')
+check(all(x['company_id'] in {l['company_id'] for l in proposal['links']} and x['rubric_ref'] in rubrics and x['criterion_key'] in {c['key'] for c in rubrics[x['rubric_ref']]['criteria']} for x in proposal['rubric_proposals']), 'Rubric proposal link/catalog/criterion references')
+check(human['subject_slot']==auto['subject_slot'] and human['supersedes_decision_id']==auto['decision_id'] and human['status']=='rejected','Same-slot human override example')
+job=read('examples/job-event.json');check(job['mode']=='shadow' and set(job['payload'])=={'input_manifest_id','job_id'},'Synthetic job reference-only and shadow')
+cases=read('examples/state-machine-cases.json');check(cases['synthetic'] and [c['change_event'] for c in cases['cases'] if c['change_event']]==['ENTER','EXIT','ENTER','RISK'],'State expected changes, NOT engine execution')
+check(not any(c['delivery_expected'] for c in cases['cases']),'First phase zero delivery expectations')
+check(cases['cases'][4]['display']=='UNKNOWN' and cases['cases'][4]['confirmed']=='IN','Unknown preserves baseline expectation')
+boundary={c['id']:c for c in read('examples/v02-boundary-cases.json')['cases']}
+check(boundary['T-30']['expected_count']==1 and boundary['T-32']['expected_current_state']=='IN','Gap/correction counterexamples recorded, NOT engine execution')
+with localcontext() as ctx:
+    ctx.prec=70;ctx.rounding=ROUND_HALF_EVEN;q=Decimal('0.000000000001')
+    v=Decimal(10)*Decimal('.8')*Decimal('.5')*Decimal('.95')*Decimal('.8')
+    check(str(v.quantize(q))==boundary['T-35']['expected_before_decay'] and str((v/2).quantize(q))==boundary['T-35']['expected_after_decay'],'Golden contribution / exact half-life arithmetic')
+    check((v/Decimal(2).sqrt()).quantize(q)==Decimal('2.149604614807'),'Non-integer half-life golden arithmetic (sqrt cross-check)')
+    check(Decimal(75)/Decimal(100)==Decimal('.75') and Decimal('.75')<Decimal('.8'),'Matched consolidated CFO/profit counterexample')
+    check(Decimal('69.999999999999')<Decimal(70) and round(Decimal('69.999999999999'),1)==Decimal('70.0'),'Displayed 70.0 does not pass exact 70 threshold')
+
+prd=(ROOT/'docs/01-product-requirements.md').read_text();accept=(ROOT/'docs/10-acceptance.md').read_text();plan=(ROOT/'docs/09-delivery-plan.md').read_text()
+for n in range(1,18):check(f'R-{n:02}' in prd and f'R-{n:02}' in accept,f'Requirement trace: R-{n:02}')
+for n in range(1,39):check(f'T-{n:02}' in accept,f'Acceptance scenario: T-{n:02}')
+for n in range(1,9):check(f'W-{n:02}' in plan and f'W-{n:02}' in accept,f'Work trace: W-{n:02}')
+for doc in ['docs/02-business-design.md','docs/07-ai-and-retrieval.md','AGENTS.md']:
+    text=(ROOT/doc).read_text();check('必须人工复核' not in text and '高影响先人工批准' not in text,f'No superseded mandatory-human gate: {doc}')
+
+from v03_material_checks import run as run_v03_checks
+run_v03_checks(read,check,reject,resolve,bundle,scoring,canonical_hash)
+for n in range(39,44):check(f'T-{n:02}' in accept,f'v03 acceptance scenario: T-{n:02}')
+for d,v in scoring['dimension_policies'].items():
+    check(v['event_policy']['half_life_days']==scoring['event_contribution']['half_life_calendar_days'][d],f'Standard event half-life policy agreement: {d}')
+
+# Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
+sources=[]
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/CODING-READINESS.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+sources=sorted(set(sources))
+for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
+from intake_material_checks import run as run_intake_checks
+run_intake_checks(read,check,reject)
+revision=current_revision()
+binding=(f'source_sha256 binds the exact inputs used by this run; Git HEAD at run was {revision}; no remote delivery claimed'
+         if revision else
+         'source_sha256 binds the exact working-tree inputs; Git revision unavailable; no remote delivery claimed')
+report={'design_version':'0.3','design_date':'2026-10-01','executed_at':datetime.now(timezone.utc).isoformat(),'base_commit':'00ac20433c33a0a6296797c94d81136e0499e13f','revision_at_run':revision,'revision_binding':binding,'status':'passed','scope':'Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance','check_count':len(checks),'checks':checks,'source_sha256':{str(p.relative_to(ROOT)):sha(p) for p in sources},'not_run':['Full draft-2020-12 validation with a standards implementation','Runtime scoring/template/decision/state-machine implementation','Database/API/source integration and concurrency','Model/retrieval gold-set evaluation','Real UI/accessibility/device/UAT','Load/security/recovery exercises','External notification (deferred)']}
+(ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
+
+[END PART 31/41]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

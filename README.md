@@ -35,6 +35,7 @@
 | [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
 | [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
+| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 固定技术/任务/输入/验收与后置事项，实施授权后进入合成开发 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -72,3 +73,5 @@ python3 tools/build_review_pack.py
 设计细化入口：[本地交互原型](./prototype/index.html)、[字段目录](./design/database-catalog.json)、[本轮核对记录](./review/DESIGN-DETAIL-REVIEW.md)。原型浏览器交互检查与材料检查分别记录，不冒充产品或目标用户验收。
 
 可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
+
+编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
