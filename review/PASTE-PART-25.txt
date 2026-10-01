@@ -1,5 +1,5 @@
 
-[PART 25/34]
+[PART 25/35]
 
 
 ===== SOURCE: tools/material_schema.py =====
@@ -163,6 +163,6 @@ parts.append('\n这些视图尚未创建。统一修订存储只减少重复值�
 (ROOT/'docs/15-database-dictionary.md').write_text(''.join(parts))
 print(f"Rendered {len(tables)} tables, {sum(len(t['columns']) for t in tables.values())} columns; references and unique-key fields checked. No SQL executed.")
 
-[END PART 25/34]
+[END PART 25/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

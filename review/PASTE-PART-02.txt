@@ -1,5 +1,5 @@
 
-[PART 2/34]
+[PART 2/35]
 
 
 ===== SOURCE: docs/02-business-design.md =====
@@ -221,6 +221,6 @@ qa/                      # 合成场景、E2E、负载与演练
 
 v0.3不新增服务或平台：analysis拥有类型化人工修订/slot、risk目标校验；scoring拥有冻结registry与policy解析；strategy拥有risk适用集合和evaluation seal。公开应用服务可加入同一PG事务，不能由队列先更新baseline/membership再补audit。开源候选与固定源码依据沿用research/second-review.md，本轮未联网刷新或安装；正式兼容/传递许可核验留在授权实施M0。
 
-[END PART 2/34]
+[END PART 2/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

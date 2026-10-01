@@ -1,5 +1,5 @@
 
-[PART 27/34]
+[PART 27/35]
 
 
 ===== SOURCE: tools/validate_design.py =====
@@ -213,7 +213,7 @@ for d,v in scoring['dimension_policies'].items():
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
 revision=current_revision()
@@ -224,6 +224,6 @@ report={'design_version':'0.3','design_date':'2026-10-01','executed_at':datetime
 (ROOT/'review/validation-result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(f'PASS: {len(checks)} material checks; {len(sources)} primary input hashes. Full JSON Schema library validation and product runtime acceptance NOT RUN.')
 
-[END PART 27/34]
+[END PART 27/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

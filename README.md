@@ -10,7 +10,7 @@
 
 ## 用户路径
 
-今天发生了什么 → 哪家公司受到什么影响 → 依据在哪里 → 公司质量与证券估值发生什么变化 → 是否进入策略区间 → 为什么发生变化 → 人工覆盖与维护规则。
+当前结论与下一步 → 今天发生了什么 → 哪家公司受到什么影响 → 依据在哪里 → 公司质量与证券估值发生什么变化 → 是否进入策略区间 → 为什么发生变化 → 人工覆盖与维护规则。
 
 管理端处理数据源、身份映射、人工审查、规则版本、运行故障与审计；业务端专注候选池、公司档案、时间线、评分解释、策略与变化记录；通知后置。两端复用设计系统，不把后台技术字段直接塞给研究人员。
 
@@ -39,7 +39,7 @@
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
 | [迁移后二轮评审](./review/ROUND-2-REVIEW.md) / [二轮请求](./review/ROUND-2-REQUEST.md) | 固定迁移基线复审，提案与已确认合同分开 |
-| [GPT Pro 提示词](./review/GPT-PRO-PROMPT.md) | 独立审查和生成改进版的完整指令 |
+| [GPT Pro 终审提示词](./review/GPT-PRO-PROMPT.md) | 以业务闭环和UI可理解性为主，按实际影响选择必要工程核对 |
 | [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
 | [开源初步候选](./research/open-source-shortlist.md) / [第二轮核查](./research/second-review.md) | 固定源码核查、候选取舍与边界，尚未集成 |
 | [v0.2变更账本](./review/V02-CHANGELOG.md) / [v0.3处置](./review/V03-CHANGELOG.md) | 历史需求映射与二轮五项设计合同完善 |
@@ -70,3 +70,5 @@ python3 tools/build_review_pack.py
 当前v0.3在v0.2上补齐二轮F01…05设计合同，见[V03-CHANGELOG](./review/V03-CHANGELOG.md)与[跨模块推演](./review/V03-COUNTEREXAMPLES.md)。11 §7…9/12 §8是新增权威语义；T-39…43列出未来运行验收。设计已写与材料检查已执行分开记录，尚未启动W-08、部署、真实源/模型或通知。GPT Pro是可选独立复核，不作为开发前置。
 
 设计细化入口：[本地交互原型](./prototype/index.html)、[字段目录](./design/database-catalog.json)、[本轮核对记录](./review/DESIGN-DETAIL-REVIEW.md)。原型浏览器交互检查与材料检查分别记录，不冒充产品或目标用户验收。
+
+可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审尚未执行，产品仍未开发。

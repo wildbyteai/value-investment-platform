@@ -35,3 +35,9 @@
 已查看桌面资讯、公司页、手机资讯与原文截图。当前prototype-checks.json和截图记录本次结果，上一版结果可从`0b8511b`读取，首轮导航等待失败证据仍保留。新增截图：[桌面资讯](./design-detail/desktop-news.png)、[逐篇原文](./design-detail/desktop-original.png)、[手机资讯](./design-detail/mobile-news.png)、[手机原文](./design-detail/mobile-original.png)。
 
 06/16、prototype README、PROJECT和V03账本同步；材料检查另见validation-result.json。本次没有产品/数据库/API/worker、真实采集/模型/行情/部署或外部发送；没有真实来源网址，也未声明完成5名目标用户验收。
+
+## 2026-10-01追加：可理解性评审收口
+
+从`bc7cea3`干净工作区落实独立报告8项问题，逐项修改、证据和边界见[USABILITY-FIXES](./USABILITY-FIXES.md)。首页与公司先当前结论、具体A/H原因和下一步；历史值标日期；资讯与原文带有效判断；评分入口先已发布口径；编辑主动展开且复制原值；手机状态先于分数；自选明确证券。公司列表/自选同样回读修改后的等待状态，港股估值依据明确打开港股。
+
+2026-10-01T01:49:23.956Z本地浏览器检查73项通过，运行基线与工作树输入hash见prototype-checks.json；首次编辑冲突折叠失败证据保留。未执行产品/UAT，也没有业务合同或阶段扩张。GPT Pro提示与核心正文已按业务闭环/UI友好重写，终审尚未执行。

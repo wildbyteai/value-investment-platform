@@ -1,5 +1,5 @@
 
-[PART 24/34]
+[PART 24/35]
 
 
 ===== SOURCE: examples/v03-seal-manifest.json =====
@@ -249,7 +249,7 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md"])
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
@@ -274,8 +274,26 @@ sections = []
 for p in source_paths:
     sections.append(f"\n\n===== SOURCE: {p.relative_to(ROOT)} =====\n\n" + p.read_text(encoding="utf-8"))
 instruction = (ROOT / "review/GPT-PRO-PROMPT.md").read_text(encoding="utf-8").split("## 完整提示词\n", 1)[1].strip()
-all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.3。\n"
+all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请按提示词开始业务闭环与UI终审，输出评审及最小修改提案。\n"
 (ROOT / "review/PASTE-ALL.txt").write_text(all_text, encoding="utf-8")
+# Focused final review keeps the business/UI path readable. Full engineering pack remains optional.
+final_names = [
+    "PROJECT.md", "README.md", "AGENTS.md", "CONTEXT.md",
+    "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md",
+    "docs/01-product-requirements.md", "docs/06-ux-and-design-system.md",
+    "docs/11-templates-automation-and-roles.md", "docs/12-time-numerics-and-corrections.md",
+    "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md",
+    "prototype/README.md", "prototype/index.html", "prototype/app.js", "prototype/style.css",
+    "config/scoring-standard-v1.json", "config/strategy-standard-v1.json", "config/rubrics-standard-v1.json",
+    "review/design-detail/prototype-checks.json",
+]
+final_sections = []
+for name in final_names:
+    p = ROOT / name
+    final_sections.append(f"\n\n===== SOURCE: {name} | SHA256: {hashlib.sha256(p.read_bytes()).hexdigest()} =====\n\n" + p.read_text(encoding="utf-8"))
+final_text = instruction + "\n\n[FINAL_REVIEW_MATERIALS_BEGIN]\n本正文包含终审核心材料与原型源码，不包含截图像素，不能据此声称已看过视觉效果。需要具体工程合同可从私有仓库或REVIEW-PACK另查。材料按文件SHA绑定当前工作树，运行报告中的Git HEAD是运行时基线。\n" + "".join(final_sections) + "\n[FINAL_REVIEW_MATERIALS_END]\n请开始业务闭环与UI终审，按提示词输出，不重写全套设计。\n"
+(ROOT / "review/FINAL-REVIEW-PASTE.txt").write_text(final_text, encoding="utf-8")
+print(f"Built focused final review: {len(final_names)} files; {len(final_text):,} characters.")
 groups, group = [], ""
 for section in sections:
     if group and len(group) + len(section) > 14000:
@@ -287,7 +305,7 @@ if group:
 links = []
 for index, group in enumerate(groups, 1):
     start = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" if index == 1 else ""
-    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.3。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
+    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请按提示词开始业务闭环与UI终审。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
     name = f"PASTE-PART-{index:02}.txt"
     body = start + f"\n[PART {index}/{len(groups)}]\n" + group + f"\n[END PART {index}/{len(groups)}]\n" + end
     (ROOT / "review" / name).write_text(body, encoding="utf-8")
@@ -300,7 +318,9 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 ## 备用：正文粘贴
 
-没有 GitHub 读取能力时，打开 [PASTE-ALL.txt](./PASTE-ALL.txt)，复制全部正文发给 GPT Pro，里面已有提示词和完整业务／工程／合同／合成示例，无需另发提示词或附件。无需 GitHub 权限也可在本地打开同名文本。
+没有 GitHub 读取能力时，优先打开 [FINAL-REVIEW-PASTE.txt](./FINAL-REVIEW-PASTE.txt)，复制全部正文发给 GPT Pro，已含提示词与本轮业务/UI核心材料、旧独立评审和逐项处置。无截图像素时应明确视觉检查未执行；纯文本可评审业务、文案和导航。GPT Pro终审尚未执行。
+
+完整工程上下文按需查 [REVIEW-PACK.md](./REVIEW-PACK.md) 或 [PASTE-ALL.txt](./PASTE-ALL.txt)，无需把全部工程材料列为本轮终审前置。全文已有提示词，无需另发提示词或附件。
 
 若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
 
@@ -308,6 +328,6 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 (ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
 print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")
 
-[END PART 24/34]
+[END PART 24/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

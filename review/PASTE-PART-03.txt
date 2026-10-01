@@ -1,5 +1,5 @@
 
-[PART 3/34]
+[PART 3/35]
 
 
 ===== SOURCE: docs/04-data-design.md =====
@@ -105,6 +105,6 @@ risk解除引用确切revision，membership提交另校验risk generation；封�
 
 [15字段字典与ER](./15-database-dictionary.md)展开本逻辑模型。字段维护入口为design/database-catalog.json，按切片逐步落实；其中link/impact/rubric/risk采用共同judgment_revision根表和类型化逻辑视图，human链可指AUTO旧修订，有效指针仍只有decision_slot。数据库表/视图/约束与事务均尚未创建或验证，不把目录完整度作为M0一次性建表门槛。
 
-[END PART 3/34]
+[END PART 3/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

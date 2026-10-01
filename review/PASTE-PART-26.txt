@@ -1,5 +1,5 @@
 
-[PART 26/34]
+[PART 26/35]
 
 
 ===== SOURCE: tools/v03_material_checks.py =====
@@ -97,6 +97,6 @@ def run(read, check, reject, resolve, bundle, scoring, canonical_hash):
     check(15<60 and 40<=60 and 50<=60 and 61>60 and 65>=60,'v03 +15/+40/+50/+60/+61/+65 boundary arithmetic; token/concurrency NOT RUN')
     bad=copy.deepcopy(seal);bad['worker_now']='2026-09-30T09:20:00Z';reject(lambda:validate(bad,read('contracts/evaluation-seal.schema.json')),'v03 seal cannot replace cutoff with caller now')
 
-[END PART 26/34]
+[END PART 26/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -1,5 +1,5 @@
 
-[PART 11/34]
+[PART 11/35]
 
 
 ===== SOURCE: docs/16-prototype-and-design-trace.md =====
@@ -20,13 +20,13 @@
 
 | 页面/路由 | 主要动作 | 显示/输入对象 | 拟用API（尚未运行） | 流程/需求 |
 |---|---|---|---|---|
-| 今日变化 `#changes` | 市场/类型筛选→固定历史解释 | transition类型、公司、security、known_at、解释 | GET /changes、/dashboard | BF-01/04，R-08/09 |
+| 今日研究 `#changes` | 当前结论/优先动作；历史市场/类型筛选→固定解释 | transition类型、公司、security、known_at、解释 | GET /changes、/dashboard | BF-01/04，R-08/09 |
 | 当时解释 `#change/enter` | 读固定依据→看当前状态 | release、evaluation、前后状态、snapshot | GET /changes及固定解释 | BF-04/05，R-07/08 |
 | 公司列表 `#companies` | 搜索主体/证券→公司档案 | company、证券关系、Q/coverage、质量 | GET /companies | BF-01，R-04/09 |
 | 新闻资讯 `#news` | 公司/类型/发布日期筛选→原文→返回原筛选 | information item/revision、published_at、source、摘要、关联公司与事件 | GET /information | BF-01/02，R-02/04/09/14 |
 | 公司档案 `#company/a`、`b` | 新闻资讯、研究事件、分数、财务、证券估值、关系、笔记、自选 | event、score/metric snapshots、note、watchlist | GET /companies/{id}及timeline/scores；/securities/{id}/valuation | BF-01/02，R-04…06/09 |
 | 原文 `#evidence/{id}`（旧`#evidence`默认订单样例） | 逐篇完整正文/高亮、三种时间、同事件其他原文→公司/判断；返回保留筛选、不可访问说明 | item_revision、evidence.locator、source policy | GET /information/{id}/revisions/{revision}、/evidence/{id}/access | BF-01/02，R-02/03/11 |
-| 人工覆盖 `#decisions/a` | impact −0.2、rubric1、拒绝本H风险、解除覆盖 | slot、完整新judgment、reason、valid_until、revision | POST /decisions/{slot}/overrides与release-override | BF-02，R-03/05/16 |
+| 人工覆盖 `#decisions/a` | 先读判断→主动编辑impact/档位/拒绝风险，草稿默认沿用原值；解除覆盖 | slot、完整新judgment、reason、valid_until、revision | POST /decisions/{slot}/overrides与release-override | BF-02，R-03/05/16 |
 | 模板 `#templates` | 看继承/覆盖/最终值；改龄期/事件参与；预览/发布 | draft、template父链、registry、effective_config、origin | resolve/simulations/publish、/scoring-bindings/publish | BF-03，R-15 |
 | 策略 `#strategy` | 候选→阈值草稿→固定模拟→确认新发布；回滚提案 | security、Q/V、AST、preview、release | drafts/simulations/publish、rollback-preview | BF-03/04，R-07/08 |
 | 自选 `#watchlist` | 移入/移出证券→公司研究 | watchlist/entry、owner、security | GET/PATCH /watchlists/{id} | R-09 |
@@ -44,11 +44,14 @@
 
 - 资讯原文逐篇对应，不把所有卡片送到同一披露；同一订单事件的公告与新闻可互链。资讯按发布时间倒序，筛选状态在原文往返时保留，未知原文ID显示未找到；格力电器财务入口不会跳到比亚迪原文。事件日期未知或只有日期/报告期时明确标注，不编造具体发生时刻。
 - 主界面使用评分档位、资料有效期、连续几个交易日等中文解释，合同中的rubric/FINAL/session等标识仍留在设计文档中；不改机器合同。
+- 首页/公司页先结论和下一步，再查看数字；当前缺价与上次入选分开。策略A股旧估值68明确为09-29历史值，关键原因必须是当天缺价。评分解释入口在当前公司内展示已发布权重/阈值/日期，不跳待发布模板；模板编辑与策略维护为进阶入口。
+- 新闻/原文/研究事件共用当前有效影响与理由；资料原文不包含测试目的。人工编辑初始折叠，主动展开后复制当前影响值；0–4资本配置锚点来自标准rubric。保存后显示人工判断已保存与依赖重算等待，格力电器不受比亚迪重算等待影响。
+- 自选分别按A/H市场和代码操作；手机先显示当前结论与缺价，身份演示设置折叠。
 - 人工修改直接保存，显示新人工值与重算等待；查看者只读。impact/rubric/risk各有独立演示修订状态；旧AUTO不因其他slot被覆盖而显示HUMAN。
 - 409演示保留新值和理由，先比较当前版本再重试。证据、身份、有效期和时点的服务端完整校验仍是目标设计，不由原型证明。
 - 原型模板为另一个待发布扩展草稿，与当前已发布企业35/20/25/15/5%方案分开；扩展草稿盈利继承制造业30%，成长5%及客户留存5%，六维总权重100%。提供90/180日证据龄期、enabled/H与baseline-only两个分支；不允许任意注册自定义字段。完整配置示例仍由examples和contracts定义。
 - 修改模板设置或策略阈值会使旧预览消失；发布按钮只对相应合成角色开放。模板研究员可编辑，发布需策略管理员；system_admin不自动有业务读取/发布/覆盖。
-- A/H价格、币种与估值独立。09-29合成评分72、覆盖100%；09-30 A缺价待评估并保留last=IN，H因估值条件未满足为OUT；挂牌风险单独使用虚构公司/SYN-H，不属于真实公司名称案例。缺价只影响证券估值/评估，不抹去公司有效经营分。影响替换后的公司重算等待则经营分快照仅供旧值比较。
+- A/H价格、币种与估值独立。09-29合成评分72、覆盖100%；09-30 A缺价待评估并保留last=IN，H因估值条件未满足为OUT；挂牌风险单独使用虚构公司/SYN-H，不属于真实公司名称案例。缺价只影响证券估值/评估，不抹去公司有效经营分。影响替换后的公司重算等待则经营分快照仅供旧值比较，证券候选页同步标记等待与旧值。
 - fixed history与current明确分开。纠错演示保留s2记录、检查s4/s6，独立s6成立时当前IN不变。
 - 来源暂停后演示导入不可点；失败项恢复仅限一证券一session，不代表全量重跑。角色差异保存及更正仅为内存演示。
 - 手机支持查看与轻量覆盖；模板与策略复杂编辑回桌面。加载、空、部分失败、不可见、冲突、UNKNOWN/等待、更新提示、停牌可以用底部设计控件切换。
@@ -65,7 +68,7 @@
 | R-06 证券估值 | company→security→listing、财务/价格/FX/义务、A/H切换 | 真实币种/股本/财报修订由T-10/36/37验证 |
 | R-07 策略维护 | BF-03、draft/version/preview/release、模拟发布原型 | 未实现AST/时点模拟引擎；样例输出不证明正确计算 |
 | R-08 状态与变化 | BF-04/05、seal/membership/transition/correction、历史解释 | 两相邻session/并发/硬风险由T-13/40/43验证；通知继续后置 |
-| R-09 业务工作流 | 新闻资讯/今日变化→公司→对应原文→覆盖，自选/笔记 | 未做目标研究员用户测试 |
+| R-09 业务工作流 | 新闻资讯/今日研究→公司→对应原文→覆盖，自选/笔记 | 未做目标研究员用户测试 |
 | R-10 管理 | 源/任务/质量/模型/身份/审计与表映射 | 操作均演示；费用/真实故障尚未连接 |
 | R-11 权限/机密 | 五角色入口、对象作用范围、复合workspace FK设计 | 客户端门禁不代表服务端安全通过；全路径权限测试未运行 |
 | R-12 恢复 | BF-05、ledger/fence/outbox及同事务边界 | 未运行崩溃、丢ACK、备份恢复与独立journal |
@@ -79,11 +82,13 @@
 
 设计材料：运行 `python3 tools/render_database_design.py` 检查表/字段引用并生成字典；运行 `python3 tools/validate_design.py` 检查既有合同与更新材料。
 
-原型：运行 `node tools/verify_prototype.cjs <Playwright模块路径> <浏览器可执行路径>`，在独立无头浏览器中打开本地file原型，阻断HTTP请求，检查固定维度向量/总分与实际模板配置一致、资讯顺序/筛选/逐篇正文/返回/同事件原文互链/虚构风险隔离、导航、完整人工值/冲突保留、角色入口、预览失效、自选笔记、失败项恢复、合成更正和1440/1280/390/430宽度。结果见[prototype-checks](../review/design-detail/prototype-checks.json)。这些是原型交互与页面布局检查，不是T-UX-01…04的5人计时任务，也不证明真实权限/DB/评分引擎。
+原型：运行 `node tools/verify_prototype.cjs <Playwright模块路径> <浏览器可执行路径>`，在独立无头浏览器中打开本地file原型，阻断HTTP请求，检查固定维度向量/总分与实际模板配置一致、资讯顺序/筛选/逐篇正文/返回/同事件原文互链/虚构风险隔离、导航、完整人工值/冲突保留、角色入口、预览失效、自选笔记、失败项恢复、合成更正、当前/历史分开、已发布评分入口、主动编辑、档位锚点、自选A/H及手机首屏，以及1440/1280/390/430宽度。结果见[prototype-checks](../review/design-detail/prototype-checks.json)。这些是原型交互与页面布局检查，不是T-UX-01…04的5人计时任务，也不证明真实权限/DB/评分引擎。
 
-截图：[新闻资讯](../review/design-detail/desktop-news.png)、[资讯原文](../review/design-detail/desktop-original.png)、[手机资讯](../review/design-detail/mobile-news.png)、[桌面变化](../review/design-detail/desktop-changes.png)、[公司研究](../review/design-detail/desktop-company.png)、[模板](../review/design-detail/desktop-template.png)、[手机公司页](../review/design-detail/mobile-company.png)。截图代表对应合成正常状态，不表示所有设计状态均经过人类可用性验证。
+截图：[股票候选](../review/design-detail/desktop-strategy.png)、[只读判断](../review/design-detail/desktop-judgment.png)、[新闻资讯](../review/design-detail/desktop-news.png)、[资讯原文](../review/design-detail/desktop-original.png)、[手机资讯](../review/design-detail/mobile-news.png)、[桌面变化](../review/design-detail/desktop-changes.png)、[公司研究](../review/design-detail/desktop-company.png)、[模板](../review/design-detail/desktop-template.png)、[手机公司页](../review/design-detail/mobile-company.png)。截图代表对应合成正常状态，不表示所有设计状态均经过人类可用性验证。
 
 本轮成果足以对照流程、字段和主用户路径；实现选型时再落实PG版本/迁移、生成类型合同及cutoff提交可见性协议，沿用原T预期。无需为了可选平台或新增全量评审暂停设计收口。
+
+本轮可理解性8项处置与剩余验证见[USABILITY-FIXES](../review/USABILITY-FIXES.md)，历史评审固定在ca4167d。GPT Pro终审提示以业务闭环/界面友好为主，不重复全部防御性工程评审；提示词已准备不代表终审已执行。
 
 
 ===== SOURCE: docs/adr/0001-architecture-and-truth.md =====
@@ -176,6 +181,6 @@ OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可
 
 最终矩阵必须记录revision、来源、许可证、维护证据、自托管/收费边界、A/H与单位/币种/股本/TTM/修订语义、集成与替换成本、最小验证以及R/W/T影响。推荐后由用户确定实施范围；本次不fork、安装、导入第三方代码或切换运行架构。
 
-[END PART 11/34]
+[END PART 11/35]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

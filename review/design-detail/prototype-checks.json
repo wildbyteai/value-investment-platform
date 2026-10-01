@@ -1,7 +1,7 @@
 {
   "scope": "Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance",
-  "executed_at": "2026-10-01T00:51:10.263Z",
-  "revision_at_run": "0b8511b82cc063b3e48dc43f091cb794963535b5",
+  "executed_at": "2026-10-01T01:49:23.956Z",
+  "revision_at_run": "bc7cea39b6627de7028fd2ce2f2a72d4c042c72b",
   "status": "passed",
   "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "viewport_widths": [
@@ -99,6 +99,46 @@
     {
       "id": "PD-NEWS-07",
       "scenario": "未知原文标识不错误回退到其他资讯",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-01",
+      "scenario": "首页先讲当前结论，历史记录另标日期",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-02",
+      "scenario": "公司当前A/H结论、最近日期、旧估值与缺价原因一致",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-03",
+      "scenario": "评分入口在公司内直接展示已发布权重，不跳待发布草稿",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-04",
+      "scenario": "新闻/原文有有效判断，先看判断再主动编辑，草稿复制原值",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-05",
+      "scenario": "合成原文只写业务材料，系统/人工比较留在独立判断区",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-06",
+      "scenario": "资本配置0到4锚点与配置真源一致",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-07",
+      "scenario": "按明确的A/H证券关注，不把公司按钮默认到A股",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UX-08",
+      "scenario": "手机首屏先出现当前结论与A股缺价，不被大分数遮蔽",
       "status": "passed"
     },
     {
@@ -340,12 +380,13 @@
   "console_errors": [],
   "external_requests": [],
   "source_sha256": {
-    "prototype/index.html": "a8cb8e0e69b8aaa5c2085edd41122ba72fd5e9a5115b72b78daa4e791ffdd43c",
-    "prototype/style.css": "dca28a65b00b7cebe1c616012acbaed854b68be6675430060c69240e7e837456",
-    "prototype/app.js": "48d255e900adee4af2576903d4c619c6ef061d95c7bfda0c2ca1e59aec89f22f",
-    "tools/verify_prototype.cjs": "07a509753d39162b89b6628a4dcb69682744419255634b9697d4d8b95f00baa6",
+    "prototype/index.html": "429897f22ab455f8f432e7588df21ff980b62e023be27c15dfe0bee3ea0a9953",
+    "prototype/style.css": "db431672057b2dd2559a14aab27be687763089a4fc0d118b8afa6e07a1c2778c",
+    "prototype/app.js": "c71424718aa65b197225a8fec23a0737d62df121245fda2bc514e255658dafee",
+    "tools/verify_prototype.cjs": "d34a6f27e2391b59e3ce6da3b39c748725521a7f639c15213a0cd282ce21766c",
     "config/scoring-standard-v1.json": "5de1ce826f98af392f459095ca57d2b33453624163aeeda845c83caef2670cd6",
-    "config/templates-standard-v1.json": "c2c17216a491b055f90ea6ddd197553294574943cbc2c01cac5d8088729655e1"
+    "config/templates-standard-v1.json": "c2c17216a491b055f90ea6ddd197553294574943cbc2c01cac5d8088729655e1",
+    "config/rubrics-standard-v1.json": "b70601e451a88481151818ff7d8f78511783720982a13ab056d66d8d49086348"
   },
   "not_run": [
     "Product database/API/workers",
