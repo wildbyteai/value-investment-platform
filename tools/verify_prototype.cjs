@@ -14,13 +14,13 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
  const text=async()=>{await page.waitForFunction(()=>document.querySelector('#main').dataset.route===(location.hash||'#changes'));return page.locator('#main').innerText();};
  await check('PD-UI-01','变化→固定历史解释→当前公司→原文→人工替换',async()=>{
   await page.locator('a[href="#change/enter"]').first().click();assert.match(await text(),/当时记录/);
-  await page.locator('a[href="#company/a"]').first().click();assert.match(await text(),/SYN-A/);assert.match(await text(),/SYN-H/);
-  await page.locator('a[href="#evidence"]').first().click();assert.match(await text(),/客户验收/);
-  await page.locator('a[href="#decisions/a"]').first().click();await page.locator('#replacement').fill('-0.2');await page.locator('#reason').fill('客户验收条件尚未满足，原正面影响过强。');await page.getByRole('button',{name:'保存人工覆盖',exact:true}).click();assert.match(await text(),/人工判断已保存，重算等待中/);assert.match(await text(),/HUMAN/);
+  await page.locator('a[href="#company/a"]').first().click();assert.match(await text(),/002594/);assert.match(await text(),/01211/);
+  await page.locator('a[href="#evidence/byd-order"]').first().click();assert.match(await text(),/客户验收/);
+  await page.locator('a[href="#decisions/a"]').first().click();await page.locator('#replacement').fill('-0.2');await page.locator('#reason').fill('客户验收条件尚未满足，原正面影响过强。');await page.getByRole('button',{name:'保存人工覆盖',exact:true}).click();assert.match(await text(),/人工判断已保存，重算等待中/);assert.match(await text(),/人工判断已生效/);
   assert.equal(await page.locator('.value-box strong').first().innerText(),'-0.2');
  });
  await check('PD-UI-02','rubric3→1独立于impact修订',async()=>{
-  await page.getByRole('button',{name:'rubric档位',exact:true}).click();assert.equal(await page.locator('.value-box strong').first().innerText(),'3');
+  await page.getByRole('button',{name:'评分档位',exact:true}).click();assert.equal(await page.locator('.value-box strong').first().innerText(),'3');
   await page.locator('#grade').selectOption('1');await page.locator('#reason').fill('资本配置锚点证据支持档位1。');await page.getByRole('button',{name:'保存人工覆盖',exact:true}).click();assert.equal(await page.locator('.value-box strong').first().innerText(),'1');
  });
  await check('PD-UI-03','模拟409保留新值和理由，再基于新版本重试',async()=>{
@@ -32,21 +32,21 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
  });
  await check('PD-UI-05','策略模拟→编辑使旧预览失效→再次模拟→发布',async()=>{
   await role('strategy_manager');await route('strategy');await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),1);
-  await page.locator('#strategy-threshold').selectOption('75');assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),0);await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.match(await text(),/CONFIG_CHANGE/);await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();assert.match(await text(),/演示发布 2/);
+  await page.locator('#strategy-threshold').selectOption('75');assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),0);await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.match(await text(),/规则变更/);await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();assert.match(await text(),/演示发布 2/);
  });
  await check('PD-UI-06','模板龄期/事件参与，旧预览失效，研究员不能发布',async()=>{
-  await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();await page.locator('#template-age').selectOption('180');assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).count(),0);await page.locator('#event-mode').selectOption('disabled');assert.match(await text(),/无虚构零贡献/);await role('researcher');await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).isDisabled(),true);
+  await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();await page.locator('#template-age').selectOption('180');assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).count(),0);await page.locator('#event-mode').selectOption('disabled');assert.match(await text(),/不额外计算事件影响/);await role('researcher');await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).isDisabled(),true);
  });
- await check('PD-UI-07','A/H估值独立，B无H风险；分数固定样例一致',async()=>{
-  await route('company/a');await page.getByRole('button',{name:'证券估值',exact:true}).click();assert.match(await text(),/68.0/);await page.getByRole('button',{name:'SYN-H / 港股',exact:true}).click();assert.match(await text(),/45.0/);assert.match(await text(),/HKD/);await page.getByRole('button',{name:'评分解释',exact:true}).click();assert.match(await text(),/76.0/);assert.match(await text(),/35%/);
-  await route('company/b');await page.getByRole('button',{name:'时间线',exact:true}).click();assert.match(await text(),/仅发行SYN-B/);
+ await check('PD-UI-07','A/H估值独立，第二家公司单证券样例；分数固定样例一致',async()=>{
+  await route('company/a');await page.getByRole('button',{name:'证券估值',exact:true}).click();assert.match(await text(),/68.0/);await page.getByRole('button',{name:'01211 / 港股',exact:true}).click();assert.match(await text(),/45.0/);assert.match(await text(),/HKD/);await page.getByRole('button',{name:'评分解释',exact:true}).click();assert.match(await text(),/76.0/);assert.match(await text(),/35%/);
+  await route('company/b');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();assert.match(await text(),/格力电器/);
  });
  await check('PD-FIXTURE-01','固定维度权重与已确认模板配置一致，总分与向量一致',async()=>{
   const snapshots=await page.evaluate(()=>companies);const config=JSON.parse(fs.readFileSync(path.join(root,'config/scoring-standard-v1.json'),'utf8'));const templates=JSON.parse(fs.readFileSync(path.join(root,'config/templates-standard-v1.json'),'utf8')).templates;
   for(const company of ['a','b']){const expected={...config.dimension_weights};for(const template of templates.slice(1,company==='a'?3:2)){for(const patch of template.patches){if(patch.weight)expected[patch.dimension]=patch.weight;}}let sum=0n;let weight=0n;for(const [id,label,value,w] of snapshots[company].dimensions){assert.equal(w,expected[id]);const ws=BigInt(w.replace('.',''));weight+=ws;sum+=BigInt(value.replace('.',''))*ws;}assert.equal(weight,100n);assert.equal(sum,BigInt(snapshots[company].quality.replace('.',''))*100n);}
  });
  await check('PD-UI-08','自选操作与笔记转义，不发请求',async()=>{
-  await route('company/b');await page.getByRole('button',{name:'加入自选',exact:true}).click();await route('watchlist');assert.match(await text(),/SYN-B/);await route('company/b');await page.getByRole('button',{name:'笔记',exact:true}).click();await page.locator('#note').fill('<script>test</script> 研究笔记');await page.getByRole('button',{name:'保存笔记',exact:true}).click();await route('companies');await route('company/b');assert.equal(await page.locator('#note').inputValue(),'<script>test</script> 研究笔记');
+  await route('company/b');await page.getByRole('button',{name:'加入自选',exact:true}).click();await route('watchlist');assert.match(await text(),/000651/);await route('company/b');await page.getByRole('button',{name:'笔记',exact:true}).click();await page.locator('#note').fill('<script>test</script> 研究笔记');await page.getByRole('button',{name:'保存笔记',exact:true}).click();await route('companies');await route('company/b');assert.equal(await page.locator('#note').inputValue(),'<script>test</script> 研究笔记');
  });
  await check('PD-UI-09','合成源暂停/恢复，失败项恢复与更正范围',async()=>{
   await role('data_admin');await page.getByRole('button',{name:'暂停计划',exact:true}).click();assert.equal(await page.getByRole('button',{name:'导入合成资料',exact:true}).isDisabled(),true);await page.getByRole('button',{name:'恢复计划',exact:true}).click();await page.getByRole('button',{name:'导入合成资料',exact:true}).click();await page.getByRole('button',{name:'预览失败项恢复',exact:true}).click();assert.match(await page.locator('#dialog').innerText(),/只恢复一个失败项/);await page.getByRole('button',{name:'确认合成恢复',exact:true}).click();assert.match(await text(),/演示恢复完成/);await route('quality');await page.getByRole('button',{name:'查看更正范围预览',exact:true}).click();await page.getByRole('button',{name:'追加合成更正说明',exact:true}).click();assert.match(await text(),/当前状态仍IN/);
@@ -55,20 +55,56 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
   await role('system_admin');await page.getByRole('checkbox',{name:'策略管理员',exact:true}).check();await page.getByRole('button',{name:'查看权限差异',exact:true}).click();assert.match(await page.locator('#dialog').innerText(),/strategy_manager/);await page.getByRole('button',{name:'保存合成角色组合',exact:true}).click();await route('models');assert.match(await text(),/0次真实请求/);await route('audit');assert.match(await text(),/操作记录/);
  });
  await reset();
+ await check('PD-NEWS-01','资讯按发布时间倒序，与事件发生时间分开',async()=>{
+  await page.locator('#nav a[href="#news"]').click();await route('news');
+  assert.deepEqual(await page.locator('[data-news-id]').evaluateAll(rows=>rows.map(x=>x.dataset.newsId)),['byd-report','byd-followup','byd-order','gree-report']);
+  const dates=await page.locator('[data-news-id]').evaluateAll(rows=>rows.map(x=>x.dataset.published));assert.deepEqual(dates,[...dates].sort().reverse());
+ });
+ await check('PD-NEWS-02','公司/类型/日期筛选与空结果清除，原文返回保留条件',async()=>{
+  await page.locator('#news-company').selectOption('a');await page.locator('#news-type').selectOption('news');assert.equal(await page.locator('[data-news-id]').count(),1);
+  await page.getByRole('link',{name:'阅读原文',exact:true}).click();assert.equal(await page.locator('[data-evidence-id]').getAttribute('data-evidence-id'),'byd-followup');
+  await page.getByRole('link',{name:'返回刚才的列表',exact:true}).click();await page.waitForSelector('#news-company');assert.equal(await page.locator('#news-company').inputValue(),'a');assert.equal(await page.locator('#news-type').inputValue(),'news');assert.equal(await page.locator('[data-news-id]').count(),1);
+  await page.locator('#news-period').selectOption('today');assert.match(await text(),/没有符合条件的资讯/);await page.getByRole('button',{name:'清除资讯筛选'}).click();assert.equal(await page.locator('[data-news-id]').count(),4);
+  await page.locator('#news-period').selectOption('today');assert.deepEqual(await page.locator('[data-news-id]').evaluateAll(rows=>rows.map(x=>x.dataset.newsId)),['byd-report']);await page.locator('#news-period').selectOption('all');
+ });
+ await check('PD-NEWS-03','四篇资讯分别对应自己的标题/三段原文/来源/三种时间/高亮/公司',async()=>{
+  const items=await page.evaluate(()=>information);
+  for(const item of items){await route('news');await page.locator(`[data-news-id="${item.id}"]`).getByRole('link',{name:'阅读原文',exact:true}).click();await page.waitForSelector(`[data-evidence-id="${item.id}"]`);
+   assert.equal(await page.locator('h1').innerText(),item.title);for(let i=0;i<3;i++)assert.match(await page.locator(`#paragraph-${i+1}`).innerText(),new RegExp(item.paragraphs[i].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+   const body=await text();assert.ok(body.includes(item.source));assert.ok(body.includes(item.published));assert.ok(body.includes(item.observed));assert.ok(body.includes(item.occurred));assert.equal(await page.locator('mark').innerText(),item.paragraphs[item.highlight]);assert.equal(await page.locator(`a[href="#company/${item.company}"]`).count()>0,true);if(item.event==='财务资料更新')assert.equal(await page.locator('.reason-list a').count(),0);
+  }
+ });
+ await check('PD-NEWS-04','同一事件两篇原文互链，浏览器后退保留筛选',async()=>{
+  await route('news');await page.locator('#news-company').selectOption('a');await page.locator('#news-type').selectOption('news');await page.getByRole('link',{name:'阅读原文',exact:true}).click();await page.waitForSelector('[data-evidence-id="byd-followup"]');await page.locator('.reason-list a[href="#evidence/byd-order"]').click();await page.waitForSelector('[data-evidence-id="byd-order"]');await page.goBack();await page.waitForSelector('[data-evidence-id="byd-followup"]');await page.goBack();await page.waitForSelector('#news-type');assert.equal(await page.locator('#news-type').inputValue(),'news');assert.equal(await page.locator('#news-company').inputValue(),'a');
+ });
+ await check('PD-NEWS-05','公司只展示自己的资讯，财务原文不跳到别家公司',async()=>{
+  await route('company/a');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();assert.equal(await page.locator('[data-news-id]').count(),3);assert.equal(await page.locator('[data-news-id="gree-report"]').count(),0);assert.doesNotMatch(await text(),/退市/);
+  await page.getByRole('button',{name:'研究事件',exact:true}).click();assert.equal(await page.locator('a[href="#evidence/byd-order"]').count(),1);assert.equal(await page.locator('a[href="#evidence/byd-followup"]').count(),1);
+  await route('company/b');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();assert.equal(await page.locator('[data-news-id]').count(),1);assert.equal(await page.locator('[data-news-id]').getAttribute('data-news-id'),'gree-report');
+  await page.getByRole('button',{name:'财务',exact:true}).click();await page.getByRole('link',{name:'查看指标原文',exact:true}).click();await page.waitForSelector('[data-evidence-id="gree-report"]');assert.match(await text(),/关联公司\n格力电器/);
+ });
+ await check('PD-NEWS-06','真实公司名有演示声明，虚构风险原文与判断不归于真实证券',async()=>{
+  await reset();assert.match(await page.locator('.prototype-bar').innerText(),/真实公司名；资讯、分数、行情均为虚构演示/);
+  await route('change/risk');assert.match(await text(),/虚构公司/);assert.doesNotMatch(await page.locator('h1').innerText(),/比亚迪/);await page.getByRole('button',{name:'打开虚构风险演练判断'}).click();await page.waitForFunction(()=>document.querySelector('h1').textContent.includes('虚构H股'));assert.match(await text(),/仅虚构SYN-H/);
+  await page.locator('a[href="#evidence/risk-example"]').click();await page.waitForSelector('[data-evidence-id="risk-example"]');assert.match(await text(),/与比亚迪、格力电器无关/);assert.equal(await page.locator('.definition a[href="#company/a"]').count(),0);
+  await page.getByRole('button',{name:'查看虚构风险判断'}).click();await page.locator('#reason').fill('虚构演练：修正这一挂牌的判断范围');await page.getByRole('button',{name:'拒绝本风险',exact:true}).click();await route('company/a');assert.equal(await page.locator('.score-number').innerText(),'72.0');
+ });
+ await check('PD-NEWS-07','未知原文标识不错误回退到其他资讯',async()=>{await route('evidence/nonexistent');assert.match(await text(),/未找到这篇原文/);assert.equal(await page.locator('[data-evidence-id]').count(),0);});
+ await reset();
  await check('PD-UI-11','状态演示：加载/空/部分失败/不可见/等待/更新/停牌',async()=>{
   for(const scenario of ['loading','empty','partial','permission','missing','updated','suspended','normal']){await page.locator('#scenario').selectOption(scenario);assert.ok((await text()).length>80);}
   await route('decisions/a');await page.locator('#scenario').selectOption('missing');assert.match(await text(),/重算等待|等待/);await page.locator('#scenario').selectOption('normal');
  });
  for(const width of [1440,1280,390,430]){
   await page.setViewportSize({width,height:width<700?844:1000});
-  for(const [r,ro] of [['changes','lead'],['company/a','lead'],['evidence','lead'],['decisions/a','lead'],['templates','lead'],['strategy','lead'],['sources','data_admin'],['jobs','data_admin'],['roles','system_admin']]){
+  for(const [r,ro] of [['changes','lead'],['news','lead'],['company/a','lead'],['evidence/byd-order','lead'],['evidence/gree-report','lead'],['decisions/a','lead'],['templates','lead'],['strategy','lead'],['sources','data_admin'],['jobs','data_admin'],['roles','system_admin']]){
    await check(`PD-VIEW-${width}-${r}`,'核心页面无整页横向溢出，表格允许容器横滚',async()=>{await role(ro);await route(r);const dims=await page.evaluate(()=>({w:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(dims.scroll<=dims.w+1,JSON.stringify(dims));});
   }
  }
  await check('PD-UI-12','键盘可进入搜索与表单，dialog Escape可关闭',async()=>{await reset();await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>document.activeElement!==document.body));await route('decisions/a');await page.locator('#reason').focus();await page.keyboard.type('键盘输入的理由');assert.match(await page.locator('#reason').inputValue(),/键盘输入/);await route('evidence');await page.getByRole('button',{name:'演示证据不可访问'}).click();await page.keyboard.press('Escape');assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false);});
  await check('PD-UI-13','浏览器无页面脚本错误、原型未尝试HTTP外发',async()=>{assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);});
- await reset();await page.setViewportSize({width:1440,height:1000});await page.evaluate(()=>document.querySelector('#toast').style.display='none');await page.screenshot({path:path.join(root,'review/design-detail/desktop-changes.png'),fullPage:true});await route('company/a');await page.getByRole('button',{name:'时间线',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-company.png'),fullPage:true});await route('templates');await page.screenshot({path:path.join(root,'review/design-detail/desktop-template.png'),fullPage:true});
- const mobile=await browser.newPage({viewport:{width:390,height:844}});await mobile.goto('file://'+path.join(root,'prototype/index.html')+'#company/a');await mobile.evaluate(()=>document.fonts.ready);await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-company.png'),fullPage:true});await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-first-screen.png')});await mobile.close();
+ await reset();await page.setViewportSize({width:1440,height:1000});await page.evaluate(()=>document.querySelector('#toast').style.display='none');await page.screenshot({path:path.join(root,'review/design-detail/desktop-changes.png'),fullPage:true});await route('news');await page.screenshot({path:path.join(root,'review/design-detail/desktop-news.png'),fullPage:true});await route('evidence/byd-order');await page.screenshot({path:path.join(root,'review/design-detail/desktop-original.png'),fullPage:true});await route('company/a');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-company.png'),fullPage:true});await route('templates');await page.screenshot({path:path.join(root,'review/design-detail/desktop-template.png'),fullPage:true});
+ const mobile=await browser.newPage({viewport:{width:390,height:844}});await mobile.goto('file://'+path.join(root,'prototype/index.html')+'#company/a');await mobile.evaluate(()=>document.fonts.ready);await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-company.png'),fullPage:true});await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-first-screen.png')});await mobile.evaluate(()=>location.hash='news');await mobile.waitForSelector('#news-company');await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-news.png'),fullPage:true});await mobile.evaluate(()=>location.hash='evidence/byd-order');await mobile.waitForSelector('[data-evidence-id="byd-order"]');await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-original.png'),fullPage:true});await mobile.close();
  }catch(e){console.error(e.message);process.exitCode=1;}finally{
   if(browser)await browser.close();const report={scope:'Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance',executed_at:executedAt,revision_at_run:cp.execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),status:results.some(r=>r.status==='failed')||process.exitCode?'failed':'passed',browser:browserPath||'Playwright default',viewport_widths:[1440,1280,390,430],checks:results,console_errors:errors,external_requests:externalRequests,source_sha256:Object.fromEntries(['prototype/index.html','prototype/style.css','prototype/app.js','tools/verify_prototype.cjs','config/scoring-standard-v1.json','config/templates-standard-v1.json'].map(p=>[p,hash(p)])),not_run:['Product database/API/workers','Actual authorization and permission enforcement','Decimal scoring/template resolution/strategy calculation','5-user timed UX acceptance','Screen-reader/200% browser zoom/real devices']};fs.writeFileSync(path.join(root,'review/design-detail/prototype-checks.json'),JSON.stringify(report,null,2)+'\n');console.log(report.status,results.length,'prototype checks');
  }

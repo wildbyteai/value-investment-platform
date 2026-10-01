@@ -10,17 +10,17 @@
 
 若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
 
-1. [PASTE-PART-01.txt](./PASTE-PART-01.txt)：18,933 字符；直接复制全文作为一条消息。
+1. [PASTE-PART-01.txt](./PASTE-PART-01.txt)：18,976 字符；直接复制全文作为一条消息。
 2. [PASTE-PART-02.txt](./PASTE-PART-02.txt)：10,613 字符；直接复制全文作为一条消息。
 3. [PASTE-PART-03.txt](./PASTE-PART-03.txt)：9,656 字符；直接复制全文作为一条消息。
-4. [PASTE-PART-04.txt](./PASTE-PART-04.txt)：10,921 字符；直接复制全文作为一条消息。
+4. [PASTE-PART-04.txt](./PASTE-PART-04.txt)：11,283 字符；直接复制全文作为一条消息。
 5. [PASTE-PART-05.txt](./PASTE-PART-05.txt)：11,298 字符；直接复制全文作为一条消息。
 6. [PASTE-PART-06.txt](./PASTE-PART-06.txt)：6,763 字符；直接复制全文作为一条消息。
 7. [PASTE-PART-07.txt](./PASTE-PART-07.txt)：9,610 字符；直接复制全文作为一条消息。
 8. [PASTE-PART-08.txt](./PASTE-PART-08.txt)：10,143 字符；直接复制全文作为一条消息。
 9. [PASTE-PART-09.txt](./PASTE-PART-09.txt)：6,767 字符；直接复制全文作为一条消息。
 10. [PASTE-PART-10.txt](./PASTE-PART-10.txt)：64,990 字符；直接复制全文作为一条消息。
-11. [PASTE-PART-11.txt](./PASTE-PART-11.txt)：11,232 字符；直接复制全文作为一条消息。
+11. [PASTE-PART-11.txt](./PASTE-PART-11.txt)：11,963 字符；直接复制全文作为一条消息。
 12. [PASTE-PART-12.txt](./PASTE-PART-12.txt)：15,640 字符；直接复制全文作为一条消息。
 13. [PASTE-PART-13.txt](./PASTE-PART-13.txt)：12,798 字符；直接复制全文作为一条消息。
 14. [PASTE-PART-14.txt](./PASTE-PART-14.txt)：11,351 字符；直接复制全文作为一条消息。
@@ -37,12 +37,12 @@
 25. [PASTE-PART-25.txt](./PASTE-PART-25.txt)：7,915 字符；直接复制全文作为一条消息。
 26. [PASTE-PART-26.txt](./PASTE-PART-26.txt)：10,066 字符；直接复制全文作为一条消息。
 27. [PASTE-PART-27.txt](./PASTE-PART-27.txt)：20,013 字符；直接复制全文作为一条消息。
-28. [PASTE-PART-28.txt](./PASTE-PART-28.txt)：12,723 字符；直接复制全文作为一条消息。
+28. [PASTE-PART-28.txt](./PASTE-PART-28.txt)：19,100 字符；直接复制全文作为一条消息。
 29. [PASTE-PART-29.txt](./PASTE-PART-29.txt)：159,854 字符；直接复制全文作为一条消息。
-30. [PASTE-PART-30.txt](./PASTE-PART-30.txt)：8,589 字符；直接复制全文作为一条消息。
-31. [PASTE-PART-31.txt](./PASTE-PART-31.txt)：15,637 字符；直接复制全文作为一条消息。
-32. [PASTE-PART-32.txt](./PASTE-PART-32.txt)：41,291 字符；直接复制全文作为一条消息。
-33. [PASTE-PART-33.txt](./PASTE-PART-33.txt)：11,550 字符；直接复制全文作为一条消息。
+30. [PASTE-PART-30.txt](./PASTE-PART-30.txt)：8,592 字符；直接复制全文作为一条消息。
+31. [PASTE-PART-31.txt](./PASTE-PART-31.txt)：17,355 字符；直接复制全文作为一条消息。
+32. [PASTE-PART-32.txt](./PASTE-PART-32.txt)：47,454 字符；直接复制全文作为一条消息。
+33. [PASTE-PART-33.txt](./PASTE-PART-33.txt)：13,265 字符；直接复制全文作为一条消息。
 34. [PASTE-PART-34.txt](./PASTE-PART-34.txt)：12,855 字符；直接复制全文作为一条消息。
 
 这些是当前v0.3的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。

@@ -1,7 +1,7 @@
 {
   "scope": "Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance",
-  "executed_at": "2026-10-01T00:32:24.757Z",
-  "revision_at_run": "a16e334e76bfe7fc69200f2a96397693811e4c8e",
+  "executed_at": "2026-10-01T00:51:10.263Z",
+  "revision_at_run": "0b8511b82cc063b3e48dc43f091cb794963535b5",
   "status": "passed",
   "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "viewport_widths": [
@@ -43,7 +43,7 @@
     },
     {
       "id": "PD-UI-07",
-      "scenario": "A/H估值独立，B无H风险；分数固定样例一致",
+      "scenario": "A/H估值独立，第二家公司单证券样例；分数固定样例一致",
       "status": "passed"
     },
     {
@@ -67,6 +67,41 @@
       "status": "passed"
     },
     {
+      "id": "PD-NEWS-01",
+      "scenario": "资讯按发布时间倒序，与事件发生时间分开",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-02",
+      "scenario": "公司/类型/日期筛选与空结果清除，原文返回保留条件",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-03",
+      "scenario": "四篇资讯分别对应自己的标题/三段原文/来源/三种时间/高亮/公司",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-04",
+      "scenario": "同一事件两篇原文互链，浏览器后退保留筛选",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-05",
+      "scenario": "公司只展示自己的资讯，财务原文不跳到别家公司",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-06",
+      "scenario": "真实公司名有演示声明，虚构风险原文与判断不归于真实证券",
+      "status": "passed"
+    },
+    {
+      "id": "PD-NEWS-07",
+      "scenario": "未知原文标识不错误回退到其他资讯",
+      "status": "passed"
+    },
+    {
       "id": "PD-UI-11",
       "scenario": "状态演示：加载/空/部分失败/不可见/等待/更新/停牌",
       "status": "passed"
@@ -77,12 +112,22 @@
       "status": "passed"
     },
     {
+      "id": "PD-VIEW-1440-news",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
       "id": "PD-VIEW-1440-company/a",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
     {
-      "id": "PD-VIEW-1440-evidence",
+      "id": "PD-VIEW-1440-evidence/byd-order",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-evidence/gree-report",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
@@ -122,12 +167,22 @@
       "status": "passed"
     },
     {
+      "id": "PD-VIEW-1280-news",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
       "id": "PD-VIEW-1280-company/a",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
     {
-      "id": "PD-VIEW-1280-evidence",
+      "id": "PD-VIEW-1280-evidence/byd-order",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-evidence/gree-report",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
@@ -167,12 +222,22 @@
       "status": "passed"
     },
     {
+      "id": "PD-VIEW-390-news",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
       "id": "PD-VIEW-390-company/a",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
     {
-      "id": "PD-VIEW-390-evidence",
+      "id": "PD-VIEW-390-evidence/byd-order",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-evidence/gree-report",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
@@ -212,12 +277,22 @@
       "status": "passed"
     },
     {
+      "id": "PD-VIEW-430-news",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
       "id": "PD-VIEW-430-company/a",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
     {
-      "id": "PD-VIEW-430-evidence",
+      "id": "PD-VIEW-430-evidence/byd-order",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-evidence/gree-report",
       "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
       "status": "passed"
     },
@@ -265,10 +340,10 @@
   "console_errors": [],
   "external_requests": [],
   "source_sha256": {
-    "prototype/index.html": "692248deacae9b9b2141e398919e3af7ade088bb0d2619f02e458c53a20a1367",
-    "prototype/style.css": "845866145fe2bd865fdcaf253a5faaf3d43d02ab2e2c80fed71ef213f8c39854",
-    "prototype/app.js": "ce7ea4fd6519a9ef89ed864198e1fa67b23043aaf88187dd5c088f8622889d88",
-    "tools/verify_prototype.cjs": "d3ea339b8f0ed0da0ad204d99d5570ea2fa6f264324e439ed04f8e9146acd542",
+    "prototype/index.html": "a8cb8e0e69b8aaa5c2085edd41122ba72fd5e9a5115b72b78daa4e791ffdd43c",
+    "prototype/style.css": "dca28a65b00b7cebe1c616012acbaed854b68be6675430060c69240e7e837456",
+    "prototype/app.js": "48d255e900adee4af2576903d4c619c6ef061d95c7bfda0c2ca1e59aec89f22f",
+    "tools/verify_prototype.cjs": "07a509753d39162b89b6628a4dcb69682744419255634b9697d4d8b95f00baa6",
     "config/scoring-standard-v1.json": "5de1ce826f98af392f459095ca57d2b33453624163aeeda845c83caef2670cd6",
     "config/templates-standard-v1.json": "c2c17216a491b055f90ea6ddd197553294574943cbc2c01cac5d8088729655e1"
   },
