@@ -1,5 +1,5 @@
 
-[PART 22/35]
+[PART 22/36]
 
 
 ===== SOURCE: contracts/strategy.schema.json =====
@@ -559,6 +559,6 @@
   ]
 }
 
-[END PART 22/35]
+[END PART 22/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

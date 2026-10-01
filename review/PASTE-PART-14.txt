@@ -1,5 +1,5 @@
 
-[PART 14/35]
+[PART 14/36]
 
 
 ===== SOURCE: config/scoring-standard-v1.json =====
@@ -402,6 +402,6 @@ analysis-result/scoring为3.0、scoring-template/review-decision为2.0；strateg
 
 新例子分别见examples/v03-human-replacements.json、v03-risk-targets.json、v03-template-custom.json和v03-seal-command.json；都是设计预期。v0.2探针仍绑定原commit/hash，不用当前Schema重写其观察。schema版本选择、旧风险消歧与不可回填规则见[V03-CHANGELOG](../review/V03-CHANGELOG.md)。
 
-[END PART 14/35]
+[END PART 14/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

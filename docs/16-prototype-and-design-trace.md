@@ -83,3 +83,9 @@
 本轮成果足以对照流程、字段和主用户路径；实现选型时再落实PG版本/迁移、生成类型合同及cutoff提交可见性协议，沿用原T预期。无需为了可选平台或新增全量评审暂停设计收口。
 
 本轮可理解性8项处置与剩余验证见[USABILITY-FIXES](../review/USABILITY-FIXES.md)，历史评审固定在ca4167d。GPT Pro终审提示以业务闭环/界面友好为主，不重复全部防御性工程评审；提示词已准备不代表终审已执行。
+
+## 6. GPT Pro终审后的三项局部修正
+
+09-29固定评分/A-H估值使用历史财务原文`byd-report-historical`（09-27发布/取得）；09-30的`byd-report`仍在新闻中作为后来更新。评分页后续订单/资本配置判断不作为该旧评分输入。修改区保留当前有效值和唯一的新值输入，去除重复新值摘要。策略发布固定版本/门槛，新评估等待，固定旧结果明确归发布1；公司研究对照也标发布1。发布新模板不强制更新旧策略。
+
+三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。

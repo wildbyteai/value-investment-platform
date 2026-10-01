@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md"])
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
@@ -36,7 +36,7 @@ all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + 
 # Focused final review keeps the business/UI path readable. Full engineering pack remains optional.
 final_names = [
     "PROJECT.md", "README.md", "AGENTS.md", "CONTEXT.md",
-    "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md",
+    "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md", "review/GPT-PRO-FINAL-DISPOSITION.md",
     "docs/01-product-requirements.md", "docs/06-ux-and-design-system.md",
     "docs/11-templates-automation-and-roles.md", "docs/12-time-numerics-and-corrections.md",
     "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md",
@@ -75,7 +75,7 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 ## 备用：正文粘贴
 
-没有 GitHub 读取能力时，优先打开 [FINAL-REVIEW-PASTE.txt](./FINAL-REVIEW-PASTE.txt)，复制全部正文发给 GPT Pro，已含提示词与本轮业务/UI核心材料、旧独立评审和逐项处置。无截图像素时应明确视觉检查未执行；纯文本可评审业务、文案和导航。GPT Pro终审尚未执行。
+没有 GitHub 读取能力时，优先打开 [FINAL-REVIEW-PASTE.txt](./FINAL-REVIEW-PASTE.txt)，复制全部正文发给 GPT Pro，已含提示词与本轮业务/UI核心材料、旧独立评审和逐项处置。无截图像素时应明确视觉检查未执行；纯文本可评审业务、文案和导航。GPT Pro终审已取得，三项处置见 [终审记录](./GPT-PRO-FINAL-DISPOSITION.md)，本入口保留为按需复核材料，不要求再次评审。
 
 完整工程上下文按需查 [REVIEW-PACK.md](./REVIEW-PACK.md) 或 [PASTE-ALL.txt](./PASTE-ALL.txt)，无需把全部工程材料列为本轮终审前置。全文已有提示词，无需另发提示词或附件。
 

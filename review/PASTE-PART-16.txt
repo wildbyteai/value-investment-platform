@@ -1,5 +1,5 @@
 
-[PART 16/35]
+[PART 16/36]
 
 
 ===== SOURCE: contracts/evaluation-input-manifest.schema.json =====
@@ -1390,6 +1390,6 @@
   "title": "Immutable seal input manifest; all input classes or explicit quality gaps"
 }
 
-[END PART 16/35]
+[END PART 16/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

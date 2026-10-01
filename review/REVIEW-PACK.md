@@ -8,8 +8,8 @@
 
 | 文件 | SHA-256 |
 |---|---|
-| `README.md` | `f022bf7d7ebdf09efdfec7e361c188396eb9388e4144dc9c8d12a477e6fda0df` |
-| `PROJECT.md` | `6cd9df6156d7f89092ba5e845b13ad7ddbe481e4c3711c078242034deba09a98` |
+| `README.md` | `387f6cd2f73d6ebdb6fd4f471050bd5da8a9d98ca7cd4acdfd2be7ef68bce6e1` |
+| `PROJECT.md` | `75525aa0ef34f0d281fe082b451dc39c44c5a7384aaf0bf7804114788f5781e8` |
 | `CONTEXT.md` | `2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6` |
 | `AGENTS.md` | `93ae52e67ec01a89a038cb97fa99de92c5540c2d25b41d321b8ecfe355e01ffe` |
 | `docs/01-product-requirements.md` | `a2b196962b3cd2609313bb5d5f5b32af7a21a5d41fd8511c28a356d441c3192a` |
@@ -17,17 +17,17 @@
 | `docs/03-architecture.md` | `781d694744a424bd4f8ff30548007cecb9c23d734cc2b6d2cb236ed2fbed1555` |
 | `docs/04-data-design.md` | `af36e7e8b94b278ea902ffff8cc3a128e848fc4516ac4c7acfc0cce71cc041f5` |
 | `docs/05-api-and-jobs.md` | `6d2fc81783f63efad8d707332f9d38f9e137bde8d08ef4f001c841efded1c201` |
-| `docs/06-ux-and-design-system.md` | `555ec714d96dd9cba10f0c56b0eede10572bdf0e85caa6db333ad8c33aab772b` |
+| `docs/06-ux-and-design-system.md` | `f2279bf21b686c46186dc731d83e362279528d5f5d4e6958f2670fa28a5a0762` |
 | `docs/07-ai-and-retrieval.md` | `4fc3d8376d898097822de412fc9d12ccebe0615a8a5898fe2ab0e58a01732832` |
 | `docs/08-security-and-operations.md` | `0baad6b8d56280e7127ce447d88f2e1406657e9c273e2d04a7dc25efd2d847c1` |
 | `docs/09-delivery-plan.md` | `8f4e5f2bb8f50d55d39f9b3f168f907cd5ab4a5bdd7882b0c06c3c751359319d` |
 | `docs/10-acceptance.md` | `007d0b405b4d3362cb5d8ef658e978a7d312bda1ed464a65e3561dfd04114c6b` |
 | `docs/11-templates-automation-and-roles.md` | `771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de` |
 | `docs/12-time-numerics-and-corrections.md` | `f20e925241f802a4ff428e7e89c366e17fb289bae45c0b3ce4827b95b6ea402e` |
-| `docs/13-first-slice.md` | `ebe5000098fa5d5ed76944b444a53cec8f696b23d2e49bd136a2895d13ca3054` |
+| `docs/13-first-slice.md` | `40542d2dde0f2f696c00e3798caf34c8fd56fc761a25cafa93716c10363205d2` |
 | `docs/14-domain-and-business-flows.md` | `24af2cc30a801d5575c9dfe11e4e1003c5583988f18c265b771c3a994a437724` |
 | `docs/15-database-dictionary.md` | `b563349820d4980887f9fd94cc8db0bfe6037f712f1e297cfd730b317a59b656` |
-| `docs/16-prototype-and-design-trace.md` | `0e81d830c7f566bbd6d8eecc5c3f2cbd0d925ffed7cffbbc1bd3895888aa3430` |
+| `docs/16-prototype-and-design-trace.md` | `8b6d37bede760407e78451c1d39c27b276f003b75723460f1428ad435369701c` |
 | `docs/adr/0001-architecture-and-truth.md` | `12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1` |
 | `docs/adr/0002-v02-confirmed-scope.md` | `134096110f0001c303549952ee39c1ef3d6aedc21affbc11a44fc8e6391b36f4` |
 | `docs/adr/0003-independent-project.md` | `241b8b464274ab2039d9ee7d6180db5d54c905cab842013286e4017021a9ddf6` |
@@ -67,29 +67,30 @@
 | `examples/v03-seal-command.json` | `c0ee61356183a80dc7b2f7106f460a2b4cade701198dda32470ae56d0d1d4ce4` |
 | `examples/v03-seal-manifest.json` | `b94233fdea35bf8c64966278ae6e052f4c6ab5ad222e3ddbcdc00b905f94337f` |
 | `examples/v03-template-custom.json` | `223f0d3a2d074afa5a2b87c62b10e60a6be0ce1bd834a01088c6ce930394e44c` |
-| `tools/build_review_pack.py` | `70a395df020b33efe0b38b34ee0d73dea551a68edb17aa05be92fab1d8cee819` |
+| `tools/build_review_pack.py` | `89ea1f666c2a14f69e220da6183ab3d4a14838da1de8b1ce64c04d5b3425c1ac` |
 | `tools/material_schema.py` | `f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a` |
 | `tools/render_database_design.py` | `639ecd353dbb8a658bc70e72d2a3708665638fa45efe4b7500806f1b01b21b85` |
 | `tools/v03_material_checks.py` | `c547b5ebfbe35a73f320f0f3d7af0fcd374cb5a5d1ed4792419e7a21a017def5` |
-| `tools/validate_design.py` | `90b04c3c4d2d753aa32b8d44ad365f0aa99733cedee85988ceb70f78ff610705` |
-| `tools/verify_prototype.cjs` | `d34a6f27e2391b59e3ce6da3b39c748725521a7f639c15213a0cd282ce21766c` |
+| `tools/validate_design.py` | `5cf61bed7eb4f864a82c9e59ed8eae310e2d9a3c649f06385b54203351c42b12` |
+| `tools/verify_prototype.cjs` | `e6ab0308390b38b229d224d3a74928f20d4b7969ee51cb8601d1ded87ffea81e` |
 | `design/database-catalog.json` | `b85ff91783413e915375c1f0840b4c896b701f3090736c48261ab142504c2cfb` |
 | `design/database-dictionary-intro.md` | `2af6bc6cdce9002533f0931742960cde6cf9dcd582b7dfd28fe5d6e88f584795` |
 | `prototype/index.html` | `429897f22ab455f8f432e7588df21ff980b62e023be27c15dfe0bee3ea0a9953` |
 | `prototype/style.css` | `db431672057b2dd2559a14aab27be687763089a4fc0d118b8afa6e07a1c2778c` |
-| `prototype/app.js` | `c71424718aa65b197225a8fec23a0737d62df121245fda2bc514e255658dafee` |
-| `prototype/README.md` | `495ed88258fa6c01c776e50127b6f72ea76f43ac945e641c69d609477d8b4148` |
-| `review/GPT-PRO-PROMPT.md` | `94e6ecf0eaff2f9911687d2971a5f18d2186109293c92a74137919f4603e88fc` |
+| `prototype/app.js` | `4e500c2a50dd9efe0287af2b10c293855c54c248229cfe70596bada6651fc09e` |
+| `prototype/README.md` | `eb9e2c3328ac8c53b731a80db31f7c80e8c3075c18dab1eddce55121cd6d515a` |
+| `review/GPT-PRO-PROMPT.md` | `7a80e2f4b1935a574b0b4693157faa5871be1b91b360d8afa190c8b33558b7d6` |
 | `review/V02-CHANGELOG.md` | `2a09c862a2a27be6916dde8c0640c0395d3da8c3438fb6626212c72931449c74` |
-| `review/V03-CHANGELOG.md` | `1c15e883df7039a76ffb2dc76fd6cca6934cfbba49cf6868093f74931b42a39a` |
+| `review/V03-CHANGELOG.md` | `620f26c247cbfcafe5f61429d4dd3dd30b0cc9e944302f902b2fd91931442870` |
 | `review/V03-COUNTEREXAMPLES.md` | `4254abb3693806a197e6c61eeb99d13e3b8b5161c656c448be8b0c871ff5f1e0` |
-| `review/DESIGN-DETAIL-REVIEW.md` | `8fdaa7784905ae51584f5d2c28c4bdd7e65e9fb92c197a7a7850897a716f57a2` |
+| `review/DESIGN-DETAIL-REVIEW.md` | `49450c5343acde16e0db523a3ef893c2f725d3d8dae8aa3df7cce749ba72c1ba` |
 | `review/USABILITY-REVIEW.md` | `3fdb0e7ec9b6d4211a694e09bdf0681896defabade7bd3d05cd1e9666517a27e` |
-| `review/USABILITY-FIXES.md` | `1f8813b9f2ff507f87785b44649de191e488aba34b6ae555b282591b30e1cfa7` |
+| `review/USABILITY-FIXES.md` | `f5ae9cd6b8d7717bc682369426f81f15dcec8ae02518b553582a0a466c5136dc` |
+| `review/GPT-PRO-FINAL-DISPOSITION.md` | `1ae430ed2f3755450168f1f227c8381ad619bca14aa4ece4df587dabe7239d31` |
 | `review/ROUND-2-PROBES.json` | `21ba6524d0eb64be080f1228cd30604ee273eb0c8fd4ff3bad2b5a97b10a7c06` |
 | `review/ROUND-2-REQUEST.md` | `16428226f55645ab15a8ad6a3dfa816082f575628bb66bfecb7dcd1b04b14f3e` |
 | `review/ROUND-2-REVIEW.md` | `5847ea4e5c800f163131107d52f50a50cbe907518076cedb7746cc6c32f8b894` |
-| `review/validation-result.json` | `8399742964fc1a886a28e9ead828030aa4280e52a3afed95247b53b4c7dadd52` |
+| `review/validation-result.json` | `8d4d3306665b72d378f43d25891d4020b5f3365e4282d61190afccd1ab638049` |
 
 
 ---
@@ -169,7 +170,7 @@ python3 tools/build_review_pack.py
 
 设计细化入口：[本地交互原型](./prototype/index.html)、[字段目录](./design/database-catalog.json)、[本轮核对记录](./review/DESIGN-DETAIL-REVIEW.md)。原型浏览器交互检查与材料检查分别记录，不冒充产品或目标用户验收。
 
-可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审尚未执行，产品仍未开发。
+可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
 
 ---
@@ -184,7 +185,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审提示已按业务闭环/UI重点准备，终审尚未执行。原v0.2评审/probes保持历史记录。GPT Pro独立复审为可选复核，尚未执行，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。随后按页面反馈补上新闻资讯/逐篇原文、真实公司名称案例与通俗文案，仍属于本地设计原型。可理解性独立评审已完成，本轮按8项问题重排用户阅读路径，处置见review/USABILITY-FIXES.md；GPT Pro终审已取得并核对，本轮修正历史依据、新值显示和策略版本三项问题，处置见review/GPT-PRO-FINAL-DISPOSITION.md。v0.3设计可收口，进入后续开发准备，未启动W-08。原v0.2评审/probes保持历史记录；不要求追加评审，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -930,6 +931,8 @@ T-UX-01增加完成+0.8→−0.2及grade3→1替换的任务样本；T-UX-02增�
 
 原文写业务资料，系统/人工判断和测试目的独立展示；不以“收入尚未实现”自动推出负面判断。本例原文额外提供延期库存/资金占用成本，允许研究者对偏正面的系统判断提出有依据的修正；分数仍为固定演示。手机首屏先出现结论与A股缺价，身份演示设置折叠但保持可访问。正常阅读不需学习内部状态机。尚未执行5名真实用户的计时/理解测试，不将本次改动宣称用户验收通过。
 
+终审局部修正：评分/估值的“当时依据”必须符合该快照的发布时间与取得时间，后来更新单列；新值采用一个明确输入，避免摘要与输入矛盾。策略发布后的当前版本/门槛与结果所属版本一致，新结果未生成时显示等待，旧结果独立标版本和日期；草稿编辑不热改已发布值。见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)，不新增审批或产品验收门槛。
+
 
 ---
 
@@ -1506,6 +1509,16 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 ## 7. 设计细化输入
 
 实施前使用[14流程/模型](./14-domain-and-business-flows.md)、[15字段候选](./15-database-dictionary.md)、[16原型连接](./16-prototype-and-design-trace.md)交接。本地原型已可演示，但不是本任务书的可运行产品，既有T-01…43与T-UX预期不因原型通过而签收。
+
+## 8. 终审补入的三条用户路径预期
+
+并入现有时间/覆盖/策略/UX验收，不增加切片范围或评审门槛：
+
+- 历史依据：09-29评分和估值只能打开符合该快照发布时间/系统取得边界的原文；09-30后来更新单列，不能替换当时依据。R-02/05/06/08，T-08/10/30。
+- 单项修改：+0.8→−0.2及档位3→1的输入与保存回读一致；避免重复的新值显示互相矛盾。人工判断生效和评分/A-H结果等待分开。R-05/09/16，T-27/39、T-UX-01。
+- 策略发布：70→75后当前版本、已发布门槛与结果所属版本一致；新结果未生成就显示等待，旧结果明确版本/日期；继续编辑草稿不改变已发布值。R-07/08/09，T-12/13、T-UX-03。
+
+具体经营维度基础/事件贡献和价格/财务分母到估值分的解释，沿用02/05的既有明细合同，在开发切片形成真实结果后展示；不是再次修改全套设计的前置。终审与原型修正证据见[处置记录](../review/GPT-PRO-FINAL-DISPOSITION.md)，不冒充上述产品验收通过。
 
 
 ---
@@ -3517,6 +3530,12 @@ erDiagram
 本轮成果足以对照流程、字段和主用户路径；实现选型时再落实PG版本/迁移、生成类型合同及cutoff提交可见性协议，沿用原T预期。无需为了可选平台或新增全量评审暂停设计收口。
 
 本轮可理解性8项处置与剩余验证见[USABILITY-FIXES](../review/USABILITY-FIXES.md)，历史评审固定在ca4167d。GPT Pro终审提示以业务闭环/界面友好为主，不重复全部防御性工程评审；提示词已准备不代表终审已执行。
+
+## 6. GPT Pro终审后的三项局部修正
+
+09-29固定评分/A-H估值使用历史财务原文`byd-report-historical`（09-27发布/取得）；09-30的`byd-report`仍在新闻中作为后来更新。评分页后续订单/资本配置判断不作为该旧评分输入。修改区保留当前有效值和唯一的新值输入，去除重复新值摘要。策略发布固定版本/门槛，新评估等待，固定旧结果明确归发布1；公司研究对照也标发布1。发布新模板不强制更新旧策略。
+
+三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
 
 
 ---
@@ -9686,7 +9705,7 @@ ROOT = Path(__file__).resolve().parents[1]
 paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
 for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
     paths.extend(sorted(ROOT.glob(pattern)))
-paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md"])
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md", ROOT / "review/USABILITY-REVIEW.md", ROOT / "review/USABILITY-FIXES.md", ROOT / "review/GPT-PRO-FINAL-DISPOSITION.md"])
 paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
 if (ROOT / "review/validation-result.json").exists():
     paths.append(ROOT / "review/validation-result.json")
@@ -9716,7 +9735,7 @@ all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + 
 # Focused final review keeps the business/UI path readable. Full engineering pack remains optional.
 final_names = [
     "PROJECT.md", "README.md", "AGENTS.md", "CONTEXT.md",
-    "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md",
+    "review/USABILITY-REVIEW.md", "review/USABILITY-FIXES.md", "review/GPT-PRO-FINAL-DISPOSITION.md",
     "docs/01-product-requirements.md", "docs/06-ux-and-design-system.md",
     "docs/11-templates-automation-and-roles.md", "docs/12-time-numerics-and-corrections.md",
     "docs/13-first-slice.md", "docs/14-domain-and-business-flows.md", "docs/16-prototype-and-design-trace.md",
@@ -9755,7 +9774,7 @@ help_text = """# 不附文件的 GPT Pro 评审方式
 
 ## 备用：正文粘贴
 
-没有 GitHub 读取能力时，优先打开 [FINAL-REVIEW-PASTE.txt](./FINAL-REVIEW-PASTE.txt)，复制全部正文发给 GPT Pro，已含提示词与本轮业务/UI核心材料、旧独立评审和逐项处置。无截图像素时应明确视觉检查未执行；纯文本可评审业务、文案和导航。GPT Pro终审尚未执行。
+没有 GitHub 读取能力时，优先打开 [FINAL-REVIEW-PASTE.txt](./FINAL-REVIEW-PASTE.txt)，复制全部正文发给 GPT Pro，已含提示词与本轮业务/UI核心材料、旧独立评审和逐项处置。无截图像素时应明确视觉检查未执行；纯文本可评审业务、文案和导航。GPT Pro终审已取得，三项处置见 [终审记录](./GPT-PRO-FINAL-DISPOSITION.md)，本入口保留为按需复核材料，不要求再次评审。
 
 完整工程上下文按需查 [REVIEW-PACK.md](./REVIEW-PACK.md) 或 [PASTE-ALL.txt](./PASTE-ALL.txt)，无需把全部工程材料列为本轮终审前置。全文已有提示词，无需另发提示词或附件。
 
@@ -10243,7 +10262,7 @@ for d,v in scoring['dimension_policies'].items():
 
 # Hash primary inputs only. Derived packs/paste files and report do not participate in self-referential hashes.
 sources=[]
-for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
+for pattern in ['README.md','PROJECT.md','CONTEXT.md','AGENTS.md','docs/*.md','docs/adr/*.md','research/*.md','config/*.json','contracts/*.md','contracts/*.json','examples/*.json','tools/*.py','tools/*.cjs','design/*.json','design/*.md','prototype/*.html','prototype/*.css','prototype/*.js','prototype/*.md','review/DESIGN-DETAIL-REVIEW.md','review/USABILITY-REVIEW.md','review/USABILITY-FIXES.md','review/GPT-PRO-FINAL-DISPOSITION.md','review/GPT-PRO-PROMPT.md','review/V02-CHANGELOG.md','review/V03-CHANGELOG.md','review/V03-COUNTEREXAMPLES.md','review/ROUND-2-*']:sources+=sorted(ROOT.glob(pattern))
 sources=sorted(set(sources))
 for p in sources:check(not re.search(r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}',p.read_text()),f'Targeted credential-pattern scan: {p.relative_to(ROOT)}')
 revision=current_revision()
@@ -10295,7 +10314,7 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
  });
  await check('PD-UI-05','策略模拟→编辑使旧预览失效→再次模拟→发布',async()=>{
   await role('strategy_manager');await route('strategy');await strategyEdit();await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),1);
-  await page.locator('#strategy-threshold').selectOption('75');assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),0);await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.match(await text(),/规则变更/);await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();assert.match(await text(),/演示发布 2/);
+  await page.locator('#strategy-threshold').selectOption('75');assert.equal(await page.getByRole('button',{name:'确认发布新版本',exact:true}).count(),0);await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();assert.match(await text(),/规则变更/);await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();assert.match(await text(),/当前规则 · 发布2/);assert.match(await page.locator('#current-strategy').innerText(),/经营分至少75/);
  });
  await check('PD-UI-06','模板龄期/事件参与，旧预览失效，研究员不能发布',async()=>{
   await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();await page.locator('#template-age').selectOption('180');assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).count(),0);await page.locator('#event-mode').selectOption('disabled');assert.match(await text(),/不额外计算事件影响/);await role('researcher');await route('templates');await page.getByRole('button',{name:'模拟与差异预览',exact:true}).click();assert.equal(await page.getByRole('button',{name:'发布新模板版本',exact:true}).isDisabled(),true);
@@ -10363,6 +10382,27 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
  await check('PD-UX-07','按明确的A/H证券关注，不把公司按钮默认到A股',async()=>{await reset();await route('company/a');await page.getByRole('button',{name:'关注 港股 01211',exact:true}).click();await route('watchlist');assert.match(await text(),/002594/);assert.match(await text(),/01211/);await page.locator('[data-action="unwatch-a-h"]').click();assert.doesNotMatch(await text(),/01211/);assert.match(await text(),/002594/);});
  await check('PD-UX-08','手机首屏先出现当前结论与A股缺价，不被大分数遮蔽',async()=>{await reset();await page.setViewportSize({width:390,height:844});await route('company/a');const mainConclusion=await page.locator('.research-summary h2').boundingBox();const aStatus=await page.locator('[data-security-id="a-a"] .badge').boundingBox();const score=await page.locator('.score-number').boundingBox();assert.ok(mainConclusion.y+mainConclusion.height<844);assert.ok(aStatus.y+aStatus.height<790);assert.ok(aStatus.y<score.y);await page.setViewportSize({width:1440,height:1000});});
  await reset();
+ await check('PD-FINAL-01','历史评分和A/H估值绑定当时财务原文，后来披露不回填',async()=>{
+  await route('company/a');await page.getByRole('button',{name:'评分解释',exact:true}).click();assert.match(await text(),/2026-09-29 的评分依据/);assert.match(await text(),/收盘后取得/);
+  await page.getByRole('link',{name:'阅读当时财务原文',exact:true}).click();await page.waitForSelector('[data-evidence-id="byd-report-historical"]');
+  const old=await page.evaluate(()=>historicalFinancial);assert.ok(old.published<='2026-09-29 15:00');assert.ok(old.observed<='2026-09-29 16:00');assert.match(await text(),/固定依据/);
+  await page.getByRole('link',{name:'返回刚才的列表',exact:true}).click();await page.waitForSelector('.score-explainer');await page.getByRole('link',{name:'查看9月30日后来更新',exact:true}).click();await page.waitForSelector('[data-evidence-id="byd-report"]');assert.match(await text(),/9月30日后来更新，未参与09-29评分/);
+  for(const security of ['a-a','a-h']){await route('company/a');await page.getByRole('button',{name:'证券估值',exact:true}).click();await page.locator('[data-action="valuation-'+security+'"]').click();await page.getByRole('link',{name:'阅读当时财务原文',exact:true}).click();await page.waitForSelector('[data-evidence-id="byd-report-historical"]');}
+ });
+ await check('PD-FINAL-02','修改只保留一个新值输入，影响和档位保存回读一致',async()=>{
+  await reset();await route('decisions/a');await edit();assert.equal(await page.locator('.value-box').count(),1);assert.doesNotMatch(await text(),/准备修改为/);
+  await page.locator('#replacement').fill('-0.2');await page.locator('#reason').fill('延期增加库存和资金占用成本。');assert.equal(await page.locator('#replacement').inputValue(),'-0.2');await page.getByRole('button',{name:'保存人工覆盖',exact:true}).click();assert.equal(await page.locator('.value-box strong').innerText(),'-0.2');assert.match(await text(),/人工判断：对盈利偏负面/);
+  await page.getByRole('button',{name:'评分档位',exact:true}).click();await edit();await page.locator('#grade').selectOption('1');assert.equal(await page.locator('.value-box').count(),1);await page.locator('#reason').fill('按资本配置原文选择档位1。');await page.getByRole('button',{name:'保存人工覆盖',exact:true}).click();assert.equal(await page.locator('.value-box strong').innerText(),'1');
+  await route('company/a');assert.equal(await page.locator('.score-number').innerText(),'—');await route('strategy');assert.match(await page.locator('[data-candidate-id="a-a"]').innerText(),/等待评估/);
+ });
+ await check('PD-FINAL-03','70→75发布后门槛/版本一致，新结果等待，旧结果保持发布1',async()=>{
+  await reset();await route('strategy');await strategyEdit();await page.locator('#strategy-threshold').selectOption('75');assert.match(await page.locator('#current-strategy').innerText(),/经营分至少70/);await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();
+  assert.match(await page.locator('.page-header .badge').innerText(),/发布2/);const current=await page.locator('#current-strategy').innerText();assert.match(current,/经营分至少75/);assert.match(current,/新规则等待评估/);assert.match(current,/评估结果尚未生成/);assert.doesNotMatch(current,/经营分至少70/);
+  assert.match(await page.locator('[data-result-release="1"]').innerText(),/发布1历史结果/);assert.match(await page.locator('[data-result-release="1"]').innerText(),/只供回看，不是新规则的结果/);
+  await strategyEdit();await page.locator('#strategy-threshold').selectOption('70');assert.match(await page.locator('#current-strategy').innerText(),/经营分至少75/);assert.match(await page.locator('.page-header .badge').innerText(),/发布2/);
+  await page.getByRole('link',{name:'查看发布1历史依据',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#main').dataset.route==='#change/enter');assert.match(await text(),/发布 1/);assert.match(await text(),/72.0 ≥ 70/);
+ });
+ await reset();
  await check('PD-UI-11','状态演示：加载/空/部分失败/不可见/等待/更新/停牌',async()=>{
   for(const scenario of ['loading','empty','partial','permission','missing','updated','suspended','normal']){await page.locator('#scenario').selectOption(scenario);assert.ok((await text()).length>80);}
   await route('decisions/a');await page.locator('#scenario').selectOption('missing');assert.match(await text(),/重算等待|等待/);await page.locator('#scenario').selectOption('normal');
@@ -10375,7 +10415,7 @@ const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(path.join(root,
  }
  await check('PD-UI-12','键盘可进入搜索与表单，dialog Escape可关闭',async()=>{await reset();await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>document.activeElement!==document.body));await route('decisions/a');await edit();await page.locator('#reason').focus();await page.keyboard.type('键盘输入的理由');assert.match(await page.locator('#reason').inputValue(),/键盘输入/);await route('evidence');await page.getByRole('button',{name:'演示证据不可访问'}).click();await page.keyboard.press('Escape');assert.equal(await page.locator('#dialog').evaluate(d=>d.open),false);});
  await check('PD-UI-13','浏览器无页面脚本错误、原型未尝试HTTP外发',async()=>{assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);});
- await reset();await page.setViewportSize({width:1440,height:1000});await page.evaluate(()=>{document.querySelector('#toast').style.display='none';document.querySelector('.demo-settings').open=false;});await page.screenshot({path:path.join(root,'review/design-detail/desktop-changes.png'),fullPage:true});await route('news');await page.screenshot({path:path.join(root,'review/design-detail/desktop-news.png'),fullPage:true});await route('evidence/byd-order');await page.screenshot({path:path.join(root,'review/design-detail/desktop-original.png'),fullPage:true});await route('company/a');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-company.png'),fullPage:true});await route('strategy');await page.screenshot({path:path.join(root,'review/design-detail/desktop-strategy.png'),fullPage:true});await route('decisions/a');await page.screenshot({path:path.join(root,'review/design-detail/desktop-judgment.png'),fullPage:true});await route('templates');await page.screenshot({path:path.join(root,'review/design-detail/desktop-template.png'),fullPage:true});
+ await reset();await page.setViewportSize({width:1440,height:1000});await page.evaluate(()=>{document.querySelector('#toast').style.display='none';document.querySelector('.demo-settings').open=false;});await page.screenshot({path:path.join(root,'review/design-detail/desktop-changes.png'),fullPage:true});await route('news');await page.screenshot({path:path.join(root,'review/design-detail/desktop-news.png'),fullPage:true});await route('evidence/byd-order');await page.screenshot({path:path.join(root,'review/design-detail/desktop-original.png'),fullPage:true});await route('company/a');await page.getByRole('button',{name:'新闻资讯',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-company.png'),fullPage:true});await route('strategy');await page.screenshot({path:path.join(root,'review/design-detail/desktop-strategy.png'),fullPage:true});await route('decisions/a');await page.screenshot({path:path.join(root,'review/design-detail/desktop-judgment.png'),fullPage:true});await edit();await page.locator('#replacement').fill('-0.2');await page.screenshot({path:path.join(root,'review/design-detail/desktop-judgment-edit.png'),fullPage:true});await route('company/a');await page.getByRole('button',{name:'评分解释',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-score-evidence.png'),fullPage:true});await route('strategy');await strategyEdit();await page.locator('#strategy-threshold').selectOption('75');await page.getByRole('button',{name:'固定时点模拟',exact:true}).click();await page.getByRole('button',{name:'确认发布新版本',exact:true}).click();await page.screenshot({path:path.join(root,'review/design-detail/desktop-strategy-published.png'),fullPage:true});await reset();await route('templates');await page.screenshot({path:path.join(root,'review/design-detail/desktop-template.png'),fullPage:true});
  const mobile=await browser.newPage({viewport:{width:390,height:844}});await mobile.goto('file://'+path.join(root,'prototype/index.html')+'#company/a');await mobile.evaluate(()=>document.fonts.ready);await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-company.png'),fullPage:true});await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-first-screen.png')});await mobile.evaluate(()=>location.hash='news');await mobile.waitForSelector('#news-company');await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-news.png'),fullPage:true});await mobile.evaluate(()=>location.hash='evidence/byd-order');await mobile.waitForSelector('[data-evidence-id="byd-order"]');await mobile.screenshot({path:path.join(root,'review/design-detail/mobile-original.png'),fullPage:true});await mobile.close();
  }catch(e){console.error(e.message);process.exitCode=1;}finally{
   if(browser)await browser.close();const report={scope:'Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance',executed_at:executedAt,revision_at_run:cp.execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),status:results.some(r=>r.status==='failed')||process.exitCode?'failed':'passed',browser:browserPath||'Playwright default',viewport_widths:[1440,1280,390,430],checks:results,console_errors:errors,external_requests:externalRequests,source_sha256:Object.fromEntries(['prototype/index.html','prototype/style.css','prototype/app.js','tools/verify_prototype.cjs','config/scoring-standard-v1.json','config/templates-standard-v1.json','config/rubrics-standard-v1.json'].map(p=>[p,hash(p)])),not_run:['Product database/API/workers','Actual authorization and permission enforcement','Decimal scoring/template resolution/strategy calculation','5-user timed UX acceptance','Screen-reader/200% browser zoom/real devices']};fs.writeFileSync(path.join(root,'review/design-detail/prototype-checks.json'),JSON.stringify(report,null,2)+'\n');console.log(report.status,results.length,'prototype checks');
@@ -17454,7 +17494,7 @@ const link=(route,text)=>`<a href="#${route}">${text}</a>`;
 const roles={viewer:['research.read'],researcher:['research.read','analysis.override','template.edit'],strategy_manager:['research.read','template.edit','template.publish','strategy.publish'],data_admin:['research.read','source.manage','job.retry','identity.manage','quality.correct'],system_admin:['role.assign','model.configure','audit.read','ops.read']};
 roles.lead=[...new Set([...roles.researcher,...roles.strategy_manager])];
 let state;
-const initial=()=>({mode:'business',role:'lead',scenario:'normal',company:'a',tab:'timeline',market:'all',newsCompany:'all',newsType:'all',newsPeriod:'all',evidenceReturn:'news',changeType:'all',query:'',watch:['a-a'],note:'',decisionKind:'impact',strategyEditing:false,editDecision:false,replacement:'0.8',reason:'',judgmentStatus:'auto',generation:3,decisionOriginal:'+0.8',grade:'1',decisionRecords:{impact:{value:'+0.8',status:'auto',generation:3},rubric:{value:'3',status:'auto',generation:2},risk:{value:'已接受，仅虚构H股挂牌',status:'auto',generation:1}},templateAge:'90',eventMode:'enabled',templateDraft:false,templatePreview:false,templatePublished:false,strategyThreshold:'70',strategyPreview:false,strategyPublished:false,sourcePaused:false,imported:false,jobRecovered:false,roleChanges:false,correctionAdded:false});
+const initial=()=>({mode:'business',role:'lead',scenario:'normal',company:'a',tab:'timeline',market:'all',newsCompany:'all',newsType:'all',newsPeriod:'all',evidenceReturn:'news',changeType:'all',query:'',watch:['a-a'],note:'',decisionKind:'impact',strategyEditing:false,editDecision:false,replacement:'0.8',reason:'',judgmentStatus:'auto',generation:3,decisionOriginal:'+0.8',grade:'1',decisionRecords:{impact:{value:'+0.8',status:'auto',generation:3},rubric:{value:'3',status:'auto',generation:2},risk:{value:'已接受，仅虚构H股挂牌',status:'auto',generation:1}},templateAge:'90',eventMode:'enabled',templateDraft:false,templatePreview:false,templatePublished:false,strategyThreshold:'70',strategyPreview:false,strategyPublished:false,strategyVersion:1,publishedStrategyThreshold:'70',sourcePaused:false,imported:false,jobRecovered:false,roleChanges:false,correctionAdded:false});
 state=initial();
 const companies={a:{name:'比亚迪',sector:'汽车制造',quality:'72.0',coverage:'100%',securities:[{id:'a-a',name:'002594',market:'A 股',currency:'CNY',v:'68.0',price:'12.40',state:'今日缺价，待评估',tone:'amber'},{id:'a-h',name:'01211',market:'港股',currency:'HKD',v:'45.0',price:'18.60',state:'暂未入选',tone:'gray'}]},b:{name:'格力电器',sector:'家用电器',quality:'76.0',coverage:'100%',securities:[{id:'b-a',name:'000651',market:'A 股',currency:'CNY',v:'64.0',price:'16.20',state:'已符合1天，还需1天',tone:'blue'}]}};
 companies.a.dimensions=[['profit_quality','盈利质量','76.0','0.35'],['financial_resilience','财务韧性','75.0','0.20'],['business_model','商业模式','70.0','0.25'],['governance','治理与资本配置','65.0','0.15'],['growth_sustainability','成长持续性','63.0','0.05']];
@@ -17466,6 +17506,9 @@ const information=[
  {id:'byd-order',company:'a',type:'announcement',source:'公司公告 · 演示',published:'2026-09-29 15:55',observed:'2026-09-29 16:40',occurred:'2026-09-28（仅日期）',event:'订单安排',title:'比亚迪：订单交付与验收安排（演示）',summary:'订单增加了业务机会，但执行条件仍需要关注，不能直接等同于利润增长。',judgment:'系统已判断，可由研究员修改',paragraphs:['以下订单安排完全虚构，仅借比亚迪名称帮助理解页面，不代表公司的真实经营消息。','订单以分期执行和客户验收为条件，尚不能确认全部转化为利润。客户可以调整交付计划，公司需先行备货，延期可能增加库存和资金占用成本。','公司表示，该订单增加了业务机会；收入将在交付并验收后按实际进度确认，最终回报还取决于执行成本。'],highlight:1},
  {id:'gree-report',company:'b',type:'announcement',source:'公司公告 · 演示',published:'2026-09-28 18:00',observed:'2026-09-28 18:10',occurred:'报告期截至2026-06-30（仅日期）',event:'财务资料更新',title:'格力电器：半年经营与现金流摘要（演示）',summary:'结合盈利、现金流和资本配置阅读财报，再查看A股估值与入选条件。',judgment:'资料已整理，尚无单独事件影响判断',paragraphs:['这是一份本地虚构财务资料，使用格力电器名称说明研究流程，不是公司真实公告。','演示财务指标为：净资产收益率12.0%，近三年经营现金流与净利润合计之比0.96，净债务与EBITDA之比1.20。指标均为固定演示数值。','报告中的财务指标采用同一合并范围，现金流和净利润按三年合计比较；管理层说明了投入计划及资金安排。'],highlight:1}
 ];
+// Frozen evidence for the 09-29 snapshot; later disclosures never replace this link.
+const historicalFinancial={id:'byd-report-historical',company:'a',type:'announcement',source:'公司公告 · 演示',published:'2026-09-27 14:00',observed:'2026-09-27 14:10',occurred:'报告期截至2026-06-30（仅日期）',event:'09-29评分使用的财务资料',title:'比亚迪：09-29评分的当时财务依据（演示）',summary:'固定保留当时已取得的财务资料，后来更新单独阅读。',paragraphs:['这是一份虚构财务公告，借比亚迪名称说明历史依据，不是公司的真实资料。','演示指标：净资产收益率12.0%，近三年经营现金流与净利润合计之比0.96，净债务与EBITDA之比1.20。指标均为虚构，使用相同合并范围与报告期间。','资本配置资料披露了投资与资金安排。本版本在9月27日已取得，供9月29日固定评分和A/H估值引用；9月30日的新资料另行保留，不替换本版本。'],highlight:1};
+const scoreEvidence={a:'byd-report-historical',b:'gree-report'};
 const riskEvidence={id:'risk-example',company:null,type:'announcement',source:'虚构监管材料 · 演示',published:'2026-09-30 10:00',observed:'2026-09-30 10:10',occurred:'2026-09-30 09:00',event:'挂牌风险演练',title:'虚构公司：仅H股挂牌退市决定（演练）',summary:'独立虚构案例，不对应真实公司。',judgment:'仅影响虚构H股挂牌',paragraphs:['这是一份完全虚构的监管材料，演示公司和SYN-H证券均非真实对象。','决定仅指向虚构SYN-H主要挂牌，没有指向同公司A股证券。风险只影响这一挂牌；解除此风险不自动解除另一条公司级风险。','本案例与比亚迪、格力电器无关，仅用于保留风险作用范围与人工修正的设计检查。'],highlight:1};
 const evidenceLink=(id,label)=>`<a href="#evidence/${id}" data-action="open-evidence-${id}">${label}</a>`;
 const articleOrder=(items)=>[...items].sort((a,b)=>b.published.localeCompare(a.published)||a.id.localeCompare(b.id));
@@ -17484,9 +17527,9 @@ function securityConclusion(security){
 }
 function securityCard(sec){const d=securityConclusion(sec);return `<div class="security-card" data-security-id="${sec.id}"><div class="toolbar"><strong>${sec.market} ${sec.name}</strong>${badge(d.label,d.tone)}</div><p>${d.reason}</p><small>${d.date}</small><div class="actions">${sec.id==='a-a'?link('change/missing','查看缺价说明'):sec.id==='a-h'?btn('查看估值依据','open-valuation-'+sec.id,'text-button'):link('strategy','查看入选规则')}${btn((state.watch.includes(sec.id)?'已关注':'关注')+' '+sec.market+' '+sec.name,'watch-'+sec.id,'text-button')}</div></div>`;}
 function researchSummary(id){
- const c=companies[id];return `<section class="research-summary" data-company-summary="${id}"><div><span class="quiet">标准价投规则 · 演示资料截至09-30</span><h2>${pendingResearch(id)?'研究判断已修改，等待新的评分和评估':id==='a'?'经营评分达到要求，A股今天暂时无法评估':'经营评分达到要求，A股还需一个交易日确认'}</h2><p>${pendingResearch(id)?'当前先核对已保存的判断；旧结果不会作为新判断的计算结果。':id==='a'?'订单提供业务机会，收入仍需交付和验收。先查看A股缺价原因，再回到订单依据。':'财务资料可继续阅读。股票最近已符合一次规则，尚未正式入选。'}</p></div><div class="actions">${pendingResearch(id)?decisionLink('查看已保存的判断'):id==='a'?link('change/missing','查看今天的缺价说明'):scoreLink(id,'查看经营评分依据')}${id==='a'?evidenceLink('byd-order','阅读订单原文'):evidenceLink('gree-report','阅读财务原文')}</div></section>`;
+ const c=companies[id];return `<section class="research-summary" data-company-summary="${id}"><div><span class="quiet">标准价投规则 · 发布1 · 演示资料截至09-30</span><h2>${pendingResearch(id)?'研究判断已修改，等待新的评分和评估':id==='a'?'经营评分达到要求，A股今天暂时无法评估':'经营评分达到要求，A股还需一个交易日确认'}</h2><p>${pendingResearch(id)?'当前先核对已保存的判断；旧结果不会作为新判断的计算结果。':id==='a'?'订单提供业务机会，收入仍需交付和验收。先查看A股缺价原因，再回到订单依据。':'财务资料可继续阅读。股票最近已符合一次规则，尚未正式入选。'}</p></div><div class="actions">${pendingResearch(id)?decisionLink('查看已保存的判断'):id==='a'?link('change/missing','查看今天的缺价说明'):scoreLink(id,'查看经营评分依据')}${id==='a'?evidenceLink('byd-order','阅读订单原文'):evidenceLink('gree-report','阅读财务原文')}</div></section>`;
 }
-function newsCard(item){const order=item.event==='订单安排';return `<article class="news-row" data-news-id="${item.id}" data-published="${item.published}"><time class="news-date">${item.published.slice(5,10)}<span>${item.published.slice(11)} 发布</span></time><div class="news-content"><div class="news-meta">${badge(item.type==='news'?'新闻':'公告','gray')}<span>${item.source}</span>${link('company/'+item.company,companies[item.company].name)}</div><h3>${evidenceLink(item.id,item.title)}</h3><p>${item.summary}</p>${order?orderJudgment():`<div class="news-research"><span>用于经营评分；尚无独立事件影响判断</span></div>`}<div class="actions">${order?decisionLink():scoreLink(item.company,'查看经营评分依据')}${evidenceLink(item.id,'阅读原文')}${order?evidenceLink(item.id==='byd-order'?'byd-followup':'byd-order','同一事件的另一篇原文'):''}</div></div></article>`;}
+function newsCard(item){const order=item.event==='订单安排';return `<article class="news-row" data-news-id="${item.id}" data-published="${item.published}"><time class="news-date">${item.published.slice(5,10)}<span>${item.published.slice(11)} 发布</span></time><div class="news-content"><div class="news-meta">${badge(item.type==='news'?'新闻':'公告','gray')}<span>${item.source}</span>${link('company/'+item.company,companies[item.company].name)}</div><h3>${evidenceLink(item.id,item.title)}</h3><p>${item.summary}</p>${order?orderJudgment():`<div class="news-research"><span>${item.id==='byd-report'?'9月30日后来更新，未参与09-29评分；尚无独立事件影响判断':'用于经营评分；尚无独立事件影响判断'}</span></div>`}<div class="actions">${order?decisionLink():scoreLink(item.company,'查看经营评分依据')}${evidenceLink(item.id,'阅读原文')}${order?evidenceLink(item.id==='byd-order'?'byd-followup':'byd-order','同一事件的另一篇原文'):''}</div></div></article>`;}
 function renderNews(){
  const rows=articleOrder(information.filter(x=>(state.newsCompany==='all'||x.company===state.newsCompany)&&(state.newsType==='all'||x.type===state.newsType)&&(state.newsPeriod==='all'||x.published.startsWith('2026-09-30'))));
  return header('新闻资讯','按发布时间从新到旧查看公告和新闻。点开一条，阅读它自己的原文。')+`<div class="toolbar news-filters"><div class="filters"><label for="news-company">公司 <select id="news-company"><option value="all">全部公司</option><option value="a">比亚迪</option><option value="b">格力电器</option></select></label><label for="news-type">类型 <select id="news-type"><option value="all">全部类型</option><option value="announcement">公告</option><option value="news">新闻</option></select></label><label for="news-period">发布时间 <select id="news-period"><option value="all">全部演示日期</option><option value="today">9月30日</option></select></label></div><span class="quiet">${rows.length}篇资讯 · 北京时间</span></div><section class="panel news-feed">${rows.map(newsCard).join('')||`<div class="empty"><h2>没有符合条件的资讯</h2><p>可以切换公司、类型或日期。</p>${btn('清除资讯筛选','clear-news','primary')}</div>`}</section><p class="footnote">新闻按发布时间排列；事件发生时间和系统取得时间在原文页分别列出。同一事件的多篇资讯保留各自原文，评分时只计算一次事件影响。</p>`;
@@ -17536,28 +17579,27 @@ function renderCompany(id='a'){
  const c=companies[state.company];const missing=pendingResearch(state.company);const tabs=['timeline','events','scores','finance','valuation','relations','notes'];const names=['新闻资讯','研究事件','评分解释','财务','证券估值','关系','笔记'];let body='';
  if(state.tab==='timeline')body=panel('新闻与公告',articleOrder(information.filter(x=>x.company===state.company)).map(newsCard).join(''),'先看系统怎样理解，再沿原文核对依据',link('news','查看全部资讯'));
  else if(state.tab==='events')body=panel('研究事件',state.company==='a'?`<div class="timeline-row"><div class="time-label">09-28<br>发生日期</div><div><h3>订单交付与验收安排（演示）</h3><p>2篇原文讲同一件事，经营影响只计算一次。</p>${orderJudgment()}<div class="actions">${decisionLink()}${evidenceLink('byd-order','订单公告')}${evidenceLink('byd-followup','后续报道')}</div></div></div><div class="timeline-row"><div class="time-label">06-30<br>报告期末</div><div><h3>财务资料更新（演示）</h3><p>用于经营评分，尚无独立事件影响判断。</p>${evidenceLink('byd-report','查看财务原文')}</div></div>`:`<div class="timeline-row"><div class="time-label">06-30<br>报告期末</div><div><h3>财务资料更新（演示）</h3><p>用于经营评分，尚无独立事件影响判断。</p>${evidenceLink('gree-report','查看财务原文')}</div></div>`,'这里把多篇资讯归成事件，再说明对公司的影响');
- else if(state.tab==='scores')body=panel('为什么得到这个分数',`<p class="score-explainer">${missing?'新判断的评分还在更新；以下是09-29的旧评分，供回看。':`09-29经营分${c.quality}，达到当前已发布规则的70分要求。`}所需评分资料覆盖100%，表示本次所需资料齐全，不是结论正确率。</p><div class="split"><div>${c.dimensions.map(([dimension,n,v,w])=>`<div class="dimension-row"><span>${n}<small class="quiet"> ${Math.round(Number(w)*100)}%</small></span><div class="bar"><i style="width:${v}%"></i></div><div class="value">${Number(v).toFixed(1)}</div></div>`).join('')}<p class="footnote">当前生效的五项权重如上。不同公司的定制规则可能不同，不能只按总分直接排名。</p></div><div><h3>沿具体评分查看依据</h3><ul class="reason-list"><li>盈利与现金流<span>结合净资产收益率、现金流与利润关系等财务资料</span>${evidenceLink(state.company==='a'?'byd-report':'gree-report','阅读财务原文')}</li>${state.company==='a'?`<li>订单对盈利的影响<span>业务机会与延期备货成本一并考虑</span>${decisionLink()} · ${evidenceLink('byd-order','阅读订单原文')}</li><li>治理与资本配置<span>按已发布标准对照具体证据选择档位</span>${btn('查看资本配置档位','rubric-detail','text-button')}</li>`:''}</ul></div></div><details class="advanced"><summary>进阶：维护评分规则</summary><p>当前分数使用已发布的五维规则；待发布模板草稿不会改变当前分数。</p>${link('templates','查看当前规则与模板草稿')}</details>`,'当前已发布规则 · 评分日期09-29，模板草稿另行维护');
+ else if(state.tab==='scores')body=panel('为什么得到这个分数',`<p class="score-explainer">${missing?'新判断的评分还在更新；以下是09-29的旧评分，供回看。':`09-29经营分${c.quality}，达到发布1规则的70分要求。`}所需评分资料覆盖100%，表示本次所需资料齐全，不是结论正确率。</p><div class="split"><div>${c.dimensions.map(([dimension,n,v,w])=>`<div class="dimension-row"><span>${n}<small class="quiet"> ${Math.round(Number(w)*100)}%</small></span><div class="bar"><i style="width:${v}%"></i></div><div class="value">${Number(v).toFixed(1)}</div></div>`).join('')}<p class="footnote">当前生效的五项权重如上。不同公司的定制规则可能不同，不能只按总分直接排名。</p></div><div><h3>2026-09-29 的评分依据</h3><p>这份评分使用当时已取得的资料；后来取得的资料不改写它。</p><ul class="reason-list"><li>盈利与现金流<span>结合净资产收益率、现金流与利润关系等财务资料</span>${evidenceLink(scoreEvidence[state.company],'阅读当时财务原文')}</li>${state.company==='a'?`<li>后续研究：订单对盈利的判断<span>09-29收盘后取得；可继续研究，不作为这份旧评分的输入</span>${decisionLink()} · ${evidenceLink('byd-order','阅读订单原文')}</li><li>后续研究：资本配置资料<span>09-30新资料用于新的判断，不改写09-29评分</span>${btn('查看资本配置档位','rubric-detail','text-button')}</li>`:''}</ul>${state.company==='a'?evidenceLink('byd-report','查看9月30日后来更新'):''}</div></div><details class="advanced"><summary>进阶：维护评分规则</summary><p>当前分数使用已发布的五维规则；待发布模板草稿不会改变当前分数。</p>${link('templates','查看当前规则与模板草稿')}</details>`,'当前已发布规则 · 评分日期09-29，模板草稿另行维护');
  else if(state.tab==='valuation')body=panel('按证券查看估值',`<div class="tabs">${c.securities.map(sec=>btn(sec.name+' / '+sec.market,'valuation-'+sec.id,'filter-button '+(state.selectedSecurity===sec.id?'active':''))).join('')}</div>${valuation(c.securities.find(sec=>sec.id===state.selectedSecurity)||c.securities[0])}`,'本套规则中分数越高，表示越符合估值条件；不是收益概率');
  else if(state.tab==='finance')body=panel('财务资料',`<div class="table-wrap"><table><thead><tr><th>指标</th><th>演示值</th><th>怎么算</th><th>原文</th></tr></thead><tbody><tr><td>净资产收益率（近12个月）</td><td>12.0%</td><td>普通股归属利润 / 对应净资产</td><td>${evidenceLink(state.company==='b'?'gree-report':'byd-report','查看指标原文')}</td></tr><tr><td>近3年经营现金流 / 净利润</td><td>0.96</td><td>先分别合计三年金额，再求比值</td><td>${evidenceLink(state.company==='b'?'gree-report':'byd-report','查看三年依据')}</td></tr><tr><td>净债务 / EBITDA</td><td>1.20</td><td>同一财务范围与币种</td><td>${evidenceLink(state.company==='b'?'gree-report':'byd-report','查看指标出处')}</td></tr></tbody></table></div>`,'报告期、发布时间与系统取得时间可在原文页分别查看');
  else if(state.tab==='relations')body=panel('公司与股票的关系',`<h3>${c.name}</h3><ul class="reason-list">${c.securities.map(sec=>`<li>${sec.name} / ${sec.market}<span>${sec.currency}报价。公司经营资料共用，各市场股票分别估值。</span></li>`).join('')}</ul><details class="advanced"><summary>进阶：查看身份与挂牌资料</summary>${link('identity','查看公司与证券资料')}</details>`);
  else body=panel('研究笔记',`<form id="notes-form"><div class="form-group"><label for="note">我的私人笔记</label><textarea id="note" placeholder="记录你的研究疑问，默认仅本人可见">${esc(state.note)}</textarea><small>本次演示中保留，刷新页面后清空。</small></div><button type="submit" class="primary">保存笔记</button></form>`);
- return `<div class="breadcrumb">${link('companies','公司研究')} / ${c.name}</div>`+header(`<span class="company-identity"><span class="company-monogram">${c.name.slice(0,1)}</span><span>${c.name}<small>${c.sector} · 演示研究</small></span></span>`,'先看当前结论，再查原文和评分依据。')+researchSummary(state.company)+`<section class="panel current-securities"><div class="panel-head"><h2>各市场股票目前怎样</h2></div><div class="panel-body security-grid">${c.securities.map(securityCard).join('')}</div></section>`+panel('公司经营质量',`<div class="score-overview"><div><div class="score-number">${missing?'—':c.quality}</div><p>${missing?'评分更新中':'经营分 / 100'}</p></div><div><strong>${missing?'新结果待更新':'09-29：达到当前规则70分要求'}</strong><p>${missing?'旧经营分'+c.quality+'（09-29），只供回看':'所需评分资料覆盖'+c.coverage+'，不是结论正确率'}</p>${scoreLink(state.company)}</div></div>`)+`<div class="tabs">${tabs.map((x,i)=>btn(names[i],'tab-'+x,state.tab===x?'active':'')).join('')}</div>${body}`;
+ return `<div class="breadcrumb">${link('companies','公司研究')} / ${c.name}</div>`+header(`<span class="company-identity"><span class="company-monogram">${c.name.slice(0,1)}</span><span>${c.name}<small>${c.sector} · 演示研究</small></span></span>`,'先看当前结论，再查原文和评分依据。')+researchSummary(state.company)+`<section class="panel current-securities"><div class="panel-head"><h2>各市场股票目前怎样</h2></div><div class="panel-body security-grid">${c.securities.map(securityCard).join('')}</div></section>`+panel('公司经营质量',`<div class="score-overview"><div><div class="score-number">${missing?'—':c.quality}</div><p>${missing?'评分更新中':'经营分 / 100'}</p></div><div><strong>${missing?'新结果待更新':'09-29：达到发布1规则70分要求'}</strong><p>${missing?'旧经营分'+c.quality+'（09-29），只供回看':'所需评分资料覆盖'+c.coverage+'，不是结论正确率'}</p>${scoreLink(state.company)}</div></div>`)+`<div class="tabs">${tabs.map((x,i)=>btn(names[i],'tab-'+x,state.tab===x?'active':'')).join('')}</div>${body}`;
 }
-function valuation(sec){const d=securityConclusion(sec);return `<div class="valuation-current">${badge(d.label,d.tone)}<p>${d.reason}</p><small>${d.date}</small></div><dl class="definition"><dt>证券 / 币种</dt><dd>${sec.name} / ${sec.currency}</dd><dt>估值分</dt><dd><strong style="font-size:30px">${sec.v}</strong>（09-29${sec.id==='a-a'||pendingResearch(sec.id==='b-a'?'b':'a')?'历史值，只供回看':''}）</dd><dt>本策略要求</dt><dd>估值分至少60；还需经营、财务和风险等条件同时符合</dd><dt>所用收盘价</dt><dd>${sec.price} ${sec.currency} · 2026-09-29</dd><dt>财务依据</dt><dd>${evidenceLink(sec.id==='b-a'?'gree-report':'byd-report','查看财务原文')}</dd></dl><p class="footnote">估值分越高，表示越符合本套估值条件，不是股价越贵。行情为固定演示快照。今日缺价或判断更新时，旧分数不表示今天仍符合规则。</p>`;}
+function valuation(sec){const d=securityConclusion(sec);return `<div class="valuation-current">${badge(d.label,d.tone)}<p>${d.reason}</p><small>${d.date}</small></div><dl class="definition"><dt>证券 / 币种</dt><dd>${sec.name} / ${sec.currency}</dd><dt>估值分</dt><dd><strong style="font-size:30px">${sec.v}</strong>（09-29${sec.id==='a-a'||pendingResearch(sec.id==='b-a'?'b':'a')?'历史值，只供回看':''}）</dd><dt>发布1规则要求</dt><dd>估值分至少60；还需经营、财务和风险等条件同时符合</dd><dt>所用收盘价</dt><dd>${sec.price} ${sec.currency} · 2026-09-29</dd><dt>财务依据</dt><dd>${evidenceLink(scoreEvidence[sec.id==='b-a'?'b':'a'],'阅读当时财务原文')}</dd></dl><p class="footnote">估值分越高，表示越符合本套估值条件，不是股价越贵。行情为固定演示快照。今日缺价或判断更新时，旧分数不表示今天仍符合规则。</p>`;}
 function renderEvidence(id='byd-order'){
- const item=id==='risk-example'?riskEvidence:information.find(x=>x.id===id);
+ const item=id==='risk-example'?riskEvidence:id===historicalFinancial.id?historicalFinancial:information.find(x=>x.id===id);
  if(!item)return header('未找到这篇原文','请回到资讯列表选择一篇资料。')+link('news','返回新闻资讯');
  const company=item.company;const related=information.filter(x=>x.company===item.company&&x.event===item.event&&x.id!==item.id);
- return `<div class="breadcrumb">${link(state.evidenceReturn,'返回刚才的列表')} / 原文</div>`+header(item.title,'本地完整演示原文。摘要和研究判断都可以回到具体段落核对。')+`<div class="split">${panel('原文',`<div class="document" data-evidence-id="${item.id}"><dl class="document-meta definition"><dt>来源</dt><dd>${item.source}</dd><dt>发布时间</dt><dd>${item.published}（北京时间）</dd><dt>系统取得</dt><dd>${item.observed}（北京时间）</dd><dt>事件发生</dt><dd>${item.occurred}</dd><dt>正文定位</dt><dd>第${item.highlight+1}段 · 本地演示版本1</dd></dl><p class="demo-source-note">这篇原文是虚构演示材料，并非真实新闻或公告。正式接入后，此处提供获许可来源的原文网址。</p>${item.paragraphs.map((t,i)=>`<p id="paragraph-${i+1}"><small class="quiet">${i+1}　</small>${i===item.highlight?'<mark>'+esc(t)+'</mark>':esc(t)}</p>`).join('')}</div>`)}${panel('这篇资料与研究的关系',`<dl class="definition"><dt>关联公司</dt><dd>${company?link('company/'+company,companies[company].name):'虚构公司 · 风险演练'}</dd><dt>研究事件</dt><dd>${item.event}</dd><dt>用途</dt><dd>${item.event==='订单安排'?'判断事件对盈利的影响':'财务与经营评分参考'}</dd></dl>${item.event==='订单安排'?orderJudgment():'<p>用于经营评分，尚无独立事件影响判断。</p>'}${related.length?'<h3>同一事件的其他原文</h3><ul class="reason-list">'+related.map(x=>'<li>'+evidenceLink(x.id,x.title)+'</li>').join('')+'</ul>':''}<div class="actions">${item.id==='risk-example'?btn('查看虚构风险判断','risk-detail'):item.event==='订单安排'?decisionLink():company?link('company/'+company,'继续研究公司'):''}</div>${btn('演示证据不可访问','evidence-revoke','text-button')}`)}</div>`;
+ return `<div class="breadcrumb">${link(state.evidenceReturn,'返回刚才的列表')} / 原文</div>`+header(item.title,'本地完整演示原文。摘要和研究判断都可以回到具体段落核对。')+`<div class="split">${panel('原文',`<div class="document" data-evidence-id="${item.id}"><dl class="document-meta definition"><dt>来源</dt><dd>${item.source}</dd><dt>发布时间</dt><dd>${item.published}（北京时间）</dd><dt>系统取得</dt><dd>${item.observed}（北京时间）</dd><dt>事件发生</dt><dd>${item.occurred}</dd><dt>正文定位</dt><dd>第${item.highlight+1}段 · 本地演示版本1</dd></dl><p class="demo-source-note">这篇原文是虚构演示材料，并非真实新闻或公告。正式接入后，此处提供获许可来源的原文网址。</p>${item.paragraphs.map((t,i)=>`<p id="paragraph-${i+1}"><small class="quiet">${i+1}　</small>${i===item.highlight?'<mark>'+esc(t)+'</mark>':esc(t)}</p>`).join('')}</div>`)}${panel('这篇资料与研究的关系',`<dl class="definition"><dt>关联公司</dt><dd>${company?link('company/'+company,companies[company].name):'虚构公司 · 风险演练'}</dd><dt>研究事件</dt><dd>${item.event}</dd><dt>用途</dt><dd>${item.event==='订单安排'?'判断事件对盈利的影响':'财务与经营评分参考'}</dd></dl>${item.event==='订单安排'?orderJudgment():item.id==='byd-report'?'<p>9月30日后来更新，未参与09-29评分。</p>':item.id===historicalFinancial.id?'<p>09-29评分与估值的固定依据，后来资料不替换本原文。</p>':'<p>用于经营评分，尚无独立事件影响判断。</p>'}${related.length?'<h3>同一事件的其他原文</h3><ul class="reason-list">'+related.map(x=>'<li>'+evidenceLink(x.id,x.title)+'</li>').join('')+'</ul>':''}<div class="actions">${item.id==='risk-example'?btn('查看虚构风险判断','risk-detail'):item.event==='订单安排'?decisionLink():company?link('company/'+company,'继续研究公司'):''}</div>${btn('演示证据不可访问','evidence-revoke','text-button')}`)}</div>`;
 }
 function renderDecision(){
  state.company='a';
  const kind=state.decisionKind;const impact=kind==='impact';const rubric=kind==='rubric';const risk=kind==='risk';const permitted=can('analysis.override');
  const label=impact?'订单对盈利的影响（演示）':rubric?'资本配置 · 评分档位':'虚构H股挂牌退市风险（演练）';
  const record=state.decisionRecords[kind];const old=record.value;
- const newValue=impact?state.replacement:rubric?state.grade:'拒绝本风险';
  const waiting=record.status==='waiting'||state.scenario==='missing';
- return `<div class="breadcrumb">${link(risk?'change/risk':'company/a',risk?'虚构风险演练':'公司研究')} / 查看和修改判断</div>`+header(label,'查看原文、旧值与完整新值，明确作用对象后直接保存。',badge(record.status==='auto'?'系统判断已生效':record.status==='released'?'覆盖已解除，等待重新评估':'人工判断已生效',record.status==='auto'?'blue':'amber'))+`<div class="tabs">${['impact','rubric','risk'].map((x,i)=>btn(['影响值','评分档位','虚构风险演练'][i],'decision-'+x,kind===x?'active':'')).join('')}</div>`+(state.scenario==='conflict'?notice('判断已被另一位研究员更新','你的新值和理由保留在下方。当前服务器示例值已变化，比较后可基于新版本重试。','error'):'')+(waiting?notice('人工判断已保存，重算等待中','新判断优先于后续系统建议；公司评分和A/H评估尚未完成。'+(risk?'若仍有公司级违约，两只证券继续受风险影响。':''),'info'):'')+`<div class="split">${panel('原文依据',`<p>${risk?'虚构监管决定仅影响一只H股挂牌。':rubric?'以财务资料和资本配置证据对照评分档位。':'订单分期执行，需经客户验收，不能确认全部转化为利润。'}</p><div class="focus-note">${risk?'这条虚构决定只指向SYN-H主要挂牌，与比亚迪及格力电器无关。':rubric?'按评分标准和证据选择档位；资料不够时保留待判断。':'修改影响是修改经营判断，不是预测股价。'}</div>${evidenceLink(risk?'risk-example':rubric?'byd-report':'byd-order','打开完整原文与证据定位')}<dl class="definition"><dt>主体</dt><dd>${risk?'虚构公司 · 风险演练':'比亚迪（演示研究）'}</dd><dt>作用范围</dt><dd>${risk?'仅虚构SYN-H主挂牌':'公司经营评分；A/H共享经营事实，各自估值'}</dd><dt>生效方式</dt><dd>从本次实际知悉时点生效，不回填系统历史</dd><dt>有效期</dt><dd>合成演练至2026-10-31；到期按当时有效资料重新判断</dd><dt>输入证据</dt><dd>${rubric?'财务原文第3段':'本页原文第2段'}</dd></dl>`)}${panel('当前判断与修改',`${impact?orderJudgment():rubric?'<p>按资本配置标准评分。当前档位：'+esc(old)+'</p>':'<p>当前风险只作用于虚构H股挂牌。</p>'}<details id="decision-editor" class="advanced" ${state.editDecision?'open':''}><summary>修改这一判断</summary><div class="value-compare"><div class="value-box"><span>当前有效值</span><strong>${esc(old)}</strong><small>${state.scenario==='conflict'?'冲突：已有更新版本':'当前判断版本 '+record.generation}</small></div><div class="value-box"><span>准备修改为</span><strong>${esc(newValue)}</strong><small>新修订保留旧值与原因</small></div></div>${!permitted?notice('此角色只能查看','查看者、策略管理员与系统管理员没有修改判断权限。可切换研究员身份体验。'):''}<form id="override-form"><div class="form-group"><label for="replacement">${impact?'新影响值（−1 至 +1）':rubric?'新档位（0 至 4）':'明确动作'}</label>${impact?`<input id="replacement" name="replacement" type="number" min="-1" max="1" step="0.1" value="${esc(state.replacement)}" ${!permitted?'disabled':''}>`:rubric?`<select id="grade" ${!permitted?'disabled':''}>${[0,1,2,3,4].map(g=>`<option ${String(g)===state.grade?'selected':''}>${g}</option>`).join('')}</select>`:'<p>拒绝这一条确切挂牌风险；不一并清除公司其他风险。</p>'}<small>${impact?'正数表示正面，负数表示负面，0表示不计方向性影响；影响值不是经营总分直接加减的点数。例：若原文中的延期库存成本使盈利承压，可据此写理由再改值。':rubric?'0：重大配置失误反复且未解释；1：资本回报差、融资/投资逻辑薄弱；2：配置规则明确，结果与解释基本一致；3：回报纪律好，投资/回购/分红与机会匹配；4：跨周期配置结果与纪律持续，失败复盘透明。':'只拒绝这一条风险，其他独立风险仍保留。'}</small></div><div class="form-group"><label for="reason">修改理由</label><textarea id="reason" required placeholder="说明证据为什么支持新判断" ${!permitted?'disabled':''}>${esc(state.reason)}</textarea></div><div id="override-error" class="form-error" role="alert"></div><div class="actions"><button type="submit" class="primary" ${!permitted?'disabled':''}>${risk?'拒绝本风险':'保存人工覆盖'}</button></div></form>${record.status!=='auto'&&record.status!=='released'?`<div class="actions">${btn('查看合成重算结果','show-recompute')}${btn('解除人工覆盖','release-override','text-button',!permitted?'disabled':'')}</div>`:''}<p class="footnote">保存后先更新判断，评分与股票评估随后更新；本页只演示这一过程。</p></details>`,'对照原判断、新判断和原文依据')}</div>`;
+ return `<div class="breadcrumb">${link(risk?'change/risk':'company/a',risk?'虚构风险演练':'公司研究')} / 查看和修改判断</div>`+header(label,'查看原文、旧值与完整新值，明确作用对象后直接保存。',badge(record.status==='auto'?'系统判断已生效':record.status==='released'?'覆盖已解除，等待重新评估':'人工判断已生效',record.status==='auto'?'blue':'amber'))+`<div class="tabs">${['impact','rubric','risk'].map((x,i)=>btn(['影响值','评分档位','虚构风险演练'][i],'decision-'+x,kind===x?'active':'')).join('')}</div>`+(state.scenario==='conflict'?notice('判断已被另一位研究员更新','你的新值和理由保留在下方。当前服务器示例值已变化，比较后可基于新版本重试。','error'):'')+(waiting?notice('人工判断已保存，重算等待中','新判断优先于后续系统建议；公司评分和A/H评估尚未完成。'+(risk?'若仍有公司级违约，两只证券继续受风险影响。':''),'info'):'')+`<div class="split">${panel('原文依据',`<p>${risk?'虚构监管决定仅影响一只H股挂牌。':rubric?'以财务资料和资本配置证据对照评分档位。':'订单分期执行，需经客户验收，不能确认全部转化为利润。'}</p><div class="focus-note">${risk?'这条虚构决定只指向SYN-H主要挂牌，与比亚迪及格力电器无关。':rubric?'按评分标准和证据选择档位；资料不够时保留待判断。':'修改影响是修改经营判断，不是预测股价。'}</div>${evidenceLink(risk?'risk-example':rubric?'byd-report':'byd-order','打开完整原文与证据定位')}<dl class="definition"><dt>主体</dt><dd>${risk?'虚构公司 · 风险演练':'比亚迪（演示研究）'}</dd><dt>作用范围</dt><dd>${risk?'仅虚构SYN-H主挂牌':'公司经营评分；A/H共享经营事实，各自估值'}</dd><dt>生效方式</dt><dd>从本次实际知悉时点生效，不回填系统历史</dd><dt>有效期</dt><dd>合成演练至2026-10-31；到期按当时有效资料重新判断</dd><dt>输入证据</dt><dd>${rubric?'财务原文第3段':'本页原文第2段'}</dd></dl>`)}${panel('当前判断与修改',`${impact?orderJudgment():rubric?'<p>按资本配置标准评分。当前档位：'+esc(old)+'</p>':'<p>当前风险只作用于虚构H股挂牌。</p>'}<details id="decision-editor" class="advanced" ${state.editDecision?'open':''}><summary>修改这一判断</summary><div class="value-box"><span>当前有效值</span><strong>${esc(old)}</strong><small>${state.scenario==='conflict'?'冲突：已有更新版本':'当前判断版本 '+record.generation}</small></div>${!permitted?notice('此角色只能查看','查看者、策略管理员与系统管理员没有修改判断权限。可切换研究员身份体验。'):''}<form id="override-form"><div class="form-group"><label for="replacement">${impact?'新影响值（−1 至 +1）':rubric?'新档位（0 至 4）':'明确动作'}</label>${impact?`<input id="replacement" name="replacement" type="number" min="-1" max="1" step="0.1" value="${esc(state.replacement)}" ${!permitted?'disabled':''}>`:rubric?`<select id="grade" ${!permitted?'disabled':''}>${[0,1,2,3,4].map(g=>`<option ${String(g)===state.grade?'selected':''}>${g}</option>`).join('')}</select>`:'<p>拒绝这一条确切挂牌风险；不一并清除公司其他风险。</p>'}<small>${impact?'正数表示正面，负数表示负面，0表示不计方向性影响；影响值不是经营总分直接加减的点数。例：若原文中的延期库存成本使盈利承压，可据此写理由再改值。':rubric?'0：重大配置失误反复且未解释；1：资本回报差、融资/投资逻辑薄弱；2：配置规则明确，结果与解释基本一致；3：回报纪律好，投资/回购/分红与机会匹配；4：跨周期配置结果与纪律持续，失败复盘透明。':'只拒绝这一条风险，其他独立风险仍保留。'}</small></div><div class="form-group"><label for="reason">修改理由</label><textarea id="reason" required placeholder="说明证据为什么支持新判断" ${!permitted?'disabled':''}>${esc(state.reason)}</textarea></div><div id="override-error" class="form-error" role="alert"></div><div class="actions"><button type="submit" class="primary" ${!permitted?'disabled':''}>${risk?'拒绝本风险':'保存人工覆盖'}</button></div></form>${record.status!=='auto'&&record.status!=='released'?`<div class="actions">${btn('查看合成重算结果','show-recompute')}${btn('解除人工覆盖','release-override','text-button',!permitted?'disabled':'')}</div>`:''}<p class="footnote">保存后先更新判断，评分与股票评估随后更新；本页只演示这一过程。</p></details>`,'对照原判断、新判断和原文依据')}</div>`;
 }
 function renderTemplates(){
  const editable=can('template.edit')&&!isPhone();const publish=can('template.publish')&&!isPhone();
@@ -17566,7 +17608,7 @@ function renderTemplates(){
 function renderStrategy(){
  const allowed=can('strategy.publish')&&!isPhone();
  const rows=Object.values(companies).flatMap(c=>c.securities.map(s=>({c,s})));
- return header('是否符合我的选股规则','先看最近评估的结论和日期。资料不足时，历史入选不代表今天仍符合。',badge(state.strategyPublished?'演示发布 2':'当前规则 · 发布1','blue'))+panel('当前已发布规则',`<p>经营分至少70、资料覆盖至少80%、估值分至少60，还需财务与风险条件同时通过，连续两个交易日确认后入选。</p><p class="quiet">下面维护的是新草稿；修改草稿不会替换当前规则和结果。</p>`)+`<section class="panel table-wrap"><table><thead><tr><th>公司 / 股票</th><th>经营分 / 日期</th><th>估值分 / 日期</th><th>当前结论</th><th>原因与下一步</th></tr></thead><tbody>${rows.map(({c,s:sec})=>{const d=securityConclusion(sec);const id=sec.id==='b-a'?'b':'a';return `<tr data-candidate-id="${sec.id}"><td>${link('company/'+id,c.name)}<p>${sec.name} / ${sec.market}</p></td><td>${pendingResearch(id)?'新评分待更新；旧值'+c.quality:c.quality}<p>09-29${pendingResearch(id)?'历史值':''} · 覆盖100%</p></td><td>${sec.id==='a-a'||pendingResearch(id)?'上次估值分'+sec.v:sec.v}<p>09-29${sec.id==='a-a'||pendingResearch(id)?'历史值':''}</p></td><td>${badge(d.label,d.tone)}<p>${d.date}</p></td><td>${d.reason}<p>${link(sec.id==='a-a'?'change/missing':'company/'+id,sec.id==='a-a'?'查看缺价说明':'查看评分与估值依据')}</p></td></tr>`;}).join('')}</tbody></table></section><details id="strategy-editor" class="advanced strategy-maintenance" ${state.strategyEditing||state.strategyPreview?'open':''}><summary>进阶：调整选股规则、模拟与发布</summary>${panel('维护策略草稿',`<div class="form-grid"><div class="form-group"><label for="strategy-threshold">进入经营分阈值</label><select id="strategy-threshold" ${!allowed?'disabled':''}><option ${state.strategyThreshold==='70'?'selected':''}>70</option><option ${state.strategyThreshold==='75'?'selected':''}>75</option></select><small>退出维持阈值65、其他条件沿用固定样例。只提供有对照快照的两个演示选项。</small></div><div><h3>条件的业务解释</h3><p>经营分 ≥ ${state.strategyThreshold}，覆盖 ≥ 80%，证券估值 ≥ 60；财务指标与风险门保持。</p><p class="footnote">需连续两个交易日确认；中途资料缺失时重新计数。</p></div></div>${!allowed?notice(isPhone()?'手机查看模式':'当前身份没有策略编辑/发布能力',isPhone()?'复杂规则编辑、模拟和发布请到桌面完成。':'研究员可覆盖判断，不能发布策略。切换策略管理员可体验模拟发布。'):''}<div class="actions">${btn('固定时点模拟','simulate-strategy','primary',!allowed?'disabled':'')}</div>`,'草稿改动使旧预览失效，发布不改旧版')}${state.strategyPreview?panel('模拟变化预览',`<div class="steps"><div class="step active"><strong>固定时点</strong><span>2026-09-29收盘输入</span></div><div class="step active"><strong>比较变化</strong><span>${state.strategyThreshold==='75'?'比亚迪72不再满足进入条件':'沿用原进入阈值'}</span></div><div class="step"><strong>发布新基线</strong><span>记录为规则变更</span></div></div><table><thead><tr><th>证券</th><th>旧规则</th><th>新规则基线</th></tr></thead><tbody><tr><td>002594</td><td>区间内</td><td>${state.strategyThreshold==='75'?'区间外 · 规则变更':'区间内 · 原规则符合'}</td></tr><tr><td>01211</td><td>区间外</td><td>区间外 · 估值条件未满足</td></tr><tr><td>000651</td><td>待确认</td><td>新规则先记录当前结果，不算作市场变化引起的新入选</td></tr></tbody></table><p class="footnote">固定样例模拟结果，无实时策略计算；发布只更新原型版本标签。</p><div class="actions">${btn('确认发布新版本','publish-strategy','primary',!allowed?'disabled':'')}</div>`):''}${panel('发布历史与回滚','<p>发布1继续保留固定规则和历史解释。回滚应引用旧配置创建新策略版本并重新预览，不覆盖发布1。</p>'+btn('查看回滚预览','rollback-preview','text-button',!allowed?'disabled':''))}</details>`;
+ return header('是否符合我的选股规则','先看最近评估的结论和日期。资料不足时，历史入选不代表今天仍符合。',badge('当前规则 · 发布'+state.strategyVersion,'blue'))+`<div id="current-strategy">${panel('当前已发布规则 · 发布'+state.strategyVersion,`<p>经营分至少${state.publishedStrategyThreshold}、资料覆盖至少80%、估值分至少60，还需财务与风险条件同时通过，连续两个交易日确认后入选。</p><p class="quiet">下面维护的是新草稿；修改草稿不会替换当前已发布门槛。</p>`)}${state.strategyPublished?notice('新规则等待评估',`发布${state.strategyVersion}已生效，经营分门槛为${state.publishedStrategyThreshold}。新规则的评估结果尚未生成；下方保留发布1的历史结果。`,'info'):''}</div><section class="panel table-wrap" data-result-release="1"><div class="panel-head"><div><h2>${state.strategyPublished?'发布1历史结果':'最近评估结果 · 发布1'}</h2><p>发布1经营分门槛70；09-29评估与09-30缺价记录。${state.strategyPublished?'只供回看，不是新规则的结果。':''}</p></div>${link('change/enter','查看发布1历史依据')}</div><table><thead><tr><th>公司 / 股票</th><th>经营分 / 日期</th><th>估值分 / 日期</th><th>当前结论</th><th>原因与下一步</th></tr></thead><tbody>${rows.map(({c,s:sec})=>{const d=securityConclusion(sec);const id=sec.id==='b-a'?'b':'a';return `<tr data-candidate-id="${sec.id}"><td>${link('company/'+id,c.name)}<p>${sec.name} / ${sec.market}</p></td><td>${pendingResearch(id)?'新评分待更新；旧值'+c.quality:c.quality}<p>09-29${pendingResearch(id)?'历史值':''} · 覆盖100%</p></td><td>${sec.id==='a-a'||pendingResearch(id)?'上次估值分'+sec.v:sec.v}<p>09-29${sec.id==='a-a'||pendingResearch(id)?'历史值':''}</p></td><td>${badge(d.label,d.tone)}<p>${d.date}</p></td><td>${d.reason}<p>${link(sec.id==='a-a'?'change/missing':'company/'+id,sec.id==='a-a'?'查看缺价说明':'查看评分与估值依据')}</p></td></tr>`;}).join('')}</tbody></table></section><details id="strategy-editor" class="advanced strategy-maintenance" ${state.strategyEditing||state.strategyPreview?'open':''}><summary>进阶：调整选股规则、模拟与发布</summary>${panel('维护策略草稿',`<div class="form-grid"><div class="form-group"><label for="strategy-threshold">进入经营分阈值</label><select id="strategy-threshold" ${!allowed?'disabled':''}><option ${state.strategyThreshold==='70'?'selected':''}>70</option><option ${state.strategyThreshold==='75'?'selected':''}>75</option></select><small>退出维持阈值65、其他条件沿用固定样例。只提供有对照快照的两个演示选项。</small></div><div><h3>条件的业务解释</h3><p>经营分 ≥ ${state.strategyThreshold}，覆盖 ≥ 80%，证券估值 ≥ 60；财务指标与风险门保持。</p><p class="footnote">需连续两个交易日确认；中途资料缺失时重新计数。</p></div></div>${!allowed?notice(isPhone()?'手机查看模式':'当前身份没有策略编辑/发布能力',isPhone()?'复杂规则编辑、模拟和发布请到桌面完成。':'研究员可覆盖判断，不能发布策略。切换策略管理员可体验模拟发布。'):''}<div class="actions">${btn('固定时点模拟','simulate-strategy','primary',!allowed?'disabled':'')}</div>`,'草稿改动使旧预览失效，发布不改旧版')}${state.strategyPreview?panel('模拟变化预览',`<p>将草稿与发布1的09-29固定输入对照，不把当前缺价或历史结果当作新规则评估。</p><div class="steps"><div class="step active"><strong>固定时点</strong><span>2026-09-29收盘输入</span></div><div class="step active"><strong>比较变化</strong><span>${state.strategyThreshold==='75'?'比亚迪72不再满足进入条件':'沿用原进入阈值'}</span></div><div class="step"><strong>发布新基线</strong><span>记录为规则变更</span></div></div><table><thead><tr><th>证券</th><th>旧规则</th><th>新规则基线</th></tr></thead><tbody><tr><td>002594</td><td>区间内</td><td>${state.strategyThreshold==='75'?'区间外 · 规则变更':'区间内 · 原规则符合'}</td></tr><tr><td>01211</td><td>区间外</td><td>区间外 · 估值条件未满足</td></tr><tr><td>000651</td><td>待确认</td><td>新规则先记录当前结果，不算作市场变化引起的新入选</td></tr></tbody></table><p class="footnote">固定样例模拟结果，无实时策略计算；发布后显示新门槛与等待评估，历史结果仍归发布1。</p><div class="actions">${btn('确认发布新版本','publish-strategy','primary',!allowed?'disabled':'')}</div>`):''}${panel('发布历史与回滚','<p>发布1的70分门槛和历史解释继续保留。当前发布'+state.strategyVersion+'的门槛为'+state.publishedStrategyThreshold+'。回滚应引用旧配置创建新策略版本并重新预览，不覆盖发布1。</p>'+btn('查看回滚预览','rollback-preview','text-button',!allowed?'disabled':''))}</details>`;
 }
 function renderWatchlist(){const securities=Object.entries(companies).flatMap(([id,c])=>c.securities.map(s=>({id,c,s}))).filter(x=>state.watch.includes(x.s.id));return header('我的自选','按证券保存，研究时可以回到同一公司档案。')+panel('关注证券',securities.length?`<div class="table-wrap"><table><thead><tr><th>公司 / 证券</th><th>经营分</th><th>证券状态</th><th>操作</th></tr></thead><tbody>${securities.map(({id,c,s})=>`<tr><td>${link('company/'+id,c.name)}<p>${s.name}</p></td><td>${pendingResearch(id)?'更新中；旧值'+c.quality:c.quality}<p>09-29${pendingResearch(id)?'历史值':''}</p></td><td>${badge(securityConclusion(s).label,securityConclusion(s).tone)}<p>${securityConclusion(s).date}</p></td><td>${btn('移出自选','unwatch-'+s.id,'text-button')}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty"><h2>开始关注一个研究对象</h2><p>在公司档案关注明确的一只股票。</p>${link('companies','查找公司')}</div>`);}
 function adminPermission(cap,title){return !can(cap)?permission('此身份没有'+title+'权限','请切换对应合成角色查看管理交互。管理权限与业务覆盖/发布分别授予。'):null;}
@@ -17618,8 +17660,8 @@ document.addEventListener('click',e=>{
  else if(action==='restore-template'){state.templateAge='180';state.eventMode='enabled';state.templatePreview=false;render();}
  else if(action==='publish-template'){if(!can('template.publish')||!state.templatePreview)return;state.templatePublished=true;state.templatePreview=false;render();toast('演示新模板发布；旧策略版本继续固定旧口径');}
  else if(action==='simulate-strategy'){if(!can('strategy.publish'))return;state.strategyPreview=true;render();}
- else if(action==='publish-strategy'){if(!can('strategy.publish')||!state.strategyPreview)return;state.strategyPublished=true;state.strategyPreview=false;render();toast('演示发布2，变化分类CONFIG_CHANGE');}
- else if(action==='rollback-preview'){dialog('<h2>回滚提案预览</h2><p>引用发布1配置，创建新的版本3；原发布2与历史解释保留。受影响证券仍为002594、01211、000651。</p><p class="footnote">这里只查看设计提案，不执行发布。</p>');}
+ else if(action==='publish-strategy'){if(!can('strategy.publish')||!state.strategyPreview)return;state.publishedStrategyThreshold=state.strategyThreshold;state.strategyVersion++;state.strategyPublished=true;state.strategyPreview=false;render();toast('演示发布'+state.strategyVersion+'，新规则等待评估');}
+ else if(action==='rollback-preview'){dialog('<h2>回滚提案预览</h2><p>引用发布1配置，创建新的版本'+(state.strategyVersion+1)+'；原已发布版本与历史解释保留。受影响证券仍为002594、01211、000651。</p><p class="footnote">这里只查看设计提案，不执行发布。</p>');}
  else if(action==='toggle-source'){if(!can('source.manage'))return;state.sourcePaused=!state.sourcePaused;render();}
  else if(action==='import-fixture'){if(!can('source.manage'))return;state.imported=true;toast('合成导入结果演示已就绪，未运行采集');navigate('jobs');}
  else if(action==='source-preview'){dialog('<h2>配置发布预览</h2><p>范围为两家公司、三只证券；本地合成fixture，无网络请求和采购。正常接入时再明确回溯期、请求量、权利和恢复方法。</p>');}
@@ -17662,6 +17704,8 @@ render();
 
 修改影响时草稿初始为当前值+0.8；只有主动修改后才是−0.2等新值。原文提供订单机会与延期库存/资金占用成本，正负方向的依据在独立判断区说明，不把测试脚本写进原文。经营分、影响值、评分档位属于不同尺度。
 
+终审三项修正：09-29评分和A/H估值使用09-27已取得的历史财务原文；09-30更新与订单后续研究不充当旧评分输入。修改区只保留一个新值输入，保存后回读。策略发布固定新版本/门槛，新结果等待，旧结果明确发布1；继续编辑草稿不改变已发布值。处置与证据见[终审记录](../review/GPT-PRO-FINAL-DISPOSITION.md)。
+
 
 ---
 
@@ -17673,7 +17717,7 @@ render();
 
 把下面“完整提示词”复制给 GPT Pro，使用已授权的 GitHub 连接读取私有仓库。连接不可用时，复制[终审正文材料](./FINAL-REVIEW-PASTE.txt)，它已包含提示词和本轮核心材料；无需附件。截图若无法实际查看，应明确视觉检查未执行，不要把源代码阅读当作看过页面。完整工程材料另见[REVIEW-PACK](./REVIEW-PACK.md)，按具体疑问查阅，不要求为终审重写全套文档。
 
-本提示词是本轮终审入口，取代旧的“全面重写v0.3、穷举跨模块反例、重新比较开源框架”评审任务。历史提示词仍可从Git历史读取。当前只准备终审材料，GPT Pro终审尚未执行；终审意见不授权产品开发、部署或真实接入。
+本提示词是本轮终审入口，取代旧的“全面重写v0.3、穷举跨模块反例、重新比较开源框架”评审任务。历史提示词仍可从Git历史读取。2026-10-01已取得该提示词对应的GPT Pro共享终审，固定旧基线645ab64；三项局部修正及验证见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。提示词保留为历史交接与按需复核入口，不要求再次终审；终审意见不授权产品开发、部署或真实接入。
 
 ## 完整提示词
 
@@ -17866,6 +17910,10 @@ F01/F02原设计主路径缺口现已有目标合同，设计层可交接；产�
 
 GPT-PRO-PROMPT重写为业务/UI终审，取消旧的全量文档重写、12组穷举反例和全量开源比较要求；保留真正影响业务结果/权限机密/恢复的必要核对。独立评审报告固定旧基线保留，终审提示准备完成不等于GPT Pro已评审。生成终审核心正文和完整材料两种入口，图片无法读取时明确视觉验证缺口。
 
+## 10. GPT Pro终审与三项局部修正
+
+2026-10-01取得用户提供的终审共享页，固定645ab64。Pro确认业务能力和页面方向，提出历史依据日期、新值重复摘要和发布后策略版本三项关键问题；当前会话复现并在用户授权后修正。原合同与R/W/T不变，13补入对应主路径预期，详细评分明细放已有开发切片。处置见[GPT-PRO-FINAL-DISPOSITION](./GPT-PRO-FINAL-DISPOSITION.md)，原型76项通过及截图核对不代替产品/UAT。v0.3设计可收口，无需新增审批、框架或评审轮次；产品、DB、真实源/模型和部署仍未启动。
+
 
 ---
 
@@ -17943,6 +17991,10 @@ GPT-PRO-PROMPT重写为业务/UI终审，取消旧的全量文档重写、12组�
 从`bc7cea3`干净工作区落实独立报告8项问题，逐项修改、证据和边界见[USABILITY-FIXES](./USABILITY-FIXES.md)。首页与公司先当前结论、具体A/H原因和下一步；历史值标日期；资讯与原文带有效判断；评分入口先已发布口径；编辑主动展开且复制原值；手机状态先于分数；自选明确证券。公司列表/自选同样回读修改后的等待状态，港股估值依据明确打开港股。
 
 2026-10-01T01:49:23.956Z本地浏览器检查73项通过，运行基线与工作树输入hash见prototype-checks.json；首次编辑冲突折叠失败证据保留。未执行产品/UAT，也没有业务合同或阶段扩张。GPT Pro提示与核心正文已按业务闭环/UI友好重写，终审尚未执行。
+
+## 2026-10-01追加：GPT Pro终审三项修正
+
+共享终审固定645ab64，未实际看到截图。用户授权后修正历史财务依据时点、删除重复新值摘要、固定策略发布门槛并把旧结果标发布1。当前会话本地复现后验证76项通过，新增PD-FINAL-01…03并查看相关截图；详见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。设计可收口，未启动产品开发或真实接入。
 
 
 ---
@@ -18135,6 +18187,47 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
 [GPT-PRO-PROMPT](./GPT-PRO-PROMPT.md)先冷读页面、走业务主线、核查8项处置，再检查会影响结果的必要工程一致性；不要求重写全仓库、重新全量开源选型、穷举防御代码或增加审批/评审轮次。结论限于设计是否可收口，不能冒充上线验收。
 
 优先使用已授权私有GitHub读取并固定实际commit；无连接时用[核心正文](./FINAL-REVIEW-PASTE.txt)，完整[REVIEW-PACK](./REVIEW-PACK.md)按疑问查阅。正文不含截图像素，无法看图必须明确视觉未执行。**GPT Pro终审尚未执行，本轮只准备提示与材料，没有对外模型调用。** 产品开发与真实接入仍需要单独授权。
+
+## 后续终审状态（2026-10-01）
+
+上文是645ab64形成时的收口记录；随后用户提供GPT Pro终审共享页并授权修正三项。终审已取得，历史依据/新值显示/策略版本局部修正完成，见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。不把当前截图回填为旧评审实际输入，也不要求再次终审。
+
+
+---
+
+# 文件：review/GPT-PRO-FINAL-DISPOSITION.md
+
+# GPT Pro终审与三项处置
+
+2026-10-01。用户提供[GPT Pro终审共享页](https://chatgpt.com/s/t_6abdc2f859f48191ab077c491f9f24c0)，随后授权修正三项问题、复验与提交。Pro固定读取`645ab645b7d69066bb2a21bee3ceca045ebce838`；本轮从该提交、干净工作区开始，仍属于设计与本地合成原型。
+
+## 终审结论与证据范围
+
+Pro结论为“修正少量关键问题后可收口”：业务主线、能力范围和当前页面方向基本成立，不需要重做设计；优先处理历史依据日期、修改的新值显示、策略发布后的版本对应关系。分数明细不足列为下一步优化，不作为设计收口前置，没有新的业务决定需要用户确认。
+
+Pro明确实际看到截图为0/9，仅依据文案、源码、导航及合同判断，未运行浏览器、产品或用户任务；不算视觉冷读通过。当前会话已只读取得共享页并在本地复现三项：09-29评分打开09-30发布/取得的原文；输入−0.2/档位1时摘要仍显示0.8/档位3；发布75门槛后页头为发布2、正文仍为70。原分享HTML、原评审正文与来源hash保留在本机`local-evidence/gpt-pro-final/`，不入Git；本文件为整理后的项目处置记录，不能解析的共享页内部filecite不冒充独立引用。
+
+## 最小修正与结果
+
+| 发现 | 已采纳修正 | 通过证据 |
+|---|---|---|
+| F-PRO-01 历史结果指向后来资料 | 新增09-27发布并取得的合成财务原文，绑定比亚迪09-29评分和A/H估值；保留09-30原文为后来更新。订单资料在09-29收盘后取得，明确属于后续研究，不冒充旧评分输入。格力仍引用当时取得的自己的原文 | PD-FINAL-01检查历史原文身份及发布时间/取得时间，A/H分别点击，往返和后来更新；PD-NEWS-05保留跨公司原文检查 |
+| F-PRO-02 新值摘要落后于输入 | 删除重复“准备修改为”摘要，只有一个带标签的新值输入；当前有效值继续只读。保存值取自该输入，影响−0.2与档位1各自回读。无确认弹窗或新审批 | PD-FINAL-02；原PD-UI-01/02/03、PD-UX-04保留保存、冲突保留、人工方向及依赖等待 |
+| F-PRO-03 策略发布混用版本 | 发布时固定版本和门槛；当前规则显示发布2/75，新版结果显示等待评估；旧表明确为发布1历史结果，保留70门槛和日期。再次编辑草稿不更改已发布75；历史解释仍引用发布1。公司研究的固定对照明确发布1 | PD-FINAL-03；PD-UI-05保留旧预览失效、再模拟与发布 |
+
+没有实现实际评分/策略引擎，也没有生成虚构的新规则计算结果。策略模拟仍使用发布1的09-29固定输入对照草稿；发布后只展示门槛已生效和结果等待。模板发布不强制改变旧策略冻结口径，沿用既有11/12合同。
+
+本轮没有改配置数字、Schema、数据库表或R/W/T业务预期；在[13](../docs/13-first-slice.md)现有任务中补入三条可检查预期，不增加新的评审、审批或框架门槛。
+
+## 验证与设计收口
+
+[原型检查](./design-detail/prototype-checks.json)执行于`2026-10-01T02:30:10.067Z`，运行时HEAD为`645ab64`，`source_sha256`绑定实际修改后的工作树。隔离无头系统Chrome、本地file原型、HTTP阻断；**76项通过**，无页面脚本错误与HTTP请求尝试。新增PD-FINAL-01…03，原73项业务交互与代表视口继续通过。材料检查另见[validation-result](./validation-result.json)，两份报告不代替产品验收。
+
+当前会话实际查看[历史评分依据](./design-detail/desktop-score-evidence.png)、[修改区](./design-detail/desktop-judgment-edit.png)、[发布后的策略](./design-detail/desktop-strategy-published.png)和[手机首屏](./design-detail/mobile-first-screen.png)。当前值和唯一新值输入区分清楚；发布后75门槛、等待提示、发布1历史表分区明确；手机公司结论及A股缺价继续先于大分数。这里是当前会话的截图核对，不能回填为Pro实际看过截图或目标用户验收。
+
+**本轮三项修正完成，v0.3设计可收口，进入后续开发准备。** 不再把可选详细评分解释、更多安全防御或追加终审列为前置。下一步优化是首个开发切片展示一项经营分的基础/贡献和一只证券的价格/分母/估值映射，沿用已有接口合同。
+
+仍未执行5名目标用户理解/计时、真机/读屏、产品DB/API/worker、真实权限、计算引擎、真实源/模型或部署。本轮授权没有启动W-08产品开发，也没有实际再调用Pro；后续实施和真实接入按既有范围另行授权。
 
 
 ---
@@ -18416,13 +18509,13 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
 {
   "design_version": "0.3",
   "design_date": "2026-10-01",
-  "executed_at": "2026-10-01T01:50:14.369011+00:00",
+  "executed_at": "2026-10-01T02:34:11.303851+00:00",
   "base_commit": "00ac20433c33a0a6296797c94d81136e0499e13f",
-  "revision_at_run": "bc7cea39b6627de7028fd2ce2f2a72d4c042c72b",
-  "revision_binding": "source_sha256 binds the exact inputs used by this run; Git HEAD at run was bc7cea39b6627de7028fd2ce2f2a72d4c042c72b; no remote delivery claimed",
+  "revision_at_run": "645ab645b7d69066bb2a21bee3ceca045ebce838",
+  "revision_binding": "source_sha256 binds the exact inputs used by this run; Git HEAD at run was 645ab645b7d69066bb2a21bee3ceca045ebce838; no remote delivery claimed",
   "status": "passed",
   "scope": "Offline material syntax, conservative subset Schema fixture checks, references, config semantics and synthetic arithmetic/counterexample expectations; NOT product runtime acceptance",
-  "check_count": 569,
+  "check_count": 591,
   "checks": [
     "JSON syntax: config/auto-review-policy-v1.json",
     "JSON syntax: config/dimensions-standard-v1.json",
@@ -18511,6 +18604,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: README.md -> ./review/USABILITY-REVIEW.md",
     "Local link: README.md -> ./review/USABILITY-FIXES.md",
     "Local link: README.md -> ./review/FINAL-REVIEW-PASTE.txt",
+    "Local link: README.md -> ./review/GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: contracts/README.md -> ./strategy.schema.json",
     "Local link: contracts/README.md -> ./analysis-result.schema.json",
     "Local link: contracts/README.md -> ./job-event.schema.json",
@@ -18533,6 +18627,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: docs/06-ux-and-design-system.md -> ../prototype/index.html",
     "Local link: docs/06-ux-and-design-system.md -> ../review/USABILITY-REVIEW.md",
     "Local link: docs/06-ux-and-design-system.md -> ../review/USABILITY-FIXES.md",
+    "Local link: docs/06-ux-and-design-system.md -> ../review/GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: docs/11-templates-automation-and-roles.md -> ../contracts/override-command.schema.json",
     "Local link: docs/11-templates-automation-and-roles.md -> ../contracts/human-judgment.schema.json",
     "Local link: docs/11-templates-automation-and-roles.md -> ../examples/v03-human-replacements.json",
@@ -18550,6 +18645,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: docs/13-first-slice.md -> ./14-domain-and-business-flows.md",
     "Local link: docs/13-first-slice.md -> ./15-database-dictionary.md",
     "Local link: docs/13-first-slice.md -> ./16-prototype-and-design-trace.md",
+    "Local link: docs/13-first-slice.md -> ../review/GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: docs/14-domain-and-business-flows.md -> ./15-database-dictionary.md",
     "Local link: docs/14-domain-and-business-flows.md -> ./16-prototype-and-design-trace.md",
     "Local link: docs/15-database-dictionary.md -> ../design/database-catalog.json",
@@ -18566,9 +18662,14 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: docs/16-prototype-and-design-trace.md -> ../review/design-detail/desktop-template.png",
     "Local link: docs/16-prototype-and-design-trace.md -> ../review/design-detail/mobile-company.png",
     "Local link: docs/16-prototype-and-design-trace.md -> ../review/USABILITY-FIXES.md",
+    "Local link: docs/16-prototype-and-design-trace.md -> ../review/GPT-PRO-FINAL-DISPOSITION.md",
+    "Local link: docs/16-prototype-and-design-trace.md -> ../review/design-detail/desktop-score-evidence.png",
+    "Local link: docs/16-prototype-and-design-trace.md -> ../review/design-detail/desktop-judgment-edit.png",
+    "Local link: docs/16-prototype-and-design-trace.md -> ../review/design-detail/desktop-strategy-published.png",
     "Local link: docs/adr/0002-v02-confirmed-scope.md -> ./0001-architecture-and-truth.md",
     "Local link: prototype/README.md -> ./index.html",
     "Local link: prototype/README.md -> ../docs/16-prototype-and-design-trace.md",
+    "Local link: prototype/README.md -> ../review/GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: research/second-review.md -> ../docs/02-business-design.md",
     "Local link: research/second-review.md -> ../docs/03-architecture.md",
     "Local link: research/second-review.md -> ../docs/02-business-design.md",
@@ -18583,10 +18684,20 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: review/DESIGN-DETAIL-REVIEW.md -> ./design-detail/mobile-news.png",
     "Local link: review/DESIGN-DETAIL-REVIEW.md -> ./design-detail/mobile-original.png",
     "Local link: review/DESIGN-DETAIL-REVIEW.md -> ./USABILITY-FIXES.md",
+    "Local link: review/DESIGN-DETAIL-REVIEW.md -> ./GPT-PRO-FINAL-DISPOSITION.md",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ../docs/13-first-slice.md",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./design-detail/prototype-checks.json",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./validation-result.json",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./design-detail/desktop-score-evidence.png",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./design-detail/desktop-judgment-edit.png",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./design-detail/desktop-strategy-published.png",
+    "Local link: review/GPT-PRO-FINAL-DISPOSITION.md -> ./design-detail/mobile-first-screen.png",
     "Local link: review/GPT-PRO-PROMPT.md -> ./FINAL-REVIEW-PASTE.txt",
     "Local link: review/GPT-PRO-PROMPT.md -> ./REVIEW-PACK.md",
+    "Local link: review/GPT-PRO-PROMPT.md -> ./GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./GPT-PRO-PROMPT.md",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./FINAL-REVIEW-PASTE.txt",
+    "Local link: review/PASTE-INSTRUCTIONS.md -> ./GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./REVIEW-PACK.md",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-ALL.txt",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-01.txt",
@@ -18624,6 +18735,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-33.txt",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-34.txt",
     "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-35.txt",
+    "Local link: review/PASTE-INSTRUCTIONS.md -> ./PASTE-PART-36.txt",
     "Local link: review/ROUND-2-REQUEST.md -> ./ROUND-2-REVIEW.md",
     "Local link: review/ROUND-2-REQUEST.md -> ./ROUND-2-PROBES.json",
     "Local link: review/ROUND-2-REQUEST.md -> ./GPT-PRO-PROMPT.md",
@@ -18644,6 +18756,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: review/USABILITY-FIXES.md -> ./GPT-PRO-PROMPT.md",
     "Local link: review/USABILITY-FIXES.md -> ./FINAL-REVIEW-PASTE.txt",
     "Local link: review/USABILITY-FIXES.md -> ./REVIEW-PACK.md",
+    "Local link: review/USABILITY-FIXES.md -> ./GPT-PRO-FINAL-DISPOSITION.md",
     "Local link: review/USABILITY-REVIEW.md -> design-detail/desktop-changes.png",
     "Local link: review/USABILITY-REVIEW.md -> design-detail/desktop-company.png",
     "Local link: review/USABILITY-REVIEW.md -> design-detail/desktop-news.png",
@@ -18660,6 +18773,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Local link: review/USABILITY-REVIEW.md -> ../docs/11-templates-automation-and-roles.md",
     "Local link: review/V03-CHANGELOG.md -> ./validation-result.json",
     "Local link: review/V03-CHANGELOG.md -> ./DESIGN-DETAIL-REVIEW.md",
+    "Local link: review/V03-CHANGELOG.md -> ./GPT-PRO-FINAL-DISPOSITION.md",
     "Schema dialect: analysis-result.schema.json",
     "Schema dialect: dimension-registry.schema.json",
     "Schema dialect: evaluation-input-manifest.schema.json",
@@ -18978,6 +19092,7 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "Targeted credential-pattern scan: research/open-source-shortlist.md",
     "Targeted credential-pattern scan: research/second-review.md",
     "Targeted credential-pattern scan: review/DESIGN-DETAIL-REVIEW.md",
+    "Targeted credential-pattern scan: review/GPT-PRO-FINAL-DISPOSITION.md",
     "Targeted credential-pattern scan: review/GPT-PRO-PROMPT.md",
     "Targeted credential-pattern scan: review/ROUND-2-PROBES.json",
     "Targeted credential-pattern scan: review/ROUND-2-REQUEST.md",
@@ -18997,8 +19112,8 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
   "source_sha256": {
     "AGENTS.md": "93ae52e67ec01a89a038cb97fa99de92c5540c2d25b41d321b8ecfe355e01ffe",
     "CONTEXT.md": "2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6",
-    "PROJECT.md": "6cd9df6156d7f89092ba5e845b13ad7ddbe481e4c3711c078242034deba09a98",
-    "README.md": "f022bf7d7ebdf09efdfec7e361c188396eb9388e4144dc9c8d12a477e6fda0df",
+    "PROJECT.md": "75525aa0ef34f0d281fe082b451dc39c44c5a7384aaf0bf7804114788f5781e8",
+    "README.md": "387f6cd2f73d6ebdb6fd4f471050bd5da8a9d98ca7cd4acdfd2be7ef68bce6e1",
     "config/auto-review-policy-v1.json": "da3bb1044acc5f50c5cf9bce5ba438832e2f26ecb398ea87fe8e8b7c39abb049",
     "config/dimensions-standard-v1.json": "3c91a60057655ee0dae110a01362c6962d7093b4bb45d9f12b1a11b840dc2c42",
     "config/metric-definitions-v2.json": "6e605de1702f71db3f3cab1e4b06ec3d8f801d65753858b22cb29a1bfe425d3b",
@@ -19029,17 +19144,17 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "docs/03-architecture.md": "781d694744a424bd4f8ff30548007cecb9c23d734cc2b6d2cb236ed2fbed1555",
     "docs/04-data-design.md": "af36e7e8b94b278ea902ffff8cc3a128e848fc4516ac4c7acfc0cce71cc041f5",
     "docs/05-api-and-jobs.md": "6d2fc81783f63efad8d707332f9d38f9e137bde8d08ef4f001c841efded1c201",
-    "docs/06-ux-and-design-system.md": "555ec714d96dd9cba10f0c56b0eede10572bdf0e85caa6db333ad8c33aab772b",
+    "docs/06-ux-and-design-system.md": "f2279bf21b686c46186dc731d83e362279528d5f5d4e6958f2670fa28a5a0762",
     "docs/07-ai-and-retrieval.md": "4fc3d8376d898097822de412fc9d12ccebe0615a8a5898fe2ab0e58a01732832",
     "docs/08-security-and-operations.md": "0baad6b8d56280e7127ce447d88f2e1406657e9c273e2d04a7dc25efd2d847c1",
     "docs/09-delivery-plan.md": "8f4e5f2bb8f50d55d39f9b3f168f907cd5ab4a5bdd7882b0c06c3c751359319d",
     "docs/10-acceptance.md": "007d0b405b4d3362cb5d8ef658e978a7d312bda1ed464a65e3561dfd04114c6b",
     "docs/11-templates-automation-and-roles.md": "771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de",
     "docs/12-time-numerics-and-corrections.md": "f20e925241f802a4ff428e7e89c366e17fb289bae45c0b3ce4827b95b6ea402e",
-    "docs/13-first-slice.md": "ebe5000098fa5d5ed76944b444a53cec8f696b23d2e49bd136a2895d13ca3054",
+    "docs/13-first-slice.md": "40542d2dde0f2f696c00e3798caf34c8fd56fc761a25cafa93716c10363205d2",
     "docs/14-domain-and-business-flows.md": "24af2cc30a801d5575c9dfe11e4e1003c5583988f18c265b771c3a994a437724",
     "docs/15-database-dictionary.md": "b563349820d4980887f9fd94cc8db0bfe6037f712f1e297cfd730b317a59b656",
-    "docs/16-prototype-and-design-trace.md": "0e81d830c7f566bbd6d8eecc5c3f2cbd0d925ffed7cffbbc1bd3895888aa3430",
+    "docs/16-prototype-and-design-trace.md": "8b6d37bede760407e78451c1d39c27b276f003b75723460f1428ad435369701c",
     "docs/adr/0001-architecture-and-truth.md": "12c39bcb255d2f9280fd14606a90a01c531f0b78def2e2e33affa9dfbb4b0ec1",
     "docs/adr/0002-v02-confirmed-scope.md": "134096110f0001c303549952ee39c1ef3d6aedc21affbc11a44fc8e6391b36f4",
     "docs/adr/0003-independent-project.md": "241b8b464274ab2039d9ee7d6180db5d54c905cab842013286e4017021a9ddf6",
@@ -19054,28 +19169,29 @@ A股 002594：今天缺收盘价，暂时不能作新判断。
     "examples/v03-seal-command.json": "c0ee61356183a80dc7b2f7106f460a2b4cade701198dda32470ae56d0d1d4ce4",
     "examples/v03-seal-manifest.json": "b94233fdea35bf8c64966278ae6e052f4c6ab5ad222e3ddbcdc00b905f94337f",
     "examples/v03-template-custom.json": "223f0d3a2d074afa5a2b87c62b10e60a6be0ce1bd834a01088c6ce930394e44c",
-    "prototype/README.md": "495ed88258fa6c01c776e50127b6f72ea76f43ac945e641c69d609477d8b4148",
-    "prototype/app.js": "c71424718aa65b197225a8fec23a0737d62df121245fda2bc514e255658dafee",
+    "prototype/README.md": "eb9e2c3328ac8c53b731a80db31f7c80e8c3075c18dab1eddce55121cd6d515a",
+    "prototype/app.js": "4e500c2a50dd9efe0287af2b10c293855c54c248229cfe70596bada6651fc09e",
     "prototype/index.html": "429897f22ab455f8f432e7588df21ff980b62e023be27c15dfe0bee3ea0a9953",
     "prototype/style.css": "db431672057b2dd2559a14aab27be687763089a4fc0d118b8afa6e07a1c2778c",
     "research/open-source-shortlist.md": "010e0cd633d17dcaf85fd0ca5af1b6a81e2cbbf5a75e0b099c8a719f70c16fe0",
     "research/second-review.md": "0e047782fc9850966545482db258af67f3e99cd55c46ae7afe5f0ff368c7076c",
-    "review/DESIGN-DETAIL-REVIEW.md": "8fdaa7784905ae51584f5d2c28c4bdd7e65e9fb92c197a7a7850897a716f57a2",
-    "review/GPT-PRO-PROMPT.md": "94e6ecf0eaff2f9911687d2971a5f18d2186109293c92a74137919f4603e88fc",
+    "review/DESIGN-DETAIL-REVIEW.md": "49450c5343acde16e0db523a3ef893c2f725d3d8dae8aa3df7cce749ba72c1ba",
+    "review/GPT-PRO-FINAL-DISPOSITION.md": "1ae430ed2f3755450168f1f227c8381ad619bca14aa4ece4df587dabe7239d31",
+    "review/GPT-PRO-PROMPT.md": "7a80e2f4b1935a574b0b4693157faa5871be1b91b360d8afa190c8b33558b7d6",
     "review/ROUND-2-PROBES.json": "21ba6524d0eb64be080f1228cd30604ee273eb0c8fd4ff3bad2b5a97b10a7c06",
     "review/ROUND-2-REQUEST.md": "16428226f55645ab15a8ad6a3dfa816082f575628bb66bfecb7dcd1b04b14f3e",
     "review/ROUND-2-REVIEW.md": "5847ea4e5c800f163131107d52f50a50cbe907518076cedb7746cc6c32f8b894",
-    "review/USABILITY-FIXES.md": "1f8813b9f2ff507f87785b44649de191e488aba34b6ae555b282591b30e1cfa7",
+    "review/USABILITY-FIXES.md": "f5ae9cd6b8d7717bc682369426f81f15dcec8ae02518b553582a0a466c5136dc",
     "review/USABILITY-REVIEW.md": "3fdb0e7ec9b6d4211a694e09bdf0681896defabade7bd3d05cd1e9666517a27e",
     "review/V02-CHANGELOG.md": "2a09c862a2a27be6916dde8c0640c0395d3da8c3438fb6626212c72931449c74",
-    "review/V03-CHANGELOG.md": "1c15e883df7039a76ffb2dc76fd6cca6934cfbba49cf6868093f74931b42a39a",
+    "review/V03-CHANGELOG.md": "620f26c247cbfcafe5f61429d4dd3dd30b0cc9e944302f902b2fd91931442870",
     "review/V03-COUNTEREXAMPLES.md": "4254abb3693806a197e6c61eeb99d13e3b8b5161c656c448be8b0c871ff5f1e0",
-    "tools/build_review_pack.py": "70a395df020b33efe0b38b34ee0d73dea551a68edb17aa05be92fab1d8cee819",
+    "tools/build_review_pack.py": "89ea1f666c2a14f69e220da6183ab3d4a14838da1de8b1ce64c04d5b3425c1ac",
     "tools/material_schema.py": "f55b5a27f75d8b95e8bbe93153466afd2c82070331f4765aa30690c9122a168a",
     "tools/render_database_design.py": "639ecd353dbb8a658bc70e72d2a3708665638fa45efe4b7500806f1b01b21b85",
     "tools/v03_material_checks.py": "c547b5ebfbe35a73f320f0f3d7af0fcd374cb5a5d1ed4792419e7a21a017def5",
-    "tools/validate_design.py": "90b04c3c4d2d753aa32b8d44ad365f0aa99733cedee85988ceb70f78ff610705",
-    "tools/verify_prototype.cjs": "d34a6f27e2391b59e3ce6da3b39c748725521a7f639c15213a0cd282ce21766c"
+    "tools/validate_design.py": "5cf61bed7eb4f864a82c9e59ed8eae310e2d9a3c649f06385b54203351c42b12",
+    "tools/verify_prototype.cjs": "e6ab0308390b38b229d224d3a74928f20d4b7969ee51cb8601d1ded87ffea81e"
   },
   "not_run": [
     "Full draft-2020-12 validation with a standards implementation",

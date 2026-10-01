@@ -1,5 +1,5 @@
 
-[PART 7/35]
+[PART 7/36]
 
 
 ===== SOURCE: docs/11-templates-automation-and-roles.md =====
@@ -111,6 +111,6 @@ event_policy为enabled=false（baseline-only，无半衰期）或enabled=true+ha
 
 [自定义模板例子](../examples/v03-template-custom.json)启用x_customer_retention、90日/发行人正文与事件H=90；配套[合成rubric](../config/rubrics-synthetic-v03.json)不是生产规则。只在该公司解析方案加载该catalog，catalog内容hash纳入resolved manifest；旧release不变。规则发布固定父链、registry、rubric/metric/numeric/policy内容hash、完整解析值及origin，不能仅冻结path或可变key。模板UI显示“接受事件/仅基准”、证据要求/龄期和最终来源；policy变更同样模拟→预览→新绑定/release。
 
-[END PART 7/35]
+[END PART 7/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

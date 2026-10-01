@@ -1,5 +1,5 @@
 
-[PART 9/35]
+[PART 9/36]
 
 
 ===== SOURCE: docs/14-domain-and-business-flows.md =====
@@ -190,6 +190,6 @@ flowchart TD
 
 下一步表字段细化见[15](./15-database-dictionary.md)，页面交互与原型出口见[16](./16-prototype-and-design-trace.md)。本轮流程图可供设计核对，尚不是实际运行证据。
 
-[END PART 9/35]
+[END PART 9/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

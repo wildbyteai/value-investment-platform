@@ -1,5 +1,5 @@
 
-[PART 10/35]
+[PART 10/36]
 
 
 ===== SOURCE: docs/15-database-dictionary.md =====
@@ -1728,6 +1728,6 @@ erDiagram
 
 这些视图尚未创建。统一修订存储只减少重复值和多态外键，公开Schema仍按现有类型分支；没有把risk/rubric能力收窄。
 
-[END PART 10/35]
+[END PART 10/36]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。
