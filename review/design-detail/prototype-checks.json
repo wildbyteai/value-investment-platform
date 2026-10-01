@@ -1,0 +1,282 @@
+{
+  "scope": "Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance",
+  "executed_at": "2026-10-01T00:32:24.757Z",
+  "revision_at_run": "a16e334e76bfe7fc69200f2a96397693811e4c8e",
+  "status": "passed",
+  "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport_widths": [
+    1440,
+    1280,
+    390,
+    430
+  ],
+  "checks": [
+    {
+      "id": "PD-UI-01",
+      "scenario": "变化→固定历史解释→当前公司→原文→人工替换",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-02",
+      "scenario": "rubric3→1独立于impact修订",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-03",
+      "scenario": "模拟409保留新值和理由，再基于新版本重试",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-04",
+      "scenario": "viewer无覆盖入口；system_admin不隐式发布",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-05",
+      "scenario": "策略模拟→编辑使旧预览失效→再次模拟→发布",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-06",
+      "scenario": "模板龄期/事件参与，旧预览失效，研究员不能发布",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-07",
+      "scenario": "A/H估值独立，B无H风险；分数固定样例一致",
+      "status": "passed"
+    },
+    {
+      "id": "PD-FIXTURE-01",
+      "scenario": "固定维度权重与已确认模板配置一致，总分与向量一致",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-08",
+      "scenario": "自选操作与笔记转义，不发请求",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-09",
+      "scenario": "合成源暂停/恢复，失败项恢复与更正范围",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-10",
+      "scenario": "合成用户角色差异与管理员业务权限分离",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-11",
+      "scenario": "状态演示：加载/空/部分失败/不可见/等待/更新/停牌",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-changes",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-company/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-evidence",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-decisions/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-templates",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-strategy",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-sources",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-jobs",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1440-roles",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-changes",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-company/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-evidence",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-decisions/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-templates",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-strategy",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-sources",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-jobs",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-1280-roles",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-changes",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-company/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-evidence",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-decisions/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-templates",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-strategy",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-sources",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-jobs",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-390-roles",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-changes",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-company/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-evidence",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-decisions/a",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-templates",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-strategy",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-sources",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-jobs",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-VIEW-430-roles",
+      "scenario": "核心页面无整页横向溢出，表格允许容器横滚",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-12",
+      "scenario": "键盘可进入搜索与表单，dialog Escape可关闭",
+      "status": "passed"
+    },
+    {
+      "id": "PD-UI-13",
+      "scenario": "浏览器无页面脚本错误、原型未尝试HTTP外发",
+      "status": "passed"
+    }
+  ],
+  "console_errors": [],
+  "external_requests": [],
+  "source_sha256": {
+    "prototype/index.html": "692248deacae9b9b2141e398919e3af7ade088bb0d2619f02e458c53a20a1367",
+    "prototype/style.css": "845866145fe2bd865fdcaf253a5faaf3d43d02ab2e2c80fed71ef213f8c39854",
+    "prototype/app.js": "ce7ea4fd6519a9ef89ed864198e1fa67b23043aaf88187dd5c088f8622889d88",
+    "tools/verify_prototype.cjs": "d3ea339b8f0ed0da0ad204d99d5570ea2fa6f264324e439ed04f8e9146acd542",
+    "config/scoring-standard-v1.json": "5de1ce826f98af392f459095ca57d2b33453624163aeeda845c83caef2670cd6",
+    "config/templates-standard-v1.json": "c2c17216a491b055f90ea6ddd197553294574943cbc2c01cac5d8088729655e1"
+  },
+  "not_run": [
+    "Product database/API/workers",
+    "Actual authorization and permission enforcement",
+    "Decimal scoring/template resolution/strategy calculation",
+    "5-user timed UX acceptance",
+    "Screen-reader/200% browser zoom/real devices"
+  ]
+}

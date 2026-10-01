@@ -1,8 +1,8 @@
 
-[PART 17/27]
+[PART 17/34]
 
 
-===== SOURCE: contracts/override-command.schema.json =====
+===== SOURCE: contracts/evaluation-seal.schema.json =====
 
 {
   "type": "object",
@@ -11,57 +11,109 @@
     "schema_version": {
       "const": "1.0"
     },
-    "action": {
-      "enum": [
-        "accept",
-        "reject",
-        "pending",
-        "replace",
-        "release"
-      ]
+    "release_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "security_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "primary_listing_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_session": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluation_as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "knowledge_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expected_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "manifest_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_id",
+    "security_id",
+    "primary_listing_id",
+    "market_session",
+    "evaluation_as_of",
+    "knowledge_cutoff",
+    "expected_generation",
+    "manifest_id",
+    "manifest_sha256"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evaluation seal command; internal strategy service only"
+}
+
+
+===== SOURCE: contracts/human-judgment.schema.json =====
+
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
     },
     "slot_id": {
       "type": "string",
       "format": "uuid"
     },
-    "subject_revision_id": {
+    "previous_revision_id": {
       "type": "string",
       "format": "uuid"
     },
-    "replacement": {
-      "$ref": "#/$defs/judgment"
+    "actor_id": {
+      "type": "string",
+      "format": "uuid"
     },
-    "override_valid_until": {
-      "type": [
-        "string",
-        "null"
-      ],
+    "created_at": {
+      "type": "string",
       "format": "date-time"
     },
-    "reason": {
+    "input_manifest_id": {
       "type": "string",
-      "minLength": 1
+      "format": "uuid"
     },
-    "evidence_ids": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "minItems": 1,
-      "uniqueItems": true
+    "judgment": {
+      "$ref": "#/$defs/judgment"
     }
   },
   "required": [
     "schema_version",
-    "action",
+    "revision_id",
     "slot_id",
-    "override_valid_until",
-    "reason",
-    "evidence_ids"
+    "previous_revision_id",
+    "actor_id",
+    "created_at",
+    "input_manifest_id",
+    "judgment"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Human override command; one If-Match generation and Idempotency-Key are required",
+  "title": "Immutable human judgment revision",
   "$defs": {
     "judgment": {
       "oneOf": [
@@ -402,139 +454,9 @@
         }
       ]
     }
-  },
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "action": {
-            "const": "replace"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "replacement"
-        ],
-        "not": {
-          "required": [
-            "subject_revision_id"
-          ]
-        }
-      },
-      "else": {
-        "required": [
-          "subject_revision_id"
-        ],
-        "not": {
-          "required": [
-            "replacement"
-          ]
-        }
-      }
-    }
-  ]
+  }
 }
 
-
-===== SOURCE: contracts/review-decision.schema.json =====
-
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "DecisionService decision; model proposal cannot approve itself",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "schema_version": {
-      "const": "2.0"
-    },
-    "decision_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "subject_slot": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "subject_revision": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "status": {
-      "enum": [
-        "accepted",
-        "rejected",
-        "pending"
-      ]
-    },
-    "actor_kind": {
-      "enum": [
-        "AUTO",
-        "HUMAN"
-      ]
-    },
-    "actor_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "policy_ref": {
-      "type": "string",
-      "minLength": 1
-    },
-    "input_manifest_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "known_at": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "valid_until": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "date-time"
-    },
-    "supersedes_decision_id": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "uuid"
-    },
-    "reason": {
-      "type": "string",
-      "minLength": 1
-    },
-    "evidence_ids": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "minItems": 1,
-      "uniqueItems": true
-    }
-  },
-  "required": [
-    "schema_version",
-    "decision_id",
-    "subject_slot",
-    "subject_revision",
-    "status",
-    "actor_kind",
-    "actor_id",
-    "policy_ref",
-    "input_manifest_id",
-    "known_at",
-    "valid_until",
-    "supersedes_decision_id",
-    "reason",
-    "evidence_ids"
-  ]
-}
-
-[END PART 17/27]
+[END PART 17/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -1,464 +1,525 @@
 
-[PART 13/27]
+[PART 13/34]
 
 
-===== SOURCE: contracts/analysis-result.schema.json =====
+===== SOURCE: config/auto-review-policy-v1.json =====
 
 {
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "schema_version": {
-      "const": "3.0"
-    },
-    "item_revision_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "no_link": {
-      "type": "boolean"
-    },
-    "links": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "company_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "relation_type": {
-            "enum": [
-              "direct",
-              "subsidiary",
-              "customer_supplier",
-              "competitor",
-              "industry_policy",
-              "indirect_theme"
-            ]
-          },
-          "relevance": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "confidence": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "evidence_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "minItems": 1,
-            "uniqueItems": true
-          },
-          "rationale": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "company_id",
-          "relation_type",
-          "relevance",
-          "confidence",
-          "evidence_ids",
-          "rationale"
-        ]
-      },
-      "maxItems": 20
-    },
-    "impact_proposals": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "company_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "dimension": {
-            "type": "string",
-            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
-          },
-          "signed_impact": {
-            "type": "string",
-            "pattern": "^-?(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "confidence": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "half_life_days": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 730
-          },
-          "valid_until": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "evidence_ids": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "minItems": 1,
-            "uniqueItems": true
-          },
-          "rationale": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "company_id",
-          "dimension",
-          "signed_impact",
-          "confidence",
-          "half_life_days",
-          "valid_until",
-          "evidence_ids",
-          "rationale"
-        ]
-      },
-      "maxItems": 100
-    },
-    "rubric_proposals": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "company_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "rubric_ref": {
-            "type": "string",
-            "minLength": 1
-          },
-          "criterion_key": {
-            "type": "string",
-            "minLength": 1
-          },
-          "grade": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4
-          },
-          "confidence": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "evidence_ids": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "rationale": {
-            "type": "string",
-            "minLength": 1
-          },
-          "valid_until": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "company_id",
-          "rubric_ref",
-          "criterion_key",
-          "grade",
-          "confidence",
-          "evidence_ids",
-          "rationale",
-          "valid_until"
-        ]
-      }
-    },
-    "risk_proposals": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "company_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "risk_code": {
-            "enum": [
-              "confirmed_fraud",
-              "going_concern_material",
-              "confirmed_debt_default",
-              "delisting_decision"
-            ]
-          },
-          "confidence": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "evidence_ids": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "rationale": {
-            "type": "string",
-            "minLength": 1
-          },
-          "target_kind": {
-            "enum": [
-              "company",
-              "security",
-              "listing"
-            ]
-          },
-          "target_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "effective_from": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "valid_until": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "company_id",
-          "risk_code",
-          "confidence",
-          "evidence_ids",
-          "rationale",
-          "target_kind",
-          "target_id",
-          "effective_from",
-          "valid_until"
-        ]
-      }
-    }
+  "policy_key": "auto-review-standard-v1",
+  "schema_version": "2.0",
+  "default_mode": "auto_accept_when_valid",
+  "calibrated_confidence_required": true,
+  "link": {
+    "minimum_relevance": "0.50",
+    "minimum_confidence": "0.90"
   },
-  "required": [
-    "schema_version",
-    "item_revision_id",
-    "no_link",
-    "links",
-    "impact_proposals",
-    "rubric_proposals",
-    "risk_proposals"
-  ],
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Unapproved analysis proposal",
-  "allOf": [
+  "impact": {
+    "minimum_confidence": "0.90",
+    "accepted_link_required": true
+  },
+  "rubric": {
+    "minimum_confidence": "0.90",
+    "anchored_evidence_required": true
+  },
+  "hard_risk": {
+    "minimum_confidence": "0.98",
+    "primary_regulator_or_issuer_evidence_required": true,
+    "allow_auto_accept": true
+  },
+  "invalid_or_conflicting": "pending",
+  "human_override_precedence": "until_released_or_expired",
+  "on_override_expiry": "reevaluate_current_legal_inputs",
+  "template_and_strategy_auto_publish": false,
+  "risk_target_policy_ref": {
+    "path": "config/risk-target-policy-v1.json",
+    "sha256": "b23f957335f5c59c9654aa1f0cdf43dd5dfbb273d6030df277e6412395a80774"
+  }
+}
+
+
+===== SOURCE: config/dimensions-standard-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "registry_key": "dimensions-standard-v1",
+  "version": 1,
+  "entries": [
     {
-      "if": {
-        "properties": {
-          "no_link": {
-            "const": true
-          }
+      "dimension": "profit_quality",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
         }
       },
-      "then": {
-        "properties": {
-          "links": {
-            "maxItems": 0
-          },
-          "impact_proposals": {
-            "maxItems": 0
-          },
-          "rubric_proposals": {
-            "maxItems": 0
-          },
-          "risk_proposals": {
-            "maxItems": 0
-          }
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "financial_resilience",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "weighted_metric_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "report_obligation"
         }
       },
-      "else": {
-        "properties": {
-          "links": {
-            "minItems": 1
-          }
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      }
+    },
+    {
+      "dimension": "business_model",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
         }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "governance",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 180
+      }
+    },
+    {
+      "dimension": "growth_sustainability",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "accessible_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 180
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 30
+      }
+    },
+    {
+      "dimension": "x_customer_retention",
+      "applicable_industries": [
+        "manufacturing"
+      ],
+      "allowed_baseline_methods": [
+        "accepted_evidence_rubric"
+      ],
+      "quality_policy": {
+        "evidence_requirement": "issuer_or_regulator_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 90
+        }
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
       }
     }
   ]
 }
 
 
-===== SOURCE: contracts/dimension-registry.schema.json =====
+===== SOURCE: config/metric-definitions-v2.json =====
 
 {
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "schema_version": {
-      "const": "1.0"
+  "definition_version": "metric-definitions-v2",
+  "metrics": {
+    "roe_ttm": {
+      "unit": "ratio",
+      "formula": "ordinary_attributable_profit_ttm / average_ordinary_attributable_equity",
+      "scope": "matching_ordinary_equity",
+      "invalid": "denominator_nonpositive_or_unmatched_scope"
     },
-    "registry_key": {
-      "type": "string",
-      "minLength": 1
+    "cfo_profit_3y": {
+      "unit": "ratio",
+      "formula": "sum(consolidated_cfo_last_3_full_years) / sum(consolidated_net_profit_same_3_years)",
+      "scope": "matching_consolidated_group",
+      "invalid": "profit_sum_nonpositive_or_missing_period_or_unmatched_scope"
     },
-    "version": {
-      "type": "integer",
-      "minimum": 1
+    "positive_cfo_year_share_3y": {
+      "unit": "ratio",
+      "formula": "positive_cfo_year_count / 3",
+      "scope": "last_3_full_fiscal_years",
+      "invalid": "missing_required_year"
     },
-    "entries": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "dimension": {
-            "type": "string",
-            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
-          },
-          "applicable_industries": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "allowed_baseline_methods": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "enum": [
-                "weighted_metric_rubric",
-                "accepted_evidence_rubric"
-              ]
-            }
-          },
-          "quality_policy": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "evidence_requirement": {
-                "enum": [
-                  "accessible_original",
-                  "issuer_or_regulator_original"
-                ]
-              },
-              "freshness": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "report_obligation"
-                      }
-                    },
-                    "required": [
-                      "kind"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "age_days"
-                      },
-                      "max_age_days": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 3650
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "max_age_days"
-                    ]
-                  }
-                ]
-              }
-            },
-            "required": [
-              "evidence_requirement",
-              "freshness"
-            ]
-          },
-          "event_policy": {
-            "oneOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": true
-                  },
-                  "half_life_days": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 730
-                  }
-                },
-                "required": [
-                  "enabled",
-                  "half_life_days"
-                ]
-              }
-            ]
-          }
-        },
-        "required": [
-          "dimension",
-          "applicable_industries",
-          "allowed_baseline_methods",
-          "quality_policy",
-          "event_policy"
-        ]
-      }
+    "net_debt_ebitda": {
+      "unit": "ratio",
+      "formula": "(interest_bearing_debt - cash_and_cash_equivalents) / ebitda_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "ebitda_nonpositive_or_unmatched_scope"
+    },
+    "interest_coverage": {
+      "unit": "ratio",
+      "formula": "ebit_ttm / interest_expense_ttm",
+      "scope": "matching_consolidated_group",
+      "invalid": "interest_nonpositive_or_unmatched_scope"
+    },
+    "pe_ttm": {
+      "unit": "multiple",
+      "formula": "primary_listing_raw_final_close / fx_converted_ordinary_eps_ttm",
+      "scope": "matching_equivalent_ordinary_shares",
+      "invalid": "earnings_nonpositive_or_unmatched_share_rights"
     }
-  },
-  "required": [
-    "schema_version",
-    "registry_key",
-    "version",
-    "entries"
-  ],
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Versioned dimension registry defaults; publication is human controlled"
+  }
 }
 
-[END PART 13/27]
+
+===== SOURCE: config/numeric-policy-v1.json =====
+
+{
+  "policy_key": "decimal-python-v1",
+  "precision": 50,
+  "guard_precision": 70,
+  "rounding": "ROUND_HALF_EVEN",
+  "storage_decimal_places": 12,
+  "display_decimal_places": 1,
+  "age_unit": "utc_elapsed_seconds_div_86400",
+  "decay_method": "decimal_power_two",
+  "operation_order": [
+    "metrics",
+    "baseline",
+    "fact_contributions",
+    "fact_id_sorted_sum",
+    "contribution_cap",
+    "dimension_clip",
+    "company_quality_and_security_valuation"
+  ],
+  "comparison": "persisted_12_decimal_values",
+  "runtime_pin_required": true
+}
+
+
+===== SOURCE: config/risk-target-policy-v1.json =====
+
+{
+  "schema_version": "1.0",
+  "policy_key": "risk-target-standard-v1",
+  "version": 1,
+  "allowed_target_kinds": {
+    "confirmed_fraud": [
+      "company",
+      "security",
+      "listing"
+    ],
+    "going_concern_material": [
+      "company"
+    ],
+    "confirmed_debt_default": [
+      "company",
+      "security"
+    ],
+    "delisting_decision": [
+      "listing"
+    ]
+  },
+  "company_propagation": "all_applicable_release_securities",
+  "security_propagation": "exact_security",
+  "listing_propagation": "release_primary_listing_only",
+  "parent_child_propagation": "none",
+  "revocation": "exact_slot_revision_generation",
+  "after_last_risk_removed": "OUT_then_normal_adjacent_session_confirmation"
+}
+
+
+===== SOURCE: config/roles-standard-v1.json =====
+
+{
+  "policy_key": "rbac-standard-v1",
+  "workspace_shared_research_default": true,
+  "private_owner_objects": [
+    "note",
+    "strategy"
+  ],
+  "multiple_roles_allowed": true,
+  "roles": {
+    "viewer": [
+      "research.read",
+      "watchlist.own",
+      "notes.own"
+    ],
+    "researcher": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "notes.shared.edit",
+      "analysis.override",
+      "template.edit"
+    ],
+    "strategy_manager": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "template.edit",
+      "template.publish",
+      "strategy.edit",
+      "strategy.simulate",
+      "strategy.publish",
+      "strategy.rollback",
+      "scoring.binding.publish"
+    ],
+    "data_admin": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "source.manage",
+      "job.retry",
+      "identity.manage",
+      "quality.correct"
+    ],
+    "system_admin": [
+      "user.manage",
+      "role.assign",
+      "system.configure",
+      "model.configure",
+      "audit.read",
+      "ops.read"
+    ]
+  }
+}
+
+
+===== SOURCE: config/rubrics-standard-v1.json =====
+
+{
+  "rubric_catalog_version": "rubrics-standard-v1",
+  "unknown_value": null,
+  "scale": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rubrics": {
+    "business-model-v1": {
+      "criteria": [
+        {
+          "key": "repeat_demand",
+          "anchors": [
+            "需求一次性且无续购依据",
+            "偶发续购、主要依赖新增客户",
+            "有稳定续购但受可选消费影响",
+            "重要需求且续购/留存有多期支持",
+            "关键持续需求，续购与留存长期稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "pricing_power",
+          "anchors": [
+            "降价才能维持销量且利润明显恶化",
+            "主要被动跟随价格，传导成本困难",
+            "成本可部分传导，证据显示利润相对稳定",
+            "多期提价/产品组合改善而留存稳定",
+            "持续提价/成本传导与客户价值证据均充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "competitive_barrier",
+          "anchors": [
+            "无差异且替代容易",
+            "差异有限、竞争者容易复制",
+            "有品牌/渠道/技术优势但可被替代",
+            "切换成本或规模优势持续且有证据",
+            "多重壁垒长期维持，竞争检验与投入证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "concentration",
+          "anchors": [
+            "单一客户/供应商依赖且无替代，已产生重大损害",
+            "高度集中，替代措施弱",
+            "存在集中但合同/备选支持缓解",
+            "客户与供应商较分散或替代经验证",
+            "分散、可替换且多期压力下稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_intensity",
+          "anchors": [
+            "持续大额投入且回报不足、维护支出不清",
+            "投入重且效率低、回收期持续拉长",
+            "投入与回报大致匹配、周期风险可解释",
+            "投入效率较好且维护/增长资本可区分",
+            "较低增量资本需求或持续高回报，有跨期依据"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "governance-v1": {
+      "criteria": [
+        {
+          "key": "related_party_transparency",
+          "anchors": [
+            "重大关联交易未解释或被正式认定损害",
+            "披露缺口显著、定价依据弱",
+            "基本披露齐全但公平性证据有限",
+            "范围/定价/审批清晰且可核对",
+            "长期透明、独立核验充分且利益冲突处理有效"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "capital_allocation",
+          "anchors": [
+            "重大配置失误反复且未解释",
+            "资本回报差、融资/投资逻辑薄弱",
+            "配置规则明确，结果与解释基本一致",
+            "回报纪律好，投资/回购/分红与机会匹配",
+            "跨周期配置结果与纪律持续，失败复盘透明"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "disclosure",
+          "anchors": [
+            "重大失实/反复违规有正式依据",
+            "反复迟延或关键口径不清",
+            "基本及时完整，偶有解释不足",
+            "及时一致，关键估计/变化有解释",
+            "长期可核对，主动解释风险与更正且口径稳定"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    },
+    "growth-v1": {
+      "criteria": [
+        {
+          "key": "revenue_stability",
+          "anchors": [
+            "三年连续显著恶化且原因未解决",
+            "明显波动/萎缩，恢复依据弱",
+            "三年总体稳定但增长不连续",
+            "三年稳定增长，有分部/订单依据",
+            "跨期增长稳定且客户/产品基础可核验"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "incremental_sources",
+          "anchors": [
+            "没有可验证增量或只有宣传",
+            "依赖单一未验证项目",
+            "增量来源明确但转化证据不足",
+            "产品/客户增量已有兑现与持续依据",
+            "多个增量来源兑现且经济性与容量证据充分"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        },
+        {
+          "key": "reinvestment_return",
+          "anchors": [
+            "增量投入无回报/持续亏损",
+            "回报低于合理资金成本且改善依据弱",
+            "回报接近合理成本或仍需验证",
+            "增量回报优于成本且可解释",
+            "跨期增量回报持续较高、口径可核对"
+          ],
+          "weight": "equal",
+          "evidence_required": true
+        }
+      ],
+      "score_formula": "mean(valid_criterion_grades) / 4 * 100",
+      "minimum_criterion_coverage": "0.80",
+      "validity_days": 180
+    }
+  }
+}
+
+
+===== SOURCE: config/rubrics-synthetic-v03.json =====
+
+{
+  "synthetic": true,
+  "catalog_key": "rubrics-synthetic-v03",
+  "rubrics": {
+    "customer-retention-synthetic-v1": {
+      "method": "equal_weight_criteria",
+      "minimum_criterion_coverage": "0.80",
+      "criteria": [
+        {
+          "key": "repeat_purchase",
+          "anchors": [
+            "持续流失且有数据支持",
+            "留存弱且恶化",
+            "留存一般且稳定",
+            "留存较强且有连续证据",
+            "留存强且跨期稳定"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+[END PART 13/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -1,371 +1,168 @@
 
-[PART 18/27]
+[PART 18/34]
 
 
-===== SOURCE: contracts/scoring-template.schema.json =====
+===== SOURCE: contracts/job-event.schema.json =====
 
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Pinned base / industry / company template",
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_type": {
+      "enum": [
+        "ItemCaptured",
+        "ItemNormalized",
+        "AnalysisProposed",
+        "ReviewApproved",
+        "EventChanged",
+        "FundamentalChanged",
+        "ScoreCompleted",
+        "StrategyEvaluated",
+        "MembershipChanged",
+        "NotificationRequested",
+        "IndexRequested",
+        "DecisionAccepted",
+        "DecisionOverridden",
+        "TemplatePublished",
+        "CorrectionRecorded"
+      ]
+    },
     "schema_version": {
       "const": "2.0"
     },
-    "template_key": {
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_revision": {
       "type": "string",
       "minLength": 1
     },
-    "version": {
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "backfill",
+        "replay",
+        "shadow",
+        "research_reconstruction"
+      ]
+    },
+    "generation": {
       "type": "integer",
       "minimum": 1
     },
-    "level": {
-      "enum": [
-        "base",
-        "industry",
-        "company"
-      ]
-    },
-    "scope": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "all"
-            }
-          },
-          "required": [
-            "kind"
-          ]
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "industry"
-            },
-            "industry_key": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "kind",
-            "industry_key"
-          ]
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kind": {
-              "const": "company"
-            },
-            "company_id": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "required": [
-            "kind",
-            "company_id"
-          ]
-        }
-      ]
-    },
-    "parent_ref": {
+    "payload": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "key": {
+        "input_manifest_id": {
           "type": "string",
-          "minLength": 1
+          "format": "uuid"
         },
-        "version": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "sha256": {
+        "job_id": {
           "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
+          "format": "uuid"
         }
       },
       "required": [
-        "key",
-        "version",
-        "sha256"
+        "input_manifest_id",
+        "job_id"
       ]
     },
-    "base_config_ref": {
+    "evaluation_context": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "path": {
-          "type": "string",
-          "minLength": 1
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
         },
-        "sha256": {
-          "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
+        "knowledge_cutoff": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "time_bucket": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "calendar_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "template_resolution_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "numeric_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
-        "path",
-        "sha256"
+        "as_of",
+        "knowledge_cutoff",
+        "time_bucket",
+        "calendar_ref",
+        "template_resolution_hash",
+        "numeric_policy_ref",
+        "decision_policy_ref"
       ]
-    },
-    "patches": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "dimension": {
-            "type": "string",
-            "pattern": "^(profit_quality|financial_resilience|business_model|governance|growth_sustainability|x_[a-z0-9_]+)$"
-          },
-          "weight": {
-            "type": "string",
-            "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-          },
-          "baseline": {
-            "oneOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "method": {
-                    "const": "weighted_metric_rubric"
-                  },
-                  "metrics": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "weight": {
-                          "type": "string",
-                          "pattern": "^(0(\\.[0-9]+)?|1(\\.0+)?)$"
-                        },
-                        "zero_at": {
-                          "type": "string",
-                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                        },
-                        "full_at": {
-                          "type": "string",
-                          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-                        }
-                      },
-                      "required": [
-                        "key",
-                        "weight",
-                        "zero_at",
-                        "full_at"
-                      ]
-                    },
-                    "minItems": 1
-                  }
-                },
-                "required": [
-                  "method",
-                  "metrics"
-                ]
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "method": {
-                    "const": "accepted_evidence_rubric"
-                  },
-                  "rubric_ref": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "method",
-                  "rubric_ref"
-                ]
-              }
-            ]
-          },
-          "disabled": {
-            "type": "boolean"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 1
-          },
-          "quality_policy": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "evidence_requirement": {
-                "enum": [
-                  "accessible_original",
-                  "issuer_or_regulator_original"
-                ]
-              },
-              "freshness": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "report_obligation"
-                      }
-                    },
-                    "required": [
-                      "kind"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "kind": {
-                        "const": "age_days"
-                      },
-                      "max_age_days": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 3650
-                      }
-                    },
-                    "required": [
-                      "kind",
-                      "max_age_days"
-                    ]
-                  }
-                ]
-              }
-            },
-            "required": [
-              "evidence_requirement",
-              "freshness"
-            ]
-          },
-          "event_policy": {
-            "oneOf": [
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              },
-              {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "enabled": {
-                    "const": true
-                  },
-                  "half_life_days": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 730
-                  }
-                },
-                "required": [
-                  "enabled",
-                  "half_life_days"
-                ]
-              }
-            ]
-          }
-        },
-        "required": [
-          "dimension",
-          "reason"
-        ],
-        "anyOf": [
-          {
-            "required": [
-              "weight"
-            ]
-          },
-          {
-            "required": [
-              "baseline"
-            ]
-          },
-          {
-            "required": [
-              "disabled"
-            ]
-          },
-          {
-            "required": [
-              "quality_policy"
-            ]
-          },
-          {
-            "required": [
-              "event_policy"
-            ]
-          }
-        ]
-      }
     }
   },
   "required": [
+    "event_id",
+    "event_type",
     "schema_version",
-    "template_key",
-    "version",
-    "level",
-    "scope",
-    "patches"
+    "workspace_id",
+    "entity_id",
+    "entity_revision",
+    "occurred_at",
+    "trace_id",
+    "mode",
+    "generation",
+    "payload",
+    "evaluation_context"
   ],
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "level": {
-            "const": "base"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "base_config_ref"
-        ],
-        "not": {
-          "required": [
-            "parent_ref"
-          ]
-        }
-      },
-      "else": {
-        "required": [
-          "parent_ref"
-        ],
-        "not": {
-          "required": [
-            "base_config_ref"
-          ]
-        }
-      }
-    }
-  ]
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Durable job reference event"
 }
 
-[END PART 18/27]
+[END PART 18/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

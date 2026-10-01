@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>价值研究 · 交互原型</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+<div class="prototype-bar"><span><strong>交互设计原型</strong>　全部为合成资料，操作仅保留在本页面</span><button id="reset" class="text-button">重置演示</button></div>
+<header class="topbar"><a class="brand" href="#changes"><span class="brand-mark">研</span><span>价值研究<small>把每个判断放回依据</small></span></a><label class="search"><span aria-hidden="true">⌕</span><input id="global-search" aria-label="搜索公司或证券代码" placeholder="搜索公司、证券代码" type="search"></label><div class="header-context">示例研究组织<span class="separator"></span><label>查看身份<select id="role" aria-label="查看身份"><option value="lead">研究员 + 策略管理员</option><option value="viewer">查看者</option><option value="researcher">研究员</option><option value="strategy_manager">策略管理员</option><option value="data_admin">数据管理员</option><option value="system_admin">系统管理员</option></select></label></div></header>
+<div class="layout"><aside><div class="mode-switch" role="group" aria-label="页面模式"><button id="business-mode" class="selected">研究</button><button id="admin-mode">管理</button></div><nav id="nav" aria-label="主导航"></nav><div class="sidebar-note"><span class="dot"></span> 合成资料工作区<p>经营判断、证券估值与策略状态各自独立。</p></div></aside><main id="main" tabindex="-1"></main></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="dialog"><div id="dialog-content"></div><button class="secondary" id="close-dialog">关闭</button></dialog>
+<script src="app.js"></script>
+</body></html>

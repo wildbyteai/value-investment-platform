@@ -1,0 +1,36 @@
+{
+  "scope": "Local synthetic design-prototype interactions only; not product/RBAC/DB/strategy-engine acceptance",
+  "executed_at": "2026-10-01T00:20:34.233Z",
+  "revision_at_run": "a16e334e76bfe7fc69200f2a96397693811e4c8e",
+  "status": "failed",
+  "browser": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewport_widths": [
+    1440,
+    1280,
+    390,
+    430
+  ],
+  "checks": [
+    {
+      "id": "PD-UI-01",
+      "scenario": "变化→固定历史解释→当前公司→原文→人工替换",
+      "status": "failed",
+      "error": "The input did not match the regular expression /当时记录/. Input:\n\n'今日变化\\n' +\n  '\\n' +\n  '先看变化，再回到当时的规则和证据。\\n' +\n  '\\n' +\n  '日期 \\n' +\n  '2026-09-28 至 09-30 · 演练窗口\\n' +\n  '全部市场\\n' +\n  'A 股\\n' +\n  '港股\\n' +\n  '演练包含 09-28 至 09-30 的固定快照\\n' +\n  '1\\n' +\n  '新入选证券\\n' +\n  '1\\n' +\n  '明确挂牌风险\\n' +\n  '1\\n' +\n  '资料缺口\\n' +\n  '2\\n' +\n  '关注公司\\n' +\n  '值得查看的变化\\n' +\n  '变化类型 \\n' +\n  '全部变化\\n' +\n  '新入选\\n' +\n  '风险\\n' +\n  '资料缺口\\n' +\n  '规则变更\\n' +\n  '09-29\\n' +\n  '固定历史快照\\n' +\n  '新入选\\n' +\n  '示例制造\\n' +\n  '\\n' +\n  'SYN-A\\n' +\n  '\\n' +\n  '两个相邻收盘时点评估均满足入选条件\\n' +\n  '\\n' +\n  '经营分 72.0，估值分 68.0；规则与证据已固定。\\n' +\n  '\\n' +\n  '查看依据\\n' +\n  '09-30\\n' +\n  '固定历史快照\\n' +\n  '挂牌风险\\n' +\n  '示例制造\\n' +\n  '\\n' +\n  'SYN-H\\n' +\n  '\\n' +\n  '合成H挂牌退市决定，作用于这只挂牌证券\\n' +\n  '\\n' +\n  'SYN-A 不受该挂牌风险影响；H证券保持区间外。\\n' +\n  '\\n' +\n  '查看依据\\n' +\n  '09-30\\n' +\n  '固定历史快照\\n' +\n  '资料缺口\\n' +\n  '示例制造\\n' +\n  '\\n' +\n  'SYN-A\\n' +\n  '\\n' +\n  '本交易日最终收盘价尚未取得\\n' +\n  '\\n' +\n  '当前待评估，保留最后已确认的区间内状态。\\n' +\n  '\\n' +\n  '查看依据\\n' +\n  '09-28\\n' +\n  '固定历史快照\\n' +\n  '规则变更\\n' +\n  '示例设备\\n' +\n  '\\n' +\n  'SYN-B\\n' +\n  '\\n' +\n  '新策略版本建立基线\\n' +\n  '\\n' +\n  '配置变化单独记录，不作为市场进入或退出。\\n' +\n  '\\n' +\n  '查看依据\\n' +\n  '从公司展开研究\\n' +\n  '查看自动判断与人工覆盖\\n' +\n  '查看策略候选\\n' +\n  '设计状态演示\\n' +\n  '页面状态\\n' +\n  '正常\\n' +\n  '加载\\n' +\n  '筛选无结果\\n' +\n  '部分失败\\n' +\n  '不可见\\n' +\n  '编辑冲突\\n' +\n  'UNKNOWN / 重算等待\\n' +\n  '新版本提示\\n' +\n  '停牌\\n' +\n  '原型状态用于讨论交互，不代表服务端验收。'\n"
+    }
+  ],
+  "console_errors": [],
+  "external_requests": [],
+  "source_sha256": {
+    "prototype/index.html": "692248deacae9b9b2141e398919e3af7ade088bb0d2619f02e458c53a20a1367",
+    "prototype/style.css": "eb70c0794bcade711f80d7ca4ce3467c95af095172c53fa5fe55e59818100b65",
+    "prototype/app.js": "0f6c5aded4d4a307c09c0b8ff8f5291ebf3fd7ba495ec2d68df8f704fe1d09ed",
+    "tools/verify_prototype.cjs": "ef5f0499320a3cc3dec48d91ca77f6f16ad74753aa62484be103d20adb52a9a4"
+  },
+  "not_run": [
+    "Product database/API/workers",
+    "Actual authorization and permission enforcement",
+    "Decimal scoring/template resolution/strategy calculation",
+    "5-user timed UX acceptance",
+    "Screen-reader/200% browser zoom/real devices"
+  ]
+}

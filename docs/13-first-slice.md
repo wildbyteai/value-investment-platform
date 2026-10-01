@@ -48,3 +48,7 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 合成输入增加：+0.8/−0.2影响、grade3/1修订链、H挂牌退市与独立公司违约、90/180日120日龄证据、x_customer_retention完整模板与baseline-only反例、收盘+15/+40/+50/+60/+65时钟序列。11 §7…9及12 §8固定请求/记录/作用范围/冻结协议；T-39…43必须和原主路径一起验证，不能只实现接受/拒绝按钮或仅公司级风险。
 
 数据库仍须按§2验证为项目隔离无真实数据；本轮没有创建库或启动代码。后续实际交付需要逐项回读human修订/有效指针、A/H risk resolutions、resolved config/origin及seal manifest/token、membership/audit/outbox；合成JSON的expected_response不是运行证据。局部故障中旧有效值不能当新值成功展示；release/到期重评与重算等待显式可诊断。
+
+## 7. 设计细化输入
+
+实施前使用[14流程/模型](./14-domain-and-business-flows.md)、[15字段候选](./15-database-dictionary.md)、[16原型连接](./16-prototype-and-design-trace.md)交接。本地原型已可演示，但不是本任务书的可运行产品，既有T-01…43与T-UX预期不因原型通过而签收。

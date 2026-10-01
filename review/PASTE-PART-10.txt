@@ -1,234 +1,1733 @@
 
-[PART 10/27]
+[PART 10/34]
 
 
-===== SOURCE: research/second-review.md =====
+===== SOURCE: docs/15-database-dictionary.md =====
 
-# 第二轮独立研究与设计取舍
+# 15 数据库字段设计与 ER 图
 
-研究日期：2026-09-30。事项：BW-0051。状态：派生研究与待批准建议，不替换 v0.1 合同，不表示实现通过。
+2026-10-01 · v0.3 物理设计候选；无DDL、迁移或数据库操作。本文件由[数据库目录](../design/database-catalog.json)与[说明源文件](../design/database-dictionary-intro.md)生成，字段以目录为唯一维护入口；运行 `python3 tools/render_database_design.py` 更新。04拥有逻辑分层/时间规范，11、12拥有业务语义，本文负责物理字段与存储映射。
 
-基线为 `wildbyteai/value-investment-platform@8b9d9de36d197b1932c4102cc98888d224984085`。本轮对照仓库中的需求、领域词汇、十份设计、关键 Schema、评分和策略配置，并回查六个开源候选的官方许可、依赖和关键源码，以及港交所披露与交易安排页面。GPT Pro 输入为[共享页的可读评审正文](https://chatgpt.com/s/t_6abcd1c0c9088191bc2d635b33b84f6f)；未取得其完整 v0.2 Markdown 或 ZIP，不能断言下面的新反例在那 60 个文件中仍未解决。
+## 1. 设计取舍与实施顺序
 
-本轮只新增本研究文档。没有安装或运行第三方项目，没有数据库操作、真实采集、模型调用、通知、部署、交易、Git 提交或推送。外部原文未导入事项、根 Raw 或 Wiki。应用 research 技能尝试的独立后台任务两次因服务繁忙未启动，官方来源核查由当前会话完成；这不是已完成的第二代理评审。
+完整字段目录覆盖既有逻辑对象及页面操作所需持久化对象；它不是M0必须一次建完的建表清单。按首个纵向路径建立需要的表，其余随对应业务加入。
 
-## 1. 结论及适用范围
-
-保留模块化单体、PostgreSQL 事实真源、确定性领域函数、不可变输入快照、事务 outbox、人工判断版本以及共享前端设计系统。Pro 的 B-01～B-04 有原文依据，建议补齐。首版优先验证整条业务路径，标准策略保持简单。
-
-本轮修正此前的两项开源判断：不能因已有 TanStack 就直接排除 Refine；不能因设计已经写了 Celery 就排除 Prefect。当前没有应用代码，切换候选的成本仍应按待开发工作的实际价值比较。默认仍可沿用轻量的原技术骨架，但 Refine 和 Prefect 应保留为有明确范围的替代候选，不能把暂缓误写成技术不兼容。
-
-新增关注点是相邻交易日确认、最终收盘数据、不同输入类别的时间过滤、历史纠错对当前状态的影响、个人订阅与共同策略状态、人审容量，以及数值精度合同。这些要求针对当前 slice 补齐，不要求先建设更多服务。
-
-## 2. 对 Pro 四项关键问题的复核
-
-| 问题 | 原设计依据 | 本轮判断与建议 | 影响的现有追踪 |
+| 步骤 | 先落实的对象 | 可演示业务 | 关联需求/验收 |
 |---|---|---|---|
-| B-01 评分与财务定义 | [业务设计 §4](../docs/02-business-design.md) 写出三年合并经营现金流除归母净利润；11 个人工子项只有名称和 0～4 档，缺完整事实锚点 | 成立。现金转化用同范围合并 CFO／合并净利润；ROE、普通股盈利等另有自己的归属口径。补齐档位锚点、有效期和证据要求，人工判断仍允许记录未知。不能只换字段名而保留原分母 | R-05/R-06，W-04，T-08/T-09/T-10 |
-| B-02 时间相关任务身份 | [架构 §5](../docs/03-architecture.md) 的任务唯一键只有 stage、entity_revision、algorithm_version、mode | 成立。解析相同材料可按静态输入去重，衰减、到期、收盘计算必须加入固定研究时点、知识截止及相应日历／规则版本。重试沿用同一逻辑截止，不能把每次 now 或随机 job ID 当成新输入 | R-05/R-08/R-12，W-02/W-04/W-05，T-01/T-08/T-13/T-18 |
-| B-03 确认后的输入更正 | [业务设计 §6](../docs/02-business-design.md) 只明确同 session 不增计数、最新有效评估替换 pending；[恢复手册](../docs/08-security-and-operations.md) 提及保留原通知和纠正，但缺状态应用合同 | 成立。先封存最终确认及原通知，修订生成 CORRECTION，区分历史提醒结论和当前合法状态。封存并不意味数据不再修订；纠正也不天然要求当前成员转为 OUT | R-07/R-08/R-12，W-05，T-07/T-13/T-14/T-16 |
-| B-04 旧备份的撤权恢复 | [安全与运维 §6](../docs/08-security-and-operations.md) 要求应用最新 tombstone，却未定义旧 DB 外可验证的最新依据 | 成立。正式使用受限资料前，需要独立于被恢复快照的可信撤权依据与恢复水位；无法核对则相关读取和发送保持关闭。独立耐久记录不必等价于新增微服务、分布式数据库或消息平台 | R-11/R-12，W-06，T-15/T-19/T-20 |
+| 最小基础 | workspace、user/membership、job/audit/outbox、manifest | 合成身份与可追溯动作 | R-11/12/17，T-14/20/29 |
+| 资料与时间线 | source/policy、item/revision/observation、evidence、company/security/listing、event/fact | 合成材料到公司研究 | R-01…04，T-01…07/33 |
+| 判断与覆盖 | analysis、slot、judgment/human revision、decision、idempotency | 自动判断及单项人工替换 | R-03/16，T-27/28/39 |
+| 评分与估值 | financial/price/FX/义务、template/config/binding、baseline/contribution/snapshot | 三层模板解释及A/H分估值 | R-05/06/15，T-08…10/25/26/41/42 |
+| 策略与变化 | draft/version/preview/release/binding、seal/evaluation/membership/transition/risk | 模拟发布及ENTER/EXIT/RISK | R-07/08，T-13/31/40/43 |
+| 协作与恢复 | watchlist/note/view、correction、inbox/checkpoint/journal receipt | 自选、笔记、失败项恢复、更正 | R-09/10/12，T-18/19/32/34 |
 
-财务反例：三年合并 CFO 合计 75、合并净利润合计 100、归母利润合计 50。相同现金流对合并利润是 0.75，不满足 0.8 门槛；混用归母分母得到 1.5，会错误通过该门槛。这个算术反例已用本地 Decimal 复算；它不是对真实公司的判断。
+采用统一 `judgment_revision` 存储完整类型化值，`item_company_link/event_company_impact/rubric_revision/risk_revision` 展开为逻辑视图，避免四份重复的有效指针及多态悬空外键。人工链表单独记录previous_revision并可指向AUTO原修订；JSONB按既有Schema和服务端语义校验，不代表可以自由塞任意字段。常用身份和有效指针有结构化键；后续只有实际查询需要才增加表达式索引。
 
-Pro 提出的主张级去重与吸收、内容 A→B→A 观察历史、报告义务日历、派生结果权限、笔记与草稿持久化、迟到 session 不覆盖新状态，也建议采纳。它们使已有原则形成可操作边界。原设计已规定对象先写、验证再提交 DB 引用；清理时仍需核对 DB 活跃引用，不能仅凭对象 tag 删除证据。
+已有04将部分对象合写一行，这里按生命周期拆开草稿、发布、修订和关联。自选、模拟预览、日历、幂等响应和当前评分指针是已有API/页面能力的存储补齐，未新增业务范围。通知表、向量表、生产分区、RLS与身份服务内部表后置。
 
-## 3. 本轮增加的边界与反例
+## 2. 共用字段、外键和约束责任
 
-以下 S 编号是本研究的发现标识，不重排已有 R/W/T。未来批准 v0.2 时才把对应预期追加到正式验收矩阵。
+- 所有表有服务端UUID `id` 和DB实际 `created_at`。组织内表有 `workspace_id` 与唯一 `(workspace_id,id)`；外键引用同组织表时必须用 `(workspace_id,ref_id)` 复合外键，不能只按id关联。`workspace`、`app_user`为全局身份，user引用由成员关系再验证范围。
+- 首slice将市场身份/事实也放在各合成workspace，避免隐式共享。后续只有合法公共事实可迁入独立只读共享层；私有判断、笔记和策略不共享。
+- `!`在目录作者格式代表必填，生成字典统一显示可空；null不等于0或无限有效。金额/比率`numeric(38,12)`、分数`numeric(15,12)`、权重`numeric(13,12)`是持久化候选，不改变12的Decimal算法/精度。超范围/不匹配单位明确invalid，不静默截断。
+- 外键本身不能保证两个孩子指向同一父对象：例如decision的revision属于slot、primary listing属于security、score属于被评估company。提交服务负责关系校验；稳定且频繁的归属可采用复合父键。跨workspace约束在数据库层强制。
+- 必须的DB约束：PK/FK/业务唯一键、非负版本/序号、范围值（权重/置信度0–1、signed_impact −1–1、分数0–100）、有效区间 `end IS NULL OR end>start`、cutoff≤generated_at、状态枚举。API/服务负责模板父链/权重/引用适用性、JSON Schema、证据权利和角色。
+- JSON对象内容hash使用固定规范化算法，不依赖PostgreSQL JSONB文本输出。引用hash与存储payload一致。业务运行输入通过manifest固定内容版本；path/最新key不够。
+- 当前指针和草稿允许更新，修订、发布、已封存评估不允许覆写。实现阶段限制对应服务写入口，不为了本轮设计增加全量触发器平台。
+- 循环外键（source↔policy、security↔listing、slot↔decision、seal↔evaluation）在迁移中先建表后加FK；通过可延迟约束/同事务完成必要初始化。提交后不能留无效指针。
+- nullable业务唯一键必须使用适用PG版本的 `NULLS NOT DISTINCT` 或明确的非空规范键；不得误以为普通UNIQUE能禁止多个NULL。
 
-### S-01：两个不同 session 不一定是连续两个应有 session
+知识序列只是辅助顺序，不能单凭先分配sequence就认定已提交。实现要把输入发布可见性、真实known_at与cutoff watermark共同验证：跨cutoff的未提交事务不能回填已封存manifest。T-43须覆盖迟到提交；本轮未声称已实现提交时钟协议。
 
-原文同时使用“连续满足”和“不同 session 才递增”，没有明确调度漏跑时的行为。若 s1 满足，s2 是应有的交易日但没有完成评估，s3 满足，只按不同 ID 计数可能在 s3 入选。
+## 3. ER 图：资料与身份
 
-建议确认器检查批准日历中的前一个应有 session。前置评估缺失、UNKNOWN、停牌或超出最终截止，就打断 pending；s3 从 1/2 开始。周末、批准的休市日不属于缺口。每个应有 session 有最终结果或明确超时缺口，不能仅等待新闻变化触发确认。迟到的旧评估保留为历史，不补发旧市场信号。
+```mermaid
+erDiagram
+    WORKSPACE ||--o{ SOURCE : owns
+    SOURCE ||--|{ SOURCE_POLICY : versioned
+    SOURCE ||--o{ INGESTION_RUN : captures
+    SOURCE ||--o{ INFORMATION_ITEM : publishes
+    INFORMATION_ITEM ||--|{ ITEM_REVISION : content
+    INFORMATION_ITEM ||--|{ ITEM_OBSERVATION : observations
+    ITEM_REVISION ||--o{ ITEM_OBSERVATION : observed_content
+    RAW_OBJECT ||--o{ ITEM_REVISION : original
+    ITEM_REVISION ||--o{ EVIDENCE : locates
+    COMPANY ||--o{ SECURITY : issues
+    SECURITY ||--|{ LISTING : quotations
+    COMPANY ||--o{ COMPANY_ALIAS : names
+    EVENT ||--|{ EVENT_REVISION : revisions
+    EVENT_REVISION ||--o{ EVENT_EVIDENCE : claims
+    EVIDENCE ||--o{ EVENT_EVIDENCE : supports
+    EVENT_REVISION ||--o{ EVENT_FACT : contains
+    ECONOMIC_FACT ||--o{ EVENT_FACT : same_fact
+```
 
-需要区分 provisional 行情修订与 FINAL 的计数：同 session 多次候选更新可替换输入，FINAL 只应用一次。漏跑修复采用什么基线由补跑／纠正政策定义，不能悄悄把漏掉的天视为满足。
+## 4. ER 图：判断、配置与评分
 
-对应 R-08/R-12，扩充 T-11/T-13/T-14/T-18。本轮仅以小型 Python 状态反例演示 distinct-only 与相邻校验的差异，没有运行未来应用状态机。
+```mermaid
+erDiagram
+    COMPANY ||--o{ DECISION_SLOT : questions
+    DECISION_SLOT ||--o{ JUDGMENT_REVISION : values
+    JUDGMENT_REVISION ||--o| HUMAN_JUDGMENT_REVISION : human_lineage
+    JUDGMENT_REVISION ||--o{ REVIEW_DECISION : decisions
+    DECISION_SLOT ||--o{ REVIEW_DECISION : accepted_pointer
+    SCORING_TEMPLATE ||--o{ TEMPLATE_DRAFT : edits
+    SCORING_TEMPLATE ||--o{ TEMPLATE_VERSION : publishes
+    TEMPLATE_VERSION o|--o{ TEMPLATE_VERSION : pinned_parent
+    TEMPLATE_VERSION ||--o{ EFFECTIVE_CONFIG : resolves
+    EFFECTIVE_CONFIG ||--o{ SCORING_BINDING : binds
+    COMPANY ||--o{ BASELINE_DIMENSION : baseline
+    ECONOMIC_FACT ||--o{ CONTRIBUTION_SLOT : deduplicates
+    BASELINE_DIMENSION ||--o{ BASELINE_ABSORPTION : absorbs
+    CONTRIBUTION_SLOT ||--o{ BASELINE_ABSORPTION : absorbed_version
+    COMPANY ||--o{ SCORE_SNAPSHOT : quality
+    SCORE_SNAPSHOT ||--o{ SCORE_DIMENSION : explains
+    SCORE_DIMENSION ||--o{ SCORE_CONTRIBUTION : contributions
+    SECURITY ||--o{ METRIC_SNAPSHOT : valuation
+```
 
-### S-02：交易日历的 close 不能自动证明取得了最终收盘价
+## 5. ER 图：策略与变化
 
-本轮固定版本的 `exchange_calendars` 在 XHKG 写 `close_times = 16:00`。港交所官网的交易时间表列出：全日收市竞价由 16:00 开始，在 16:08～16:10 随机收市；半日为 12:00 开始、12:08～12:10 随机收市。交易机制页说明 CAS 结束的最终 IEP 才构成适用证券的收盘价，不能把 16:00 的连续交易末值自动当最终收盘价。[官方交易时间](https://www.hkex.com.hk/Services/Trading-hours-and-Severe-Weather-Arrangements/Trading-Hours/Securities-Market?sc_lang=en)；[官方价格定义](https://www.hkex.com.hk/Services/Trading/Securities/Overview/Trading-Mechanism?sc_lang=en)。
+```mermaid
+erDiagram
+    STRATEGY ||--o{ STRATEGY_DRAFT : edits
+    STRATEGY ||--o{ STRATEGY_VERSION : config_versions
+    STRATEGY_VERSION ||--o{ STRATEGY_RELEASE : releases
+    PREVIEW ||--o| STRATEGY_RELEASE : compared
+    STRATEGY_RELEASE ||--o{ RELEASE_COMPANY_BINDING : pins_config
+    SCORING_BINDING ||--o{ RELEASE_COMPANY_BINDING : config
+    STRATEGY_RELEASE ||--o{ RELEASE_SECURITY : pins_listing
+    STRATEGY_RELEASE ||--o{ EVALUATION_SEAL : sessions
+    EVALUATION_SEAL ||--o{ SEAL_CANDIDATE : attempts
+    INPUT_MANIFEST ||--o{ SEAL_CANDIDATE : frozen_input
+    STRATEGY_RELEASE ||--o{ STRATEGY_EVALUATION : results
+    STRATEGY_RELEASE ||--o{ STRATEGY_MEMBERSHIP : states
+    SECURITY ||--o{ STRATEGY_MEMBERSHIP : independent
+    STRATEGY_MEMBERSHIP ||--o{ MEMBERSHIP_TRANSITION : history
+    STRATEGY_EVALUATION o|--o{ MEMBERSHIP_TRANSITION : ordinary_basis
+    JUDGMENT_REVISION ||--o{ RISK_RESOLUTION : risk_scope
+    CORRECTION_RUN ||--o{ CORRECTION_RECORD : historical_notes
+```
 
-建议来源适配器输出 session、价格类型、是否最终、供应商修订、首次观察时间。首次 slice 用合成的非最终→最终两次输入证明：非最终值可以展示 provisional，但不能形成 FINAL 进入／退出确认。普通生产调度可在市场最晚常规收市窗口后运行，并等待获许可数据源的完成条件；不用为本项目新增逐笔行情或交易所实时事件系统。
+图强调业务关联，完整字段/FK以目录为准；不是要求每个阅读路径都做多表实时联查，列表可使用由事实库快照形成的读模型。
 
-上海日历的源码预计算节假日截至 2026 年，基类边界也由最后已记录年份计算；这不是自动覆盖未来所有年份。当前注册表有 XSHG、XHKG，本轮未发现 XSHE 注册项。深市映射需要核对、批准和记录，不能直接假设存在 XSHE，或把上海日历当所有 A 股日历的永久真源。年份覆盖不足要显式报错，不能自行把工作日当交易日。
+## 6. 写入事务与页面读取
 
-时间表页面显示 Updated 20 Aug 2018；本轮在 2026-09-30 实际读到仍在线的官方表，并与仍在线的交易机制说明交叉核对。这是常规安排的依据，不是已核验所有临时交易通知。
-
-对应 R-06/R-08，T-10/T-11/T-13。日历源码证据见第 5 节固定 SHA 链接。
-
-### S-03：收盘时点、知识截止和输入类别要有分别明确的规则
-
-Pro 指出“收盘后才公开的公告不进入收盘判断”合理，但不能把所有输入统一过滤为 published_at≤收盘，否则供应商在收市后才发布的正式日收盘数据也会被拒绝。
-
-建议标准收盘配置分别定义：
-
-- 行情：对应批准 session 的最终收盘观测；可以在固定宽限截止前到达，记录真正的获得时间，决策时间不能回写为收盘瞬间。
-- 公告与经营事实：按所选历史研究口径限制公开时间、实际观察时间与有效期；收盘后首次公开的新公告留待下一次标准收盘判断，日内风险流程另有授权政策。
-- 人工／模型判断：批准或产生时间不得回填。截止后才产生的判断，不能因其引用旧公告就声称截止前系统已有该判断。
-- 确定性派生：冻结合法输入后晚完成的计算可以关联该固定快照；generated_at 保持实际值。
-
-反例必须同时包含“收盘数据在收市后到达可用”和“新公告在收市后首次发布不可偷渡”。这是一项待冻结业务选择，单有 as_of、cutoff 字段不能替代执行政策。
-
-对应 R-05/R-06/R-08，T-07/T-10/T-13。
-
-### S-04：历史提醒纠正与当前成员状态不能混为一个动作
-
-反例：s2 发过 ENTER，s4 发过 EXIT，s6 再次发 ENTER。今天修正 s2 的旧输入。即使早期 ENTER 需要纠正，也不能仅凭 s2 修订抹掉 s6 的新进入；后续状态与依据可能已经独立成立。
-
-建议将纠正拆为：历史解释修订、原通知关联说明、受影响的后续快照集合、当前合法状态处理。保留当时实际发生的提醒记录。确定性再评估按固定政策和未受影响的起点进行；应用当前状态前核对最新 generation、session、release，避免旧纠正覆盖新结论。是否改变当前状态取决于后续合法结果；当前未变化时只说明历史修正，不能凭空增加当前 EXIT 或 ENTER。
-
-对于当时不能知悉、现在才新增的材料，使用新知识判断当前状态，不冒充对原历史输入的修正。Pro 摘要中的“建立纠正后的基线”还需要这组反例来界定范围；由于未读完整 v0.2，不断言其实现合同一定遗漏。
-
-对应 R-07/R-08/R-12，T-07/T-13/T-14/T-16。
-
-### S-05：个人暂停提醒不能冻结共同策略状态
-
-原 [业务状态机 §6](../docs/02-business-design.md) 把“用户暂停”列为 SUSPENDED 条件，而评估粒度是 workspace+release+security。若按这个粒度实现，一个用户暂停可影响同策略其他订阅人。
-
-建议共同 membership 只接受策略／范围级暂停和证券市场状态；个人静默、稍后提醒、渠道暂停只作用于 subscription/delivery。界面可以并列显示“共同状态：区间内；你的提醒：已暂停”。Pro 正文已提出该分离，本轮回查确认有必要具体修正文档。
-
-对应 R-08/R-09/R-11，T-13/T-16/T-20/T-22。
-
-### S-06：报告义务与指标所需期间比统一 180 天更重要
-
-港交所主板规则 13.49(1) 规定通常不迟于年结后三个月发布全年业绩；13.49(6) 规定通常不迟于半年期末后两个月发布半年业绩，并有新上市等例外。[已读官方规则](https://en-rules.hkex.com.hk/rulebook/1349)。这说的是业绩公告，不自动等价于完整报告派发期限；本轮没有审查 GEM、所有特殊发行人和全部 A 股披露规定。规则站说明 PDF 与 HTML 冲突时 PDF 优先，本轮未单独逐条比对 PDF。
-
-建议新鲜度按发行人、板块、报告类型、会计年度、应有期间、豁免／延期及指标依赖判断。三年 CFO 指标本来就需要三个历史完整年度，不能把其中旧年度按“公告年龄 180 天”全部判过期；也不能因旧报告重新更正就把它视为新报告期。TTM、最新年报和三年历史指标使用各自所需期集合。
-
-标准策略仍可限制输入质量，但规则示例不要假设 A 股和港股都提供四个完整季度。Pro 的报告义务日历方向应采纳，先覆盖首批明确类型，再扩展例外。
-
-对应 R-05/R-06，T-07/T-09/T-10/T-11。
-
-### S-07：人审容量是首版工程与 UX 的共同约束
-
-原需求的每日 20,000 份讯息为容量假设，不是实际采集量。人工基准、影响批准、歧义和强风险审查都需要人。若最终每天产生 100 个人审任务，假设每条 3 分钟，就是 5 小时；50 条为 2.5 小时，200 条为 10 小时。耗时是假设，必须在样本中测量，不可宣称实际效率。
-
-建议先按 50～100 家启用公司收敛研究范围，去重后按公司、经济事实和具体判断生成复核任务。运营指标包括待审任务年龄、吞吐、预计工作量、每公司有效覆盖，以及对策略判断的阻塞程度。“采集到可检索 p95<10min”与“需人审材料到已批准评分”分开定义；资料处于待审时，时间线可展示线索并明确状态，策略不能冒充已批准结果。
-
-业务端的主任务应为：今天哪些关注对象有值得处理的变化，打开同版本证据，完成一项明确判断。管理端围绕受影响公司和恢复动作，技术堆栈留在诊断详情。优先级与人工队列 UX 的价值通常高于首版全市场高容量向量索引。
-
-对应 R-03/R-05/R-09/R-10/R-14，T-06/T-09/T-UX-01/T-UX-03。
-
-### S-08：Decimal 类型还不是完整数值合同
-
-PE 线性映射与 `2^(-age/H)` 包含除法、非整数幂；Decimal 运算仍有精度与舍入上下文。输入 Decimal 字符串并不能保证两个语言或两个计算上下文得到相同的跨线结果。
-
-建议定义计算精度、运算顺序、时间粒度、幂运算方法、存储规范和比较方式，归入 numeric_policy_version。只有后端计算策略；前端用格式化值展示，禁止从显示的一位小数重判阈值。提供等于阈值、极接近阈值、半衰期整倍数、时区边界及重复重放的固定期望。先用一个后端实现，其他研究库只作允许误差的离线对照。
-
-本轮只复算了 10×0.8×0.5×0.95×0.8=3.04，30 日／30 日半衰期后为 1.52；没有验证所有非整数幂或未来实现的一致性。
-
-对应 R-05/R-06/R-08/R-13，T-08/T-10/T-13。
-
-### S-09：增加 Listing 之后还要明确估值和策略粒度
-
-Pro 建议 Company／Security／Listing 分离，适用于同证券的多币种交易柜台，也有利于风险作用范围。原 Security 定义包含市场与币种，单纯新增表而不修正词汇、报价归属和 membership 唯一键，会留下两套解释。
-
-建议首版 A/H 保持不同证券、共享公司经营资料；每只证券明确一个主要交易柜台，未支持的柜台显式排除。为 Listing 留出数据模型和适配器边界。若以后开放双柜台，估值和候选列表必须指向具体报价柜台，策略对象究竟是证券还是可交易挂牌需一起批准，不能共享一个不带币种来源的 V。先保留正确模型，再按真实首批范围实现。
-
-对应 R-04/R-06/R-08/R-09，T-10/T-11/T-UX-02。官方交易机制页存在 HKD-RMB Dual Counter Model 导航，但本轮未完整审查双柜台产品规范，不据此宣称已完成适配。
-
-## 4. 开源选择：修正为可比较的候选
-
-本轮核查的是公开仓库默认分支的固定提交。默认分支不是经过本项目验证的发行版。核心许可结论不覆盖所有传递依赖、插件、云服务条款、数据授权或商标。
-
-| 候选 | 本轮观察到的原始事实 | 建议取舍 | 需要证明的最小问题 |
+| 动作 | 同事务必需内容 | 读取/页面结果 | 冲突/失败 |
 |---|---|---|---|
-| FastAPI Full Stack Template | MIT；前端依赖 React、TanStack Query/Router/Table、Radix、Tailwind；后端 SQLModel、JWT 与用户密码流程；当前 pyproject 要求 Python≥3.14 | 最有价值的工程起点。选择一个固定基线，保留生成客户端、测试、CI、容器与基础组件；身份替换为本项目 OIDC/BFF，领域持久化明确采用 SQLAlchemy/Alembic。模板中的 SQLModel 也基于 SQLAlchemy，不应描述为两者必然不兼容 | 在所选运行版本下，生成客户端、OIDC mock、一次含权限与 outbox 的领域事务、共享组件状态能够一起工作。不能只复制文件后宣称节省多少工期 |
-| Refine Core | MIT；`useList` 直接调用 TanStack Query；routerProvider 可选且用于对接路由；headless UI、dataProvider 自定义接口支持 meta/custom | 保留为管理端候选。不能以 TanStack/Radix 已存在为理由排除。研究业务端保持领域任务页面；管理端只有在适配足够薄、减少重复 CRUD 时采用 | 用同一生成客户端、QueryClient 和 UI 组件实现来源列表／草稿、409 保留输入、403、ETag 和 cursor 分页；不能把游标列表硬套成总量已知的页码列表，也不能让通用 CRUD 绕过复核／发布合同 |
-| Prefect Core | Apache-2.0；支持调度、缓存、重试、事件流程、self-host server/UI；事务文档明确外部副作用须自行补偿，默认结果事务不是应用 PG 的业务提交 | 保留为 Celery 编排层的替代候选，当前可继续 Celery+PG ledger。比较时替代队列／编排职责，避免叠加两套活跃调度器；PG membership/outbox 仍由应用拥有 | 在同一合成切片比较进度可见性、恢复入口、部署成本与所需自研量。无论选哪一个，业务状态／通知原子性、时间身份、generation/fencing 和权限恢复都不能交给框架自动保证 |
-| exchange_calendars | Apache-2.0；有 XSHG/XHKG；XSHG 的预计算假期到 2026；XHKG 常规 close=16:00；日历维护包含历史天气休市补充 | 采用日历适配器的方向合理。它提供候选 session 和时间结构，应用有批准版本、覆盖范围、交易所变更与最终价格质量合同 | A/H 不同休市、半日、跨年覆盖不足、深市映射、停牌、CAS 后最终数据；不只验证“可以 get_calendar” |
-| Qlib | MIT；PIT 模块按观察时点选期间数据，拒绝未来期间引用；该模块的结果数组使用 float32 | 保留离线研究参考／后续隔离适配器。它的 PIT 功能有实际价值，但不能替代人工批准、来源 ACL、历史通知、Decimal 策略状态等应用合同 | 仅消费本应用输出的冻结研究快照；导出历史 cutoff、修订和归属正确，明确研究数值格式；不反向成为实时 membership 或财务真源 |
-| FinanceToolkit | MIT；EPS 函数使用平均股数；ROE 用传入净利润和平均权益；Toolkit controller 明确默认 FMP／Yahoo 来源及可能回退 | 少量公式参考和离线对照合理；生产侧采用明确口径的 Decimal 纯函数。允许自带数据并不自动证明所有路径不出网 | 对照时固定输入且显式禁用所有数据获取；区别报告 EPS 的平均股数与当前估值的现时等价股数；ROE 的净利润与权益范围由适配器确定，不由通用函数名保证 |
+| 人工replace | judgment_revision+human lineage+decision+slot CAS+idempotency+audit/outbox | 新值、作用对象、重算queued | 全回滚；409保留用户草稿 |
+| 解除覆盖 | audit解除记录+清人工有效指针/提升generation+固定重评job/outbox | 人工覆盖已解除，当前等待合法新判断 | 不恢复过期旧AUTO |
+| 基准吸收 | 新baseline+absorption+contribution指针+outbox | 新基准与扣除贡献同时可见 | 不出现双计中间结果 |
+| 发布 | 验证preview/draft版本+固定config/binding/release+active指针+audit/outbox | CONFIG_CHANGE新基线 | 过期预览不创建半个release |
+| 最终封存/应用 | evaluation+seal token+membership CAS+transition解释+audit/outbox | 唯一最终session和状态 | 旧fence拒绝；新风险优先 |
+| 即时风险 | 有效risk decision/slot+适用resolution+membership风险代次+RISK解释+audit/outbox | 仅适用证券风险变化 | 不要求等待收盘evaluation |
+| 历史更正 | 原记录保留+correction结果+当前必要reconciliation CAS+audit/outbox | 当时记录/更正说明可并列 | 旧generation不覆盖今天 |
 
-Scrapy 的有许可 HTML 适配器定位仍合理；API 来源不必经过爬虫框架。LEAN 的研究参考定位暂保留，本轮没有重新核对其完整代码与 A/H 数据适配。RQAlpha 与 AKShare 的许可／数据边界沿用[首轮官方来源核查](./open-source-shortlist.md)，本轮没有把它们当成新增已通过选型，也没有重复审查其完整依赖。
+当前评分查询取 `score_current` 指针但校验其状态、当前判断/权限代次；历史页直接取固定snapshot。候选按release/security分页，时间线按company/event_time/id；自选按security保存、公司页可聚合显示。原型仅固定样例，不实现这些查询。
 
-建议先锁定统一 API、领域边界和前端语义，再决定可替换的工程组件。不要为“多找开源框架”引入重复业务真源；也不要把“现有文档先写了某技术”当成不能复用更合适框架的理由。
+## 7. 本轮验证边界
 
-## 5. 固定版本与官方源码依据
+字段目录已覆盖逻辑对象和核心页面写入；引用存在性/字段唯一性/唯一键字段检查由生成工具执行。未连接数据库，未生成或执行DDL，不报告FK/索引/事务/锁/权限实际通过。实现时将字段设计转为Alembic迁移，按切片执行既有T测试；生产类型容量/索引性能由真实工作负载确认。
 
-下面的 SHA 来自本轮公开 GitHub GET；日期是该提交的 committer 时间，和仓库 pushed_at 不等价。维护活跃度、响应速度与安全成熟度没有仅凭这些时间得到证明。
+## 字段字典（由目录生成）
 
-| 仓库 | 本轮固定完整 SHA | 提交时间（UTC） | 实际许可文件 |
+### workspace
+
+责任：governance；生命周期：`mutable`；范围：`global`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
 |---|---|---|---|
-| fastapi/full-stack-fastapi-template | `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7` | 2026-09-01 18:42:01 | [MIT LICENSE](https://github.com/fastapi/full-stack-fastapi-template/blob/cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7/LICENSE) |
-| refinedev/refine | `2352eb5b6539e2f39ad9aef652279ad1dcf2c467` | 2026-09-10 12:56:33 | [MIT LICENSE](https://github.com/refinedev/refine/blob/2352eb5b6539e2f39ad9aef652279ad1dcf2c467/LICENSE) |
-| PrefectHQ/prefect | `420d0d6a78bb6df1fc18bcf188fdad43c1d22ea9` | 2026-09-29 20:55:33 | [Apache-2.0 LICENSE](https://github.com/PrefectHQ/prefect/blob/420d0d6a78bb6df1fc18bcf188fdad43c1d22ea9/LICENSE) |
-| gerrymanoim/exchange_calendars | `bbda29fed902374bdb75acab008f421fbd567823` | 2026-09-15 09:27:58 | [Apache-2.0 LICENSE](https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/LICENSE) |
-| microsoft/qlib | `be725493eb1a6bbb42bf11b37aa7669f59610ff1` | 2026-09-16 06:56:07 | [MIT LICENSE](https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/LICENSE) |
-| JerBouma/FinanceToolkit | `9fa19f9e97fee229dad4d65cf9c1448597af5df5` | 2026-08-18 12:45:57 | [MIT LICENSE.txt](https://github.com/JerBouma/FinanceToolkit/blob/9fa19f9e97fee229dad4d65cf9c1448597af5df5/LICENSE.txt) |
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `name` | `text` | 否 | 研究组织名称 |
+| `status` | `text` | 否 | active/suspended |
+| `permission_generation` | `bigint` | 否 | 撤权或授权变更提升版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-关键事实的直接来源：
+唯一键：`(id)`。
 
-- FastAPI 模板：[README](https://github.com/fastapi/full-stack-fastapi-template/blob/cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7/README.md)、[前端 package.json](https://github.com/fastapi/full-stack-fastapi-template/blob/cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7/frontend/package.json)、[后端 pyproject](https://github.com/fastapi/full-stack-fastapi-template/blob/cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7/backend/pyproject.toml)、[登录与密码流程](https://github.com/fastapi/full-stack-fastapi-template/blob/cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7/backend/app/api/routes/login.py)。
-- Refine：[核心依赖](https://github.com/refinedev/refine/blob/2352eb5b6539e2f39ad9aef652279ad1dcf2c467/packages/core/package.json)、[useList 的 TanStack 调用](https://github.com/refinedev/refine/blob/2352eb5b6539e2f39ad9aef652279ad1dcf2c467/packages/core/src/hooks/data/useList.ts#L7)、[routerProvider](https://github.com/refinedev/refine/blob/2352eb5b6539e2f39ad9aef652279ad1dcf2c467/documentation/docs/routing/router-provider/index.md#L11)、[dataProvider 接口与 total 约定](https://github.com/refinedev/refine/blob/2352eb5b6539e2f39ad9aef652279ad1dcf2c467/documentation/docs/data/data-provider/index.md#L226)。
-- Prefect：[README](https://github.com/PrefectHQ/prefect/blob/420d0d6a78bb6df1fc18bcf188fdad43c1d22ea9/README.md#L58)、[事务与外部副作用](https://github.com/PrefectHQ/prefect/blob/420d0d6a78bb6df1fc18bcf188fdad43c1d22ea9/docs/v3/advanced/transactions.mdx#L191)。
-- 日历：[XSHG 年份与定义](https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/exchange_calendar_xshg.py#L596)、[预计算日历边界](https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/precomputed_exchange_calendar.py#L27)、[XHKG close](https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/exchange_calendar_xhkg.py#L285)、[注册与别名](https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/calendar_utils.py)。
-- Qlib：[PIT 模块及 float32](https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/data/pit.py)。
-- FinanceToolkit：[EPS／PE 公式](https://github.com/JerBouma/FinanceToolkit/blob/9fa19f9e97fee229dad4d65cf9c1448597af5df5/financetoolkit/ratios/valuation_model.py#L8)、[ROE 公式](https://github.com/JerBouma/FinanceToolkit/blob/9fa19f9e97fee229dad4d65cf9c1448597af5df5/financetoolkit/ratios/profitability_model.py#L228)、[默认来源及回退说明](https://github.com/JerBouma/FinanceToolkit/blob/9fa19f9e97fee229dad4d65cf9c1448597af5df5/financetoolkit/toolkit_controller.py#L130)。
+### app_user
 
-这些链接与少量事实摘录支持本轮判断，不构成完整源代码审计、第三方安全背书或实施许可选择。后续实施锁定可支持的 release／commit 和整套依赖。
+责任：governance；生命周期：`mutable`；范围：`global`。
 
-## 6. 推荐的首版范围与后续出口
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `principal_key` | `text` | 否 | 身份提供方与subject组成的稳定身份 |
+| `name` | `text` | 否 | 显示名称 |
+| `status` | `text` | 否 | active/disabled |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-### UX 首先验证四条完整任务
+唯一键：`(id)`；`(principal_key)`。
 
-原设计的 tokens、共享组件、焦点、历史快照和可用性任务应保留。首轮原型以任务连续性确定页面组合，17 个页面规格不等于第一切片必须交付 17 个完整页面。
+### membership_user
 
-| 人类任务 | 连续操作 | 关键体验预期 |
-|---|---|---|
-| 处理一条新提醒 | 今日变化／提醒→当时评估→失败或通过条件→证据→标记复核 | 时间与版本常显，历史不跳当前，返回恢复阅读位置；已读不等于已复核 |
-| 判断一家公司的变化 | 公司工作台→去重时间线→某维度贡献→基准及事实 | Q、覆盖、新鲜度、A/H 估值分别展示；线索与批准判断清楚分开 |
-| 维护一条个人策略 | 可视规则→固定输入模拟→变化解释→发布预览 | 同一组件解释所有规则，未知不当失败；当前发布不可原地编辑，409 不丢输入 |
-| 恢复一项数据问题 | 质量／任务面板→受影响对象→明确失败项→安全重试→回读恢复结果 | 不要求用户理解 queue、fencing 或 embedding；技术信息按权限折叠，不能一键盲目全量重跑 |
+责任：governance；生命周期：`mutable`；范围：`workspace`。
 
-这些路径可以共享公司工作台、评估／证据抽屉、复核台、策略页与运营面板，不强制为每个后端模块建立一页。沿用 T-UX-01～03 的用户任务指标；合成切片先验证路径与理解，再用真实产品做 UAT。此处未创建原型或执行用户测试。
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `user_id` | `uuid` | 否 | 成员身份；→ `app_user.id` |
+| `roles` | `jsonb` | 否 | 五角色ID集合；不混入评分权限 |
+| `capabilities` | `jsonb` | 否 | 服务端按固定角色政策解析的有效能力 |
+| `role_policy_ref` | `text` | 否 | 固定角色政策版本 |
+| `version` | `bigint` | 否 | 角色修改If-Match |
+| `status` | `text` | 否 | active/revoked |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-### 第一完整切片：合成输入到人类可用的站内闭环
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,user_id)`。
 
-保留 Pro 的 W-08 方向：两家合成公司、三只 A/H 证券、固定财务／行情／日历、一个本地来源、模拟分析提案；贯通原文证据、公司关联复核、11 项人工基准、Q/V、最终 session 确认、站内提醒、同版本证据回查与纠正。常规页面与管理页面共用组件，但通过各自用户任务组织。
+- 角色可兼任；最后管理员/可授予范围校验由治理服务承担
+- roles与capabilities同一次写入生成，客户端不能直接伪造capabilities
 
-第一切片核心运行依赖可以先是 React、FastAPI、PostgreSQL、本地隔离对象存储适配器和一套后台执行方式。对象代理、权限、outbox、版本和恢复不能省掉；源／模型／渠道使用 mock，日历与权限外部依据采用合成适配器。OpenSearch、向量、真实 OIDC 提供商和外部源不必成为合成流程启动的前置依赖。
+### source
 
-需要从真实页面观察以下预期：
+责任：ingestion；生命周期：`mutable`；范围：`workspace`。
 
-1. 提醒打开当时的规则结果，沿评分、主张到达同版本原文证据；当前状态有单独入口。
-2. 重试、同 session 修订、迟到旧任务不会重复计数或覆盖新状态。
-3. 漏掉中间交易日、非最终港股价、覆盖不足、缺资料、停牌均有明确结果。
-4. 个人暂停只改自己的提醒，不冻结其他人的共同候选状态。
-5. 旧历史纠正保留原通知，对当前无影响时不额外创造当前市场进出。
-6. 两人编辑发生 409 时保留双方输入；不能以自动覆盖换取“成功保存”。
-7. 撤权和模拟旧备份恢复后，无可靠最新权限依据则受影响路径关闭。
-8. 模拟模型无批准权；真实网络、模型、通知关闭状态可验证。
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_key` | `text` | 否 | 组织内源标识 |
+| `name` | `text` | 否 | 人可读名称 |
+| `adapter_ref` | `text` | 否 | 适配器及版本 |
+| `credential_ref` | `text` | 是 | 凭证引用；不保存凭证 |
+| `current_policy_id` | `uuid` | 否 | 当前权利政策；→ `source_policy.id` |
+| `enabled` | `boolean` | 否 | 采集启用状态 |
+| `owner_user_id` | `uuid` | 否 | 运营负责人；→ `app_user.id` |
+| `config` | `jsonb` | 否 | 范围 频率 配额与解析设置；无秘密 |
+| `version` | `bigint` | 否 | 编辑并发版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-### 有限公司试用与生产扩展
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_key)`。
 
-第二阶段才替换一条权利明确的真实来源、批准的日历与财务适配器、真实身份提供商；50～100 家公司用作运营起点。标注与测量人审任务量，明确研究负责人和适用行业。首版不需要同时支持所有挂牌、所有平台、所有规则表达式或自动交易。
+### source_policy
 
-全文搜索必需，是否从有限试用开始启用 OpenSearch，由中文标题／正文检索效果、权限过滤、索引容量与运营预算决定；第一合成切片可使用简化搜索适配器，但不能把它的通过当生产全文验收。向量只有在与全文基线比较确有召回收益时开启。
+责任：governance；生命周期：`immutable`；范围：`workspace`。
 
-Refine 的最小验证聚焦来源管理与复核任务外壳；Prefect 的最小验证聚焦多阶段任务进度与故障恢复。二者可在工程选型时分别做有界实验，实验不是本轮已经完成的工作，也不阻止当前设计交付。没有实测收益时沿用简单方案，不为满足框架清单而安装。
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 适用来源；→ `source.id` |
+| `version` | `integer` | 否 | 发布版本 |
+| `allow_fetch` | `boolean` | 否 | 是否允许采集 |
+| `allow_store` | `boolean` | 否 | 是否允许保存 |
+| `allow_analyze` | `boolean` | 否 | 是否允许模型分析 |
+| `allow_export` | `boolean` | 否 | 是否允许导出 |
+| `visibility` | `jsonb` | 否 | 基础ACL范围 |
+| `expires_at` | `timestamptz` | 是 | 权利到期 |
+| `retention_days` | `integer` | 是 | 运行前确定的期限；null不表示无限 |
+| `approval_ref` | `text` | 否 | 授权依据引用 |
+| `content_sha256` | `char(64)` | 否 | 政策内容hash |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-正式投放前再验证获许可实际输入、权限与撤权恢复、数据库事务、故障恢复、中文检索、UI 用户任务、容量、成本和 RPO/RTO。独立撤权记录的正式存储与监控在受限资料开放前实现；合成阶段先验证其协议与缺水位关闭行为。
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,version)`。
 
-## 7. 本轮验证与未验证边界
+- 四项权利分别检查；null期限为未配置，不能据此长期保存
 
-本轮已做：官方 GET 与浏览器正文读取、六个候选提交及实际许可定位、关键依赖／源码核查、原设计逐项对照，以及本地标准库的五组反例／算术检查。反例检查只验证推演逻辑，不是仓库中不存在的产品实现测试。摘要如下：
+### source_schedule
 
-| 推演 | 已观察的结果 |
-|---|---|
-| CFO 同范围与混用分母 | 0.75 与 1.5，0.8 门槛判断不同 |
-| session 缺口 | distinct-only 示例会累计为 2；相邻校验示例在 s3 保持 1/2；同 session 重复、UNKNOWN 打断和正常相邻两次分别符合预期 |
-| 时间相关唯一键 | 相同静态键重复；加入 day0/day30 时钟桶后指纹不同 |
-| 合成事件衰减 | 初始 3.04，一个半衰期后 1.52 |
-| 人审容量敏感性 | 50/100/200 条×假设 3 分钟，为 2.5/5/10 小时；非实测 |
+责任：ingestion；生命周期：`mutable`；范围：`workspace`。
 
-未做：取得或校验 Pro 的 60 文件包；第三方安装、组合兼容 PoC、完整传递许可、安全历史审计、真实来源／市场数据验证、数据库迁移与并发、实际 UI/UAT、模型效果、检索质量、性能、恢复演练或投资效果。没有重跑 v0.1 的 184 项材料检查，因为本轮没有改变配置、Schema、示例或正式设计合同；其旧结果仍只证明旧材料检查。
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `partition_key` | `text` | 否 | 市场/范围分区 |
+| `cron` | `text` | 否 | 计划表达式 |
+| `timezone` | `text` | 否 | IANA时区 |
+| `generation` | `bigint` | 否 | 计划版本 |
+| `next_due_at` | `timestamptz` | 是 | 下次计划时间 |
+| `paused` | `boolean` | 否 | 暂停状态 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
 
-下一版应把 B-01～B-04、S-01～S-09 的适用部分转成唯一业务／工程合同与固定反例，保留已有 R/W/T，再实施一个完整切片。研究记录本身不授予实施、接入、发布或真实发送权限。
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,partition_key,generation)`。
 
-[END PART 10/27]
+### ingestion_run
+
+责任：ingestion；生命周期：`append_then_finalize`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `schedule_id` | `uuid` | 是 | 计划；手动合成导入可空；→ `source_schedule.id` |
+| `partition_key` | `text` | 否 | 范围分区 |
+| `due_at` | `timestamptz` | 否 | 逻辑计划时点 |
+| `schedule_generation` | `bigint` | 否 | 计划版本 |
+| `mode` | `text` | 否 | live/backfill/replay/shadow |
+| `status` | `text` | 否 | queued/running/partial/succeeded/failed |
+| `input_manifest_id` | `uuid` | 否 | 输入范围及版本；→ `input_manifest.id` |
+| `completed_at` | `timestamptz` | 是 | 实际完成时间 |
+| `error_code` | `text` | 是 | 可诊断业务错误 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,partition_key,due_at,schedule_generation,mode)`。
+
+查询索引：`workspace_id,status,due_at`。
+
+### checkpoint
+
+责任：ingestion；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `partition_key` | `text` | 否 | 范围分区 |
+| `cursor` | `jsonb` | 是 | 最后完整持久化的游标 |
+| `holes` | `jsonb` | 否 | 失败项及重试引用 |
+| `version` | `bigint` | 否 | 并发版本 |
+| `last_run_id` | `uuid` | 是 | 最近运行；→ `ingestion_run.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,partition_key)`。
+
+- 本页材料未全部落盘不推进cursor；失败洞保留
+
+### raw_object
+
+责任：ingestion；生命周期：`append_then_finalize`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `policy_id` | `uuid` | 否 | 权利版本；→ `source_policy.id` |
+| `object_key` | `text` | 否 | 项目对象存储路径；不可枚举外部URL |
+| `sha256` | `char(64)` | 否 | 原始字节hash |
+| `size_bytes` | `bigint` | 否 | 非负字节数 |
+| `mime_type` | `text` | 否 | 媒体类型 |
+| `status` | `text` | 否 | temporary/committed/restricted/tombstoned |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,source_id,sha256)`。
+
+- 上传与DB非跨库事务；相同内容重试复用对象，清理检查活跃引用
+
+### information_item
+
+责任：information；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `external_id` | `text` | 是 | 源提供的稳定ID |
+| `canonical_url_hash` | `char(64)` | 是 | 无external_id时的去重URL hash |
+| `latest_observation_id` | `uuid` | 是 | 当前观察指针；→ `item_observation.id` |
+| `latest_revision_id` | `uuid` | 是 | 当前内容修订指针；→ `item_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+- partial unique(workspace_id,source_id,external_id) WHERE external_id IS NOT NULL
+- partial unique(workspace_id,source_id,canonical_url_hash) WHERE external_id IS NULL
+- external_id与canonical_url_hash至少一项非空；指针必须属于本item
+
+### item_revision
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_id` | `uuid` | 否 | 材料；→ `information_item.id` |
+| `raw_object_id` | `uuid` | 是 | metadata_only可无原文对象；→ `raw_object.id` |
+| `content_hash` | `char(64)` | 否 | 内容hash |
+| `normalized_hash` | `char(64)` | 是 | 规范化文本hash |
+| `parse_version` | `text` | 否 | 解析算法 |
+| `published_at` | `timestamptz` | 是 | 源发布时间；未知可空 |
+| `observed_at` | `timestamptz` | 否 | 首次获得此内容修订时间 |
+| `title` | `text` | 否 | 标题 |
+| `status` | `text` | 否 | valid/metadata_only/conflicting/restricted |
+| `supersedes_id` | `uuid` | 是 | 前一内容修订；→ `item_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,content_hash,parse_version)`。
+
+### item_observation
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_id` | `uuid` | 否 | 材料；→ `information_item.id` |
+| `sequence` | `bigint` | 否 | 每材料单调观察序号 |
+| `revision_id` | `uuid` | 否 | 本次看到的内容版本；→ `item_revision.id` |
+| `observed_at` | `timestamptz` | 否 | 本次真正获取时点 |
+| `previous_observation_id` | `uuid` | 是 | 上一观察；→ `item_observation.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_id,sequence)`。
+
+- A→B→A三次sequence；revision属于同item，不以内容hash丢观察
+
+### evidence
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_revision_id` | `uuid` | 否 | 原始修订；→ `item_revision.id` |
+| `locator_kind` | `text` | 否 | text/table/observation |
+| `locator` | `jsonb` | 否 | 字符范围或sheet/row/column，含原单位 |
+| `quote_hash` | `char(64)` | 否 | 定位片段hash |
+| `text_excerpt` | `text` | 是 | 获许可片段；不是模型摘要 |
+| `source_quality` | `numeric(13,12)` | 否 | 来源等级0到1 |
+| `policy_id` | `uuid` | 否 | 权利版本；→ `source_policy.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,item_revision_id,locator,quote_hash)`。
+
+- JSONB定位建立唯一键前规范化；正文受源权利代理访问
+
+### company
+
+责任：identity；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `legal_name` | `text` | 否 | 经营主体名称 |
+| `legal_identity_key` | `text` | 否 | 法定身份类型和值；同名不同主体 |
+| `industry_code` | `text` | 否 | 当前唯一行业绑定 |
+| `identity_generation` | `bigint` | 否 | 身份修订版本 |
+| `redirect_company_id` | `uuid` | 是 | 合并后当前指向；旧ID保留；→ `company.id` |
+| `status` | `text` | 否 | active/merged/unsupported |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,legal_identity_key)`。
+
+### company_alias
+
+责任：identity；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `alias` | `text` | 否 | 别名，不全局唯一 |
+| `language` | `text` | 否 | 语言 |
+| `context` | `text` | 是 | 市场/来源上下文 |
+| `valid_from` | `timestamptz` | 否 | 业务生效 |
+| `valid_to` | `timestamptz` | 是 | 半开结束 |
+| `known_at` | `timestamptz` | 否 | 系统知悉 |
+| `evidence_id` | `uuid` | 否 | 身份依据；→ `evidence.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,alias`；`workspace_id,company_id,valid_from`。
+
+### security
+
+责任：identity；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 发行主体；→ `company.id` |
+| `security_key` | `text` | 否 | 内部工具标识；非报价代码 |
+| `isin` | `text` | 是 | ISIN；合成资料可空 |
+| `share_class` | `text` | 否 | A/H等权利类别 |
+| `primary_listing_id` | `uuid` | 否 | 当前主挂牌；→ `listing.id` |
+| `valid_from` | `timestamptz` | 否 | 生效 |
+| `valid_to` | `timestamptz` | 是 | 结束 |
+| `identity_generation` | `bigint` | 否 | 身份版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,security_key)`。
+
+### listing
+
+责任：identity；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `exchange` | `text` | 否 | 交易所 |
+| `symbol` | `text` | 否 | 报价代码 |
+| `currency` | `char(3)` | 否 | 报价币种 |
+| `calendar_version_id` | `uuid` | 否 | 固定日历；→ `calendar_version.id` |
+| `close_policy_ref` | `text` | 否 | 最终价格类别政策 |
+| `valid_from` | `timestamptz` | 否 | 生效 |
+| `valid_to` | `timestamptz` | 是 | 结束 |
+| `known_at` | `timestamptz` | 否 | 知悉 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,exchange,symbol`。
+
+- exchange+symbol的有效区间不得重叠；用PostgreSQL范围排斥约束（迁移时确认btree_gist）
+- 主挂牌属于该security；release另冻结确切listing修订
+
+### company_relation
+
+责任：identity；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `from_company_id` | `uuid` | 否 | 关系主体；→ `company.id` |
+| `to_company_id` | `uuid` | 否 | 关系对象；→ `company.id` |
+| `relation_type` | `text` | 否 | 母子 客户 供应商等 |
+| `ownership_ratio` | `numeric(13,12)` | 是 | 持股比例 |
+| `valid_from` | `timestamptz` | 否 | 业务生效 |
+| `valid_to` | `timestamptz` | 是 | 业务结束 |
+| `known_at` | `timestamptz` | 否 | 知悉 |
+| `evidence_id` | `uuid` | 否 | 证据；→ `evidence.id` |
+| `previous_revision_id` | `uuid` | 是 | 前版本；→ `company_relation.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### identity_change
+
+责任：identity；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `action` | `text` | 否 | merge/split/correct |
+| `preview_id` | `uuid` | 否 | 范围预览；→ `preview.id` |
+| `identity_manifest` | `jsonb` | 否 | 旧/新主体及证券映射 |
+| `reason` | `text` | 否 | 原因 |
+| `actor_user_id` | `uuid` | 否 | 操作人；→ `app_user.id` |
+| `generation` | `bigint` | 否 | 新身份版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+- 不批量覆写历史company_id；查询当前显式跳转
+
+### event
+
+责任：information；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `event_key` | `text` | 否 | 业务事件稳定ID |
+| `current_revision_id` | `uuid` | 是 | 当前修订；→ `event_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,event_key)`。
+
+### event_revision
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `event_id` | `uuid` | 否 | 事件；→ `event.id` |
+| `claims` | `jsonb` | 否 | 带支持/反驳的事实主张 |
+| `event_time` | `timestamptz` | 是 | 发生时间未知可空 |
+| `precision` | `text` | 否 | second/day/range/unknown |
+| `source_timezone` | `text` | 是 | 日期粒度时区 |
+| `event_end_at` | `timestamptz` | 是 | 范围结束 |
+| `known_at` | `timestamptz` | 否 | 知悉 |
+| `status` | `text` | 否 | valid/disputed/retracted |
+| `supersedes_id` | `uuid` | 是 | 前修订；→ `event_revision.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,event_time,id`。
+
+### event_evidence
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `event_revision_id` | `uuid` | 否 | 事件修订；→ `event_revision.id` |
+| `evidence_id` | `uuid` | 否 | 原文证据；→ `evidence.id` |
+| `stance` | `text` | 否 | support/refute/context |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,event_revision_id,evidence_id,stance)`。
+
+### economic_fact
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `fact_key` | `text` | 否 | 规范对象+动作+时期/批次 |
+| `identity_details` | `jsonb` | 否 | 归并依据与事实期间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,fact_key)`。
+
+- 语义相似不能作为唯一键；事实身份变更走显式归并/拆分修订
+
+### event_fact
+
+责任：information；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `event_revision_id` | `uuid` | 否 | 事件修订；→ `event_revision.id` |
+| `economic_fact_id` | `uuid` | 否 | 经济事实；→ `economic_fact.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,event_revision_id,economic_fact_id)`。
+
+### input_manifest
+
+责任：platform；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `kind` | `text` | 否 | analysis/scoring/evaluation/preview/ingestion |
+| `schema_ref` | `text` | 否 | 对应Schema或固定内部DTO版本 |
+| `content` | `jsonb` | 否 | 规范化完整输入修订、缺口、政策及算法 |
+| `content_sha256` | `char(64)` | 否 | 规范化字节hash |
+| `evaluation_as_of` | `timestamptz` | 是 | 研究时点 |
+| `knowledge_cutoff` | `timestamptz` | 是 | 允许知识截止 |
+| `frozen_at` | `timestamptz` | 否 | 实际冻结时间 |
+| `cutoff_knowledge_sequence` | `bigint` | 是 | 数据库知识watermark |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+- evaluation类别必须符合evaluation-input-manifest.Schema；实际字段不能只冻结价格
+- manifest的revision/hash可追溯，ACL仍按当前权限再检查
+
+### analysis_run
+
+责任：analysis；生命周期：`append_then_finalize`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `item_revision_id` | `uuid` | 否 | 材料；→ `item_revision.id` |
+| `input_manifest_id` | `uuid` | 否 | 受限候选证据输入；→ `input_manifest.id` |
+| `model_ref` | `text` | 否 | 模型适配器/版本 |
+| `prompt_ref` | `text` | 否 | 提示词版本 |
+| `schema_ref` | `text` | 否 | proposal Schema版本 |
+| `mode` | `text` | 否 | live/shadow/reanalysis |
+| `input_hash` | `char(64)` | 否 | 逻辑输入hash |
+| `proposals` | `jsonb` | 是 | 符合analysis-result的完整结果；未运行可空 |
+| `status` | `text` | 否 | queued/running/succeeded/failed |
+| `usage` | `jsonb` | 否 | 请求/token等用量，无秘密 |
+| `error_code` | `text` | 是 | 失败说明 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,input_hash,model_ref,prompt_ref,schema_ref,mode)`。
+
+### decision_slot
+
+责任：analysis；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `kind` | `text` | 否 | link/impact/rubric/risk |
+| `slot_key` | `text` | 否 | 11§7规范自然键序列化；不得只用hash去重 |
+| `company_id` | `uuid` | 否 | 研究主体；→ `company.id` |
+| `subject_identity` | `jsonb` | 否 | 不可变自然键组成项 |
+| `current_decision_id` | `uuid` | 是 | 当前有效决定；→ `review_decision.id` |
+| `override_valid_until` | `timestamptz` | 是 | 人工覆盖结束 |
+| `generation` | `bigint` | 否 | 唯一If-Match并发版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,kind,slot_key)`。
+
+- subject_identity建立后不能改；换身份需新slot
+- 跨记录归属校验：current_decision.slot_id等于本slot
+
+### judgment_revision
+
+责任：analysis；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `slot_id` | `uuid` | 否 | 判断问题；→ `decision_slot.id` |
+| `analysis_run_id` | `uuid` | 是 | AUTO建议来源；人工可空；→ `analysis_run.id` |
+| `kind` | `text` | 否 | link/impact/rubric/risk |
+| `value` | `jsonb` | 否 | 完整类型化值；按human-judgment相应分支或AUTO DTO |
+| `input_manifest_id` | `uuid` | 否 | 固定输入；→ `input_manifest.id` |
+| `actor_kind` | `text` | 否 | AUTO/HUMAN |
+| `actor_id` | `text` | 否 | 服务身份或用户身份 |
+| `effective_from` | `timestamptz` | 否 | 业务生效 |
+| `valid_until` | `timestamptz` | 是 | 业务结束 |
+| `known_at` | `timestamptz` | 否 | 实际知悉 |
+| `knowledge_sequence` | `bigint` | 否 | DB生成单调知识序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,slot_id,known_at,id`。
+
+- value形状/单位/身份/证据语义按11§7；kind与slot一致
+- 同slot修订只改值不能换身份；系统时间不能由客户端回填
+
+### human_judgment_revision
+
+责任：analysis；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `judgment_revision_id` | `uuid` | 否 | 完整人工值；→ `judgment_revision.id` |
+| `previous_revision_id` | `uuid` | 否 | 替换前的AUTO或HUMAN修订；→ `judgment_revision.id` |
+| `actor_user_id` | `uuid` | 否 | 操作者；→ `app_user.id` |
+| `reason` | `text` | 否 | 修改原因 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,judgment_revision_id)`。
+
+- id与judgment_revision_id相同，对应HumanJudgmentRevision.revision_id；只replace生成此行
+- previous可指AUTO根记录；两修订属于同slot，不限于人工链
+
+### judgment_evidence
+
+责任：analysis；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `judgment_revision_id` | `uuid` | 否 | 判断；→ `judgment_revision.id` |
+| `evidence_id` | `uuid` | 否 | 证据；→ `evidence.id` |
+| `stance` | `text` | 否 | support/refute/context |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,judgment_revision_id,evidence_id,stance)`。
+
+### review_decision
+
+责任：analysis；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `slot_id` | `uuid` | 否 | 对应subject_slot；→ `decision_slot.id` |
+| `subject_revision_id` | `uuid` | 否 | 对应subject_revision；→ `judgment_revision.id` |
+| `status` | `text` | 否 | accepted/rejected/pending；解除动作记录audit，不增改公开枚举 |
+| `actor_kind` | `text` | 否 | AUTO/HUMAN |
+| `actor_id` | `text` | 否 | 服务身份/用户 |
+| `policy_ref` | `text` | 否 | 固定政策版本 |
+| `input_manifest_id` | `uuid` | 否 | 输入；→ `input_manifest.id` |
+| `known_at` | `timestamptz` | 否 | 决定生效时点 |
+| `valid_until` | `timestamptz` | 是 | 决定有效期 |
+| `supersedes_decision_id` | `uuid` | 是 | 前决定；→ `review_decision.id` |
+| `reason` | `text` | 否 | 理由 |
+| `evidence_ids` | `jsonb` | 否 | 确切证据ID集合 |
+| `knowledge_sequence` | `bigint` | 否 | DB实际知识序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,slot_id,known_at,id`。
+
+- subject_revision归属slot；证据通过judgment_evidence及提交参数一致校验
+- 解除覆盖仅追加audit/outbox并清有效指针，不虚构accepted决定；保留旧决定
+
+### risk_resolution
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `risk_revision_id` | `uuid` | 否 | kind=risk的根修订；→ `judgment_revision.id` |
+| `release_id` | `uuid` | 否 | 冻结策略发布；→ `strategy_release.id` |
+| `security_id` | `uuid` | 否 | 确切适用证券；→ `security.id` |
+| `primary_listing_id` | `uuid` | 否 | 冻结挂牌；→ `listing.id` |
+| `policy_ref` | `text` | 否 | 风险目标政策hash版本 |
+| `identity_manifest_id` | `uuid` | 否 | 固定身份版本；→ `input_manifest.id` |
+| `known_at` | `timestamptz` | 否 | 实际风险适用时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,risk_revision_id,release_id,security_id)`。
+
+- target_kind/id从risk_revision视图取；H listing只适用匹配主挂牌
+- 撤销确切slot+revision；release有公司级风险时不能因挂牌风险拒绝而解除
+
+### financial_fact
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `metric_key` | `text` | 否 | 指标注册ID |
+| `period_start` | `date` | 否 | 财政期间开始 |
+| `period_end` | `date` | 否 | 财政期间结束 |
+| `report_type` | `text` | 否 | annual/quarter/ytd/half_year |
+| `consolidation_scope` | `text` | 否 | consolidated/parent等 |
+| `profit_basis` | `text` | 是 | 合并/归母/普通股利润独立口径 |
+| `currency` | `char(3)` | 否 | 原币种 |
+| `unit` | `text` | 否 | 规范计量单位 |
+| `value` | `numeric(38,12)` | 是 | 缺失使用null与质量 |
+| `quality` | `text` | 否 | valid/missing/conflicting/unsupported |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `evidence_id` | `uuid` | 否 | 原数据位置；→ `evidence.id` |
+| `source_revision` | `text` | 否 | 源修订标识 |
+| `announced_at` | `timestamptz` | 否 | 公开时点 |
+| `observed_at` | `timestamptz` | 否 | 获取时点 |
+| `knowledge_sequence` | `bigint` | 否 | DB知识序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,metric_key,period_start,period_end,report_type,consolidation_scope,profit_basis,source_id,source_revision)`。
+
+查询索引：`workspace_id,company_id,metric_key,period_end,observed_at,id`。
+
+- profit_basis空时唯一键采用NULLS NOT DISTINCT或规范口径键，避免null导致重复
+- 38,12为持久化设计；超范围明确invalid不截断；Python中间计算仍precision=50
+
+### report_obligation
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `market_board` | `text` | 否 | 市场及板块 |
+| `report_type` | `text` | 否 | 应披露类别 |
+| `required_period_end` | `date` | 否 | 应有期间 |
+| `fiscal_year_end` | `text` | 否 | 财年末规则 |
+| `due_at` | `timestamptz` | 否 | 到期时间 |
+| `grace_seconds` | `integer` | 否 | 批准宽限 |
+| `exception` | `jsonb` | 是 | 例外与证据 |
+| `policy_ref` | `text` | 否 | 义务规则版本 |
+| `evidence_id` | `uuid` | 否 | 依据；→ `evidence.id` |
+| `observed_at` | `timestamptz` | 否 | 获取时间 |
+| `knowledge_sequence` | `bigint` | 否 | DB序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,market_board,report_type,required_period_end,policy_ref)`。
+
+### calendar_version
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `calendar_key` | `text` | 否 | 市场日历ID |
+| `version` | `text` | 否 | 版本 |
+| `sessions` | `jsonb` | 否 | 覆盖日期、expected时段、休市例外及来源 |
+| `content_sha256` | `char(64)` | 否 | 完整日历hash |
+| `valid_start` | `date` | 否 | 覆盖开始 |
+| `valid_end` | `date` | 否 | 覆盖结束 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,calendar_key,version)`。
+
+### price_bar
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `listing_id` | `uuid` | 否 | 挂牌；→ `listing.id` |
+| `market_session` | `date` | 否 | 挂牌本地市场session |
+| `raw_close` | `numeric(38,12)` | 是 | 原始收盘价；缺价null |
+| `currency` | `char(3)` | 否 | 报价币种 |
+| `price_kind` | `text` | 否 | 连续末值/CAS最终价/正式收盘等 |
+| `is_final` | `boolean` | 否 | 报价是否最终；不代表evaluation封存 |
+| `source_id` | `uuid` | 否 | 行情来源；→ `source.id` |
+| `source_revision` | `text` | 否 | 源修订 |
+| `observed_at` | `timestamptz` | 否 | 获取时点 |
+| `knowledge_sequence` | `bigint` | 否 | DB序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,listing_id,market_session,source_id,source_revision,price_kind)`。
+
+查询索引：`workspace_id,security_id,market_session,observed_at,id`。
+
+### fx_rate
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `base_currency` | `char(3)` | 否 | 基准币种 |
+| `quote_currency` | `char(3)` | 否 | 报价币种 |
+| `rate` | `numeric(38,12)` | 否 | 每单位base的quote |
+| `as_of` | `timestamptz` | 否 | 汇率时点 |
+| `source_id` | `uuid` | 否 | 来源；→ `source.id` |
+| `source_revision` | `text` | 否 | 修订 |
+| `observed_at` | `timestamptz` | 否 | 获取 |
+| `knowledge_sequence` | `bigint` | 否 | DB序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,base_currency,quote_currency,as_of,source_id,source_revision)`。
+
+- rate>0；相反币对不是可直接互换值
+
+### corporate_action
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `security_id` | `uuid` | 是 | 特定证券动作；公司股本可空；→ `security.id` |
+| `kind` | `text` | 否 | share_basis/split/dividend等 |
+| `share_basis` | `jsonb` | 否 | 同权普通股数量、期间、权利类别与证据 |
+| `values` | `jsonb` | 否 | decimal字符串及单位，匹配metric-definition |
+| `source_revision` | `text` | 否 | 源修订 |
+| `evidence_id` | `uuid` | 否 | 依据；→ `evidence.id` |
+| `effective_at` | `timestamptz` | 否 | 业务生效 |
+| `observed_at` | `timestamptz` | 否 | 获取 |
+| `knowledge_sequence` | `bigint` | 否 | DB序列 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### dimension_registry
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `registry_key` | `text` | 否 | 注册目录 |
+| `version` | `integer` | 否 | 版本 |
+| `content` | `jsonb` | 否 | dimension-registry.Schema完整目录 |
+| `content_sha256` | `char(64)` | 否 | 内容hash |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,registry_key,version)`。
+
+### scoring_template
+
+责任：scoring；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `template_key` | `text` | 否 | 模板稳定标识 |
+| `level` | `text` | 否 | base/industry/company |
+| `scope` | `jsonb` | 否 | 适用主体/行业 |
+| `current_version_id` | `uuid` | 是 | 最新发布提示指针，运行不按latest读取；→ `template_version.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,template_key)`。
+
+### template_draft
+
+责任：scoring；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `template_id` | `uuid` | 否 | 模板；→ `scoring_template.id` |
+| `parent_version_id` | `uuid` | 是 | base无父；其余固定父；→ `template_version.id` |
+| `base_config_ref` | `jsonb` | 是 | base完整评分配置引用 |
+| `patches` | `jsonb` | 否 | 完整类型化patches |
+| `version` | `bigint` | 否 | 草稿If-Match |
+| `owner_user_id` | `uuid` | 否 | 维护人；→ `app_user.id` |
+| `status` | `text` | 否 | editing/published/abandoned |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### template_version
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `template_id` | `uuid` | 否 | 模板；→ `scoring_template.id` |
+| `version` | `integer` | 否 | 发布序号 |
+| `parent_version_id` | `uuid` | 是 | 固定父版本；→ `template_version.id` |
+| `registry_id` | `uuid` | 否 | 冻结注册目录；→ `dimension_registry.id` |
+| `content` | `jsonb` | 否 | scoring-template.Schema内容 |
+| `content_sha256` | `char(64)` | 否 | 整个模板hash |
+| `published_by` | `uuid` | 否 | 发布人；→ `app_user.id` |
+| `published_at` | `timestamptz` | 否 | 真实发布时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,template_id,version)`。
+
+- 不跳层/跨组织/循环；范围匹配；parent hash与引用一致
+
+### effective_config
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `template_version_id` | `uuid` | 否 | 末层模板；→ `template_version.id` |
+| `parent_chain` | `jsonb` | 否 | 全部固定父ID/version/hash |
+| `resolved_config` | `jsonb` | 否 | 完整EffectiveScoringConfig |
+| `origin_map` | `jsonb` | 否 | 逐字段来源 |
+| `resolution_hash` | `char(64)` | 否 | 含registry/rubric/metric/numeric/policy内容hash |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,resolution_hash)`。
+
+### scoring_binding
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `effective_config_id` | `uuid` | 否 | 冻结解析配置；→ `effective_config.id` |
+| `profile_key` | `text` | 否 | 首版standard；多方案需显式ID |
+| `generation` | `bigint` | 否 | 发布绑定代次 |
+| `published_by` | `uuid` | 否 | 发布人；→ `app_user.id` |
+| `published_at` | `timestamptz` | 否 | 真实发布时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,profile_key,generation)`。
+
+### baseline_dimension
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `dimension` | `text` | 否 | 冻结registry ID |
+| `effective_config_id` | `uuid` | 否 | 口径；→ `effective_config.id` |
+| `input_manifest_id` | `uuid` | 否 | 财务/rubric判断依据；→ `input_manifest.id` |
+| `score` | `numeric(15,12)` | 是 | 0到100；缺失null |
+| `quality` | `text` | 否 | valid/missing/stale/conflicting/unsupported/pending_review |
+| `valid_from` | `timestamptz` | 否 | 业务起点 |
+| `valid_until` | `timestamptz` | 是 | 业务终点 |
+| `known_at` | `timestamptz` | 否 | 实际可用时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,company_id,dimension,known_at,id`。
+
+### contribution_slot
+
+责任：scoring；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `economic_fact_id` | `uuid` | 否 | 经济事实；→ `economic_fact.id` |
+| `dimension` | `text` | 否 | 维度 |
+| `impact_revision_id` | `uuid` | 是 | 当前接受影响；kind=impact；→ `judgment_revision.id` |
+| `absorbed_by_baseline_id` | `uuid` | 是 | 已吸收的基准；→ `baseline_dimension.id` |
+| `generation` | `bigint` | 否 | 指针版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,economic_fact_id,dimension)`。
+
+- 新baseline与吸收指针同事务；一个经济事实只计一个有效贡献
+
+### baseline_absorption
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `baseline_id` | `uuid` | 否 | 新基准；→ `baseline_dimension.id` |
+| `contribution_slot_id` | `uuid` | 否 | 被吸收slot；→ `contribution_slot.id` |
+| `slot_generation` | `bigint` | 否 | 被吸收版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,baseline_id,contribution_slot_id,slot_generation)`。
+
+### score_snapshot
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 经营主体；→ `company.id` |
+| `as_of` | `timestamptz` | 否 | 评分时点 |
+| `input_manifest_id` | `uuid` | 否 | 所有固定依据；→ `input_manifest.id` |
+| `effective_config_id` | `uuid` | 否 | 解析配置；→ `effective_config.id` |
+| `input_hash` | `char(64)` | 否 | 含时点/政策的输入hash |
+| `model_version` | `text` | 否 | 评分算法版本 |
+| `quality_score` | `numeric(15,12)` | 是 | Q，缺失null |
+| `coverage` | `numeric(13,12)` | 否 | 0到1 |
+| `quality` | `text` | 否 | 质量状态 |
+| `required_source_ids` | `jsonb` | 否 | 依赖来源集合 |
+| `permission_generation` | `bigint` | 否 | 读取/发布时再校验当前权限版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,input_hash,model_version)`。
+
+查询索引：`workspace_id,company_id,as_of,id`。
+
+### score_dimension
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `score_snapshot_id` | `uuid` | 否 | 公司分；→ `score_snapshot.id` |
+| `dimension` | `text` | 否 | 维度 |
+| `weight` | `numeric(13,12)` | 否 | 权重 |
+| `baseline_id` | `uuid` | 是 | 有效基准；→ `baseline_dimension.id` |
+| `baseline_score` | `numeric(15,12)` | 是 | 基准 |
+| `contribution_total` | `numeric(15,12)` | 是 | 持久化贡献合计 |
+| `final_score` | `numeric(15,12)` | 是 | 裁剪后维度分 |
+| `subcoverage` | `numeric(13,12)` | 否 | 子指标覆盖 |
+| `quality` | `text` | 否 | 质量 |
+| `origin` | `jsonb` | 否 | 口径来源与指标/rubric解释 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,score_snapshot_id,dimension)`。
+
+### score_contribution
+
+责任：scoring；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `score_dimension_id` | `uuid` | 否 | 维度输出；→ `score_dimension.id` |
+| `contribution_slot_id` | `uuid` | 否 | 事实贡献slot；→ `contribution_slot.id` |
+| `impact_revision_id` | `uuid` | 否 | 确切影响判断；→ `judgment_revision.id` |
+| `value` | `numeric(15,12)` | 否 | 单事实贡献 |
+| `explanation` | `jsonb` | 否 | m/r/a/q/H/age及证据引用；decimal字符串 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,score_dimension_id,contribution_slot_id)`。
+
+### metric_snapshot
+
+责任：fundamentals；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `listing_id` | `uuid` | 否 | 挂牌；→ `listing.id` |
+| `as_of` | `timestamptz` | 否 | 估值时点 |
+| `input_manifest_id` | `uuid` | 否 | 匹配财务/价格/FX/股本；→ `input_manifest.id` |
+| `input_hash` | `char(64)` | 否 | 输入hash |
+| `metric_version` | `text` | 否 | 指标/数值版本 |
+| `values` | `jsonb` | 否 | 规范decimal字符串及分母/单位 |
+| `valuation_score` | `numeric(15,12)` | 是 | V，不有效null |
+| `quality` | `text` | 否 | valid/missing/stale/invalid/unsupported |
+| `required_source_ids` | `jsonb` | 否 | 依赖来源 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,security_id,input_hash,metric_version)`。
+
+查询索引：`workspace_id,security_id,as_of,id`。
+
+### score_current
+
+责任：scoring；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `profile_key` | `text` | 否 | 研究方案 |
+| `snapshot_id` | `uuid` | 是 | 最新成功完整评分；→ `score_snapshot.id` |
+| `generation` | `bigint` | 否 | CAS版本 |
+| `recompute_status` | `text` | 否 | current/queued/running/failed/invalidated |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,company_id,profile_key)`。
+
+- 失败不覆盖成功快照；被拒/替换贡献后旧分只能作为历史解释，当前展示pending_review
+
+### strategy
+
+责任：strategy；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `strategy_key` | `text` | 否 | 组织内规则标识 |
+| `name` | `text` | 否 | 名称 |
+| `owner_user_id` | `uuid` | 否 | 维护人；→ `app_user.id` |
+| `visibility` | `text` | 否 | private/workspace |
+| `active_release_id` | `uuid` | 是 | 当前发布指针；→ `strategy_release.id` |
+| `version` | `bigint` | 否 | 活动指针CAS版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,strategy_key)`。
+
+### strategy_draft
+
+责任：strategy；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `strategy_id` | `uuid` | 否 | 规则；→ `strategy.id` |
+| `parent_release_id` | `uuid` | 是 | 来源发布；→ `strategy_release.id` |
+| `config` | `jsonb` | 否 | strategy.Schema完整有类型AST |
+| `version` | `bigint` | 否 | If-Match |
+| `owner_user_id` | `uuid` | 否 | 维护人；→ `app_user.id` |
+| `status` | `text` | 否 | editing/published/abandoned |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### strategy_version
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `strategy_id` | `uuid` | 否 | 规则；→ `strategy.id` |
+| `version` | `integer` | 否 | 不可变配置序号 |
+| `config` | `jsonb` | 否 | 完整策略Schema |
+| `content_sha256` | `char(64)` | 否 | 内容hash |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,strategy_id,version)`。
+
+### preview
+
+责任：platform；生命周期：`append_then_finalize`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `kind` | `text` | 否 | strategy/template/binding/identity/correction/retry |
+| `actor_user_id` | `uuid` | 否 | 请求人；→ `app_user.id` |
+| `subject_ref` | `jsonb` | 否 | 草稿或业务目标及版本 |
+| `request_hash` | `char(64)` | 否 | 预览请求hash |
+| `input_manifest_id` | `uuid` | 否 | 固定输入；→ `input_manifest.id` |
+| `result` | `jsonb` | 是 | 受影响对象与前后变化；未完成可空 |
+| `status` | `text` | 否 | queued/running/ready/failed/consumed/expired |
+| `expires_at` | `timestamptz` | 否 | 预览有效期 |
+| `consumed_at` | `timestamptz` | 是 | 发布/确认时点 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+- 草稿/输入变化或权限撤销即不可发布；单项覆盖不依赖此表
+
+### strategy_release
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `strategy_id` | `uuid` | 否 | 规则；→ `strategy.id` |
+| `strategy_version_id` | `uuid` | 否 | 固定策略配置；→ `strategy_version.id` |
+| `release_number` | `integer` | 否 | 发布序号 |
+| `preview_id` | `uuid` | 否 | 已完成且匹配的模拟；→ `preview.id` |
+| `parent_release_id` | `uuid` | 是 | 上次发布；回滚也新增；→ `strategy_release.id` |
+| `published_by` | `uuid` | 否 | 有权发布人；→ `app_user.id` |
+| `active_from` | `timestamptz` | 否 | 生效时点 |
+| `binding_manifest_hash` | `char(64)` | 否 | 冻结所有公司配置与主挂牌清单 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,strategy_id,release_number)`。
+
+### release_company_binding
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `release_id` | `uuid` | 否 | 发布；→ `strategy_release.id` |
+| `company_id` | `uuid` | 否 | 主体；→ `company.id` |
+| `scoring_binding_id` | `uuid` | 否 | 固定公司配置；→ `scoring_binding.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,release_id,company_id)`。
+
+### release_security
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `release_id` | `uuid` | 否 | 发布；→ `strategy_release.id` |
+| `security_id` | `uuid` | 否 | 监控证券；→ `security.id` |
+| `primary_listing_id` | `uuid` | 否 | 冻结主挂牌；→ `listing.id` |
+| `identity_generation` | `bigint` | 否 | 冻结身份版本 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,release_id,security_id)`。
+
+### evaluation_seal
+
+责任：strategy；生命周期：`mutable_until_sealed`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `release_id` | `uuid` | 否 | 发布；→ `strategy_release.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `primary_listing_id` | `uuid` | 否 | 主挂牌；→ `listing.id` |
+| `market_session` | `date` | 否 | 市场session |
+| `mode` | `text` | 否 | live/replay/shadow等隔离 |
+| `state` | `text` | 否 | session_due/ready_to_seal/sealed；provisional为独立评估run |
+| `planned_seal_cutoff` | `timestamptz` | 否 | 固定目标cutoff |
+| `evaluation_as_of` | `timestamptz` | 否 | 市场最终时点 |
+| `manifest_id` | `uuid` | 是 | 当前冻结候选；→ `input_manifest.id` |
+| `manifest_sha256` | `char(64)` | 是 | 候选内容hash |
+| `generation` | `bigint` | 否 | 封存CAS版本 |
+| `worker_fence` | `bigint` | 否 | 有效租约token |
+| `sealed_at` | `timestamptz` | 是 | 真实封存时间 |
+| `finalization_token` | `uuid` | 是 | 唯一token；sealed必须非空 |
+| `evaluation_id` | `uuid` | 是 | 最终评估；→ `strategy_evaluation.id` |
+| `application_status` | `text` | 否 | not_applied/applied/superseded/invalidated |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,release_id,security_id,market_session,mode)`。
+
+- partial unique(workspace_id,finalization_token) WHERE finalization_token IS NOT NULL
+- cutoff之前不能sealed/token；sealed后冻结字段不可变，应用诊断可追加
+- provisional run不占最终键：本表session_due/ready_to_seal/sealed为封存slot；provisional状态在评估run中展示而非另建竞争slot
+
+### seal_candidate
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `seal_id` | `uuid` | 否 | 封存slot；→ `evaluation_seal.id` |
+| `generation` | `bigint` | 否 | 候选代次 |
+| `manifest_id` | `uuid` | 否 | 冻结manifest；→ `input_manifest.id` |
+| `worker_fence` | `bigint` | 否 | 领租fence |
+| `invalidated_reason` | `text` | 是 | 建立时已废弃的诊断；后续废弃以audit追加 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,seal_id,generation)`。
+
+- 重新冻结先CAS提升seal generation，旧manifest/candidate保留
+
+### strategy_evaluation
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `release_id` | `uuid` | 否 | 发布；→ `strategy_release.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `market_session` | `date` | 否 | 市场session |
+| `mode` | `text` | 否 | live/shadow/replay/research_reconstruction |
+| `is_provisional` | `boolean` | 否 | 是否仅临时展示 |
+| `input_manifest_id` | `uuid` | 否 | 冻结输入；→ `input_manifest.id` |
+| `score_snapshot_id` | `uuid` | 是 | 经营分缺失可空；→ `score_snapshot.id` |
+| `metric_snapshot_id` | `uuid` | 是 | 估值缺失可空；→ `metric_snapshot.id` |
+| `context_hash` | `char(64)` | 否 | 含版本/时点的输入hash |
+| `rule_results` | `jsonb` | 否 | 逐条件true/false/unknown及原因 |
+| `quality` | `text` | 否 | 质量状态 |
+| `evaluation_as_of` | `timestamptz` | 否 | 研究时点 |
+| `knowledge_cutoff` | `timestamptz` | 否 | 实际允许知识截止 |
+| `generated_at` | `timestamptz` | 否 | 实际完成时间 |
+| `risk_generation` | `bigint` | 否 | 计算所见风险代次 |
+| `permission_generation` | `bigint` | 否 | 权限代次 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,release_id,security_id,market_session,context_hash,mode,is_provisional)`。
+
+- knowledge_cutoff<=generated_at；provisional不能引用未来目标cutoff作已知截止
+
+### strategy_membership
+
+责任：strategy；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `release_id` | `uuid` | 否 | 发布；→ `strategy_release.id` |
+| `security_id` | `uuid` | 否 | 证券；→ `security.id` |
+| `confirmed_state` | `text` | 是 | IN/OUT；无基线null |
+| `display_state` | `text` | 否 | UNKNOWN/OUT/ENTER_PENDING/IN/EXIT_PENDING/SUSPENDED |
+| `pending_sessions` | `jsonb` | 否 | 明确相邻session ID集合 |
+| `last_applied_session` | `date` | 是 | 最后应用session |
+| `finalization_token` | `uuid` | 是 | 最后普通封存token |
+| `current_evaluation_id` | `uuid` | 是 | 当前依据；→ `strategy_evaluation.id` |
+| `generation` | `bigint` | 否 | 状态CAS |
+| `risk_generation` | `bigint` | 否 | 当前风险版本 |
+| `transition_sequence` | `bigint` | 否 | 变化序号 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,release_id,security_id)`。
+
+查询索引：`workspace_id,release_id,display_state`。
+
+- 所有写只由strategy服务；实时风险无需最终评估也可更新，变化有独立risk依据
+- 行锁/CAS+fence+当前risk/ACL generation校验；不应用迟到session
+
+### membership_transition
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `membership_id` | `uuid` | 否 | 证券状态；→ `strategy_membership.id` |
+| `sequence` | `bigint` | 否 | 该状态变化序号 |
+| `from_state` | `text` | 是 | 无初始基线可空 |
+| `to_state` | `text` | 否 | 目标状态 |
+| `reason_kind` | `text` | 否 | ENTER/EXIT/RISK/MISSING/CONFIG_CHANGE/CORRECTION |
+| `basis_kind` | `text` | 否 | evaluation/risk/correction/config |
+| `basis_ref` | `jsonb` | 否 | 对应确切修订ID，含风险证据或更正ID |
+| `evaluation_id` | `uuid` | 是 | 实时风险可无收盘evaluation；→ `strategy_evaluation.id` |
+| `explanation_snapshot` | `jsonb` | 否 | 固定当时规则、状态、公司/证券/证据/缺口 |
+| `known_at` | `timestamptz` | 否 | 真正发生时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,membership_id,sequence)`。
+
+- 初始基线不产生ENTER/EXIT；风险退出不再重复生成EXIT
+- 同basis业务唯一键由事务/幂等账本保证；普通状态变化同封存事务提交
+
+### correction_run
+
+责任：strategy；生命周期：`append_then_finalize`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `preview_id` | `uuid` | 否 | 影响预览；→ `preview.id` |
+| `original_evaluation_id` | `uuid` | 否 | 原错误对象；→ `strategy_evaluation.id` |
+| `anchor_evaluation_id` | `uuid` | 是 | 受影响窗口前锚点；→ `strategy_evaluation.id` |
+| `window` | `jsonb` | 否 | 受影响session及后续冻结输入 |
+| `replacement_manifest_id` | `uuid` | 否 | 合法替换依据；→ `input_manifest.id` |
+| `reason` | `text` | 否 | 原错误类别与原因 |
+| `expected_generation` | `bigint` | 否 | 当前状态CAS |
+| `status` | `text` | 否 | queued/running/completed/failed/superseded |
+| `actor_user_id` | `uuid` | 否 | 发起人；→ `app_user.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### correction_record
+
+责任：strategy；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `correction_run_id` | `uuid` | 否 | 更正运行；→ `correction_run.id` |
+| `original_evaluation_id` | `uuid` | 否 | 当时记录；→ `strategy_evaluation.id` |
+| `replacement_evaluation_id` | `uuid` | 否 | 更正评估；→ `strategy_evaluation.id` |
+| `reconciliation` | `jsonb` | 否 | 旧转移是否仍成立及当前影响说明 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,correction_run_id,original_evaluation_id)`。
+
+### watchlist
+
+责任：research；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `owner_user_id` | `uuid` | 否 | 所有人；→ `app_user.id` |
+| `name` | `text` | 否 | 自选名称 |
+| `version` | `bigint` | 否 | If-Match |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### watchlist_entry
+
+责任：research；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `watchlist_id` | `uuid` | 否 | 自选；→ `watchlist.id` |
+| `security_id` | `uuid` | 否 | 自选粒度证券；→ `security.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,watchlist_id,security_id)`。
+
+### research_note
+
+责任：research；生命周期：`mutable_with_revisions`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `owner_user_id` | `uuid` | 否 | 所有人；→ `app_user.id` |
+| `company_id` | `uuid` | 否 | 研究公司；→ `company.id` |
+| `visibility` | `text` | 否 | private/workspace |
+| `current_revision_id` | `uuid` | 是 | 当前笔记；→ `note_revision.id` |
+| `version` | `bigint` | 否 | If-Match |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### note_revision
+
+责任：research；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `note_id` | `uuid` | 否 | 笔记；→ `research_note.id` |
+| `content` | `text` | 否 | 用户研究内容，非真实持仓 |
+| `actor_user_id` | `uuid` | 否 | 修改者；→ `app_user.id` |
+| `revision_number` | `bigint` | 否 | 修订序号 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,note_id,revision_number)`。
+
+### saved_view
+
+责任：research；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `owner_user_id` | `uuid` | 否 | 所有人；→ `app_user.id` |
+| `visibility` | `text` | 否 | private/workspace |
+| `name` | `text` | 否 | 视图名 |
+| `filters` | `jsonb` | 否 | 公司/策略筛选及排序 |
+| `version` | `bigint` | 否 | If-Match |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+### job
+
+责任：platform；生命周期：`mutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `stage` | `text` | 否 | 业务阶段 |
+| `logical_key` | `text` | 否 | 12§6完整规范键 |
+| `input_manifest_id` | `uuid` | 否 | 固定输入；→ `input_manifest.id` |
+| `mode` | `text` | 否 | live/backfill/replay/shadow等 |
+| `status` | `text` | 否 | due/running/succeeded/failed/dead |
+| `next_attempt_at` | `timestamptz` | 是 | 下次重试 |
+| `attempts` | `integer` | 否 | 已尝试次数 |
+| `lease_until` | `timestamptz` | 是 | 租约结束 |
+| `worker_fence` | `bigint` | 否 | 租约fence |
+| `result_ref` | `jsonb` | 是 | 输出修订/状态引用 |
+| `error_code` | `text` | 是 | 失败诊断 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,logical_key)`。
+
+查询索引：`status,next_attempt_at`。
+
+### outbox
+
+责任：platform；生命周期：`append_then_delivered`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `event_id` | `uuid` | 否 | 稳定事件ID |
+| `event_type` | `text` | 否 | 版本化领域事件 |
+| `schema_version` | `text` | 否 | 事件外壳版本 |
+| `payload` | `jsonb` | 否 | 只放受控对象引用，不放原文/密钥 |
+| `occurred_at` | `timestamptz` | 否 | 业务提交时间 |
+| `published_at` | `timestamptz` | 是 | 已投递时间 |
+| `attempts` | `integer` | 否 | 投递次数 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,event_id)`。
+
+查询索引：`published_at WHERE published_at IS NULL`。
+
+### inbox_dedupe
+
+责任：platform；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `consumer_key` | `text` | 否 | 消费者及版本 |
+| `event_id` | `uuid` | 否 | 事件ID |
+| `job_id` | `uuid` | 否 | 恢复账本；→ `job.id` |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,consumer_key,event_id)`。
+
+### idempotency_record
+
+责任：platform；生命周期：`mutable_until_complete`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `actor_key` | `text` | 否 | 用户/服务身份 |
+| `route_key` | `text` | 否 | 固定端点与目标 |
+| `idempotency_key` | `text` | 否 | 请求键 |
+| `payload_hash` | `char(64)` | 否 | 请求内容hash |
+| `status` | `text` | 否 | reserved/completed |
+| `response_ref` | `jsonb` | 是 | 原201/结果引用 |
+| `expires_at` | `timestamptz` | 否 | 默认保留7日提案 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,actor_key,route_key,idempotency_key)`。
+
+- 同键异payload为409；过期不能绕过长期业务唯一键
+
+### audit_event
+
+责任：governance；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `actor_key` | `text` | 否 | 操作身份 |
+| `action` | `text` | 否 | 明确业务动作 |
+| `object_ref` | `jsonb` | 否 | 对象及修订 |
+| `request_id` | `text` | 否 | 请求追踪 |
+| `before_after_hash` | `jsonb` | 否 | 前后hash，无秘密值 |
+| `reason` | `text` | 是 | 业务理由 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`。
+
+查询索引：`workspace_id,created_at,id`。
+
+### model_policy
+
+责任：governance；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `policy_key` | `text` | 否 | 模型/审核政策标识 |
+| `version` | `integer` | 否 | 版本 |
+| `config` | `jsonb` | 否 | 模型引用 校准/审核/受限候选政策；不含凭证 |
+| `content_sha256` | `char(64)` | 否 | 内容hash |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,policy_key,version)`。
+
+### revocation_receipt
+
+责任：governance；生命周期：`immutable`；范围：`workspace`。
+
+| 字段 | PostgreSQL类型 | 可空 | 含义/引用 |
+|---|---|---|---|
+| `id` | `uuid` | 否 | 稳定记录ID；服务端生成 |
+| `workspace_id` | `uuid` | 否 | 所属研究组织；→ `workspace.id` |
+| `journal_sequence` | `bigint` | 否 | 独立耐久journal序号 |
+| `scope_ref` | `jsonb` | 否 | 撤销范围 |
+| `receipt_hash` | `char(64)` | 否 | 耐久receipt |
+| `revoked_at` | `timestamptz` | 否 | 实际撤权时间 |
+| `created_at` | `timestamptz` | 否 | 数据库实际写入时间；不接受调用者回填 |
+
+唯一键：`(id)`；`(workspace_id,id)`；`(workspace_id,journal_sequence)`。
+
+- 只是独立journal的本库回执投影，不能充当恢复时最新真源；本轮不建外部存储
+
+## 逻辑对象与物理表示映射
+
+| 逻辑对象/视图 | 存储根 | 展开条件 | 说明 |
+|---|---|---|---|
+| `item_company_link` | `judgment_revision` | `kind=link` | 从slot身份与value展开材料/事件关联；当前有效视图join decision_slot.current_decision |
+| `event_company_impact` | `judgment_revision` | `kind=impact` | 完整signed_impact/confidence/H/economic_fact及证据；不重复存另一份可编辑值 |
+| `rubric_revision` | `judgment_revision` | `kind=rubric` | 完整criterion/period/grade/锚点修订；baseline由有效判断计算 |
+| `risk_revision` | `judgment_revision` | `kind=risk` | 完整target_kind/target_id/risk_code/economic_fact/有效期；传播另存risk_resolution |
+| `frozen_manifest` | `input_manifest` | `kind=evaluation` | 满足evaluation-input-manifest.Schema的冻结内容 |
+
+这些视图尚未创建。统一修订存储只减少重复值和多态外键，公开Schema仍按现有类型分支；没有把risk/rubric能力收窄。
+
+[END PART 10/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

@@ -1,168 +1,1395 @@
 
-[PART 16/27]
+[PART 16/34]
 
 
-===== SOURCE: contracts/job-event.schema.json =====
+===== SOURCE: contracts/evaluation-input-manifest.schema.json =====
 
 {
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "event_id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "event_type": {
-      "enum": [
-        "ItemCaptured",
-        "ItemNormalized",
-        "AnalysisProposed",
-        "ReviewApproved",
-        "EventChanged",
-        "FundamentalChanged",
-        "ScoreCompleted",
-        "StrategyEvaluated",
-        "MembershipChanged",
-        "NotificationRequested",
-        "IndexRequested",
-        "DecisionAccepted",
-        "DecisionOverridden",
-        "TemplatePublished",
-        "CorrectionRecorded"
-      ]
-    },
     "schema_version": {
-      "const": "2.0"
+      "const": "1.0"
     },
-    "workspace_id": {
+    "manifest_id": {
       "type": "string",
       "format": "uuid"
     },
-    "entity_id": {
+    "release_id": {
       "type": "string",
       "format": "uuid"
     },
-    "entity_revision": {
+    "security_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "primary_listing_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "market_session": {
       "type": "string",
       "minLength": 1
     },
-    "occurred_at": {
+    "evaluation_as_of": {
       "type": "string",
       "format": "date-time"
     },
-    "trace_id": {
+    "knowledge_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "selection_algorithm_ref": {
       "type": "string",
       "minLength": 1
     },
-    "mode": {
-      "enum": [
-        "live",
-        "backfill",
-        "replay",
-        "shadow",
-        "research_reconstruction"
-      ]
-    },
-    "generation": {
+    "cutoff_knowledge_sequence": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 0
     },
-    "payload": {
+    "inputs": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "input_manifest_id": {
-          "type": "string",
-          "format": "uuid"
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
         },
-        "job_id": {
-          "type": "string",
-          "format": "uuid"
+        "calendar": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "price": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "fx": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "share_capital": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "financials": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "report_obligations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "impacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rubrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "risks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "human_overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "templates": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "decision_policies": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "algorithms": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "rights": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "quality": {
+              "enum": [
+                "valid",
+                "missing",
+                "stale",
+                "conflicting",
+                "unsupported",
+                "pending_review",
+                "not_applicable"
+              ]
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "known_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "revision_id",
+                  "sha256",
+                  "known_at"
+                ]
+              }
+            },
+            "reason_codes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "quality",
+            "inputs",
+            "reason_codes"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "quality": {
+                    "const": "valid"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "inputs": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "reason_codes": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
         }
       },
       "required": [
-        "input_manifest_id",
-        "job_id"
-      ]
-    },
-    "evaluation_context": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "as_of": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date-time"
-        },
-        "knowledge_cutoff": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date-time"
-        },
-        "time_bucket": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "calendar_ref": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "template_resolution_hash": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "numeric_policy_ref": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "decision_policy_ref": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "as_of",
-        "knowledge_cutoff",
-        "time_bucket",
-        "calendar_ref",
-        "template_resolution_hash",
-        "numeric_policy_ref",
-        "decision_policy_ref"
+        "identity",
+        "calendar",
+        "price",
+        "fx",
+        "share_capital",
+        "financials",
+        "report_obligations",
+        "links",
+        "impacts",
+        "rubrics",
+        "risks",
+        "human_overrides",
+        "templates",
+        "decision_policies",
+        "algorithms",
+        "rights"
       ]
     }
   },
   "required": [
-    "event_id",
-    "event_type",
     "schema_version",
-    "workspace_id",
-    "entity_id",
-    "entity_revision",
-    "occurred_at",
-    "trace_id",
-    "mode",
-    "generation",
-    "payload",
-    "evaluation_context"
+    "manifest_id",
+    "release_id",
+    "security_id",
+    "primary_listing_id",
+    "market_session",
+    "evaluation_as_of",
+    "knowledge_cutoff",
+    "frozen_at",
+    "selection_algorithm_ref",
+    "cutoff_knowledge_sequence",
+    "inputs"
   ],
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Durable job reference event"
+  "title": "Immutable seal input manifest; all input classes or explicit quality gaps"
 }
 
-[END PART 16/27]
+[END PART 16/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

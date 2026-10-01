@@ -94,3 +94,7 @@ economic_fact与contribution_slot防止跨event重复；baseline吸收同事务�
 | evaluation_seal / frozen_manifest | 唯一workspace+release+security+session+mode，generation,fence,完整输入/缺口,cutoff watermark,hash,sealed_at/token,application_status | strategy；12 §8独占冻结/CAS/唯一封存 |
 
 risk解除引用确切revision，membership提交另校验risk generation；封存与普通状态原子提交见12。所有修订/manifest保留source ACL继承和同workspace复合引用；DDL与运行约束仍未实现。
+
+## 7. 字段级物理设计候选
+
+[15字段字典与ER](./15-database-dictionary.md)展开本逻辑模型。字段维护入口为design/database-catalog.json，按切片逐步落实；其中link/impact/rubric/risk采用共同judgment_revision根表和类型化逻辑视图，human链可指AUTO旧修订，有效指针仍只有decision_slot。数据库表/视图/约束与事务均尚未创建或验证，不把目录完整度作为M0一次性建表门槛。

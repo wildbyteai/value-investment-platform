@@ -93,14 +93,14 @@ H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候�
 
 [REVIEW_MATERIALS_BEGIN]
 
-[PART 1/27]
+[PART 1/34]
 
 
 ===== SOURCE: README.md =====
 
 # 价值投资策略管理系统
 
-> 设计基线 v0.3 · 2026-09-30 · A 股与港股 · 用户范围已确认，工程设计待实施验证
+> 设计基线 v0.3 · 2026-10-01 · A 股与港股 · 用户范围已确认，工程设计待实施验证
 
 从定时采集到公司研究、可解释评分、策略筛选及状态提醒的一套系统。优先建立可信、可恢复、可维护的流程和工程基础；价投规则提供可替换的标准版本，不承诺预测或收益。本仓库当前交付设计与可检查合同，不含可运行产品。
 
@@ -132,6 +132,9 @@ H. 开源选型与复用矩阵：按系统／策略／数据分组，记录候�
 | [11 模板、自动审核与权限](./docs/11-templates-automation-and-roles.md) | 已确认边界、三层继承、判断生效/人工覆盖和RBAC |
 | [12 时点、数值与纠错](./docs/12-time-numerics-and-corrections.md) | 财务口径、FINAL、相邻session、恢复与更正 |
 | [13 首个开发切片](./docs/13-first-slice.md) | 可开始实施的合成全流程任务书，尚未开发 |
+| [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
+| [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
+| [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -166,6 +169,8 @@ python3 tools/build_review_pack.py
 
 当前v0.3在v0.2上补齐二轮F01…05设计合同，见[V03-CHANGELOG](./review/V03-CHANGELOG.md)与[跨模块推演](./review/V03-COUNTEREXAMPLES.md)。11 §7…9/12 §8是新增权威语义；T-39…43列出未来运行验收。设计已写与材料检查已执行分开记录，尚未启动W-08、部署、真实源/模型或通知。GPT Pro是可选独立复核，不作为开发前置。
 
+设计细化入口：[本地交互原型](./prototype/index.html)、[字段目录](./design/database-catalog.json)、[本轮核对记录](./review/DESIGN-DETAIL-REVIEW.md)。原型浏览器交互检查与材料检查分别记录，不冒充产品或目标用户验收。
+
 
 ===== SOURCE: PROJECT.md =====
 
@@ -177,7 +182,7 @@ python3 tools/build_review_pack.py
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：v0.3二轮设计完善；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；原v0.2评审/probes保持历史记录。GPT Pro独立复审为可选复核，尚未执行，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
+当前阶段：v0.3二轮设计与建模/表设计/交互原型细化；已在独立工作区复核F01…05并同步文档、Schema、配置、示例与T-39…43。处置与证据边界见review/V03-CHANGELOG.md；2026-10-01已补领域/流程14、字段目录与ER15、页面原型及追踪16，检查见review/DESIGN-DETAIL-REVIEW.md。原v0.2评审/probes保持历史记录。GPT Pro独立复审为可选复核，尚未执行，产品尚未实施。本文件定义项目管理状态，已确认业务边界以docs/11为准，验收以docs/10为准。BW-0051仅为历史来源标识，原事项保留迁移指向，不再管理本项目。
 
 ## 权威文件与管理方式
 
@@ -188,6 +193,7 @@ python3 tools/build_review_pack.py
 | 已确认业务选择、模板/自动审核/角色 | [11](./docs/11-templates-automation-and-roles.md) |
 | 业务需求与设计 | [01](./docs/01-product-requirements.md)、[02](./docs/02-business-design.md) |
 | 工程架构、数据、API、UX、AI、运维 | docs/03…08 |
+| 领域/流程、字段设计、可点击原型 | [14](./docs/14-domain-and-business-flows.md)、[15](./docs/15-database-dictionary.md)、[16](./docs/16-prototype-and-design-trace.md) |
 | 实施任务和首个切片 | [09](./docs/09-delivery-plan.md)、[13](./docs/13-first-slice.md) |
 | 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
 | 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md |
@@ -205,7 +211,7 @@ python3 tools/build_review_pack.py
 
 多人五角色RBAC；通用基础/行业/企业定制评分；自动判断符合政策即生效、人工有效覆盖优先；外部模型接入；开发不设固定成本上限；管理与业务端统一体验；通知后置，策略变化先完整记录。A/H基本资料可查，首批50–100家完整监控是试运行范围。
 
-先完成设计评审，再按单独实施授权推进W-08合成全流程，随后单个获许可真实源→多源/检索→真实评分/策略→运行验收。技术大多有成熟方案，阶段划分按依赖和验证安排，不能因技术实现难度删减已确认需求。
+当前先通过建模、字段设计、核心流程与原型核对主用户路径，不要求100%穷尽所有未来设计；再按单独实施授权推进W-08合成全流程，随后单个获许可真实源→多源/检索→真实评分/策略→运行验收。技术大多有成熟方案，阶段划分按依赖和验证安排，不能因技术实现难度删减已确认需求。
 
 ## 历史证据与外部动作
 
@@ -265,6 +271,16 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 **有效判断（Accepted decision）**：独立DecisionService按政策AUTO接受或有权限人员HUMAN确认/覆盖的判断；不是模型proposal自我批准。
 
 **策略变化记录（Change record）**：不可变状态转移、配置重分类或纠错及其解释，首版可查看；通知是后续面向收件人的投递，不是产生变化的前提。
+
+**经济事实（Economic fact）**：公司/对象、动作和事实时期组成的同一业务事实，用于跨材料/事件去重。避免：每篇转载一个贡献。
+
+**判断槽（Decision slot）**：某个稳定业务问题的身份键；修改值产生新修订，通过有效决定指针生效。避免：把当前值与问题身份混为一行可覆写事实。
+
+**判断修订（Judgment revision）**：关联、影响、rubric或风险的完整类型化值；AUTO与HUMAN均可有修订，接受/拒绝/未知由决定记录表达。避免：修改理由里暗藏新值。
+
+**冻结输入清单（Input manifest）**：某次评估固定使用的事实、判断、身份、模板、算法、政策和缺口引用及内容hash。避免：只冻结一个价格或引用latest。
+
+**评估封存（Evaluation seal）**：到固定知识截止后冻结输入并生成唯一最终评估的过程；价格FINAL与评估封存各自独立。避免：收盘价到达即认为可以推进session计数。
 
 
 ===== SOURCE: AGENTS.md =====
@@ -373,6 +389,6 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 
 这些上线配置不阻止设计和合成开发；未核实能力/报价不当成事实。设计确认不等于真实接入、部署或交易授权。
 
-[END PART 1/27]
+[END PART 1/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。

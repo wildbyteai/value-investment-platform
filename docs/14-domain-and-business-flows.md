@@ -1,0 +1,185 @@
+# 14 领域模型与核心业务流程
+
+2026-10-01 · v0.3 设计细化。以11、12为业务合同真源，02为评分/策略规则入口；本文将其展开为对象、责任与业务活动，不另设阈值或审批门。首个实现范围仍见13，产品尚未实现。
+
+## 1. 领域对象与边界
+
+| 领域/负责人 | 聚合入口 | 核心对象 | 对外结果 | 不能承担的职责 |
+|---|---|---|---|---|
+| 身份 identity | Company、Security | 别名、Listing、关系修订、合并决定 | 固定身份版本及受限候选 | 不能把证券代码当公司主键；不改历史引用 |
+| 采集 ingestion | Source、IngestionRun | 权利版本、计划、检查点、原始对象 | 可追溯材料及采集缺口 | 不直接接受模型判断 |
+| 资料 information | InformationItem、Event | 内容修订、观察、证据、事件主张、EconomicFact | 时间线和证据定位 | 相似文本不等于同一经济事实 |
+| 判断 analysis | DecisionSlot | JudgmentRevision、ReviewDecision、HumanRevision | 有效关联、影响、rubric、风险 | 模型proposal不能直接写经营分或membership |
+| 财务 fundamentals | 财务/行情修订 | 报告义务、汇率、股本/公司行动、日历 | 固定时点规范事实和缺口 | 不能用今天数据回填过去 |
+| 评分 scoring | Template、ScoringBinding | 父链、registry、EffectiveConfig、Baseline、ContributionSlot、ScoreSnapshot | 公司经营分及解释 | 不计算证券价格、不发交易指令 |
+| 策略 strategy | StrategyRelease、Membership | Preview、EvaluationManifest、Seal、Evaluation、Transition、Correction | 证券候选状态及固定变化解释 | 不以重试改写封存历史 |
+| 治理 governance | Workspace、成员授权 | 能力、源/模型政策、审计、任务账本 | 权限及运行诊断 | system_admin不自动拥有业务发布权限 |
+| 研究协作 research | 自选/笔记/保存视图 | owner、visibility、revision | 个人研究上下文 | 私人对象不默认组织共享 |
+
+这些是同一模块化单体中的责任边界，不是新增微服务。一个动作可在同一数据库事务调用公开应用服务，共同提交业务记录、审计及outbox。
+
+## 2. 关系与粒度
+
+```mermaid
+erDiagram
+    COMPANY ||--o{ SECURITY : issues
+    SECURITY ||--o{ LISTING : quoted_as
+    INFORMATION_ITEM ||--|{ ITEM_OBSERVATION : observed
+    INFORMATION_ITEM ||--|{ ITEM_REVISION : revised
+    ITEM_REVISION ||--o{ EVIDENCE : locates
+    EVENT ||--|{ EVENT_REVISION : revised
+    EVENT_REVISION ||--o{ EVENT_EVIDENCE : supported_or_refuted
+    EVIDENCE ||--o{ EVENT_EVIDENCE : linked
+    COMPANY ||--o{ DECISION_SLOT : researched
+    DECISION_SLOT ||--o{ JUDGMENT_REVISION : values
+    JUDGMENT_REVISION ||--o{ REVIEW_DECISION : accepted_or_rejected
+    COMPANY ||--o{ SCORING_BINDING : configured
+    TEMPLATE_VERSION ||--o{ SCORING_BINDING : resolves
+    COMPANY ||--o{ SCORE_SNAPSHOT : quality_at_time
+    SECURITY ||--o{ METRIC_SNAPSHOT : valuation_at_time
+    STRATEGY_RELEASE ||--o{ STRATEGY_MEMBERSHIP : monitors
+    SECURITY ||--o{ STRATEGY_MEMBERSHIP : monitored
+    STRATEGY_MEMBERSHIP ||--o{ MEMBERSHIP_TRANSITION : records
+```
+
+- 公司有多只证券；每只证券有挂牌历史，release固定一个primary listing。公司分可共享，价格/币种/估值/策略状态不共享。
+- 一份材料有多个内容修订和观察；A→B→A是三次观察，不是两次。多材料可证明一个事件，一个事件可包含多个经济事实。
+- slot代表稳定的判断问题，revision代表某次值，decision代表接受/拒绝/未知及生效来源。人工修改产生新值和新决定；当前指针可变，旧记录不变。
+- 模板、有效配置、策略版本和发布不是同一对象。发布固定配置与每家公司解析结果；父模板升级不修改旧release。
+- 评分属于company；估值和membership属于security；变化固定evaluation和解释，点击历史不能偷偷展示当前结果。
+
+## 3. 主闭环（BF-01）
+
+```mermaid
+flowchart TD
+    A[数据管理员配置合成源与范围] --> B[保存原文 内容修订与观察]
+    B --> C[抽取证据 确定公司候选]
+    C --> D[模型产出关联 影响 rubric 风险建议]
+    D --> E{DecisionService按政策判断}
+    E -->|accepted| F[记录有效判断与事件时间线]
+    E -->|pending或rejected| G[显示理由与可处理事项]
+    G --> H[研究员回查证据并作人工判断]
+    H --> F
+    F --> I[解析固定三层模板 计算公司评分]
+    J[财务 行情 FX 股本与报告义务] --> K[按证券独立计算估值]
+    I --> L[策略管理员模拟并发布规则]
+    K --> L
+    L --> M[按市场session冻结输入并封存评估]
+    M --> N[按相邻session与优先级更新证券状态]
+    N --> O[生成固定变化解释]
+    O --> P[今日变化 公司档案与证据回查]
+    P --> H
+```
+
+pending只阻止受影响输入生效，不暂停整个源；no_link是正常业务结果。首版生成变化记录，通知投递后置。
+
+## 4. 自动判断与人工覆盖（BF-02）
+
+```mermaid
+flowchart TD
+    P[受限候选与本输入证据] --> A[模型proposal]
+    A --> V[校验形状 身份 证据 时点 适用政策]
+    V --> C{满足自动接受政策}
+    C -->|是| R[记录AUTO accepted]
+    C -->|否| U[记录pending或rejected及理由]
+    R --> S{存在有效人工覆盖}
+    S -->|否| E[更新有效slot指针]
+    S -->|是| K[保留AUTO建议 人工仍优先]
+    U --> H[研究员查看原文与旧值]
+    E --> H
+    H --> O[修改完整值 拒绝 或无法确认]
+    O --> X{有权且If-Match匹配}
+    X -->|否| Z[无权只读 或保留草稿并显示冲突]
+    X -->|是| T[同事务写人工修订 决策 指针 审计 outbox]
+    T --> W[立即显示新判断与重算等待]
+    W --> Q[重算公司评分和各证券状态]
+    Q --> D[展示已完成结果与证据]
+    K --> F[到期或有权解除覆盖]
+    F --> G[清旧有效指针 固定cutoff重评]
+    G --> C
+```
+
+关键边界：单项修改不额外预览审批；同幂等请求返回原结果。拒绝本风险与解除人工覆盖不同。重算未完成时不能显示旧贡献已按新值生效。冲突只影响该提交。
+
+## 5. 三层模板、模拟与发布（BF-03）
+
+```mermaid
+flowchart LR
+    B[固定base版本] --> I[固定industry版本]
+    I --> C[company差异草稿]
+    C --> R[解析完整配置及逐字段来源]
+    R --> V{注册维度 权重 证据规则适用}
+    V -->|不合法| E[定位字段错误 草稿保留]
+    V -->|合法| S[固定输入模拟]
+    S --> P[展示受影响公司和证券变化]
+    P --> A[有权人员发布绑定或策略release]
+    A --> F[冻结父链 配置与输入hash]
+    F --> G[新release建立CONFIG_CHANGE基线]
+```
+
+模板草稿可由研究员编辑，发布按11能力矩阵。发布预览与输入/草稿版本绑定；更改草稿后旧预览失效。策略回滚建立新release，不覆盖旧版。自定义维度通过registry及新base发布，不能从页面任意增加未知字段。
+
+## 6. 收盘评估与硬风险（BF-04）
+
+```mermaid
+flowchart TD
+    A[确定primary listing与expected session] --> B{市场时点与日历是否明确}
+    B -->|否| U[记录不可封存缺口 不猜cutoff]
+    B -->|是| C[设定固定收盘cutoff]
+    C --> D{已到cutoff}
+    D -->|否| P[仅provisional 不计确认次数]
+    D -->|是| F[一致性快照冻结合法输入与缺口]
+    F --> E[计算经营分 估值和规则结果]
+    E --> T[校验seal generation fence及最新风险/权限]
+    T --> V{风险 暂停 质量门 普通规则}
+    V -->|硬风险| R[适用证券OUT 记录RISK]
+    V -->|停牌或范围暂停| S[SUSPENDED 保留last_confirmed]
+    V -->|缺口| M[UNKNOWN 保留last_confirmed 清pending]
+    V -->|有效普通规则| N[相邻expected FINAL两次确认]
+    N --> O[ENTER EXIT或保持]
+    R --> X[同事务封存及状态 解释 审计 outbox]
+    S --> X
+    M --> X
+    O --> X
+    H[独立实时硬风险判断] --> I[精确company/security/listing传播]
+    I --> J[提升risk generation 即时RISK]
+    J --> T
+```
+
+H挂牌退市只影响该挂牌证券，公司违约可影响A/H。最后风险解除后普通规则重新确认；旧普通任务不能清除新风险。同session FINAL只应用一次，迟到旧session不倒灌当前状态。价格FINAL不代表评估已封存。
+
+## 7. 纠错与恢复（BF-05）
+
+```mermaid
+flowchart TD
+    A[发现材料 映射或计算错误] --> B{封存后原错误还是新知识}
+    B -->|新知识| N[新判断 自实际known_at生效]
+    B -->|原错误| P[预览受影响窗口与历史锚点]
+    P --> C[授权范围内建立correction run]
+    C --> R[原release与冻结后续session重放]
+    R --> H[保留当时记录 追加更正说明]
+    H --> I{是否影响当前状态}
+    I -->|否| O[仅CORRECTION历史说明]
+    I -->|是| K[最新合法输入reconciliation]
+    K --> G{当前generation仍匹配}
+    G -->|否| P
+    G -->|是| T[CORRECTION状态调整 审计 outbox]
+    F[任务失败或丢ACK] --> L[同逻辑键账本恢复]
+    L --> M[有租约的worker重试失败阶段]
+    M --> Q[回读结果 不重复生效]
+```
+
+业务错误纠正与技术任务重试不同；不能把“重试失败项”变成全量历史回写。s2更正必须检查s4/s6后续依据，不能直接改今天的状态。
+
+## 8. 页面—流程—对象—验收连接
+
+| 流程 | 页面入口 | 主要持久对象 | 需求/任务 | 既有验收 |
+|---|---|---|---|---|
+| BF-01 资料到研究 | 来源/任务→公司时间线 | source、item_revision、observation、evidence、event | R-01…04，W-02/03/08 | T-01…07、T-33 |
+| BF-02 判断与覆盖 | 证据→判断详情 | decision_slot、judgment_revision、human_judgment_revision、review_decision | R-03/05/09/16，W-03/04/08 | T-27/28/39、T-UX-01 |
+| BF-03 配置与发布 | 模板→策略模拟 | template_version、effective_config、scoring_binding、preview、strategy_release | R-07/15，W-04/05/08 | T-25/26/41/42、T-UX-02/03 |
+| BF-04 状态与变化 | 候选→今日变化→历史解释 | manifest、seal、evaluation、membership、transition、risk_resolution | R-06/08/12，W-05/08 | T-13/14/31/40/43 |
+| BF-05 纠错与恢复 | 质量中心→任务/更正 | correction_run/record、job、outbox、audit | R-10/12，W-06/08 | T-18/19/32/34、T-UX-04 |
+| 研究协作与权限 | 自选/笔记/用户角色 | watchlist、research_note、saved_view、membership_user | R-09/11/17，W-01/08 | T-15/20/29 |
+
+下一步表字段细化见[15](./15-database-dictionary.md)，页面交互与原型出口见[16](./16-prototype-and-design-trace.md)。本轮流程图可供设计核对，尚不是实际运行证据。

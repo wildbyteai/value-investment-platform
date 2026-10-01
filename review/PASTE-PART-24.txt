@@ -1,102 +1,313 @@
 
-[PART 24/27]
+[PART 24/34]
 
 
-===== SOURCE: tools/v03_material_checks.py =====
+===== SOURCE: examples/v03-seal-manifest.json =====
 
-"""Offline contract predicates and expected examples, never product acceptance."""
-import copy
-from decimal import Decimal
-from datetime import datetime
-from material_schema import validate
+{
+  "schema_version": "1.0",
+  "release_id": "00000000-0000-4000-8000-000000000070",
+  "security_id": "00000000-0000-4000-8000-000000000102",
+  "primary_listing_id": "00000000-0000-4000-8000-000000000202",
+  "market_session": "synthetic-s1",
+  "evaluation_as_of": "2026-09-30T08:10:00Z",
+  "knowledge_cutoff": "2026-09-30T09:10:00Z",
+  "manifest_id": "00000000-0000-4000-8000-000000000080",
+  "frozen_at": "2026-09-30T09:10:00Z",
+  "selection_algorithm_ref": "synthetic-cutoff-selection-v1",
+  "cutoff_knowledge_sequence": 120,
+  "inputs": {
+    "identity": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000300",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "calendar": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000301",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "price": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000302",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "fx": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000303",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "share_capital": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000304",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "financials": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000305",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "report_obligations": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000306",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "links": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000307",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "impacts": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000308",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "rubrics": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000309",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "risks": {
+      "quality": "not_applicable",
+      "inputs": [],
+      "reason_codes": [
+        "synthetic_no_active_risks"
+      ]
+    },
+    "human_overrides": {
+      "quality": "not_applicable",
+      "inputs": [],
+      "reason_codes": [
+        "synthetic_no_active_human_overrides"
+      ]
+    },
+    "templates": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000312",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "decision_policies": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000313",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "algorithms": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000314",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    },
+    "rights": {
+      "quality": "valid",
+      "inputs": [
+        {
+          "revision_id": "00000000-0000-4000-8000-000000000315",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "known_at": "2026-09-30T09:00:00Z"
+        }
+      ],
+      "reason_codes": []
+    }
+  }
+}
 
 
-def run(read, check, reject, resolve, bundle, scoring, canonical_hash):
-    # Shared typed payload copies cannot drift across the request and stored revision.
-    command_schema=read('contracts/override-command.schema.json')
-    human_schema=read('contracts/human-judgment.schema.json')
-    check(command_schema['$defs']['judgment']==human_schema['$defs']['judgment'], 'v03 typed request/revision judgment agreement')
-    decision_schema=read('contracts/review-decision.schema.json')
-    replacements=read('examples/v03-human-replacements.json')['cases']
-    for case in replacements:
-        cmd=case['request'];response=case['expected_response'];rev=response['revision'];dec=response['decision']
-        validate(cmd,command_schema);validate(rev,human_schema);validate(dec,decision_schema)
-        check(rev['judgment']==cmd['replacement'] and rev['slot_id']==cmd['slot_id']==dec['subject_slot'], 'v03 replacement value / slot: '+case['id'])
-        check(dec['subject_revision']==rev['revision_id'] and rev['previous_revision_id']!=rev['revision_id'] and dec['status']=='accepted' and dec['actor_kind']=='HUMAN', 'v03 immutable revision/decision references: '+case['id'])
-        match=case['headers']['If-Match'].rsplit('-', 1)[-1]
-        check(dec['supersedes_decision_id'] and response['slot_generation']==int(match)+1, 'v03 single If-Match CAS expectation: '+case['id'])
-        check(set(cmd['replacement']['value']['evidence_ids'])<=set(cmd['evidence_ids']), 'v03 replacement evidence bound: '+case['id'])
-        bad=copy.deepcopy(cmd);del bad['replacement'];reject(lambda:validate(bad,command_schema),'v03 replace without full value')
-        bad=copy.deepcopy(cmd);bad['subject_revision_id']=rev['previous_revision_id'];reject(lambda:validate(bad,command_schema),'v03 replace mixed with subject reference')
-    for action in ['accept','reject','pending','release']:
-        cmd=copy.deepcopy(replacements[0]['request']);del cmd['replacement'];cmd.update(action=action,subject_revision_id=replacements[0]['expected_response']['revision']['previous_revision_id'])
-        validate(cmd,command_schema);check(True,'v03 non-replacement action shape: '+action)
-        bad=copy.deepcopy(cmd);bad['replacement']=replacements[0]['request']['replacement'];reject(lambda:validate(bad,command_schema),'v03 non-replace carries replacement: '+action)
-    # Material target-resolution counterexamples. These predicates are not runtime DecisionService.
-    fixture=read('examples/v03-risk-targets.json');policy=read('config/risk-target-policy-v1.json')
-    risk_schema=read('contracts/analysis-result.schema.json')['properties']['risk_proposals']['items']
-    def targets(p):
-        validate(p,risk_schema)
-        if p['company_id']!=fixture['identity_fixture']['company_id']:raise ValueError('company outside candidates')
-        if p['target_kind'] not in policy['allowed_target_kinds'][p['risk_code']]:raise ValueError('risk kind')
-        securities=fixture['identity_fixture']['securities']
-        if p['target_kind']=='company':
-            if p['target_id']!=p['company_id']:raise ValueError('company target')
-            return [s['id'] for s in securities]
-        matches=[s['id'] for s in securities if s['id' if p['target_kind']=='security' else 'primary_listing_id']==p['target_id']]
-        if not matches:raise ValueError('target outside candidates')
-        return matches
-    a,b=fixture['proposals']
-    check(targets(a)==fixture['expected']['listing_risk_targets'],'v03 H listing-only expected resolution')
-    check(targets(b)==fixture['expected']['company_risk_targets'],'v03 company default expected resolution A/H')
-    check(set(targets(b))==set(targets(a))|set(targets(b)), 'v03 removal of listing risk leaves independent company risk set')
-    for changes,label in [({'target_kind':'company','target_id':a['company_id']},'delisting cannot broaden to company'),({'target_id':'00000000-0000-4000-8000-000000999999'},'target outside manifest'),({'company_id':'00000000-0000-4000-8000-000000999999'},'wrong parent company')]:
-        bad=copy.deepcopy(a);bad.update(changes);reject(lambda:targets(bad),'v03 '+label)
-    old=copy.deepcopy(a);del old['target_kind'];del old['target_id'];reject(lambda:validate(old,risk_schema),'v03 ambiguous company-only old risk rejected')
-    # Registry / inheritance / custom contribution whitelist shape and material semantics.
-    registry=read('config/dimensions-standard-v1.json');validate(registry,read('contracts/dimension-registry.schema.json'));check(True,'v03 registry shape')
-    custom=read('examples/v03-template-custom.json');templates=copy.deepcopy(bundle['templates'])+[custom]
-    resolved=resolve(custom['template_key'],templates)
-    check(sum(Decimal(v) for v in resolved['dimension_weights'].values())==1 and resolved['dimension_policies']['x_customer_retention']['event_policy']=={'enabled':True,'half_life_days':90},'v03 custom dimension resolved weight/event golden')
-    q=resolved['dimension_policies']['governance']['quality_policy']
-    check(q['freshness']['max_age_days']==90 and q['evidence_requirement']=='issuer_or_regulator_original','v03 complete policy patch golden')
-    check(scoring['dimension_policies']['governance']['quality_policy']['freshness']['max_age_days']==180,'v03 base 180-day policy unchanged')
-    check(120<180 and not 120<90 and not 90<90,'v03 120-day freshness / exact expiry boundary arithmetic, NOT runtime freshness')
-    check(min(365,180)==180,'v03 restrictive strategy age composition arithmetic')
-    for changes,label in [({'dimension':'x_not_registered'},'unknown custom dimension'),({'event_policy':{'enabled':True,'half_life_days':0}},'invalid event half-life'),({'disabled':True},'disabled mixed with patch')]:
-        ts=copy.deepcopy(templates);ts[-1]['patches'][-1].update(changes);reject(lambda:resolve(custom['template_key'],ts),'v03 '+label)
-    # Blueprint policy references are frozen: a different content hash cannot load silently.
-    bad=copy.deepcopy(templates);bad[0]['base_config_ref']['sha256']='0'*64;reject(lambda:resolve(custom['template_key'],bad),'v03 old parent hash not hot-replaced')
-    impact=copy.deepcopy(read('examples/analysis-proposal.json')['impact_proposals'][0]);impact.update(dimension='x_customer_retention',half_life_days=90)
-    impact_schema=read('contracts/analysis-result.schema.json')['properties']['impact_proposals']['items']
-    def allow(p,c):
-        validate(p,impact_schema)
-        if p['dimension'] not in c['dimension_weights']:raise ValueError('dimension not active')
-        event=c['dimension_policies'][p['dimension']]['event_policy']
-        if not event['enabled'] or p['half_life_days']!=event['half_life_days']:raise ValueError('event policy')
-    allow(impact,resolved);check(True,'v03 registered active custom impact material allowlist')
-    bad=copy.deepcopy(impact);bad['dimension']='x_not_registered';reject(lambda:allow(bad,resolved),'v03 unregistered impact')
-    bad=copy.deepcopy(impact);bad['half_life_days']=30;reject(lambda:allow(bad,resolved),'v03 model cannot alter event half-life')
-    ts=copy.deepcopy(templates);ts[-1]['patches'][-1]['event_policy']={'enabled':False};baseline_only=resolve(custom['template_key'],ts)
-    check(baseline_only['baselines']['x_customer_retention']==resolved['baselines']['x_customer_retention'],'v03 baseline-only retains baseline')
-    check('x_customer_retention' not in baseline_only['event_contribution']['half_life_calendar_days'],'v03 baseline-only no fictitious half-life')
-    reject(lambda:allow(impact,baseline_only),'v03 baseline-only refuses event proposal')
-    check(resolve('company-synthetic-manufacturer')['baselines']==scoring['baselines'],'v03 custom template does not mutate old standard chain')
-    # Only temporal boundary / command shape assertions. No seal/token or SQL execution exists.
-    seal=read('examples/v03-seal-command.json');validate(seal,read('contracts/evaluation-seal.schema.json'));check(True,'v03 seal command shape')
-    manifest=read('examples/v03-seal-manifest.json');manifest_schema=read('contracts/evaluation-input-manifest.schema.json')
-    validate(manifest,manifest_schema)
-    check(canonical_hash(manifest)==seal['manifest_sha256'] and manifest['manifest_id']==seal['manifest_id'], 'v03 frozen manifest hash/reference binding')
-    check(all(manifest[k]==seal[k] for k in ['release_id','security_id','primary_listing_id','market_session','evaluation_as_of','knowledge_cutoff']), 'v03 seal/manifest fixed context agreement')
-    bad=copy.deepcopy(manifest);del bad['inputs']['human_overrides'];reject(lambda:validate(bad,manifest_schema),'v03 manifest cannot omit input class')
-    bad=copy.deepcopy(manifest);bad['inputs']['price']['inputs']=[];reject(lambda:validate(bad,manifest_schema),'v03 valid price class without input')
-    bad=copy.deepcopy(manifest);bad['inputs']['price']={'quality':'missing','inputs':[],'reason_codes':[]};reject(lambda:validate(bad,manifest_schema),'v03 missing input without quality reason')
-    check(all(datetime.fromisoformat(i['known_at'])<=datetime.fromisoformat(manifest['knowledge_cutoff']) for g in manifest['inputs'].values() for i in g['inputs']), 'v03 manifest fixture does not include late known input')
-    cutoff=datetime.fromisoformat(seal['knowledge_cutoff']);asof=datetime.fromisoformat(seal['evaluation_as_of'])
-    check((cutoff-asof).total_seconds()==3600,'v03 seal fixture fixed 60 minute cutoff')
-    check(15<60 and 40<=60 and 50<=60 and 61>60 and 65>=60,'v03 +15/+40/+50/+60/+61/+65 boundary arithmetic; token/concurrency NOT RUN')
-    bad=copy.deepcopy(seal);bad['worker_now']='2026-09-30T09:20:00Z';reject(lambda:validate(bad,read('contracts/evaluation-seal.schema.json')),'v03 seal cannot replace cutoff with caller now')
+===== SOURCE: examples/v03-template-custom.json =====
 
-[END PART 24/27]
+{
+  "schema_version": "2.0",
+  "template_key": "company-synthetic-custom-dimension",
+  "version": 1,
+  "level": "company",
+  "scope": {
+    "kind": "company",
+    "company_id": "00000000-0000-4000-8000-000000000001"
+  },
+  "parent_ref": {
+    "key": "industry-manufacturing",
+    "version": 2,
+    "sha256": "4ab9f3166ef772e7b5f718c9fcba6a4df175a1f8ccd89dbf50c6af37df199c6d"
+  },
+  "patches": [
+    {
+      "dimension": "governance",
+      "quality_policy": {
+        "evidence_requirement": "issuer_or_regulator_original",
+        "freshness": {
+          "kind": "age_days",
+          "max_age_days": 90
+        }
+      },
+      "reason": "90日行业/企业证据口径示范"
+    },
+    {
+      "dimension": "growth_sustainability",
+      "weight": "0.05",
+      "reason": "为新增维度保留0.05权重"
+    },
+    {
+      "dimension": "x_customer_retention",
+      "weight": "0.05",
+      "baseline": {
+        "method": "accepted_evidence_rubric",
+        "rubric_ref": "customer-retention-synthetic-v1"
+      },
+      "event_policy": {
+        "enabled": true,
+        "half_life_days": 90
+      },
+      "reason": "合成客户留存扩展示范"
+    }
+  ]
+}
+
+
+===== SOURCE: tools/build_review_pack.py =====
+
+#!/usr/bin/env python3
+"""Build local review pack and copy/paste messages; no network calls."""
+import hashlib
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+paths = [ROOT / "README.md", ROOT / "PROJECT.md", ROOT / "CONTEXT.md", ROOT / "AGENTS.md"]
+for pattern in ["docs/*.md", "docs/adr/*.md", "research/*.md", "config/*.json", "contracts/*.md", "contracts/*.json", "examples/*.json", "tools/*.py", "tools/*.cjs", "design/*.json", "design/*.md", "prototype/*.html", "prototype/*.css", "prototype/*.js", "prototype/*.md"]:
+    paths.extend(sorted(ROOT.glob(pattern)))
+paths.extend([ROOT / "review/GPT-PRO-PROMPT.md", ROOT / "review/V02-CHANGELOG.md", ROOT / "review/V03-CHANGELOG.md", ROOT / "review/V03-COUNTEREXAMPLES.md", ROOT / "review/DESIGN-DETAIL-REVIEW.md"])
+paths.extend(sorted(ROOT.glob("review/ROUND-2-*")))
+if (ROOT / "review/validation-result.json").exists():
+    paths.append(ROOT / "review/validation-result.json")
+parts = ["# 价值投资策略管理系统 v0.3 · GPT Pro 整包评审材料\n\n日期：2026-10-01。产品范围已确认，工程设计尚未实现。只含本次新生成设计、合成例子及材料检查。\n\n请对照随附提示词完整审查；不能从材料检查通过推导运行时已通过。\n\n## 文件目录与 SHA-256\n\n| 文件 | SHA-256 |\n|---|---|\n"]
+for p in paths:
+    parts.append(f"| `{p.relative_to(ROOT)}` | `{hashlib.sha256(p.read_bytes()).hexdigest()}` |\n")
+for p in paths:
+    rel = p.relative_to(ROOT)
+    parts.append(f"\n\n---\n\n# 文件：{rel}\n\n")
+    text = p.read_text(encoding="utf-8")
+    if p.suffix == ".json":
+        parts.append("```json\n" + text + "```\n")
+    else:
+        parts.append(text)
+output = ROOT / "review/REVIEW-PACK.md"
+output.write_text("".join(parts), encoding="utf-8")
+print(f"Built {len(paths)} source sections; {output.stat().st_size} bytes; SHA256={hashlib.sha256(output.read_bytes()).hexdigest()}")
+
+# Plain-text alternatives: no attachment and no repository access are required.
+source_paths = [p for p in paths if str(p.relative_to(ROOT)) not in {"review/GPT-PRO-PROMPT.md", "review/validation-result.json"}]
+sections = []
+for p in source_paths:
+    sections.append(f"\n\n===== SOURCE: {p.relative_to(ROOT)} =====\n\n" + p.read_text(encoding="utf-8"))
+instruction = (ROOT / "review/GPT-PRO-PROMPT.md").read_text(encoding="utf-8").split("## 完整提示词\n", 1)[1].strip()
+all_text = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" + "".join(sections) + "\n[REVIEW_MATERIALS_END]\n请现在开始完整评审并输出 v0.3。\n"
+(ROOT / "review/PASTE-ALL.txt").write_text(all_text, encoding="utf-8")
+groups, group = [], ""
+for section in sections:
+    if group and len(group) + len(section) > 14000:
+        groups.append(group)
+        group = ""
+    group += section
+if group:
+    groups.append(group)
+links = []
+for index, group in enumerate(groups, 1):
+    start = instruction + "\n\n[REVIEW_MATERIALS_BEGIN]\n" if index == 1 else ""
+    end = "\n[REVIEW_MATERIALS_END]\n全部材料已发完，请现在开始完整评审并输出 v0.3。\n" if index == len(groups) else "\n本段结束，材料尚未发完，请只确认已收到，不开始评审。\n"
+    name = f"PASTE-PART-{index:02}.txt"
+    body = start + f"\n[PART {index}/{len(groups)}]\n" + group + f"\n[END PART {index}/{len(groups)}]\n" + end
+    (ROOT / "review" / name).write_text(body, encoding="utf-8")
+    links.append(f"{index}. [{name}](./{name})：{len(body):,} 字符；直接复制全文作为一条消息。")
+help_text = """# 不附文件的 GPT Pro 评审方式
+
+## 优先：读取 GitHub
+
+复制 [完整提示词](./GPT-PRO-PROMPT.md)中“完整提示词”下的全部内容，直接发给 GPT Pro。提示词已经指定仓库与材料路径，不要求上传附件。该方式要求当前 GPT Pro 会话有权限读取这个私有仓库；链接本身不赋予权限。
+
+## 备用：正文粘贴
+
+没有 GitHub 读取能力时，打开 [PASTE-ALL.txt](./PASTE-ALL.txt)，复制全部正文发给 GPT Pro，里面已有提示词和完整业务／工程／合同／合成示例，无需另发提示词或附件。无需 GitHub 权限也可在本地打开同名文本。
+
+若单条消息长度受界面限制，按下列顺序复制各段到同一个对话。第1段已包含完整提示词；中间段仅接收，最后一段自动开始评审。每个原文件完整保留，不在文件中间截断。没有假定所有界面都支持一次粘贴整包。
+
+""" + "\n".join(links) + "\n\n这些是当前v0.3的传递方式。纯文本按文件完整覆盖README、领域词汇、实现规则、全部设计/ADR/两轮研究/配置/Schema/合成例子与变更账本；不包含机器检查报告的冗长日志，该日志仍在仓库可查。\n"
+(ROOT / "review/PASTE-INSTRUCTIONS.md").write_text(help_text, encoding="utf-8")
+print(f"Built full copy/paste text: {len(all_text):,} characters; {len(groups)} file-boundary parts.")
+
+[END PART 24/34]
 
 本段结束，材料尚未发完，请只确认已收到，不开始评审。
