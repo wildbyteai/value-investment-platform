@@ -2,7 +2,7 @@
 
 本项目独立管理，不再属于BYTEWATCHER事项；先读PROJECT.md和README.md，不再按Matter路由、registry分配或内容生产/DBS流程执行。
 
-本仓库当前是 v0.3 设计基线（范围已确认，产品未实现）。先读 README、CONTEXT、与任务对应的 docs、contracts 和验收矩阵；未经用户授权不把设计任务扩大为部署、真实采集、模型外传、真实告警或交易。用户 scope 优先，技术细节可在已授权 slice 内自主决定。
+本仓库设计基线为 v0.3，v0.0.1 已部分实现与验证，完整首slice必选尚未通过（当前状态以PROJECT.md与versions/v0.0.1/VERIFICATION.md为准）。先读 README、CONTEXT、与任务对应的 docs、contracts 和验收矩阵；未经用户授权不把设计任务扩大为部署、真实采集、模型外传、真实告警或交易。用户 scope 优先，技术细节可在已授权 slice 内自主决定。
 
 ## 项目管理与设计优先级
 
@@ -31,4 +31,4 @@
 
 历史事项/迁移证据位于local-evidence/，不入Git；这不是可自动清理的临时缓存。当前项目所有相对路径均从独立Git根目录解释，不依赖原bytewatcher/repo位置。项目管理真源为PROJECT.md，业务确认真源仍为docs/11。
 
-编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。当前仅准备完成，产品仍未实施。
+编码准备入口为docs/17；资料接入语义以04 §6为准、接口05 §7、字段design/database-catalog.json（15自动生成），解析载荷InformationEntry/IngestionResult 1.0。首个slice包括合成文件摘要先可读与T-44…49，不自动读取local-evidence/真实参考表。编码准备已完成，产品已进入部分实现/验证阶段；未完成必选见versions/v0.0.1/VERIFICATION.md，不降低既定验收。

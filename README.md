@@ -1,8 +1,28 @@
 # 价值投资策略管理系统
 
-> 设计基线 v0.3 · 2026-10-01 · A 股与港股 · 用户范围已确认，工程设计待实施验证
+> 设计基线 v0.3 · 本地产品 v0.0.1 部分实现与验证 · A 股与港股 · 完整必选验收未通过
 
-从定时采集到公司研究、可解释评分、策略筛选及状态提醒的一套系统。优先建立可信、可恢复、可维护的流程和工程基础；价投规则提供可替换的标准版本，不承诺预测或收益。本仓库当前交付设计与可检查合同，不含可运行产品。
+从定时采集到公司研究、可解释评分、策略筛选及状态提醒的一套系统。优先建立可信、可恢复、可维护的流程和工程基础；价投规则提供可替换的标准版本，不承诺预测或收益。本仓库已有本地可运行的v0.0.1研究版本；完整首slice必选验收尚未通过。设计基线仍为v0.3。
+
+## 当前整体评估入口
+
+2026-10-05整理：其他Agent整体评估请先读[当前交接](./review/CURRENT-HANDOFF.md)及[可直接转发的评估提示词](./review/CURRENT-REVIEW-PROMPT.md)，覆盖方案、设计、源码、核心逻辑、实际UI和文案；当前源码包用`python3 tools/build_current_review_bundle.py`从干净提交本地生成，manifest固定revision与逐文件hash，不含真实原始资料、凭证或备份。旧REVIEW-PACK/PASTE材料属于编码前历史快照。
+
+GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./review/GPT-PRO-UX18-PROMPT.md)，指定`codex/ux18-review`干净评审分支并固定SHA；待评审方案为[18重设计修订1](./docs/18-ux-and-copywriting-redesign.md)。不需要附件或本地zip，不把默认main/历史原型当当前产品。
+
+## 当前本地运行与验收
+
+```sh
+./tools/vip migrate
+./tools/vip build-ui
+./tools/vip dev
+```
+
+API/React UI/本地worker启动在127.0.0.1，默认8765，占用时使用8766；本轮入口为[本地工作台](http://127.0.0.1:8766)。停止用`./tools/vip dev-down`，测试用`./tools/vip test`（只重建合成测试库）。依赖：Python3.12的backend/.venv、npm锁定依赖、本机项目专用PG库；凭证配置在忽略的backend/.env。前端依赖重建用`npm ci --prefix frontend --ignore-scripts`。本机make受Xcode许可限制时用tools/vip，无需修改系统许可。
+
+最新已运行：67项后端测试；TS构建、迁移升级/降级/升级、两家公司真实资料、38条免费A股日线与40条三年财务指标的API/浏览器回读通过。先前9组页面场景保留为历史验证。实际研究入口仅展示有真实来源的资料和公司；合成操作只允许在隔离test库，旧记录保留。真实评分必须具有可追溯的原文修订，缺失财报和正式行情时显示具体缺口。完整封存/风险/纠错/Excel及目标用户签收仍未完成；详见[验证与缺口](./versions/v0.0.1/VERIFICATION.md)，不能把本地演示当作完整版本或生产就绪。真实文本导入显式运行`./tools/vip public-import`；免费A股日线显式运行`./tools/vip baostock-import --capture`，固定响应重放使用`--snapshot /absolute/path`。免费财务指标显式运行`./tools/vip financial-import --capture`；先只取本地响应使用`--capture --capture-only`，已保存响应重放使用`--snapshot /absolute/path`。正常启动不采集。在工作台“研究运行”可保存当前真实资料的本地研究预览，查看价格、区间统计与缺口。三年财务指标已接入，可看报告期、提供商披露日与原始字段比较；完整财报原始科目/口径、港股行情及正式封存仍未完成，研究运行状态为partial；详见[来源与流程证据](./versions/v0.0.1/REAL-DATA.md)。
+
+下面的设计说明保留编码前基线时的上下文；当前产品状态以PROJECT和版本验证为准。
 
 ## 独立项目入口
 
@@ -31,11 +51,11 @@
 | [10 验收矩阵](./docs/10-acceptance.md) | 需求—设计—任务—验证追踪与真实通过标准 |
 | [11 模板、自动审核与权限](./docs/11-templates-automation-and-roles.md) | 已确认边界、三层继承、判断生效/人工覆盖和RBAC |
 | [12 时点、数值与纠错](./docs/12-time-numerics-and-corrections.md) | 财务口径、FINAL、相邻session、恢复与更正 |
-| [13 首个开发切片](./docs/13-first-slice.md) | 可开始实施的合成全流程任务书，尚未开发 |
+| [13 首个开发切片](./docs/13-first-slice.md) | 合成全流程基线任务书；实现进展以版本验证为准 |
 | [14 领域与业务流程](./docs/14-domain-and-business-flows.md) | 领域边界、核心流程图与对象/页面连接 |
-| [15 字段字典与ER](./docs/15-database-dictionary.md) | PostgreSQL字段、外键/唯一键、分组ER与事务边界；尚未建表 |
+| [15 字段字典与ER](./docs/15-database-dictionary.md) | 目标字段/ER与事务边界；实际表另核对models及迁移 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
-| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 固定技术/任务/输入/验收与后置事项，实施授权后进入合成开发 |
+| [17 编码前准备与交接](./docs/17-coding-readiness.md) | 编码前固定技术/任务/输入/验收与后置事项；保留设计依据 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -46,7 +66,9 @@
 | [v0.2变更账本](./review/V02-CHANGELOG.md) / [v0.3处置](./review/V03-CHANGELOG.md) | 历史需求映射与二轮五项设计合同完善 |
 | [不附文件的使用方式](./review/PASTE-INSTRUCTIONS.md) | 私有 GitHub 直读提示词、完整正文及分段复制入口 |
 
-## 当前授权与状态
+## 编码前授权与状态（历史）
+
+本节及后续材料检查说明保留编码前上下文，不表示当前产品尚未实现或真实接入未授权；后续研发、真实源及三年范围授权见PROJECT的日期记录，当前实际结果以版本验证为准。
 
 已确认：A/H、完整流程及技术框架优先、多人角色权限、三层评分模板、自动审核按规则生效/人工覆盖、允许外部模型、开发不设固定预算、通知后置；管理端与业务端、桌面完整操作/手机轻量处理、提交当前个人账号私有GitHub。完整决定见11。用户未要求本阶段部署、真实采集、外部模型调用、真实通知或交易。
 

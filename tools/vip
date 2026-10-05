@@ -1,0 +1,17 @@
+#!/bin/sh
+# Working project entry when macOS make is blocked by the Xcode license.
+set -eu
+cd "$(dirname "$0")/.."
+case "${1:-help}" in
+  dev|start) exec backend/.venv/bin/python tools/local_manage.py start ;;
+  dev-down|stop) exec backend/.venv/bin/python tools/local_manage.py stop ;;
+  migrate) exec backend/.venv/bin/python tools/local_manage.py migrate ;;
+  migrate-test) exec backend/.venv/bin/python tools/local_manage.py migrate-test ;;
+  seed-synthetic) exec backend/.venv/bin/python tools/local_manage.py seed-test ;;
+  test|check-slice) cd backend; exec .venv/bin/python -m pytest tests/ -q ;;
+  build-ui) exec npm --prefix frontend run build ;;
+  baostock-import) shift; cd backend; exec .venv/bin/python scripts_baostock.py "$@" ;;
+  financial-import) shift; cd backend; exec .venv/bin/python scripts_financial.py "$@" ;;
+  public-import) cd backend; exec .venv/bin/python scripts_public.py --enable-wikimedia ;;
+  *) echo 'Usage: tools/vip migrate | seed-synthetic | test | build-ui | dev | dev-down | public-import | baostock-import/financial-import (--capture or --snapshot /absolute/path)';;
+esac

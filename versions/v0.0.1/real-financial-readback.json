@@ -1,0 +1,82 @@
+{
+  "base": "http://127.0.0.1:8766",
+  "run_id": "c2961bd9-7abd-4328-97dc-c767cee215fe",
+  "manifest_hash": "60e1eb6ac107746823ca3dd078b5e68d59c4953b4a34fc4dc2b6aec169734bed",
+  "created_at": "2026-10-02T05:05:11.135814+08:00",
+  "status": "partial",
+  "companies": [
+    "比亚迪股份有限公司",
+    "珠海格力电器股份有限公司"
+  ],
+  "readable_items": 6,
+  "market_rows": 38,
+  "financial_rows": 40,
+  "standard_financial_metrics": "UNKNOWN",
+  "source_revisions": [
+    {
+      "hash": "47fad308ca02540af5c910cfccf254bca3daeb5a0b8c5114e4a697fb797b67d3",
+      "item_id": "d71c2761-e84c-46e6-bcb4-4060bc4a8f33",
+      "revision_id": "9120ca41-fb9f-466d-ab89-7992e0d2a5dd",
+      "source_id": "413f8540-4534-480e-a69b-9a3e3ebe2761"
+    },
+    {
+      "hash": "b2004bb77bd1df6fda5d6c14857cf2a2d27ca2b0d03c8a4c25e70e95b8bb82c3",
+      "item_id": "24e0cab6-8bfa-40f9-977a-c75533166c1a",
+      "revision_id": "fbac0cb0-32d8-48eb-a999-7ae14365cd78",
+      "source_id": "413f8540-4534-480e-a69b-9a3e3ebe2761"
+    },
+    {
+      "hash": "8b05cd078485641b440c70704f5ff6c37ca440ec948855eeafd05dbf7a7e74ba",
+      "item_id": "288256bf-227f-4db8-9080-03d27fdcca46",
+      "revision_id": "30dadd87-843b-43a1-b75a-fc5105b4dff2",
+      "source_id": "45bad040-5c39-4e56-98e2-7b2cf2d5926e"
+    },
+    {
+      "hash": "466f858e5de3e6c21bb09b33f2828d010c132767a971e7a840a885aa506085b2",
+      "item_id": "3d500d58-d49c-44b2-9b64-6cce7f44532e",
+      "revision_id": "da80cd46-65c7-44f8-ba52-426816382c89",
+      "source_id": "45bad040-5c39-4e56-98e2-7b2cf2d5926e"
+    },
+    {
+      "hash": "c0b06ce4ae902dd88d9d3687e98f79626aa045d5b8822c53a6cfd17055af54cd",
+      "item_id": "0f8cc942-2122-4a61-b266-6afbbeef3434",
+      "revision_id": "b62a6991-9434-451b-bc6f-fc3c9ac8d8e6",
+      "source_id": "f7de1fab-4c6d-45a5-b653-dd50b907529d"
+    },
+    {
+      "hash": "4b43d9136d3ef09cb73b8d304bc383198d52eff2d69c8dcb54c5bd9d5923762a",
+      "item_id": "bdece598-6b30-4622-a93f-f20a8deeef6e",
+      "revision_id": "212734de-8a92-4ad8-afd2-071ddbc692bc",
+      "source_id": "f7de1fab-4c6d-45a5-b653-dd50b907529d"
+    }
+  ],
+  "stages": [
+    {
+      "detail": "6份可读真实资料，当前修订已固定",
+      "stage": "read_sources",
+      "status": "completed"
+    },
+    {
+      "detail": "实际行情/财务字段比较和原文摘录；财务口径与经营判断缺口明确保留",
+      "stage": "analyze",
+      "status": "completed"
+    },
+    {
+      "detail": "执行真实输入评分；缺失项保持UNKNOWN",
+      "stage": "score",
+      "status": "partial"
+    },
+    {
+      "detail": "逐证券计算草稿规则；缺数为UNKNOWN，未正式封存或应用",
+      "stage": "strategy_preview",
+      "status": "partial"
+    }
+  ],
+  "statistics_verified_against_source_rows": true,
+  "idempotent_retry_verified": true,
+  "unknown_securities": 3,
+  "synthetic_objects_visible": 0,
+  "membership_applied": false,
+  "source_body_or_prices_saved_in_report": false,
+  "legacy_research_retry_preserved": true
+}

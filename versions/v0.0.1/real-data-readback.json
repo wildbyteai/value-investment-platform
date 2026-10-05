@@ -1,0 +1,35 @@
+{
+  "base": "http://127.0.0.1:8766",
+  "companies": [
+    "比亚迪股份有限公司",
+    "珠海格力电器股份有限公司"
+  ],
+  "real_readings": [
+    {
+      "id": "3d500d58-d49c-44b2-9b64-6cce7f44532e",
+      "revision": {
+        "id": "da80cd46-65c7-44f8-ba52-426816382c89",
+        "hash": "466f858e5de3e6c21bb09b33f2828d010c132767a971e7a840a885aa506085b2"
+      },
+      "date": "2026-09-22",
+      "observed_at": "2026-10-01T17:33:22.971915+08:00",
+      "url": "https://en.wikipedia.org/w/index.php?oldid=1376152500",
+      "original_readable": true
+    },
+    {
+      "id": "288256bf-227f-4db8-9080-03d27fdcca46",
+      "revision": {
+        "id": "30dadd87-843b-43a1-b75a-fc5105b4dff2",
+        "hash": "8b05cd078485641b440c70704f5ff6c37ca440ec948855eeafd05dbf7a7e74ba"
+      },
+      "date": "2026-09-10",
+      "observed_at": "2026-10-01T17:33:24.012751+08:00",
+      "url": "https://en.wikipedia.org/w/index.php?oldid=1374143041",
+      "original_readable": true
+    }
+  ],
+  "quality_and_valuation": "UNKNOWN",
+  "strategy_securities": 3,
+  "synthetic_objects_visible": 0,
+  "source_body_saved_in_report": false
+}

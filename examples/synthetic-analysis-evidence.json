@@ -1,0 +1,10 @@
+{
+  "synthetic": true,
+  "origin": "原创合成原文与受限proposal，和日报摘要分别保存",
+  "entries": {
+    "digest-1": {"original": "甲制造原始公告（合成）：订单安排带来可核对的产品需求增量，同时延期库存形成资金占用。", "magnitude": "0.8", "economic_fact_id": "甲-订单-2026Q3"},
+    "digest-2": {"original": "甲制造原始访谈（合成）：管理层说明重复采购机制；此声明仅作为模拟判断依据。", "magnitude": "0.8", "economic_fact_id": "甲-采购机制-2026Q3"},
+    "digest-3": {"original": "甲制造原始公告转载（合成）：转述同一批订单安排，不构成第二个经济事实。", "magnitude": "0.8", "economic_fact_id": "甲-订单-2026Q3"},
+    "digest-4": {"original": "乙制造原始公告（合成）：供应条件改善，但缺少完整财务与rubric基准。", "magnitude": "0.8", "economic_fact_id": "乙-供应条件-2026Q3"}
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "effective_at": "2026-09-01T00:00:00+00:00",
+  "published_at": "2026-09-01T00:00:00+00:00",
+  "financials": {
+    "currency": "CNY", "scope": "matching_ordinary_equity",
+    "ordinary_profit_ttm": "180", "average_ordinary_equity": "1200",
+    "annual_periods": ["2023", "2024", "2025"],
+    "consolidated_cfo_3y": ["120", "140", "170"],
+    "consolidated_profit_3y": ["100", "110", "120"],
+    "debt": "300", "cash": "100", "ebitda_ttm": "200",
+    "ebit_ttm": "140", "interest_expense_ttm": "20",
+    "ordinary_shares": "100", "equivalent_share_rights": true,
+    "obligation_valid_until": "2026-11-01T00:00:00+00:00",
+    "evidence": "synthetic://financials/2026-h1#matching-scope"
+  },
+  "prices": [
+    {"ticker": "600001.SH", "currency": "CNY", "raw_close": "21.6", "is_final": true, "session": "2026-09-30", "fx_per_cny": "1", "evidence": "synthetic://prices/A/2026-09-30"},
+    {"ticker": "0001.HK", "currency": "HKD", "raw_close": "28.71", "is_final": true, "session": "2026-09-30", "fx_per_cny": "1.1", "evidence": "synthetic://prices/H/2026-09-30"}
+  ],
+  "rubric_grades": {"business_model": 3, "governance": 3, "growth_sustainability": 3, "x_customer_retention": 3}
+}

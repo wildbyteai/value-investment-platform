@@ -1,0 +1,44 @@
+{
+  "base": "http://127.0.0.1:8766",
+  "executed_at": "2026-10-01T10:24:32.774Z",
+  "target_user_test": false,
+  "results": [
+    {
+      "id": "F05-reading-real-profile",
+      "status": "passed"
+    },
+    {
+      "id": "F05-company-A-H-score-and-watch",
+      "status": "passed"
+    },
+    {
+      "id": "F05-human-impact-override",
+      "status": "passed"
+    },
+    {
+      "id": "F05-rubric-grade-override",
+      "status": "passed"
+    },
+    {
+      "id": "F05-notes-and-watchlist",
+      "status": "passed"
+    },
+    {
+      "id": "F05-strategy-preview-publish",
+      "status": "passed"
+    },
+    {
+      "id": "F05-template-preview-publish",
+      "status": "passed"
+    },
+    {
+      "id": "F05-viewer-permission",
+      "status": "passed"
+    },
+    {
+      "id": "F05-viewports-keyboard",
+      "status": "passed"
+    }
+  ],
+  "page_errors": []
+}
