@@ -4,7 +4,7 @@
 
 ---
 
-请整体评估价值投资策略管理系统，从方案、业务设计、工程设计到实际落地，包含 UI、交互、中文文案及核心逻辑。先读 `review/CURRENT-HANDOFF.md` 和包内 `REVIEW-MANIFEST.json`，以 manifest 的 Git revision 为固定基线。若直接读仓库，请记录你实际读取的 HEAD 和工作树状态。
+请整体评估价值投资策略管理系统，从方案、业务设计、工程设计到实际落地，包含 UI、交互、中文文案及核心逻辑。先读 `review/CURRENT-HANDOFF.md` 和包内 `REVIEW-MANIFEST.json`，以 manifest 的 Git revision 为固定基线。若直接读GitHub，使用main最新提交并固定SHA，不依赖本地包manifest；先读review/PRE-MAIN-DISPOSITION.md。若在本机评估，请记录HEAD和工作树状态。
 
 用户希望使用真实源头数据，先跑通可用研究闭环。设计基线为 v0.3，实际产品为 v0.0.1 部分实现与验证；已能读取两家公司真实资料、A股日线及三年财务指标，保存固定来源的研究预览，但完整财报、标准评分/估值/策略正式封存仍未完成。不要将 UNKNOWN 当零分，不要将供应商指标当完整财报，也不要因局部测试通过宣布全部验收通过。
 

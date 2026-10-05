@@ -1,23 +1,23 @@
 # GPT Pro：当前产品UX设计完善与整体评审（只读GitHub）
 
-日期：2026-10-05。此入口承接docs/18修订1及当前产品整体交接，不使用附件、压缩包、本机路径或本地浏览器。下方完整提示词可直接发给GPT Pro。
+日期：2026-10-05，主干交接版。此入口承接docs/18修订1及当前产品整体交接，不使用附件、压缩包、本机路径或本地浏览器。下方完整提示词可直接发给GPT Pro。
 
 ## 完整提示词
 
 请作为产品设计与投资研究业务评审者，参与完善本项目UI、中文文案、交互设计，并核对方案→设计→实际实现→核心逻辑的一致性。先给设计与评审结果，暂不实施、不写仓库。
 
-你的材料只能从GitHub读取：私有仓库 https://github.com/wildbyteai/value-investment-platform ，**分支 `codex/ux18-review`**，不是默认main。先解析该分支当前完整commit SHA，记录并将后续所有文件读取固定到该SHA。如果用户另指定完整SHA，以它为准；不要混读不同提交。该分支是当前源码与设计的干净评审快照，不含早期本地研发提交历史；文档中的原实现commit仅是本机证据来源标识，不要求你能读取那些提交。
+你的材料只能从GitHub读取：私有仓库 https://github.com/wildbyteai/value-investment-platform ，**分支 `main`**。此前修订与当前源码已合并主干，先解析main当前完整commit SHA，记录并将后续所有文件读取固定到该SHA。如果用户另指定完整SHA，以它为准；不要混读不同提交。主干包含当前源码与设计的干净快照，不含早期本地研发提交历史；文档中的原实现commit仅是本机证据来源标识，不要求你能读取那些提交。
 
 若你没有这个私有仓库的读取权限，请明确停止文件评审，指出无法访问；不要索要凭证、要求公开仓库、要求附件或假装已看过材料。GitHub链接不自动赋予访问权限。
 
 ### 先读这些GitHub文件
 
-以下链接帮助定位，实际读取时用解析到的commit SHA替换分支部分。
+以下链接帮助定位，实际读取时用解析到的commit SHA替换main部分。
 
-1. [PROJECT](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/PROJECT.md)、[README](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/README.md)、[AGENTS](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/AGENTS.md)：当前阶段、范围与规则。
-2. [18 UX/文案重设计修订1](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/docs/18-ux-and-copywriting-redesign.md)：本轮要参与完善的设计提案，重点读术语字典、七页流程、依赖和UX18验收。
-3. [当前交接](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/review/CURRENT-HANDOFF.md)、[版本验证与缺口](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/versions/v0.0.1/VERIFICATION.md)、[真实数据证据](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/versions/v0.0.1/REAL-DATA.md)：当前真实主路径、历史检查和未完成能力。不要执行交接中的本机命令。
-4. 实际UI源码：[app.tsx](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/frontend/src/app.tsx)、[style.css](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/frontend/src/style.css)、[client.ts](https://github.com/wildbyteai/value-investment-platform/blob/codex/ux18-review/frontend/src/client.ts)。这是当前产品；`prototype/`只是历史合成设计原型。
+1. [PROJECT](https://github.com/wildbyteai/value-investment-platform/blob/main/PROJECT.md)、[README](https://github.com/wildbyteai/value-investment-platform/blob/main/README.md)、[AGENTS](https://github.com/wildbyteai/value-investment-platform/blob/main/AGENTS.md)：当前阶段、范围与规则。
+2. [18 UX/文案重设计修订1](https://github.com/wildbyteai/value-investment-platform/blob/main/docs/18-ux-and-copywriting-redesign.md)：本轮要参与完善的设计提案，重点读术语字典、七页流程、依赖和UX18验收。另读[既有评审处置索引](https://github.com/wildbyteai/value-investment-platform/blob/main/review/PRE-MAIN-DISPOSITION.md)，核对已修订与未实现的区别。
+3. [当前交接](https://github.com/wildbyteai/value-investment-platform/blob/main/review/CURRENT-HANDOFF.md)、[版本验证与缺口](https://github.com/wildbyteai/value-investment-platform/blob/main/versions/v0.0.1/VERIFICATION.md)、[真实数据证据](https://github.com/wildbyteai/value-investment-platform/blob/main/versions/v0.0.1/REAL-DATA.md)：当前真实主路径、历史检查和未完成能力。不要执行交接中的本机命令。
+4. 实际UI源码：[app.tsx](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/app.tsx)、[style.css](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/style.css)、[client.ts](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/client.ts)。这是当前产品；`prototype/`只是历史合成设计原型。
 5. 业务依据：`docs/01-product-requirements.md`、`02-business-design.md`、`06-ux-and-design-system.md`、`11-templates-automation-and-roles.md`、`12-time-numerics-and-corrections.md`、`10-acceptance.md`、`13-first-slice.md`。字段/API问题按需读04/05/15/17、design/database-catalog.json及contracts/openapi-v0001.json。
 6. 核心逻辑与接口：`backend/app/services/scoring_service.py`、`strategy_service.py`、`state_machine.py`、`decision_service.py`、`research_pipeline.py`、`data_mode.py`、`baostock_financial.py`；`backend/app/api/collab.py`、`judgments.py`、`templates.py`、`strategy.py`、`research.py`、`intake.py`及对应models/tests。从实际代码确认18里标注的接口缺口，不假设它们已实现。
 7. 数字/政策真源：`config/scoring-standard-v1.json`、`templates-standard-v1.json`、`rubrics-standard-v1.json`、`metric-definitions-v2.json`、`strategy-standard-v1.json`、`roles-standard-v1.json`、`numeric-policy-v1.json`；必要时读其余Schema、config和原验收矩阵，不需要先读旧大包。

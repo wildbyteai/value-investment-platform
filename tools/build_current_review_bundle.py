@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_FILES = {"AGENTS.md", "PROJECT.md", "README.md", "CONTEXT.md", "Makefile", ".gitignore"}
 PREFIXES = ("docs/", "design/", "contracts/", "config/", "examples/", "research/",
             "prototype/", "backend/", "frontend/", "tools/", "versions/v0.0.1/")
-REVIEWS = {"CURRENT-HANDOFF.md", "CURRENT-REVIEW-PROMPT.md", "GPT-PRO-UX18-PROMPT.md", "CODING-READINESS.md",
+REVIEWS = {"CURRENT-HANDOFF.md", "CURRENT-REVIEW-PROMPT.md", "GPT-PRO-UX18-PROMPT.md", "PRE-MAIN-DISPOSITION.md", "CODING-READINESS.md",
            "V02-CHANGELOG.md", "V03-CHANGELOG.md", "V03-COUNTEREXAMPLES.md",
            "DESIGN-DETAIL-REVIEW.md", "USABILITY-REVIEW.md", "USABILITY-FIXES.md",
            "GPT-PRO-FINAL-DISPOSITION.md", "ROUND-2-REVIEW.md"}

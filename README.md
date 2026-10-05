@@ -8,7 +8,7 @@
 
 2026-10-05整理：其他Agent整体评估请先读[当前交接](./review/CURRENT-HANDOFF.md)及[可直接转发的评估提示词](./review/CURRENT-REVIEW-PROMPT.md)，覆盖方案、设计、源码、核心逻辑、实际UI和文案；当前源码包用`python3 tools/build_current_review_bundle.py`从干净提交本地生成，manifest固定revision与逐文件hash，不含真实原始资料、凭证或备份。旧REVIEW-PACK/PASTE材料属于编码前历史快照。
 
-GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./review/GPT-PRO-UX18-PROMPT.md)，指定`codex/ux18-review`干净评审分支并固定SHA；待评审方案为[18重设计修订1](./docs/18-ux-and-copywriting-redesign.md)。不需要附件或本地zip，不把默认main/历史原型当当前产品。
+GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./review/GPT-PRO-UX18-PROMPT.md)，从`main`最新代码解析并固定SHA；待评审方案为[18重设计修订1](./docs/18-ux-and-copywriting-redesign.md)。不需要附件或本地zip，main已包含当前产品与设计；既有修订见[处置索引](./review/PRE-MAIN-DISPOSITION.md)，不把历史原型当当前产品。
 
 ## 当前本地运行与验收
 

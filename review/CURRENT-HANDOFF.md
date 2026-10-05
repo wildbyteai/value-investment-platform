@@ -6,9 +6,9 @@
 
 从[评估提示词](./CURRENT-REVIEW-PROMPT.md)开始；项目管理真源[PROJECT](../PROJECT.md)，业务确认真源[11](../docs/11-templates-automation-and-roles.md)，验收预期[10](../docs/10-acceptance.md)，实际运行/剩余必选[VERIFICATION](../versions/v0.0.1/VERIFICATION.md)。设计基线v0.3与产品版本v0.0.1属于不同层次，不能按编号认定实现进度。
 
-后续用户授权的GitHub-only交接使用[GPT Pro专用入口](./GPT-PRO-UX18-PROMPT.md)及[18修订1](../docs/18-ux-and-copywriting-redesign.md)，读取`codex/ux18-review`干净评审快照并固定当次SHA，不使用附件或本机截图。本文的实现基线与本地zip说明保留当时上下文；18仍是设计提案，未实施。
+后续用户授权的GitHub-only交接使用[GPT Pro专用入口](./GPT-PRO-UX18-PROMPT.md)及[18修订1](../docs/18-ux-and-copywriting-redesign.md)，从`main`最新代码解析并固定当次SHA，不使用附件或本机截图。本文的实现基线与本地zip说明保留当时上下文；18仍是设计提案，未实施。
 
-本机原研发提交历史未向GitHub推送；远程评审快照与本次最终本机树一致，只有已核验main历史和新的快照提交。本文原commit是本机历史标识，不要求远程可读；当前源码/证据均可在评审快照中核对。
+本机原研发提交历史未向GitHub推送；已将干净评审快照与入口修订合并主干，保留已核验main历史和新的安全提交。本文原commit是本机历史标识，不要求远程可读；当前源码/证据均可在main核对。先前评审的处置与未实现边界见[主干交接索引](./PRE-MAIN-DISPOSITION.md)。
 
 当前产品**部分实现与验证**，不是完整交付或生产就绪。用户要求真实研究不使用假数据；原合成研发/测试仍用于隔离验证，不代表实际经营结论。此前8切片报告、设计评审和原型检查均保留历史意义，不能替代当前源码和验收证据。
 
