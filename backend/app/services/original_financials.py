@@ -83,6 +83,13 @@ def _normalize(bundle):
         except (ValueError,TypeError):raise FinancialGap('股数变动时点格式错误')
         if share_deadline.tzinfo is None or share_deadline.date()<=current or not share_evidence or any(not e.get('source_revision_id') or not e.get('hash') or not e.get('locator') or e.get('synthetic') is not False for e in share_evidence):
             raise FinancialGap('期后股数变动时点或原文依据缺失')
+    shares_through=bundle.get('ordinary_shares_verified_through')
+    shares_basis=bundle.get('share_basis_evidence',[])
+    if shares_through is not None:
+        try:verified_day=date.fromisoformat(shares_through)
+        except (ValueError,TypeError):raise FinancialGap('股数已核验截止日期格式错误')
+        if verified_day<current or not shares_basis or any(not e.get('source_revision_id') or not e.get('hash') or not e.get('locator') or e.get('synthetic') is not False for e in shares_basis):
+            raise FinancialGap('股数已核验范围或原文依据缺失')
     rows=bundle.get('facts',[]);selected=[];refs=[]
     def get(key,end,start=None):
         matches=[r for r in rows if r.get('key')==key and r.get('period_end')==end and r.get('period_start')==start]
@@ -106,5 +113,9 @@ def _normalize(bundle):
         output['ordinary_shares_valid_until']=share_until
         output['share_change_evidence']=share_evidence
         refs.extend(share_evidence)
+    if shares_through is not None:
+        output['ordinary_shares_verified_through']=shares_through
+        output['share_basis_evidence']=shares_basis
+        refs.extend(shares_basis)
     unique={digest(ref):ref for ref in refs};output['evidence']=list(unique.values())
     return output

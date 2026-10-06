@@ -63,7 +63,13 @@ def validate(bundle):
         # Reviewer fixes a source row and column; exact value must occur on that row.
         line=row['original_line']
         if not page or not line or line not in page['text'] or row['original_value'] not in line or row['label'] not in line:raise ValueError('原值或原文行/页定位不匹配')
+        # Small reported amounts can be ungrouped (e.g. depreciation < 1,000).
+        # Require whitespace around those tokens, avoiding numbered row labels.
         pattern=r'-?\d{1,3}(?:,\d{3})+'+(r'\.\d{2}' if row['unit']=='yuan' else '')
+        tokenization=row.get('column_tokenization','grouped_v1')
+        if tokenization not in ('grouped_v1','grouped_or_small_amounts_v1'):raise ValueError('原文列分词规则不支持')
+        if tokenization=='grouped_or_small_amounts_v1':
+            pattern+=r'|(?<!\S)-?\d{1,3}'+(r'\.\d{2}' if row['unit']=='yuan' else '')+r'(?!\S)'
         values=re.findall(pattern,line)
         index=row.get('column_index')
         if type(index)!=int or not 0<=index<len(values) or values[index]!=row['original_value']:raise ValueError('原值与选定列不匹配')

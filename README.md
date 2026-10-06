@@ -58,6 +58,7 @@ UX18阶段已运行（2026-10-06）：81项后端测试、TS构建与OpenAPI生�
 | [15 字段字典与ER](./docs/15-database-dictionary.md) | 目标字段/ER与事务边界；实际表另核对models及迁移 |
 | [16 页面原型与追踪](./docs/16-prototype-and-design-trace.md) | 可点击合成原型、页面与全部需求连接及检查边界 |
 | [17 编码前准备与交接](./docs/17-coding-readiness.md) | 编码前固定技术/任务/输入/验收与后置事项；保留设计依据 |
+| [19 生产资源与配置清单](./docs/19-production-resources-and-configuration.md) | 现有组件、域名/HTTPS、资源估算、上线缺口及 Java 差异；尚未部署 |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
@@ -103,3 +104,7 @@ python3 tools/build_review_pack.py
 ### 原始科目与正式封存续建（2026-10-06）
 
 本轮118项后端测试、构建及合成库迁移升降级通过。新增原始科目规范化、许可港股快照适配、内部worker与只读正式结果；真实来源与真实库启用尚未完成，详情见[实施与迁移审查](./review/REAL-COMPLETION-PLAN.md)及[来源核查](./research/real-completion-sources.md)。`./tools/vip original-import --snapshot /absolute/path --kind financials|hk-price --workspace ID --company ID`默认仅校验，`--write`是明确真实入库动作。`./tools/vip seal --prepare-artifacts`和按既有seal-id/批准挂牌日历排期的`seal`命令会写正式机制/状态，默认不随dev启动；真实库0010、artifact登记及正式任务需对应业务批准。不能用仅有参考价或猜测日历生成FINAL或封存时间。
+
+### 财务续建与港股覆盖纠正（2026-10-06最新）
+
+两家公司合计100项原始值，两家公司标准财务五指标和两个财务维度已通过真实独立核算与API/UI回读；166项合成库检查及构建通过。EODHD实际支持市场不含HK，不能据全球套餐文案承诺港股覆盖；令牌有效但真实港股接入未完成。当前股数/经营判断及批准日历/最终收盘/真实封存仍缺证据，研究partial，完整必选未通过。详情见[续建结果与具体依赖](./review/REAL-FINANCIAL-CONTINUATION.md)。显式命令`./tools/vip eodhd-import --capture --workspace ID`先检查覆盖再请求身份/价格，默认仅本机捕获校验，`--write`才入库；正常启动不采集，个人来源不能直接用于多人/商业服务。

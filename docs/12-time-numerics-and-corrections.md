@@ -87,3 +87,5 @@ strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定
 原始科目转换实现允许有界的`reviewed_signed_sum_v1`：同期间/合并范围/币种的原值分量按±1求和，保留各分量单位、原值、固定修订/hash/定位与独立转换依据；拒绝重复、嵌套、期间/币种/股数与金额混用及将转换结果标为original_value。TTM与指标公式不变。
 
 已知期后发行、回购或库存股过户会使报告期末股数不再适合后续价格。标准输入可保留有原文依据的`ordinary_shares_valid_until`和`share_change_evidence`；到该exclusive时点后，估值返回SHARE_BASIS_EXPIRED、同权股数门失败，直到取得更新股数证据。财报义务有效期和股数有效期分别判断，股数变化不抹去仍有效的合并现金/盈利指标。该字段不回填旧修订或知识截止；来源实际取得时间仍独立记录。
+
+股数证据覆盖边界与已知股数变动是两种情况。仅核验到报告日时，可保留`ordinary_shares_verified_through`（当地日期，inclusive）和`share_basis_evidence`；之后估值返回SHARE_BASIS_NOT_CURRENT、同权股数门失败，而仍有效的现金/盈利指标保持可用。该字段不宣称之后发生已知股份变动、不借报告义务期限扩大证据覆盖、不回填known_at；与上述已知变动exclusive时点共同限制估值。当前比亚迪真实输入采用此保守边界，尚未验证为当前股数。

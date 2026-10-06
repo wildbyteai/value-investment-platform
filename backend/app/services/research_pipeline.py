@@ -27,6 +27,18 @@ def source_stats(db,item,ref):
     original=payload.get('readable_text')
     if not original:return None
     data=payload.get('raw_capture')
+    if data and data.get('provider')=='eodhd':
+        from app.services.eodhd_source import validate
+        meta=json.loads(item.reading_metadata_json)
+        rows=validate({**data,'observed_at':meta['source_observed_at']})
+        first,last=rows[0],rows[-1]
+        with localcontext() as context:
+            context.prec=50
+            delta=numeric((Decimal(last['close'])/Decimal(first['close'])-1)*100)
+        return {'kind':'market_summary','data_mode':'real_public','source_item_id':item.id,'source_revision_id':revision.id,
+                'first_session':first['date'],'last_session':last['date'],'observations':len(rows),
+                'first_close':first['close'],'last_close':last['close'],'change_pct':delta,'currency':'HKD','adjustment':'unadjusted',
+                'meaning':'EODHD未复权收盘价的描述统计，仅个人研究；复权价独立保留，正式最终性尚未确认','evidence':[ref]}
     if data and data.get('report_type')=='reviewed_original_statements':
         from app.services.issuer_reports import analysis
         return analysis(data,ref)

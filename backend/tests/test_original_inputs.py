@@ -107,3 +107,18 @@ def test_known_share_change_expires_only_valuation_at_exact_boundary():
 def test_share_change_requires_original_evidence_and_later_zoned_time(deadline,refs):
     b=bundle();b['ordinary_shares_valid_until']=deadline;b['share_change_evidence']=evidence() if refs else []
     with pytest.raises(FinancialGap):normalize(b)
+
+def test_share_verified_day_only_keeps_financial_metrics_after_it():
+    from types import SimpleNamespace
+    from datetime import datetime
+    from app.services.scoring_service import score_security
+    from app.services.transactions import canonical
+    b=bundle();b['ordinary_shares_verified_through']='2026-06-30';b['share_basis_evidence']=evidence()
+    f=normalize(b);metrics=metrics_from_financials(f)
+    s=SimpleNamespace(id='test',company_id='c',ticker='TEST',market='CN_A',currency='CNY')
+    p={'currency':'CNY','session':'2026-06-30','is_final':True,'raw_close':'10','fx_per_cny':'1','evidence':evidence()}
+    rows=[SimpleNamespace(id='f',kind='financials',input_key='financials',payload_json=canonical(f)),SimpleNamespace(id='p',kind='price',input_key='price:TEST',payload_json=canonical(p))]
+    assert score_security(None,s,'ws',datetime.fromisoformat('2026-06-30T23:59:59+08:00'),input_rows=rows)['valuation_score'] is not None
+    after=score_security(None,s,'ws',datetime.fromisoformat('2026-07-01T00:00:00+08:00'),input_rows=rows)
+    assert after['reason']=='SHARE_BASIS_NOT_CURRENT' and after['pe_ttm'] is None and not after['common_equity']
+    assert metrics_from_financials(f)==metrics

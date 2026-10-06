@@ -39,3 +39,7 @@
 [EODHD官方免费方案](https://eodhd.com/pricing)当前表明全球EOD一年历史、每日20次；[历史接口](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes)区分close和adjusted_close；[个人使用条款](https://eodhd.com/financial-apis/terms-conditions)允许个人存储/分析，禁止向其他人或组分享、再分发，商业/组织使用另需授权。仍需注册token及真实取样；未注册/采购/调用收费接口，未猜供应商代码、未把EOD close自动提为CAS FINAL。待回复的注册问题未回答，本机未配置EODHD_API_TOKEN。注册/接受账号条款不能用本地数据库授权代替。
 
 真实库0010及artifact已启用；原范围三年/本地写入授权不再是缺口。剩余为具体口径匹配、最新股数、真实港股/同日FX与批准市场日历/最终性依据；不能将内部未完成工作统称为需要用户提供财报附件。
+
+## 2026-10-06 令牌生效后的实测纠正
+
+用户配置EODHD个人令牌后，真实请求鉴权成功：比亚迪数字代码与名称HK筛选返回空，名称/ISIN搜索仅返回其他市场；官方`/api/exchanges-list`给出70个市场但无HK。因此“全球免费套餐可接港股”的先前建议不准确，不能要求无依据付费升级，也不能用ADR或EUR挂牌代替01211.HK。未发港股日线请求或向真实库导入EODHD资料。适配有覆盖/身份停点、未复权/复权字段分离、同日FX、个人政策和幂等验证，但真实港股仍未通过。HKMA本轮代理502与一次公共直连重试失败，旧8月汇率未配新价格。比亚迪财报标准口径已补齐及独立核算，最新股份仍需证据；完整结果见[续建记录](../review/REAL-FINANCIAL-CONTINUATION.md)。

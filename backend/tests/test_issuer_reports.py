@@ -44,6 +44,18 @@ def test_adjacent_pdf_columns_do_not_merge_decimal_digits():
     validate(b)
     r.update(column_index=1,original_value='2,345.67');validate(b)
 
+def test_small_ungrouped_amount_remains_an_original_column():
+    b=bundle();r=b['facts'][0];old=r['original_line'];new='合并净利润 12.34 56.78'
+    b['documents'][0]['pages'][0]['text']=b['documents'][0]['pages'][0]['text'].replace(old,new)
+    r.update(original_line=new,original_value='12.34',column_tokenization='grouped_or_small_amounts_v1');validate(b)
+    r.update(column_index=1,original_value='56.78');validate(b)
+
+def test_grouped_columns_ignore_note_numbers_for_existing_snapshots():
+    b=bundle();r=b['facts'][0];old=r['original_line'];new='合并净利润 50 1,234.56 2,345.67'
+    b['documents'][0]['pages'][0]['text']=b['documents'][0]['pages'][0]['text'].replace(old,new)
+    r['original_line']=new;validate(b)
+    r.update(column_index=1,original_value='2,345.67');validate(b)
+
 def test_only_three_matching_complete_annuals_produce_cash_metrics():
     b=bundle();base=b['facts'][0];b['facts']=[]
     for year,profit,cash in [(2023,'1,000.00','2,000.00'),(2024,'2,000.00','0.00'),(2025,'3,000.00','4,000.00')]:
