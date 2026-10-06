@@ -58,7 +58,7 @@ def migrate(test=False):
         subprocess.run([str(BACKEND/'.venv/bin/alembic'),'upgrade','head'],cwd=BACKEND,env=env,check=True)
 
 
-def start():
+def start(api_only=False):
     RUNTIME.mkdir(exist_ok=True)
     pidfile=RUNTIME/'processes.json'
     if pidfile.exists(): raise SystemExit('Process state exists; use status/stop first')
@@ -71,6 +71,7 @@ def start():
                 if alt.connect_ex(('127.0.0.1',port))==0: raise SystemExit('Both local ports in use; existing processes untouched')
             print('Port 8765 belongs to an existing process; using 8766')
     commands=[[str(PYTHON),'-m','uvicorn','app.main:app','--host','127.0.0.1','--port',str(port)],[str(PYTHON),'-m','app.worker']]
+    if api_only: commands=commands[:1]
     processes=[]
     for index,cmd in enumerate(commands):
         log=open(RUNTIME/('api.log' if index==0 else 'worker.log'),'ab')
@@ -95,7 +96,7 @@ def start():
             except ProcessLookupError: pass
         raise SystemExit('API did not become ready; inspect local logs')
     pidfile.write_text(json.dumps(processes))
-    print('Started this project API/worker:',[p['pid'] for p in processes],f'http://127.0.0.1:{port}')
+    print('Started this project '+('API only' if api_only else 'API/worker')+':',[p['pid'] for p in processes],f'http://127.0.0.1:{port}')
 
 
 def stop():
@@ -121,9 +122,10 @@ def stop():
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['start','stop','migrate','migrate-test','seed-test'])
+    parser=argparse.ArgumentParser();parser.add_argument('action',choices=['start','start-api','stop','migrate','migrate-test','seed-test'])
     args=parser.parse_args()
     if args.action=='start':start()
+    elif args.action=='start-api':start(api_only=True)
     elif args.action=='stop':stop()
     elif args.action=='seed-test':
         _,env=database(True);env['VIP_DEMO_MODE']='true'

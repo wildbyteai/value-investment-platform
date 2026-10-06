@@ -105,3 +105,20 @@ body_access描述本材料自身正文：agent_digest默认无“新闻原文”
 生成客户端入口在M0实施：后端DTO从固定Schema生成/导出，OpenAPI含资讯列表、详情和参考访问状态，再生成TS客户端。当前只是接口合同，未声称已有HTTP端点或生成客户端。
 
 列表/详情共用字段已固定为[InformationRead 1.0](../contracts/information-read.schema.json)，阅读类型与解析DTO由材料检查核对同源。body_access/reference_access的state、可见url、target_revision_id均由后端返回；restricted/no_locator不返回目标ID或URL，available必须有确切目标修订。列表返回标准{data:InformationRead[],meta}，详情{data:InformationRead加可用body_text/evidence/events/decisions及parent locator,meta}；body_text只在本source_document正文available时返回，摘要页不虚构body。全文/父定位和判断属于既有详情合同，客户端按各自固定类型生成。合成expected_read_response是预期，不是HTTP回读。
+
+## 8. v0.0.1 UX18实际接口（2026-10-06）
+
+本节记录已实现本机API，与前文目标端点分开；机器形状以contracts/openapi-v0001.json、frontend/src/api-schema.ts及对应Pydantic DTO为准，不称全部目标API已落地。当前本机身份仍为开发验证头，非生产认证。
+
+| 实际端点 | 输入/返回与边界 |
+|---|---|
+| GET /api/judgments/catalog/{company_id} | research.read，返回当前公司模板的dimension、rubric_ref、criteria/anchors、quality_policy，供首次有证据录入 |
+| POST /api/judgments | analysis.override；Idempotency-Key必填。公司、dimension/rubric_ref/criterion、研究period_start/end、StrictInt grade 0…4、confidence、reason、带时区effective_from/valid_until、固定证据source_revision_id/hash/start/end/quote/relation；至少一项supports；定位为Unicode codepoint半开区间。校验当前关联/读/分析权、证据完整性和模板身份；证据类别由来源政策派生。稳定slot及不可变revision/audit/outbox/receipt同事务，201返回saved与applicability分开；重复同命令返回原结果，冲突409 |
+| GET /api/judgments；POST /api/judgments/{slot_key}/override | 读取与评分共用有效修订选择器；rubric覆盖不改问题身份。已有If-Match-Generation CAS；release清有效指针及固定cutoff，不恢复旧AUTO，worker只有合法重评才产生新修订。到期判断不再适用；无新合法修订保持pending_review |
+| GET /api/intake/items/{item_id}?revision_id=… | 指定历史正文、摘要、日期及阅读元数据来自同一revision snapshot；旧历史无法还原字段用metadata_state=unavailable，不借当前值；旧当前版本可legacy_current；来源权利仍实时校验 |
+| GET /api/me/watchlist；POST/DELETE /api/me/watchlist/{security_id} | 本人及workspace；GET含稳定security_id/company_id；A/H分开，添加与取消效果幂等，audit/outbox同事务 |
+| POST /api/strategy/simulate | strategy.simulate；expected_version及quality_threshold，基于当前发布完整规则，仅改受限经营门槛。返回simulation_token、input_hash、expected_version、results；模拟存receipt及audit/outbox，不改正式membership |
+| POST /api/strategy/publish | strategy.publish；expected_version、quality_threshold、simulation_token。所见模拟绑定actor/workspace/版本/草稿/模板/判断/来源及证券身份和适用状态；超过30分钟或输入变化409重模拟；发布保留未修改规则并存scoring_binding_manifest |
+| GET /api/worker/tasks、/api/worker/sources | ops.read；任务/来源元数据，不给管理员research.read/analysis.override/strategy.publish，来源DTO不包含正文、URL或私人笔记 |
+
+评分返回逐维度与criterion的status/reason/修订/龄期，并区分公司经营与各证券估值；缺数不能被前端补算。策略顺序为有效风险、暂停/适用范围、质量门、普通数值AND；质量门不足UNKNOWN，门通过后任一数值false优先于unknown。当前FINAL价格/财务口径门保持；参考报价不生成正式估值。正式封存、完整策略规则AST编辑及目标合同的全部DTO仍另见版本未完成清单。

@@ -500,6 +500,96 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "judgments"
+        ],
+        "summary": "Create Judgment",
+        "operationId": "create_judgment_api_judgments_post",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/judgments/catalog/{company_id}": {
+      "get": {
+        "tags": [
+          "judgments"
+        ],
+        "summary": "Rubric Catalog",
+        "operationId": "rubric_catalog_api_judgments_catalog__company_id__get",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/judgments/{slot_key}/override": {
@@ -1005,6 +1095,44 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "collab"
+        ],
+        "summary": "Remove Watch",
+        "operationId": "remove_watch_api_me_watchlist__security_id__delete",
+        "parameters": [
+          {
+            "name": "security_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Security Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/me/watchlist": {
@@ -1181,6 +1309,25 @@
         }
       }
     },
+    "/api/worker/sources": {
+      "get": {
+        "tags": [
+          "worker"
+        ],
+        "summary": "Source Runs",
+        "operationId": "source_runs_api_worker_sources_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api": {
       "get": {
         "summary": "Api Root",
@@ -1200,6 +1347,144 @@
   },
   "components": {
     "schemas": {
+      "CreateIn": {
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "dimension": {
+            "type": "string",
+            "title": "Dimension"
+          },
+          "rubric_ref": {
+            "type": "string",
+            "title": "Rubric Ref"
+          },
+          "criterion": {
+            "type": "string",
+            "title": "Criterion"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "grade": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 0.0,
+            "title": "Grade"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 3,
+            "pattern": "\\S",
+            "title": "Reason"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effective From"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid Until"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceIn"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Evidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_id",
+          "dimension",
+          "rubric_ref",
+          "criterion",
+          "period_start",
+          "period_end",
+          "grade",
+          "confidence",
+          "reason",
+          "effective_from",
+          "valid_until",
+          "evidence"
+        ],
+        "title": "CreateIn"
+      },
+      "EvidenceIn": {
+        "properties": {
+          "source_revision_id": {
+            "type": "string",
+            "title": "Source Revision Id"
+          },
+          "hash": {
+            "type": "string",
+            "title": "Hash"
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Start"
+          },
+          "end": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "End"
+          },
+          "quote": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Quote"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "supports",
+              "contradicts"
+            ],
+            "title": "Relation",
+            "default": "supports"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source_revision_id",
+          "hash",
+          "start",
+          "end",
+          "quote"
+        ],
+        "title": "EvidenceIn"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1267,6 +1552,17 @@
             "type": "string",
             "title": "Quality Threshold",
             "default": "70"
+          },
+          "simulation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Simulation Token"
           }
         },
         "type": "object",

@@ -8,7 +8,7 @@
 
 2026-10-05整理：其他Agent整体评估请先读[当前交接](./review/CURRENT-HANDOFF.md)及[可直接转发的评估提示词](./review/CURRENT-REVIEW-PROMPT.md)，覆盖方案、设计、源码、核心逻辑、实际UI和文案；当前源码包用`python3 tools/build_current_review_bundle.py`从干净提交本地生成，manifest固定revision与逐文件hash，不含真实原始资料、凭证或备份。旧REVIEW-PACK/PASTE材料属于编码前历史快照。
 
-GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./review/GPT-PRO-UX18-PROMPT.md)，从`main`最新代码解析并固定SHA；待评审方案为[18重设计修订1](./docs/18-ux-and-copywriting-redesign.md)。不需要附件或本地zip，main已包含当前产品与设计；既有修订见[处置索引](./review/PRE-MAIN-DISPOSITION.md)，不把历史原型当当前产品。
+GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./review/GPT-PRO-UX18-PROMPT.md)，从`main`最新代码解析并固定SHA；设计与本轮实现为[18重设计修订2](./docs/18-ux-and-copywriting-redesign.md)，逐项处置、检查及限制见[UX18实施记录](./review/UX18-IMPLEMENTATION.md)。不需要附件或本地zip，main已包含当前产品与设计；既有修订见[处置索引](./review/PRE-MAIN-DISPOSITION.md)，不把历史原型当当前产品。
 
 ## 当前本地运行与验收
 
@@ -18,9 +18,9 @@ GPT Pro仅能读取GitHub时，使用[UX18设计与评审专用提示词](./revi
 ./tools/vip dev
 ```
 
-API/React UI/本地worker启动在127.0.0.1，默认8765，占用时使用8766；本轮入口为[本地工作台](http://127.0.0.1:8766)。停止用`./tools/vip dev-down`，测试用`./tools/vip test`（只重建合成测试库）。依赖：Python3.12的backend/.venv、npm锁定依赖、本机项目专用PG库；凭证配置在忽略的backend/.env。前端依赖重建用`npm ci --prefix frontend --ignore-scripts`。本机make受Xcode许可限制时用tools/vip，无需修改系统许可。
+API/React UI/本地worker启动在127.0.0.1，默认8765，占用时使用8766；本轮入口为[本地工作台](http://127.0.0.1:8766)。仅启动API可用`./tools/vip dev-api`；停止用`./tools/vip dev-down`，测试用`./tools/vip test`（只重建合成测试库）。依赖：Python3.12的backend/.venv、npm锁定依赖、本机项目专用PG库；凭证配置在忽略的backend/.env。前端依赖重建用`npm ci --prefix frontend --ignore-scripts`。本机make受Xcode许可限制时用tools/vip，无需修改系统许可。
 
-最新已运行：67项后端测试；TS构建、迁移升级/降级/升级、两家公司真实资料、38条免费A股日线与40条三年财务指标的API/浏览器回读通过。先前9组页面场景保留为历史验证。实际研究入口仅展示有真实来源的资料和公司；合成操作只允许在隔离test库，旧记录保留。真实评分必须具有可追溯的原文修订，缺失财报和正式行情时显示具体缺口。完整封存/风险/纠错/Excel及目标用户签收仍未完成；详见[验证与缺口](./versions/v0.0.1/VERIFICATION.md)，不能把本地演示当作完整版本或生产就绪。真实文本导入显式运行`./tools/vip public-import`；免费A股日线显式运行`./tools/vip baostock-import --capture`，固定响应重放使用`--snapshot /absolute/path`。免费财务指标显式运行`./tools/vip financial-import --capture`；先只取本地响应使用`--capture --capture-only`，已保存响应重放使用`--snapshot /absolute/path`。正常启动不采集。在工作台“研究运行”可保存当前真实资料的本地研究预览，查看价格、区间统计与缺口。三年财务指标已接入，可看报告期、提供商披露日与原始字段比较；完整财报原始科目/口径、港股行情及正式封存仍未完成，研究运行状态为partial；详见[来源与流程证据](./versions/v0.0.1/REAL-DATA.md)。
+最新已运行（2026-10-06）：81项后端测试、TS构建与OpenAPI生成通过；七页研究界面、首次有证据研判、自选取消、历史元数据一致性、策略模拟发布绑定及质量门已实施。真实库只读浏览器核对原文返回、历史比较、失败保留、390px布局、键盘/焦点与独立运维身份通过；未替用户录入真实经营判断。10-02的真实接入/迁移及日线、财务回读保留为历史证据。先前9组页面场景保留为历史验证。实际研究入口仅展示有真实来源的资料和公司；合成操作只允许在隔离test库，旧记录保留。真实评分必须具有可追溯的原文修订，缺失财报和正式行情时显示具体缺口。完整封存/风险/纠错/Excel及目标用户签收仍未完成；详见[验证与缺口](./versions/v0.0.1/VERIFICATION.md)，不能把本地演示当作完整版本或生产就绪。真实文本导入显式运行`./tools/vip public-import`；免费A股日线显式运行`./tools/vip baostock-import --capture`，固定响应重放使用`--snapshot /absolute/path`。免费财务指标显式运行`./tools/vip financial-import --capture`；先只取本地响应使用`--capture --capture-only`，已保存响应重放使用`--snapshot /absolute/path`。正常启动不采集。在工作台“研究运行”可保存当前真实资料的本地研究预览，查看价格、区间统计与缺口。三年财务指标已接入，可看报告期、提供商披露日与原始字段比较；完整财报原始科目/口径、港股行情及正式封存仍未完成，研究运行状态为partial；详见[来源与流程证据](./versions/v0.0.1/REAL-DATA.md)。
 
 下面的设计说明保留编码前基线时的上下文；当前产品状态以PROJECT和版本验证为准。
 

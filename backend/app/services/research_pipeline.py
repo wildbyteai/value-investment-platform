@@ -105,7 +105,7 @@ def start_run(db,principal,command_key):
     result={'mode':'real_research_preview','status':status,'companies':results,'stages':[
         {'stage':'read_sources','status':'completed','detail':f'{len(read_items)}份可读真实资料，当前修订已固定'},
         {'stage':'analyze','status':'completed','detail':'实际行情/财务字段比较和原文摘录；财务口径与经营判断缺口明确保留'},
-        {'stage':'score','status':'partial' if any(c['quality']['quality_score'] is None for c in results) else 'completed','detail':'执行真实输入评分；缺失项保持UNKNOWN'},
+        {'stage':'score','status':'partial' if any(c['quality']['quality_score'] is None or any(s['valuation']['valuation_score'] is None for s in c['securities']) for c in results) else 'completed','detail':'执行真实输入评分；缺失项保持UNKNOWN'},
         {'stage':'strategy_preview','status':'partial','detail':'逐证券计算草稿规则；缺数为UNKNOWN，未正式封存或应用'},
     ]}
     run=ResearchRun(workspace_id=principal.workspace.id,actor_id=principal.user.id,command_key=command_key,request_hash=request_hash,

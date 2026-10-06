@@ -1,0 +1,83 @@
+{
+  "checked_at": "2026-10-06T00:22:46.761815+00:00",
+  "mode": "GET_only",
+  "data_mode": "real_public",
+  "companies": 2,
+  "items": 6,
+  "readable_bodies": 6,
+  "scores": [
+    {
+      "company_id": "35d56e2e-de23-4fad-99f8-69adfe31bd57",
+      "quality_unknown": true,
+      "coverage": "0.000000000000",
+      "rubric_count": 3,
+      "securities": [
+        {
+          "market": "CN_A",
+          "valuation_unknown": true,
+          "price_final": false
+        },
+        {
+          "market": "HK",
+          "valuation_unknown": true,
+          "price_final": false
+        }
+      ]
+    },
+    {
+      "company_id": "eb5e3b3e-a745-4a79-b590-0e77429a8757",
+      "quality_unknown": true,
+      "coverage": "0.000000000000",
+      "rubric_count": 3,
+      "securities": [
+        {
+          "market": "CN_A",
+          "valuation_unknown": true,
+          "price_final": false
+        }
+      ]
+    }
+  ],
+  "saved_runs": 3,
+  "history_readback": [
+    {
+      "status": "partial",
+      "manifest_hash": "60e1eb6ac107746823ca3dd078b5e68d59c4953b4a34fc4dc2b6aec169734bed"
+    },
+    {
+      "status": "partial",
+      "manifest_hash": "9159689a0e2e0269a3f2c207f0e9284d06ea4195b2f3425676e0e12602406fac"
+    }
+  ],
+  "ops": {
+    "tasks": 3,
+    "sources": 4,
+    "research_access_status": 403
+  },
+  "empty_workspace_companies": 0,
+  "source_sha256": {
+    "backend/app/services/judgment_authoring.py": "a50d4f793f4a05563ae4bada3b72cf1bd96636a1a57fa156ac919885b51ec23e",
+    "backend/app/services/scoring_service.py": "cb95e4865722b991b1b56c5eadaaab74e522b48e0e91f5d64df35f390d874c08",
+    "backend/app/services/strategy_service.py": "38fa66676c43f6fb6d119da6560614191fb8e329264786b64ab2e56defae10c7",
+    "backend/app/services/decision_service.py": "5a679778fb9f5189bc1bb551abba420ddff1d109eb39c809c2eebcf24c8b0807",
+    "backend/app/services/worker_service.py": "0da6156dd30abd509ab4fff9d4da153e25ce08962e92880e8986ba2b1b9aa6a2",
+    "backend/app/services/item_history.py": "f5cb2c425386cf28f33b22df242aae911fa00642bee2671d5d5bcfa16589ec9f",
+    "backend/app/services/research_pipeline.py": "a0bad60465a656f95ef09bfe2b9653cae0d11584b294807d005a7d080b8632e3",
+    "backend/app/api/intake.py": "c31ec98febc2f836a323717530adc157dbefaed6a02013709089e14fb0538ec1",
+    "backend/app/api/judgments.py": "ffbc74b2f06e109e5413e6d6632594dbcfd704f6d4383d0a6820d1bf595b2393",
+    "backend/app/api/strategy.py": "e14efa8c6a5faf6a8072fbc9b1741a40e4713c1a6924effb330c5d3b3dbe3925",
+    "backend/app/api/collab.py": "b66924fb3590537457a13f3fe8c668cc3b256ac745d89475687fb4f23aa2b753",
+    "frontend/src/app.tsx": "0d85e5016cf54d5f35df47392f3228421216dca04a163107cee2606ab393c2f6",
+    "frontend/src/judgments.tsx": "b41ba50063687b829517733fd44bc5304f0e1ce9b1659e78778c7a369351c482",
+    "frontend/src/template.tsx": "82f5a0af61e335bf4aef52e45566d22fbf8ac0d87bb7e4b6a9a601c99052f626",
+    "frontend/src/ui.tsx": "8ee692b665874a6268979093110a2604c623e4ae5051467ae853e9d7feb680df",
+    "frontend/src/client.ts": "4116ef2a1b11eed7188c25e10607fdbb8eb524d5ec05ce7d21e6f4b8c7091b82",
+    "frontend/src/style.css": "d63931ce614127b52cd9a4eab7b56487f1e7883d1eaab74847a6061438b73f1d",
+    "backend/static/app.js": "669ee9bf4fb38a085cb01f220caa3937399739cd792319204eea88b163c6561f",
+    "backend/static/app.css": "d69285de4e5f1a1b64aa5fbdb18838b09e8c79db0fad21770620fc42ca9020b8",
+    "contracts/openapi-v0001.json": "b13334130c34fd95ea4805b34c6ed279cfc8afdf09db67991b6020c8f7e2cbdf",
+    "frontend/src/api-schema.ts": "60f8520635801ba48f20562c3068070ae3aa9afee2e10c86e5538c5ff8d2a22b",
+    "backend/tests/test_ux18.py": "6aee373a3f9e95bb108247ebbefa102356b177d72a2e9b38ce2390ead6470a31",
+    "tools/verify_ux18_readonly.py": "dd07fc8199d2cbd87846c95c4cebd68d5a540563e278ed22914025459f311444"
+  }
+}

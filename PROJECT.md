@@ -6,7 +6,7 @@
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。
 
-当前阶段：**v0.0.1 部分实现与验证，完整必选验收尚未通过**。v0.3继续作为设计基线。2026-10-01初版8个研发提交后进行了交付核查与本地修复：截至2026-10-02，67项后端测试通过，新增真实公司资料、免费A股日线及三年财务指标研究预览；先前9组浏览器场景及本轮实际浏览器操作分别记录；结果与未完成必选以[本轮验证](./versions/v0.0.1/VERIFICATION.md)为准。不能把原28 passed或health成功作为完整版本签收。通知、生产部署、远程库、外部模型外发及交易未执行。项目管理真源为本文件，业务确认仍以11为准。
+当前阶段：**v0.0.1 部分实现与验证，完整必选验收尚未通过**。v0.3继续作为设计基线。2026-10-01初版8个研发提交后进行了交付核查与本地修复：截至2026-10-06，81项后端测试通过；UX18与GPT Pro UXR-01…12整改已实施（[逐项处置](./review/UX18-IMPLEMENTATION.md)），TS构建、真实资料只读浏览器与窄屏/键盘检查通过。此前2026-10-02，67项后端测试通过，新增真实公司资料、免费A股日线及三年财务指标研究预览；先前9组浏览器场景及本轮实际浏览器操作分别记录；结果与未完成必选以[本轮验证](./versions/v0.0.1/VERIFICATION.md)为准。不能把原28 passed或health成功作为完整版本签收。通知、生产部署、远程库、外部模型外发及交易未执行。项目管理真源为本文件，业务确认仍以11为准。
 
 ### 编码前阶段历史
 
@@ -22,7 +22,7 @@
 | 业务需求与设计 | [01](./docs/01-product-requirements.md)、[02](./docs/02-business-design.md) |
 | 工程架构、数据、API、UX、AI、运维 | docs/03…08 |
 | 领域/流程、字段设计、可点击原型 | [14](./docs/14-domain-and-business-flows.md)、[15](./docs/15-database-dictionary.md)、[16](./docs/16-prototype-and-design-trace.md) |
-| UX/文案重设计提案 | [18修订1](./docs/18-ux-and-copywriting-redesign.md)（承接06/16，待设计评审，未实施）；[GPT Pro GitHub-only入口](./review/GPT-PRO-UX18-PROMPT.md) |
+| UX/文案与评审整改 | [18修订2](./docs/18-ux-and-copywriting-redesign.md)（已授权实施）；[UX18处置与验证](./review/UX18-IMPLEMENTATION.md)；[GPT Pro GitHub-only入口](./review/GPT-PRO-UX18-PROMPT.md) |
 | 实施任务和首个切片 | [09](./docs/09-delivery-plan.md)、[13](./docs/13-first-slice.md) |
 | 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
 | 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md |
@@ -87,3 +87,11 @@ GitHub授权覆盖本项目新生成设计、合成示例、验证工具和评�
 用户明确授权按建议处理，三年范围已批准。BaoStock免费财务指标两家各20条、共40条已获取并追加入本机已备份资料库，无schema/权限变更；两家提供商、三个真实资料通道（百科/日线/财务），日线保持30天。6份真实资料的研究v2可读固定原文、显示报告期/提供商披露日期、实际比较字段并保存新结果。旧研究命令回原结果；67 passed、构建、实际字段/计算/幂等回读与浏览器表格/原文通过。
 
 财务接口不是完整三大表；缺原始CFO/匹配普通股权益/债务现金/EBITDA及单位范围、报告义务等，供应商比率不能代填标准公式。只有financial_observations可追溯观察，没有标准financials，Q/V/策略仍UNKNOWN，研究partial；完整真实分析尚未完成。后续缺项是数据/实现依赖，三年授权不再是阻断。来源、验证与最小后续依赖见[REAL-DATA](./versions/v0.0.1/REAL-DATA.md)。最终工作台8766，原始资料/备份/截图仍忽略保存，未采购、注册、外部模型外发、通知或交易。
+
+## 2026-10-06：UX18评审落实与主干交付
+
+用户提供GPT Pro共享评审并明确“确认没问题就全部落地，最终合并到主干”。原始评审固定基线为c44d0afa8b4453ede35b25ae11edd8d6e6e52695；本轮从安全main派生codex/ux18-implementation，不合入早期含凭证的本机历史。UXR-01…12对应判断创建及正确评分选择、空档位拒绝、历史正文/元数据同源、模板注册/政策替换/逐字段来源、当前规则草稿及模拟发布绑定、策略质量门、解除覆盖固定时点重评、失败恢复与上下文隔离、自选闭环、阶段与缺口表达、运维权限及公司默认视图；七页采用中文业务说明与对象附近诊断。
+
+本轮81 passed（1项现有Starlette/httpx警告），TS与本地产物构建、同源OpenAPI/TS生成通过；真实公开资料库只读页面检查及合成test库创建/评分/历史/并发边界检查分别记录在review/UX18-IMPLEMENTATION.md。无需schema迁移，未采集/采购/外发模型/通知/交易或生产部署；本机8766使用本轮实现。保留FINAL估值门与角色权限；完整原始财务科目、港股与正式封存等必选仍未完成，不能称完整首slice通过。用户授权提交私有GitHub并合并main；最终提交与远程回读由交付响应给出，GitHub复核应先固定实际main SHA。
+
+本轮worker恢复曾被自动审批拒绝；用户随后单独明确授权“授权恢复原 worker”，范围为vip_v0001_local后续判断/研究任务对应不可变修订、任务效果、审计/outbox，不新增采集/通知。已核验空队列并恢复原本机进程；新增dev-api只启动API选项。

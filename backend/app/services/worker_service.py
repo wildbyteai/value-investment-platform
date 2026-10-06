@@ -48,11 +48,19 @@ def complete(db: Session, token: dict):
             from app.models.judgment import JudgmentSlot
             from app.models.company import Company, Security
             from app.services.scoring_service import score_company, score_security
-            slot = db.get(JudgmentSlot, row.aggregate_id)
+            slot = db.scalar(select(JudgmentSlot).where(JudgmentSlot.id==row.aggregate_id).with_for_update().execution_options(populate_existing=True))
             generation = json.loads(row.payload_json).get('generation')
             if slot and generation is not None and generation != slot.generation:
                 result['status'] = 'superseded'
             elif slot and slot.company_id:
+                if row.event_type=='judgment.released':
+                    from datetime import datetime
+                    from app.services.decision_service import reevaluate_release
+                    cutoff=json.loads(row.payload_json).get('cutoff')
+                    if cutoff:
+                        result['reassessment']=reevaluate_release(db,slot,datetime.fromisoformat(cutoff))
+                    else:
+                        result['reassessment']='pending_review' # legacy event lacks fixed cutoff
                 company = db.get(Company, slot.company_id)
                 result['company_id'] = company.id
                 result['score'] = score_company(db, company, row.workspace_id)

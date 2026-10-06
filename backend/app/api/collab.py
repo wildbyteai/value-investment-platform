@@ -48,7 +48,22 @@ def list_watch(
     rows = db.scalars(select(Watchlist).where(Watchlist.user_id == principal.user.id, Watchlist.workspace_id == principal.workspace.id)).all()
     secs = [db.get(Security, r.security_id) for r in rows]
     allowed={c.id for c in data_mode.companies(db,principal.workspace.id)}
-    return [{"ticker": s.ticker, "market": s.market} for s in secs if s and s.company_id in allowed]
+    return [{"security_id": s.id, "company_id": s.company_id, "ticker": s.ticker, "market": s.market} for s in secs if s and s.company_id in allowed]
+
+
+@router.delete('/watchlist/{security_id}')
+def remove_watch(security_id: str, principal: Principal = Depends(require('watchlist.own')), db: Session = Depends(get_db)):
+    security = db.get(Security, security_id)
+    if security is None: raise HTTPException(404, '没有该证券')
+    data_mode.require_company(db, security.company_id, principal.workspace.id)
+    row = db.scalar(select(Watchlist).where(Watchlist.user_id == principal.user.id,
+        Watchlist.workspace_id == principal.workspace.id, Watchlist.security_id == security_id).with_for_update())
+    if row:
+        db.delete(row)
+        from app.services.transactions import record
+        record(db, principal.workspace.id, principal.user.id, 'watchlist.removed', 'security', security_id)
+        db.commit()
+    return {'security_id': security_id, 'watching': False}
 
 
 class NoteIn(BaseModel):
@@ -112,7 +127,7 @@ def claim_outbox(
 
 
 @worker_router.get('/tasks')
-def tasks(principal: Principal = Depends(require('research.read')), db: Session = Depends(get_db)):
+def tasks(principal: Principal = Depends(require('ops.read')), db: Session = Depends(get_db)):
     rows = db.scalars(select(Outbox).where(Outbox.workspace_id == principal.workspace.id)
                       .order_by(Outbox.created_at.desc()).limit(100)).all()
     if not data_mode.fixture_mode():
@@ -157,3 +172,11 @@ def retry(outbox_id: str, principal: Principal = Depends(require('job.retry')), 
     record(db, principal.workspace.id, principal.user.id, 'research.task_retried', 'outbox', row.id)
     db.commit()
     return {'id': row.id, 'status': 'waiting'}
+
+@worker_router.get('/sources')
+def source_runs(principal: Principal = Depends(require('ops.read')), db: Session = Depends(get_db)):
+    from app.models.audit import IngestionRun
+    rows=db.scalars(select(IngestionRun).where(IngestionRun.workspace_id==principal.workspace.id)
+                    .order_by(IngestionRun.created_at.desc()).limit(100)).all()
+    # Operations metadata only: no source content, source URLs or private run notes.
+    return [{'id':r.id,'source_key':r.source_key,'status':r.status} for r in rows]

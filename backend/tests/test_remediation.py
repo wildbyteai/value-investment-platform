@@ -145,8 +145,9 @@ def test_publish_permissions_immutable_versions_and_golden_replay(prepared):
     assert c.post('/api/strategy/publish',headers=headers(ws),json={'quality_threshold':'75'}).status_code==403
     h=headers(ws,'strat@demo');preview=c.post('/api/strategy/simulate',headers=h,json={'quality_threshold':'70'})
     assert preview.status_code==200 and len(preview.json()['results'])==3
-    one=c.post('/api/strategy/publish',headers=h,json={'quality_threshold':'70'}).json()
-    two=c.post('/api/strategy/publish',headers=h,json={'quality_threshold':'75','expected_version':one['version']}).json()
+    one=c.post('/api/strategy/publish',headers=h,json={'quality_threshold':'70','simulation_token':preview.json()['simulation_token']}).json()
+    next_preview=c.post('/api/strategy/simulate',headers=h,json={'quality_threshold':'75','expected_version':one['version']}).json()
+    two=c.post('/api/strategy/publish',headers=h,json={'quality_threshold':'75','expected_version':one['version'],'simulation_token':next_preview['simulation_token']}).json()
     assert two['version']==one['version']+1
     with Session() as db:
         from app.models.strategy import StrategyVersion
@@ -163,7 +164,7 @@ def test_release_preserves_revision_history(prepared):
         r,status,gen=human_override(db,slot.slot_key,{'magnitude':'-0.2'},slot.generation,ws);db.commit()
         assert json.loads(r.value_json)['direction']=='negative'
         released,status,gen=human_override(db,slot.slot_key,{},gen,ws,release=True);db.commit()
-        assert slot.effective_revision_id==old
+        assert slot.effective_revision_id is None
         assert db.get(JudgmentRevision,r.id).decision=='accepted'
         assert released.decision=='released'
 

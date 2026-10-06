@@ -1,61 +1,1352 @@
-import React,{useEffect,useState} from 'react';
-import{createRoot}from'react-dom/client';
-import{api,post,session,ApiError}from'./client';
-import type {components} from './api-schema';
-import './style.css';
-type ResearchDetail=components['schemas']['RunDetail'];
-const labels={news:'新闻与资料',companies:'公司研究',research:'研究运行',judgments:'判断与覆盖',strategy:'策略与变化',mine:'我的研究',tasks:'运行与恢复'};
-const dimensionName=(k:string)=>({profit_quality:'盈利质量',financial_resilience:'财务韧性',business_model:'商业模式',governance:'治理与资本配置',growth_sustainability:'成长持续性',x_customer_retention:'客户留存'}[k]||k);
-const human=(x:any)=>x==null?'未有有效资料':Number(x).toFixed(1);
-function Json({value}:{value:any}){return <details><summary>查看依据与诊断</summary><pre>{JSON.stringify(value,null,2)}</pre></details>}
-function App(){
- const[identities,setIdentities]=useState<any>();const[me,setMe]=useState<any>();const[tab,setTab]=useState('news');
- const[data,setData]=useState<any>(null);const[detail,setDetail]=useState<any>(null);const[busy,setBusy]=useState(false);const[message,setMessage]=useState('');
- const[error,setError]=useState('');const[login,setLogin]=useState('research@demo');const[workspace,setWorkspace]=useState('');
- const[threshold,setThreshold]=useState('70');const[preview,setPreview]=useState<any>(null);const[rule,setRule]=useState<any>(null);
- const[note,setNote]=useState('');const[companyId,setCompanyId]=useState('');const[patches,setPatches]=useState('[{"dimension":"business_model","event_policy":{"enabled":false}}]');const[templatePreview,setTemplatePreview]=useState<any>(null);
- const[runKey,setRunKey]=useState(crypto.randomUUID());
- const allow=(permission:string)=>me?.permissions?.includes(permission);
- async function action(fn:()=>Promise<any>,success?:string){setBusy(true);setError('');setMessage('');try{const result=await fn();if(success)setMessage(success);return result}catch(e){const a=e as ApiError;setError(a.status===403?'当前身份无权执行此操作。':a.status===409?'已有新修改，本次未保存。你的输入已保留，请先查看当前值。':a.message);return undefined}finally{setBusy(false)}}
- async function load(route=tab){setDetail(null);setData(null);setPreview(null);setTemplatePreview(null);
-  await action(async()=>{const user=await api('/api/me');setMe(user);let value;
-   if(route==='news')value=await api('/api/intake/items');
-   if(route==='companies'){const cs=await api('/api/companies');value=await Promise.all(cs.map(async(c:any)=>({...c,score:await api(`/api/companies/${c.id}/score`),timeline:await api(`/api/companies/${c.id}/timeline`)})));setCompanyId(cs[0]?.id||'')}
-   if(route==='research'){value=await api('/api/research/runs');if(value.length)setDetail(await api(`/api/research/runs/${value[0].id}`))}
-   if(route==='judgments')value=await api('/api/judgments');
-   if(route==='strategy'){const r=await api('/api/strategy/current');setRule(r);setThreshold(r.rules.enter.all[0].value);value=await api('/api/strategy/transitions')}
-   if(route==='mine'){value={watch:await api('/api/me/watchlist'),notes:await api('/api/me/notes'),companies:await api('/api/companies')};setCompanyId(value.companies[0]?.id||'')}
-   if(route==='tasks'){value={runs:await api('/api/demo/runs'),work:await api('/api/worker/tasks')}}
-   setData(value);});
- }
- useEffect(()=>{action(async()=>{const ids=await api('/api/identities');setIdentities(ids);const ws=ids.workspaces.find((w:any)=>w.has_real_data)||ids.workspaces[0];setWorkspace(ws.id);session.workspace=ws.id;session.login=login;await load('news')})},[]);
- async function enter(){setRunKey(crypto.randomUUID());session.login=login;session.workspace=workspace;setData(null);setDetail(null);await load()}
- async function navigate(t:string){setTab(t);await load(t)}
- async function readItem(id:string,revision?:string){const d=await action(()=>api(`/api/intake/items/${id}${revision?`?revision_id=${revision}`:""}`));if(d)setDetail(d)}
- async function openSource(id:string,revision?:string){await action(async()=>{const list=await api("/api/intake/items");const doc=await api(`/api/intake/items/${id}${revision?`?revision_id=${revision}`:""}`);setData(list);setDetail(doc);setTab("news")})}
- return <><header><div><h1>价值投资研究</h1><p>从资料到判断，再核对策略依据。研究结果不代表交易指令。</p></div><details className="identity"><summary>本地身份与工作区</summary><label>身份<select aria-label="身份" value={login} onChange={e=>setLogin(e.target.value)}>{identities?.users.map((u:any)=><option key={u.login} value={u.login}>{u.display_name}</option>)}</select></label><label>工作区<select aria-label="工作区" value={workspace} onChange={e=>setWorkspace(e.target.value)}>{identities?.workspaces.map((w:any)=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label><button disabled={busy} onClick={enter}>切换身份</button></details></header>
- <div className="shell"><nav aria-label="研究导航">{Object.entries(labels).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>navigate(key)}>{label}</button>)}<p className="muted">{me?.user?.display_name}<br/>当前仅使用真实来源。真实日线与财务指标已接入；标准口径依据不足时，评分保持未知。</p></nav><main>
- <div className="toolbar"><h2>{labels[tab]}</h2><button className="quiet" onClick={()=>load()} disabled={busy}>刷新当前页</button></div>
- {busy&&<p role="status">正在读取或保存，请稍候…</p>}{error&&<p className="notice danger" role="alert">{error}</p>}{message&&<p className="notice" role="status">{message}</p>}
- {!busy&&data==null&&!error&&<p>尚未读取资料。</p>}
- {tab==='news'&&data&&<><p className="muted">已接入真实公司简介、免费A股日线与三年财务指标。指标资料可阅读和比较；完整财报原始科目、港股行情及正式收盘政策仍待补齐。百科修订时间不代表公司事件时间。</p>{me?.data_mode==='synthetic_test'&&allow('source.manage')&&<button disabled={busy} onClick={()=>action(async()=>{await post('/api/intake/synthetic',{});await load()},'合成资料已导入')}>导入合成资料</button>}{detail?<article><button className="quiet" onClick={()=>setDetail(null)}>返回资料列表</button><h3>{detail.title}</h3><p>{detail.publication.date||'发布时间未知'} · 系统取得 {detail.observed_at}</p><p className="summary">{detail.summary_text||'暂无摘要'}</p><h4>原文与来源</h4>{detail.original_text?<><p className="muted">{detail.source.name}；文本许可 {detail.reading_metadata.license}。{detail.reading_metadata.change_notice}</p><div className="body-text">{detail.original_text}</div></>:<p>尚未取得原文，摘要仍可阅读。</p>}{detail.body_access.url&&<a href={detail.body_access.url} target="_blank" rel="noreferrer">来源固定版本</a>} {detail.reading_metadata.history_url&&<a href={detail.reading_metadata.history_url} target="_blank" rel="noreferrer">作者与历史</a>}<Json value={{source:detail.source,revision:detail.revision}}/></article>:data.length?data.map((it:any)=><article key={it.id}><div className="meta"><span>{it.source_name||'来源待确认'}</span><span>{it.publication_date||'日期未知'}</span></div><h3>{it.title}</h3><p>{it.summary_text||'暂无摘要'}</p><p className="muted">{it.body_state==='available'?'原文已取得':'原文尚未取得'}；尚无影响判断时不将摘要当作结论。</p><button className="quiet" onClick={()=>readItem(it.id)}>阅读摘要与来源</button></article>):<p>尚未接入可用真实资料。请先配置具有保存和分析许可的来源。</p>}</>}
- {tab==='companies'&&data&&data.map((c:any)=><article key={c.id}><h3>{c.name}</h3><p>经营质量 {human(c.score.quality_score)} · 有效维度覆盖 {(c.score.coverage*100).toFixed(0)}%</p>{c.score.reasons.length>0&&<p className="notice">缺少足够真实经营依据，暂时不能作确定判断。</p>}{c.score.financial_observations_available&&<p>已取得三年真实财务指标；在“研究运行”查看报告期、字段比较与口径缺口。</p>}<p className="muted">{c.score.missing_data?.join("；")}</p><div className="securities">{c.score.securities.map((s:any)=><section key={s.security_id}><h4>{s.market==='HK'?'港股':'A股'} {s.ticker}</h4>{s.latest_quote&&<p>真实日线收盘 {s.latest_quote.raw_close} {s.latest_quote.currency} · {s.latest_quote.session}<br/><span className="muted">未复权；正式收盘最终性尚未核验</span></p>}<p>PE {human(s.pe_ttm)} / 估值分 {human(s.valuation_score)}</p><p className="muted">{s.currency} · {s.basis?.session||s.latest_quote?.session||'未取得对应证券行情'}</p>{allow('watchlist.own')&&<button className="quiet" onClick={()=>action(()=>post(`/api/me/watchlist/${s.security_id}`,{}),'已加入对应证券自选')}>关注 {s.ticker}</button>}{s.missing_data?.length>0&&<p className="muted">待补充：{s.missing_data.join("；")}</p>}<Json value={s.basis||{reason:s.reason}}/></section>)}</div><details><summary>为什么得到这个经营分数</summary><div className="table-scroll"><table><thead><tr><th>维度</th><th>经营基准</th><th>事件贡献</th><th>有效分</th></tr></thead><tbody>{Object.entries(c.score.dimensions).map(([k,d]:any)=><tr key={k}><td>{dimensionName(k)}</td><td>{human(d.baseline)}</td><td>{human(d.event_contribution)}</td><td>{human(d.score)}</td></tr>)}</tbody></table></div><Json value={c.score}/></details><h4>公司资料</h4>{c.timeline.items.length?c.timeline.items.map((it:any)=><button className="quiet" key={it.id} onClick={()=>openSource(it.id)}>{it.title}</button>):<p>暂无已明确关联的资料。</p>}
- <details><summary>进阶：查看与维护评分模板</summary><p>当前父链 {c.score.template.levels_applied.join(' → ')}；当前分数使用已发布口径。</p><Json value={c.score.template}/>{allow('template.edit')?<><label>模板修改（JSON差异）<textarea aria-label="模板修改" value={patches} onChange={e=>{setPatches(e.target.value);setTemplatePreview(null)}}/></label><button onClick={()=>action(async()=>{const current=await api(`/api/templates/${c.id}`);const p=await post(`/api/templates/${c.id}/preview`,{patches:JSON.parse(patches)});setTemplatePreview({company:c.id,version:current.version,...p})})}>预览模板差异</button>{templatePreview?.company===c.id&&<><Json value={templatePreview.resolved}/><button disabled={!allow('template.publish')} onClick={()=>action(async()=>{await post(`/api/templates/${c.id}/publish`,{expected_version:templatePreview.version,patches:JSON.parse(patches)});await load()},'新模板已发布，当前评分已按新口径读取')}>发布模板</button></>}</>:<p>当前身份只能查看模板。</p>}</details></article>)}
- {tab==='research'&&data&&<><p>运行已取得真实资料的本地研究，保存当次来源、价格、计算和缺口。缺数时显示未知，补齐依据后再运行。</p>{allow('analysis.override')?<button disabled={busy} onClick={()=>action(async()=>{const run=await post('/api/research/runs',{}, {'Idempotency-Key':runKey});setDetail(run);setData(await api('/api/research/runs'));setRunKey(crypto.randomUUID())},'研究结果已保存；请查看已完成阶段与待补依据')}>运行真实资料研究</button>:<p>当前身份可阅读已保存的研究。</p>}{data.length?<label>历史运行<select aria-label="历史研究运行" value={detail?.id||''} onChange={e=>action(async()=>setDetail(await api(`/api/research/runs/${e.target.value}`)))}>{data.map((r:any)=><option key={r.id} value={r.id}>{new Date(r.created_at).toLocaleString()} · {r.status==='partial'?'有待补依据':'已完成'}</option>)}</select></label>:<p>尚无研究运行。</p>}{detail&&<ResearchResult run={detail} read={openSource}/>}</>}
- {tab==='judgments'&&data&&<><p>先核对依据与作用范围，再替换单项判断。有效人工覆盖优先于自动判断。</p>{me?.data_mode==='synthetic_test'&&allow('analysis.override')&&<button disabled={busy} onClick={()=>action(async()=>{await post('/api/judgments/auto-run',{});await load()},'合成判断已生成')}>运行合成判断</button>}{data.length?data.map((j:any)=><Judgment key={j.slot_key} j={j} editable={allow('analysis.override')} save={async(value:any,release=false,commandKey=crypto.randomUUID())=>{const result=await action(async()=>{try{const r=await post(`/api/judgments/${j.slot_key}/override`,{value,release},{'If-Match-Generation':String(j.generation),'Idempotency-Key':commandKey});setData(await api('/api/judgments'));return r}catch(e){if((e as ApiError).status===409)setData(await api('/api/judgments'));throw e}},'本次修改已生效，重新打开公司评分可查看结果');return result}}/>):<p>尚无有效判断，资料阅读可继续。</p>}</>}
- {tab==='strategy'&&data&&<><article><h3>当前规则 {rule?.version?'版本 '+rule.version:'尚未发布'}</h3><p>入选经营分门槛 {rule?.rules.enter.all[0].value}；缺数据时不判作零分。</p>{allow('strategy.simulate')?<><label>草稿经营分门槛<input aria-label="经营分门槛" type="number" value={threshold} onChange={e=>{setThreshold(e.target.value);setPreview(null)}}/></label><button disabled={busy} onClick={()=>action(async()=>setPreview(await post('/api/strategy/simulate',{quality_threshold:threshold})))}>模拟草稿</button>{preview&&<><h4>本次模拟</h4>{preview.results.map((r:any)=><p key={r.security_id}>{r.company} {r.ticker}：{r.passes==null?'无法判断':r.passes?'满足条件':'未满足条件'}（经营 {human(r.quality)} / 估值 {human(r.valuation)}）</p>)}<button disabled={!allow('strategy.publish')||busy} onClick={()=>action(async()=>{await post('/api/strategy/publish',{quality_threshold:threshold,expected_version:rule.version});await load()},'新版本已发布，正式评估尚未生成')}>发布新版本</button></>}</>:<p>当前身份可看规则，不能模拟或发布。</p>}<Json value={rule?.rules}/></article><h3>历史变化</h3>{data.length?data.map((t:any)=><article key={t.id}><p>{t.session}：{t.from} → {t.to}（{t.reason}）</p>{t.evaluation_id&&<button className="quiet" onClick={()=>action(async()=>setDetail(await api(`/api/strategy/evaluations/${t.evaluation_id}`)))}>查看当时解释</button>}</article>):<p>暂无变化记录。规则模拟不产生正式市场变化。</p>}{detail&&<article><h3>固定历史解释</h3><Json value={detail}/></article>}</>}
- {tab==='mine'&&data&&<><article><h3>我的证券自选</h3>{data.watch.length?data.watch.map((w:any)=><p key={w.ticker}>{w.market} {w.ticker}</p>):<p>暂无自选，请在公司页分别关注A股或港股。</p>}</article><article><h3>研究笔记</h3><label>公司<select value={companyId} onChange={e=>setCompanyId(e.target.value)}>{data.companies.map((c:any)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label>笔记内容<textarea aria-label="笔记内容" value={note} onChange={e=>setNote(e.target.value)}/></label><button disabled={busy||!note.trim()} onClick={()=>action(async()=>{await post('/api/me/notes',{company_id:companyId,body:note});setNote('');await load()},'笔记已保存')}>保存笔记</button>{data.notes.map((n:any)=><p key={n.id}>{n.body}</p>)}</article></>}
- {tab==='tasks'&&data&&<><p>这里只展示当前工作区的运行记录。没有记录不代表“无重要动态”。</p>{data.runs.map((r:any)=><article key={r.id}><h3>{r.source_key}</h3><p>{r.status} {r.note}</p></article>)}<h3>处理任务</h3>{data.work.map((r:any)=><article key={r.id}><p>{r.stage}：{r.status==='completed'?'已完成':r.status==='failed'?'失败待恢复':'等待处理'} {r.error||''}</p>{r.status==='failed'&&allow('job.retry')&&<button onClick={()=>action(async()=>{await post(`/api/worker/outbox/${r.id}/retry`,{});await load()},'已仅重试此项任务')}>只重试此项任务</button>}</article>)}</>}
- </main></div><footer>本地研究版本 v0.0.1 · 通知后置 · 真实来源研究 · 本地身份仍为开发验证身份</footer></>;
+import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { api, post, session, ApiError } from "./client";
+import {
+  Diagnostic,
+  GapList,
+  FinancialSummary,
+  ResearchResult,
+  CompareRuns,
+  dimensionName,
+  criterionName,
+  human,
+  when,
+} from "./ui";
+import { AuthorJudgment, Judgment } from "./judgments";
+import { TemplateEditor } from "./template";
+import "./style.css";
+const labels = {
+  today: "今日概览",
+  companies: "公司研究",
+  research: "研究快照",
+  news: "资讯与研判",
+  strategy: "策略候选池",
+  mine: "我的工作台",
+  tasks: "系统支持",
+};
+const companyTabs = [
+  "经营质量与待补依据",
+  "财务与估值依据",
+  "资料与研判",
+  "评分规则",
+];
+function App() {
+  const [ids, setIds] = useState<any>();
+  const [error, setError] = useState("");
+  const [login, setLogin] = useState("research@demo");
+  const [workspace, setWorkspace] = useState("");
+  const [active, setActive] = useState<any>();
+  useEffect(() => {
+    api("/api/identities")
+      .then((value) => {
+        setIds(value);
+        const ws =
+          value.workspaces.find((w: any) => w.has_real_data) ||
+          value.workspaces[0];
+        setWorkspace(ws.id);
+        setActive({ login, workspace: ws.id });
+      })
+      .catch((e) => setError(e.message));
+  }, []);
+  return (
+    <>
+      <header>
+        <div>
+          <h1>价值投资研究</h1>
+          <p>查看公司、依据与下一步</p>
+        </div>
+        <details className="identity">
+          <summary>本地开发身份与工作区</summary>
+          <p className="muted">仅供本机开发验证，尚未接入正式登录。</p>
+          <label>
+            身份
+            <select value={login} onChange={(e) => setLogin(e.target.value)}>
+              {ids?.users.map((u: any) => (
+                <option key={u.login} value={u.login}>
+                  {u.display_name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            工作区
+            <select
+              value={workspace}
+              onChange={(e) => setWorkspace(e.target.value)}
+            >
+              {ids?.workspaces.map((w: any) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            onClick={() => setActive({ login, workspace })}
+            disabled={!workspace}
+          >
+            切换身份与工作区
+          </button>
+        </details>
+      </header>
+      {error && <p role="alert">{error}</p>}
+      {active && (
+        <Workspace key={active.login + active.workspace} identity={active} />
+      )}
+      <footer>本地研究预览 · 真实资料 · A/H独立估值 · 不产生交易指令</footer>
+    </>
+  );
 }
-function ResearchResult({run,read}:{run:ResearchDetail,read:(id:string,revision:string)=>Promise<void>}){
- const result=run.result as any;
- return <><article><h3>本次研究 · {run.status==='partial'?'有待补依据':'已完成'}</h3><p>保存于 {new Date(run.created_at).toLocaleString()}；来源与计算依据已固定。</p>{result.stages.map((s:any)=><p key={s.stage}>{({read_sources:'阅读资料',analyze:'分析数据',score:'计算评分',strategy_preview:'核对策略'} as any)[s.stage]}：{s.status==='completed'?'已完成':'有待补依据'} · {s.detail}</p>)}</article>{result.companies.map((c:any)=><article key={c.company_id}><h3>{c.company_name}</h3>{c.analysis.map((a:any)=><section key={a.source_revision_id}>{a.kind==='market_summary'?<><h4>真实行情区间统计</h4><p>{a.first_session} 至 {a.last_session} · {a.observations} 个交易日</p><p>首日收盘 {a.first_close} → 末日收盘 {a.last_close} {a.currency}；变化 {Number(a.change_pct).toFixed(2)}%</p><p className="muted">未复权；{a.meaning}</p></>:a.kind==='financial_summary'?<FinancialSummary data={a}/>:<><h4>已读资料摘录</h4><p>{a.excerpt}</p></>}<button className="quiet" onClick={()=>read(a.source_item_id,a.source_revision_id)}>阅读此次来源原文</button></section>)}<h4>经营质量 {human(c.quality.quality_score)}</h4><p className="muted">{c.quality.missing_data.join('；')}</p><div className="securities">{c.securities.map((s:any)=><section key={s.security_id}><h4>{s.ticker} · {s.market==='HK'?'港股':'A股'}</h4>{s.latest_quote?<p>已取得 {s.latest_quote.session} 收盘 {s.latest_quote.raw_close} {s.currency}</p>:<p>尚未取得对应证券行情</p>}<p>估值分 {human(s.valuation.valuation_score)}；策略 {s.strategy.result==='UNKNOWN'?'未知':s.strategy.result==='MATCH'?'满足条件':'未满足条件'}</p><p className="muted">{s.gaps.join('；')}</p></section>)}</div><p className="muted">当前为研究预览；未正式封存或产生策略状态变化。</p></article>)}<Json value={{manifest:run.manifest,result:run.result}}/></>
+function Workspace({ identity }: any) {
+  const [me, setMe] = useState<any>();
+  const [tab, setTab] = useState("today");
+  const [state, setState] = useState<any>();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [more, setMore] = useState(false);
+  const [selected, setSelected] = useState("");
+  const [reader, setReader] = useState<any>();
+  const [returnTo, setReturnTo] = useState<any>();
+  const [runKey, setRunKey] = useState(crypto.randomUUID());
+  const scope = useRef(0),
+    live = useRef(true),
+    route = useRef("today");
+  const gate = useRef(false);
+  const allow = (p: string) => me?.permissions?.includes(p);
+  const data = state?.route === tab ? state.value : null;
+  useEffect(() => {
+    session.login = identity.login;
+    session.workspace = identity.workspace;
+    live.current = true;
+    load("today").catch(() => {});
+    return () => {
+      live.current = false;
+      scope.current++;
+    };
+  }, []);
+  async function fetchPage(target: string, user: any) {
+    if (["today", "companies"].includes(target)) {
+      const cs = await api("/api/companies");
+      const companyResults = await Promise.allSettled(
+        cs.map(async (c: any) => ({
+          ...c,
+          score: await api(`/api/companies/${c.id}/score`),
+          timeline: await api(`/api/companies/${c.id}/timeline`),
+          catalog: await api(`/api/judgments/catalog/${c.id}`),
+        })),
+      );
+      const companies = companyResults
+        .filter((r: any) => r.status === "fulfilled")
+        .map((r: any) => r.value);
+      const failures = companyResults.flatMap((r: any, i: number) =>
+        r.status === "rejected" ? [`${cs[i].name}：${r.reason.message}`] : [],
+      );
+      if (cs.length && !companies.length) throw new Error(failures.join("；"));
+      let watch = null;
+      if (user.permissions.includes("watchlist.own")) {
+        try {
+          watch = await api("/api/me/watchlist");
+        } catch (e) {
+          failures.push("自选状态未读到，请刷新重试。");
+        }
+      }
+      return {
+        companies,
+        failures,
+        judgments: await api("/api/judgments"),
+        watch,
+        runs: await api("/api/research/runs"),
+      };
+    }
+    if (target === "news")
+      return {
+        items: await api("/api/intake/items"),
+        judgments: await api("/api/judgments"),
+        companies: await api("/api/companies"),
+      };
+    if (target === "research") {
+      const runs = await api("/api/research/runs");
+      return {
+        runs,
+        detail: runs.length
+          ? await api(`/api/research/runs/${runs[0].id}`)
+          : null,
+      };
+    }
+    if (target === "strategy")
+      return {
+        rule: await api("/api/strategy/current"),
+        changes: await api("/api/strategy/transitions"),
+      };
+    if (target === "mine") {
+      const cs = await api("/api/companies");
+      return {
+        watch: await api("/api/me/watchlist"),
+        notes: await api("/api/me/notes"),
+        companies: await Promise.all(
+          cs.map(async (c: any) => ({
+            ...c,
+            score: await api(`/api/companies/${c.id}/score`),
+          })),
+        ),
+      };
+    }
+    if (target === "tasks")
+      return {
+        sources: await api("/api/worker/sources"),
+        tasks: await api("/api/worker/tasks"),
+      };
+  }
+  async function load(target = route.current) {
+    const token = ++scope.current;
+    setBusy(true);
+    setError("");
+    try {
+      const user = await api("/api/me");
+      if (!live.current || token !== scope.current) return;
+      setMe(user);
+      if (!user.permissions.includes("research.read")) target = "tasks";
+      const value = await fetchPage(target, user);
+      if (!live.current || token !== scope.current) return;
+      route.current = target;
+      setTab(target);
+      setState({ route: target, value });
+      return value;
+    } catch (e) {
+      if (live.current && token === scope.current)
+        setError((e as Error).message);
+      throw e;
+    } finally {
+      if (live.current && token === scope.current) setBusy(false);
+    }
+  }
+  async function execute(
+    fn: () => Promise<any>,
+    success?: string | ((r: any) => string),
+    reload = true,
+  ) {
+    if (gate.current) return;
+    gate.current = true;
+    const token = scope.current;
+    setBusy(true);
+    setError("");
+    setMessage("");
+    let result: any;
+    try {
+      result = await fn();
+      if (!live.current || token !== scope.current) return;
+      if (success)
+        setMessage(typeof success === "function" ? success(result) : success);
+      if (reload) {
+        try {
+          await load();
+        } catch (e) {
+          if (live.current)
+            setError(
+              "操作已保存，但页面回读失败：" +
+                (e as Error).message +
+                "。请刷新核对结果。",
+            );
+        }
+      }
+      return result;
+    } catch (e) {
+      if (live.current && token === scope.current) {
+        const err = e as ApiError;
+        setError(
+          (err.status === 403 ? "当前身份无权操作：" : "") +
+            err.message +
+            "。输入已保留。",
+        );
+      }
+      return undefined;
+    } finally {
+      gate.current = false;
+      if (live.current) setBusy(false);
+    }
+  }
+  async function navigate(t: string) {
+    if (busy) return;
+    setMessage("");
+    setReader(null);
+    setReturnTo(null);
+    setTab(t);
+    route.current = t;
+    setMore(false);
+    try {
+      await load(t);
+    } catch {}
+  }
+  async function read(id: string, revision?: string) {
+    const doc = await execute(
+      () =>
+        api(
+          `/api/intake/items/${id}${revision ? `?revision_id=${revision}` : ""}`,
+        ),
+      undefined,
+      false,
+    );
+    if (doc) {
+      setReturnTo({ tab, selected });
+      setReader(doc);
+    }
+  }
+  const watchIds = data?.watch
+    ? new Set(data.watch.map((w: any) => w.security_id))
+    : null;
+  async function toggle(s: any) {
+    await execute(
+      () =>
+        api(`/api/me/watchlist/${s.security_id}`, {
+          method: watchIds?.has(s.security_id) ? "DELETE" : "POST",
+        }),
+      watchIds?.has(s.security_id)
+        ? "已移出对应证券自选。"
+        : "已加入对应证券自选。",
+    );
+  }
+  return (
+    <div className="shell">
+      <nav aria-label="研究导航">
+        {Object.entries(labels)
+          .filter(([key]) =>
+            key === "tasks"
+              ? allow("ops.read")
+              : key === "mine"
+                ? allow("watchlist.own")
+                : allow("research.read"),
+          )
+          .map(([key, label], index) => (
+            <button
+              className={
+                index > 2 && key !== "mine"
+                  ? "secondary-nav" + (more ? " expanded" : "")
+                  : ""
+              }
+              key={key}
+              disabled={busy}
+              aria-current={tab === key ? "page" : undefined}
+              onClick={() => navigate(key)}
+            >
+              {label}
+            </button>
+          ))}
+        <button className="mobile-more quiet" onClick={() => setMore(!more)}>
+          更多
+        </button>
+        <p className="muted">
+          {me?.user?.display_name}
+          <br />
+          {allow("research.read")
+            ? "已保存资料可阅读；评分依据不足时显示待评估。"
+            : "查看当前工作区的运维记录。"}
+        </p>
+      </nav>
+      <main>
+        <div className="toolbar">
+          <h2>{reader ? "固定原文" : labels[tab]}</h2>
+          <button
+            className="quiet"
+            disabled={busy}
+            onClick={() => load().catch(() => {})}
+          >
+            刷新当前页
+          </button>
+        </div>
+        {busy && <p role="status">正在读取或保存…</p>}
+        {error && (
+          <p className="notice danger" role="alert">
+            {error}
+          </p>
+        )}
+        {!!data?.failures?.length && (
+          <p className="notice" role="status">
+            部分读取未完成：{data.failures.join("；")}
+            。其余资料可继续阅读，刷新可重试。
+          </p>
+        )}
+        {message && (
+          <p className="notice" role="status">
+            {message}
+          </p>
+        )}
+        {reader && (
+          <article>
+            <button
+              className="quiet"
+              onClick={() => {
+                setReader(null);
+                if (returnTo) {
+                  setTab(returnTo.tab);
+                  setSelected(returnTo.selected);
+                }
+              }}
+            >
+              返回{labels[returnTo?.tab || tab]}
+            </button>
+            <h3>{reader.title}</h3>
+            <p className="muted">
+              {reader.source.name}；资料日期 {reader.publication.date || "未知"}
+              ；系统取得 {when(reader.observed_at)}
+            </p>
+            {reader.metadata_state === "unavailable" && (
+              <p className="notice">
+                此旧修订未保存标题、摘要、日期与网址；不使用当前元数据替代。
+              </p>
+            )}
+            {reader.summary_text && <p>{reader.summary_text}</p>}
+            {reader.original_text ? (
+              <div className="body-text">{reader.original_text}</div>
+            ) : (
+              <p>原文尚未取得，现有摘要仍可阅读。</p>
+            )}
+            <p className="muted">
+              许可：{reader.reading_metadata.license || "见来源政策"}；
+              {reader.reading_metadata.change_notice}
+            </p>
+            {reader.body_access.url && (
+              <a href={reader.body_access.url} target="_blank" rel="noreferrer">
+                来源入口
+              </a>
+            )}
+            {reader.reading_metadata.history_url && (
+              <a
+                href={reader.reading_metadata.history_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                作者与历史
+              </a>
+            )}
+            <Diagnostic
+              value={{
+                revision: reader.revision,
+                source: reader.source,
+                metadata: reader.reading_metadata,
+              }}
+            />
+          </article>
+        )}
+        <div hidden={!!reader}>
+          {data && tab === "today" && (
+            <>
+              <p className="intro">
+                真实资料研究预览。先看公司与关键缺口，再阅读依据、补充研判。
+              </p>
+              <div className="overview">
+                {data.companies.map((c: any) => (
+                  <article key={c.id}>
+                    <h3>{c.name}</h3>
+                    <span
+                      className={
+                        "badge " +
+                        (c.score.quality_score == null ? "" : "success")
+                      }
+                    >
+                      {c.score.quality_score == null
+                        ? "资料可读 · 经营待评估"
+                        : "经营依据可评估"}
+                    </span>
+                    <p>
+                      经营质量：{human(c.score.quality_score)}；
+                      {c.timeline.items.length} 份关联资料
+                    </p>
+                    <GapList values={c.score.missing_data.slice(0, 2)} />
+                    <button
+                      disabled={busy}
+                      onClick={() => {
+                        setSelected(c.id);
+                        navigate("companies");
+                      }}
+                    >
+                      继续研究这家公司
+                    </button>
+                  </article>
+                ))}
+              </div>
+              {!data.companies.length && (
+                <p>
+                  暂无有权读取且已关联的公司资料。请由数据管理员接入获许可来源。
+                </p>
+              )}
+              <h3>最近已保存研究</h3>
+              {data.runs.length ? (
+                <p>
+                  {when(data.runs[0].created_at)} ·{" "}
+                  {data.runs[0].status === "partial"
+                    ? "待补依据"
+                    : "本次计算完成"}{" "}
+                  <button
+                    className="quiet"
+                    onClick={() => navigate("research")}
+                  >
+                    查看快照
+                  </button>
+                </p>
+              ) : (
+                <p>尚无研究快照；阅读并研判后可生成预览。</p>
+              )}
+            </>
+          )}
+          {data && tab === "companies" && (
+            <>
+              <label>
+                研究公司
+                <select
+                  value={selected || data.companies[0]?.id || ""}
+                  onChange={(e) => setSelected(e.target.value)}
+                >
+                  {data.companies.map((c: any) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {data.companies
+                .filter(
+                  (c: any) => c.id === (selected || data.companies[0]?.id),
+                )
+                .map((c: any) => (
+                  <CompanyPanel
+                    key={c.id}
+                    company={c}
+                    judgments={data.judgments.filter(
+                      (j: any) => j.company_id === c.id,
+                    )}
+                    watchIds={watchIds}
+                    toggle={toggle}
+                    busy={busy}
+                    allow={allow}
+                    execute={execute}
+                    read={read}
+                    error={error}
+                    research={() => navigate("research")}
+                  />
+                ))}
+              {!data.companies.length && <p>当前工作区暂无可研究公司。</p>}
+            </>
+          )}
+          {data && tab === "news" && (
+            <>
+              <p>
+                资料的公布 /
+                修订时间与系统取得时间分别展示，百科修订不等同公司事件。
+              </p>
+              {data.items.map((it: any) => (
+                <article key={it.id}>
+                  <div className="meta">
+                    <span>{it.source_name}</span>
+                    <span>资料日期 {it.publication_date || "未知"}</span>
+                  </div>
+                  <h3>{it.title}</h3>
+                  <p>{it.summary_text || "暂无摘要"}</p>
+                  <p className="muted">系统取得 {when(it.observed_at)}</p>
+                  <button
+                    className="quiet"
+                    disabled={busy}
+                    onClick={() => read(it.id)}
+                  >
+                    {it.body_state === "available"
+                      ? "阅读原文与来源"
+                      : "阅读摘要与来源"}
+                  </button>
+                </article>
+              ))}
+              {!data.items.length && (
+                <p>尚无可读资料。请接入具有保存与分析许可的来源。</p>
+              )}
+              <h3>当前研判</h3>
+              {data.judgments.map((j: any) => (
+                <Judgment
+                  key={j.slot_key}
+                  j={j}
+                  editable={allow("analysis.override")}
+                  execute={execute}
+                />
+              ))}
+              <button className="quiet" onClick={() => navigate("companies")}>
+                到公司页核对评价项并补充研判
+              </button>
+            </>
+          )}
+          {data && tab === "research" && (
+            <ResearchPage
+              data={data}
+              busy={busy}
+              read={read}
+              execute={execute}
+              allow={allow}
+              runKey={runKey}
+              nextKey={() => setRunKey(crypto.randomUUID())}
+            />
+          )}
+          {data && tab === "strategy" && (
+            <StrategyPage
+              data={data}
+              allow={allow}
+              busy={busy}
+              execute={execute}
+            />
+          )}
+          {data && tab === "mine" && (
+            <Mine
+              data={data}
+              busy={busy}
+              execute={execute}
+              openCompany={(id: string) => {
+                setSelected(id);
+                navigate("companies");
+              }}
+            />
+          )}
+          {data && tab === "tasks" && (
+            <>
+              <p>当前工作区的接入记录与本地处理任务。这里只显示运维元数据。</p>
+              <h3>接入记录</h3>
+              {data.sources.length ? (
+                data.sources.map((r: any) => (
+                  <article key={r.id}>
+                    <h4>{r.source_key}</h4>
+                    <p>{r.status}</p>
+                  </article>
+                ))
+              ) : (
+                <p>暂无接入记录。</p>
+              )}
+              <h3>处理任务</h3>
+              {data.tasks.length ? (
+                data.tasks.map((r: any) => (
+                  <article key={r.id}>
+                    <p>
+                      {r.stage}：
+                      {r.status === "completed"
+                        ? "完成"
+                        : r.status === "failed"
+                          ? "失败待恢复"
+                          : "等待处理"}
+                    </p>
+                    <p>{r.error}</p>
+                    {r.status === "failed" && allow("job.retry") && (
+                      <button
+                        disabled={busy}
+                        onClick={() =>
+                          execute(
+                            () => post(`/api/worker/outbox/${r.id}/retry`, {}),
+                            "已仅重试此项任务。",
+                          )
+                        }
+                      >
+                        只重试此项任务
+                      </button>
+                    )}
+                  </article>
+                ))
+              ) : (
+                <p>当前有界列表暂无任务；不代表没有重要业务动态。</p>
+              )}
+            </>
+          )}
+          {!data && !busy && !error && <p>尚未读取当前页面，点击刷新重试。</p>}
+        </div>
+      </main>
+    </div>
+  );
 }
-function FinancialSummary({data}:{data:any}){
- return <><h4>三年真实财务指标</h4><p>{data.report_rows} 条提供商记录；报告期和披露日期分别列示。</p><div className="table-scroll"><table><thead><tr><th>报告期</th><th>提供商标注披露日</th><th>利润字段原始值</th><th>EPS字段原始值</th><th>ROE字段原始值</th><th>股本字段原始值</th><th>CFO/利润字段原始值</th></tr></thead><tbody>{data.periods.map((p:any)=><tr key={p.stat_date}><td>{p.stat_date}</td><td>{[...new Set(Object.values(p.reports).map((r:any)=>r.pub_date))].join(' / ')}</td><td>{p.values.netProfit??'缺失'}</td><td>{p.values.epsTTM??'缺失'}</td><td>{p.values.roeAvg??'缺失'}</td><td>{p.values.totalShare??'缺失'}</td><td>{p.values.CFOToNP??'缺失'}</td></tr>)}</tbody></table></div>{data.annual_net_profit_field_change_pct!=null&&<p>三个完整年度的利润字段首末变化 {Number(data.annual_net_profit_field_change_pct).toFixed(2)}%（仅比较供应商同名字段）</p>}<p className="notice">{data.meaning}；货币、单位和范围未确认时，保留原始数值，不换算成标准评分。</p><details><summary>这些数据为什么还不能直接用于标准财务评分</summary>{data.missing_data.map((g:string)=><p key={g}>{g}</p>)}</details></>
+function CompanyPanel({
+  company: c,
+  judgments,
+  watchIds,
+  toggle,
+  busy,
+  allow,
+  execute,
+  read,
+  error,
+  research,
+}: any) {
+  const [index, setIndex] = useState(0);
+  const [author, setAuthor] = useState<any>();
+  const [financials, setFinancials] = useState<any>();
+  async function startAuthor() {
+    const docs = await execute(
+      () =>
+        Promise.all(
+          c.timeline.items.map((it: any) => api(`/api/intake/items/${it.id}`)),
+        ),
+      undefined,
+      false,
+    );
+    if (docs) setAuthor(docs.filter((d: any) => d.original_text && d.revision));
+  }
+  async function viewFinancials() {
+    setIndex(1);
+    const d = await execute(
+      async () => {
+        const runs = await api("/api/research/runs");
+        if (!runs.length) return [];
+        const run = await api(`/api/research/runs/${runs[0].id}`);
+        return (
+          run.result.companies
+            .find((x: any) => x.company_id === c.id)
+            ?.analysis.filter((a: any) => a.kind === "financial_summary") || []
+        );
+      },
+      undefined,
+      false,
+    );
+    if (d) setFinancials(d);
+  }
+  return (
+    <>
+      <article>
+        <h3>{c.name}</h3>
+        <p>
+          经营质量：{human(c.score.quality_score)}。依据{" "}
+          {c.score.known_dimensions.length}/
+          {Object.keys(c.score.dimensions).length} 个维度，加权覆盖{" "}
+          {(c.score.coverage * 100).toFixed(0)}%。
+        </p>
+        <GapList values={c.score.missing_data.slice(0, 2)} />
+        {allow("analysis.override") && (
+          <button disabled={busy || !c.catalog.length} onClick={startAuthor}>
+            补充一项真实研判
+          </button>
+        )}
+        <div className="securities">
+          {c.score.securities.map((s: any) => (
+            <section key={s.security_id}>
+              <h4>
+                {s.market === "HK" ? "港股" : "A股"} {s.ticker}
+              </h4>
+              <p className="quote">
+                {s.latest_quote
+                  ? `${s.latest_quote.raw_close} ${s.currency}`
+                  : "行情待接入"}
+              </p>
+              {s.latest_quote ? (
+                <p className="muted">
+                  {s.latest_quote.session}
+                  ，未复权参考日线价；尚未核验为正式策略用价。
+                </p>
+              ) : (
+                <p className="muted">
+                  A/H共用公司基本面；本证券需独立行情与汇率。
+                </p>
+              )}
+              <p>
+                PE：{human(s.pe_ttm)}；估值：{human(s.valuation_score)}
+              </p>
+              <p className="muted">正式状态：暂不提供，封存评估尚未就绪。</p>
+              {allow("watchlist.own") && (
+                <button
+                  className="quiet"
+                  disabled={busy || watchIds === null}
+                  onClick={() => toggle(s)}
+                >
+                  {watchIds === null
+                    ? "自选状态待读取"
+                    : watchIds.has(s.security_id)
+                      ? "已加入自选 · 点击移除"
+                      : "加入自选"}
+                </button>
+              )}
+              <details>
+                <summary>估值依据与缺口</summary>
+                <GapList values={s.missing_data} />
+                {s.basis && (
+                  <p>
+                    利润 {s.basis.ordinary_profit_ttm} / 股本{" "}
+                    {s.basis.ordinary_shares}，EPS {s.basis.eps}，汇率{" "}
+                    {s.basis.fx}；PE = 收盘价 {s.basis.raw_final_close} /
+                    换算EPS {s.basis.converted_eps}。
+                  </p>
+                )}
+                <Diagnostic value={s} />
+              </details>
+            </section>
+          ))}
+        </div>
+      </article>
+      <div className="tabs" role="tablist" aria-label="公司研究内容">
+        {companyTabs.map((label, i) => (
+          <button
+            key={label}
+            role="tab"
+            aria-selected={index === i}
+            aria-controls={"company-panel-" + i}
+            id={"company-tab-" + i}
+            tabIndex={index === i ? 0 : -1}
+            onKeyDown={(e) => {
+              if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
+                e.preventDefault();
+                const n =
+                  e.key === "Home"
+                    ? 0
+                    : e.key === "End"
+                      ? 3
+                      : (i + (e.key === "ArrowRight" ? 1 : 3)) % 4;
+                setIndex(n);
+                document.getElementById("company-tab-" + n)?.focus();
+                if (n === 1) viewFinancials();
+              }
+            }}
+            onClick={() => (i === 1 ? viewFinancials() : setIndex(i))}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <article
+        role="tabpanel"
+        id={"company-panel-" + index}
+        aria-labelledby={"company-tab-" + index}
+      >
+        {index === 0 && (
+          <>
+            <h3>经营质量与待补依据</h3>
+            <GapList values={c.score.missing_data} />
+            {Object.entries(c.score.dimensions).map(([d, v]: any) => (
+              <section key={d} className="dimension">
+                <h4>
+                  {dimensionName(d)}：{human(v.score)}{" "}
+                  <span className="muted">
+                    权重{" "}
+                    {(Number(c.score.template.weights[d]) * 100).toFixed(0)}%
+                  </span>
+                </h4>
+                <p>
+                  基准 {human(v.baseline)}；事件贡献{" "}
+                  {human(v.event_contribution)}；来源{" "}
+                  {c.score.template.field_origins?.[d]?.baseline ||
+                    c.score.template.origins[d]}
+                </p>
+                {v.reason && <p>{v.reason}</p>}
+                {v.criteria?.map((q: any) => (
+                  <p key={q.key}>
+                    {criterionName(q.key)}：
+                    {q.status === "valid" ? `${q.grade}档` : "待补"} {q.reason}
+                  </p>
+                ))}
+                <Diagnostic value={v} />
+              </section>
+            ))}
+          </>
+        )}
+        {index === 1 && (
+          <>
+            <h3>财务与估值依据</h3>
+            <p>
+              财务字段来自最近已保存预览，期间与提供商披露日期分别列示。新资料需生成新预览。
+            </p>
+            {financials === undefined ? (
+              <p role="status">读取财务参考…</p>
+            ) : financials.length ? (
+              financials.map((f: any) => (
+                <FinancialSummary key={f.source_revision_id} data={f} />
+              ))
+            ) : (
+              <p>尚无保存的财务字段比较。</p>
+            )}
+            <GapList values={c.score.missing_data} />
+            <button className="quiet" onClick={research}>
+              查看 / 生成研究预览
+            </button>
+          </>
+        )}
+        {index === 2 && (
+          <>
+            <h3>资料与研判</h3>
+            {c.timeline.items.map((it: any) => (
+              <p key={it.id}>
+                <button
+                  className="quiet"
+                  disabled={busy}
+                  onClick={() => read(it.id)}
+                >
+                  {it.title}
+                </button>
+              </p>
+            ))}
+            {judgments.length ? (
+              judgments.map((j: any) => (
+                <Judgment
+                  key={j.slot_key}
+                  j={j}
+                  catalog={c.catalog}
+                  editable={allow("analysis.override")}
+                  execute={execute}
+                />
+              ))
+            ) : (
+              <p>尚无可用研判。先阅读固定原文，再按评价项补充。</p>
+            )}
+            {allow("analysis.override") && (
+              <button
+                disabled={busy || !c.catalog.length}
+                onClick={startAuthor}
+              >
+                补充真实研判
+              </button>
+            )}
+            <button className="quiet" onClick={research}>
+              生成新的研究预览
+            </button>
+          </>
+        )}
+        {index === 3 && (
+          <TemplateEditor
+            company={c}
+            template={c.score.template}
+            allow={allow}
+            execute={execute}
+          />
+        )}
+      </article>
+      {author && (
+        <AuthorJudgment
+          company={c}
+          catalog={c.catalog}
+          documents={author}
+          execute={execute}
+          error={error}
+          close={() => setAuthor(null)}
+        />
+      )}
+    </>
+  );
 }
-function Judgment({j,editable,save}:any){const[commandKey,setCommandKey]=useState(crypto.randomUUID());const[releaseKey,setReleaseKey]=useState(crypto.randomUUID());const[value,setValue]=useState(j.kind==='rubric'?String(j.effective?.grade??''):String(j.effective?.magnitude??''));
- return <article><h3>{j.kind==='rubric'?'经营档位':'维度影响'} · {dimensionName(j.dimension)}</h3><p>当前有效值 {j.kind==='rubric'?j.effective?.grade:j.effective?.magnitude} {j.effective?.criterion||''}</p><Json value={j.effective}/>{editable?<><label>{j.kind==='rubric'?'完整新档位（0–4）':'完整新影响（−1到1）'}<input aria-label={j.kind==='rubric'?'新档位':'新影响'} value={value} onChange={e=>{setValue(e.target.value);setCommandKey(crypto.randomUUID())}}/></label><button onClick={async()=>{const r=await save(j.kind==='rubric'?{...j.effective,grade:Number(value)}:{...j.effective,magnitude:value},false,commandKey);if(r)setCommandKey(crypto.randomUUID())}}>保存人工覆盖</button> <button className="quiet" onClick={async()=>{const r=await save({},true,releaseKey);if(r)setReleaseKey(crypto.randomUUID())}}>解除人工覆盖</button></>:<p className="muted">当前身份只能查看判断。</p>}</article>
+function ResearchPage({
+  data,
+  busy,
+  read,
+  execute,
+  allow,
+  runKey,
+  nextKey,
+}: any) {
+  const [detail, setDetail] = useState(data.detail);
+  const [other, setOther] = useState<any>();
+  const [compareId, setCompareId] = useState("");
+  return (
+    <>
+      <p>
+        根据已取得资料生成新的研究预览，记录当次输入与口径。预览不改变正式入选状态。
+      </p>
+      {allow("analysis.override") && (
+        <button
+          disabled={busy}
+          onClick={async () => {
+            const r = await execute(
+              () =>
+                post("/api/research/runs", {}, { "Idempotency-Key": runKey }),
+              "研究预览已保存，请核对完成阶段与待补依据。",
+            );
+            if (r) {
+              setDetail(r);
+              nextKey();
+            }
+          }}
+        >
+          生成新的研究预览
+        </button>
+      )}
+      {data.runs.length ? (
+        <label>
+          已保存快照
+          <select
+            value={detail?.id || ""}
+            disabled={busy}
+            onChange={async (e) => {
+              const d = await execute(
+                () => api(`/api/research/runs/${e.target.value}`),
+                undefined,
+                false,
+              );
+              if (d) {
+                setDetail(d);
+                setOther(null);
+                setCompareId("");
+              }
+            }}
+          >
+            {data.runs.map((r: any) => (
+              <option key={r.id} value={r.id}>
+                {when(r.created_at)} ·{" "}
+                {r.status === "partial" ? "待补依据" : "完成"}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <p>尚无研究快照。</p>
+      )}
+      {detail && (
+        <>
+          <label>
+            比较另一份已保存快照
+            <select
+              value={compareId}
+              onChange={(e) => setCompareId(e.target.value)}
+            >
+              <option value="">请选择</option>
+              {data.runs
+                .filter((r: any) => r.id !== detail.id)
+                .map((r: any) => (
+                  <option key={r.id} value={r.id}>
+                    {when(r.created_at)}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <button
+            className="quiet"
+            disabled={!compareId || busy}
+            onClick={async () => {
+              const d = await execute(
+                () => api(`/api/research/runs/${compareId}`),
+                undefined,
+                false,
+              );
+              if (d) setOther(d);
+            }}
+          >
+            比较已保存结果
+          </button>
+          {other && <CompareRuns left={detail} right={other} />}
+          <ResearchResult run={detail} read={read} />
+        </>
+      )}
+    </>
+  );
 }
-createRoot(document.getElementById('root')!).render(<App/>);
+const fieldName = (k: string) =>
+  ({
+    "company.quality_score": "经营质量分",
+    "company.coverage": "加权覆盖度",
+    "security.valuation_score": "证券估值分",
+    "metrics.roe_ttm": "TTM ROE",
+    "metrics.cfo_profit_3y": "三年累计CFO/利润",
+    "metrics.net_debt_ebitda": "净负债/EBITDA",
+  })[k] || k;
+function StrategyPage({ data, allow, busy, execute }: any) {
+  const rule = data.rule;
+  const [threshold, setThreshold] = useState(
+    rule.rules.enter.all.find((r: any) => r.field === "company.quality_score")
+      .value,
+  );
+  const [preview, setPreview] = useState<any>();
+  const [confirm, setConfirm] = useState(false);
+  const [historical, setHistorical] = useState<any>();
+  return (
+    <>
+      <article>
+        <h3>{rule.rules.name}</h3>
+        <p>
+          {rule.version ? `已发布版本 ${rule.version}` : "参考基准，尚未发布"}
+        </p>
+        <div className="securities">
+          {["enter", "retain"].map((k) => (
+            <section key={k}>
+              <h4>{k === "enter" ? "准入门槛" : "保持门槛"}</h4>
+              {rule.rules[k].all.map((r: any) => (
+                <p key={r.field}>
+                  {fieldName(r.field)} {r.op === "gte" ? "≥" : "≤"} {r.value}
+                </p>
+              ))}
+            </section>
+          ))}
+        </div>
+        <details>
+          <summary>适用范围、时效与硬风险</summary>
+          <p>
+            市场：{rule.rules.universe.markets.join(" / ")}；排除行业：
+            {rule.rules.universe.exclude_sector_groups.join(" / ")}。
+          </p>
+          <p>
+            必需维度：
+            {rule.rules.quality_gates.required_dimensions
+              .map(dimensionName)
+              .join("、")}
+            ；经营判断最长 {rule.rules.quality_gates.baseline_max_age_days}{" "}
+            天；财务按报告义务。
+          </p>
+          <p>
+            已确认欺诈、重大持续经营、债务违约或退市风险按目标证券排除；参考日线不能替代FINAL评估价格。
+          </p>
+        </details>
+        <Diagnostic value={rule.rules} />
+      </article>
+      {allow("strategy.simulate") && (
+        <article>
+          <h3>规则草稿</h3>
+          <p>只修改经营质量准入门槛，其他规则保留当前发布值。</p>
+          <label>
+            经营质量准入门槛
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={threshold}
+              onChange={(e) => {
+                setThreshold(e.target.value);
+                setPreview(null);
+                setConfirm(false);
+              }}
+            />
+          </label>
+          <button
+            disabled={busy || threshold === ""}
+            onClick={async () => {
+              const r = await execute(
+                () =>
+                  post("/api/strategy/simulate", {
+                    quality_threshold: threshold,
+                    expected_version: rule.version,
+                  }),
+                undefined,
+                false,
+              );
+              if (r) setPreview(r);
+            }}
+          >
+            进行模拟测算
+          </button>
+          {preview && (
+            <>
+              <h4>
+                当前版本 → 草稿：
+                {
+                  rule.rules.enter.all.find(
+                    (g: any) => g.field === "company.quality_score",
+                  ).value
+                }{" "}
+                → {threshold}
+              </h4>
+              {preview.results.map((r: any) => (
+                <section key={r.security_id}>
+                  <p>
+                    {r.company} {r.ticker}：
+                    {r.status === "risk_excluded"
+                      ? "风险排除"
+                      : r.status === "suspended"
+                        ? "暂停评估"
+                        : r.status === "not_applicable"
+                          ? "不适用"
+                          : r.passes == null
+                            ? "待评估"
+                            : r.passes
+                              ? "满足条件"
+                              : "未满足条件"}
+                  </p>
+                  <GapList values={r.gaps} />
+                  <details>
+                    <summary>逐项数值条件</summary>
+                    {r.conditions.map((q: any) => (
+                      <p key={q.field}>
+                        {fieldName(q.field)}：{q.actual ?? "缺失"}{" "}
+                        {q.op === "gte" ? "≥" : "≤"} {q.expected}；
+                        {q.result === null
+                          ? "待评估"
+                          : q.result
+                            ? "满足"
+                            : "未满足"}
+                      </p>
+                    ))}
+                  </details>
+                </section>
+              ))}
+              <Diagnostic value={preview.rules} />
+              {allow("strategy.publish") &&
+                (confirm ? (
+                  <>
+                    <p className="notice">
+                      发布所见草稿与模拟输入。新版本发布后仍需正式评估，模拟满足不代表入选。
+                    </p>
+                    <button
+                      disabled={busy}
+                      onClick={async () => {
+                        const r = await execute(
+                          () =>
+                            post("/api/strategy/publish", {
+                              quality_threshold: threshold,
+                              expected_version: preview.expected_version,
+                              simulation_token: preview.simulation_token,
+                            }),
+                          "策略新版本已发布，正式评估尚未生成。",
+                        );
+                        if (r) {
+                          setPreview(null);
+                          setConfirm(false);
+                        }
+                      }}
+                    >
+                      确认发布策略
+                    </button>
+                    <button className="quiet" onClick={() => setConfirm(false)}>
+                      取消
+                    </button>
+                  </>
+                ) : (
+                  <button disabled={busy} onClick={() => setConfirm(true)}>
+                    发布策略新版本
+                  </button>
+                ))}
+            </>
+          )}
+        </article>
+      )}
+      <h3>正式变化记录</h3>
+      <p>当前正式入选状态暂不提供；空变化记录不能推断未入选。</p>
+      {data.changes.map((t: any) => (
+        <article key={t.id}>
+          <p>
+            {t.session}：{t.from} → {t.to}（{t.reason}）
+          </p>
+          <button
+            className="quiet"
+            onClick={async () => {
+              const d = await execute(
+                () => api(`/api/strategy/evaluations/${t.evaluation_id}`),
+                undefined,
+                false,
+              );
+              if (d) setHistorical(d);
+            }}
+          >
+            查看固定历史解释
+          </button>
+        </article>
+      ))}
+      {historical && (
+        <article>
+          <h3>固定历史解释</h3>
+          <p>
+            当次结果：
+            {historical.result.risk
+              ? "风险排除"
+              : historical.result.passes === true
+                ? "满足条件"
+                : historical.result.passes === false
+                  ? "未满足条件"
+                  : "待评估"}
+            ；应用状态 {historical.application}。
+          </p>
+          <Diagnostic value={historical} />
+        </article>
+      )}
+    </>
+  );
+}
+function Mine({ data, busy, execute, openCompany }: any) {
+  const [id, setId] = useState(data.companies[0]?.id || "");
+  const [note, setNote] = useState("");
+  return (
+    <>
+      <article>
+        <h3>我的证券自选</h3>
+        {data.watch.length ? (
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>证券</th>
+                  <th>参考报价</th>
+                  <th>正式状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.watch.map((w: any) => (
+                  <tr key={w.security_id}>
+                    <td>
+                      {w.market === "HK" ? "港股" : "A股"} {w.ticker}
+                    </td>
+                    <td>
+                      {(() => {
+                        const q = data.companies
+                          .find((c: any) => c.id === w.company_id)
+                          ?.score.securities.find(
+                            (s: any) => s.security_id === w.security_id,
+                          )?.latest_quote;
+                        return q
+                          ? `${q.raw_close} ${q.currency}（${q.session}）`
+                          : "行情待接入";
+                      })()}
+                    </td>
+                    <td>暂不提供正式入选状态</td>
+                    <td>
+                      <button
+                        className="quiet"
+                        onClick={() => openCompany(w.company_id)}
+                      >
+                        查看公司与参考报价
+                      </button>
+                      <button
+                        className="quiet"
+                        disabled={busy}
+                        onClick={() =>
+                          execute(
+                            () =>
+                              api(`/api/me/watchlist/${w.security_id}`, {
+                                method: "DELETE",
+                              }),
+                            "已取消此证券自选。",
+                          )
+                        }
+                      >
+                        取消自选
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>暂无自选，在公司页分别加入A股或港股。</p>
+        )}
+      </article>
+      <article>
+        <h3>研究笔记</h3>
+        <label>
+          公司
+          <select value={id} onChange={(e) => setId(e.target.value)}>
+            {data.companies.map((c: any) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          笔记内容
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} />
+        </label>
+        <button
+          disabled={busy || !note.trim() || !id}
+          onClick={async () => {
+            const r = await execute(
+              () => post("/api/me/notes", { company_id: id, body: note }),
+              "笔记已保存。",
+            );
+            if (r) setNote("");
+          }}
+        >
+          保存笔记
+        </button>
+        {data.notes.map((n: any) => (
+          <section key={n.id}>
+            <h4>
+              {data.companies.find((c: any) => c.id === n.company_id)?.name}
+            </h4>
+            <p className="note">{n.body}</p>
+          </section>
+        ))}
+      </article>
+    </>
+  );
+}
+createRoot(document.getElementById("root")!).render(<App />);

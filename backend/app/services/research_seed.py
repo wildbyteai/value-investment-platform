@@ -48,7 +48,7 @@ def seed_rubrics(db, workspace_id=None, actor_id=None):
                 effective_at=original.effective_at,published_at=original.published_at,
                 evidence_json=canonical([{'input_id':original.id,'hash':original.content_hash,'locator':criterion['key'],
                                           'issuer_original':True}]),
-                value_json=canonical({'criterion':criterion['key'],'grade':payload['grades'][dim],'confidence':'0.95'}))
+                value_json=canonical({'rubric_ref':rubric,'period_start':'2026-01-01','period_end':'2026-12-31','criterion':criterion['key'],'grade':payload['grades'][dim],'confidence':'0.95'}))
             db.add(rev);db.flush();slot.effective_revision_id=rev.id
             record(db,workspace_id,actor_id,'judgment.auto_accepted','judgment_slot',slot.id,{'revision_id':rev.id})
             created+=1

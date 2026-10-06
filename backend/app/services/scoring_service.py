@@ -50,7 +50,17 @@ def resolve_template(company, db=None, workspace_id=None, at=None):
             return {**result, 'release_id': release.id, 'config_hash': release.config_hash}
     base = config('scoring-standard-v1.json')
     result = {**base, 'weights': {k: float(v) for k,v in base['dimension_weights'].items()},
-              'levels_applied': ['base'], 'origins': {k: 'base-standard@2' for k in base['dimension_weights']}}
+              'levels_applied': ['base'], 'origins': {k: 'base-standard@2' for k in base['dimension_weights']},
+              'field_origins': {k: {f: 'base-standard@2' for f in ('weight','baseline','quality_policy','event_policy')} for k in base['dimension_weights']},
+              'industry_key': company.industry_key}
+    registry = config('dimensions-standard-v1.json')
+    result['registry_hash'] = digest(registry)
+    result['rubric_hash'] = digest(config('rubrics-standard-v1.json'))
+    defaults = {entry['dimension']: entry for entry in registry['entries']}
+    for d in result['weights']:
+        policies = result.setdefault('dimension_policies', {}).setdefault(d, {})
+        for field in ('quality_policy', 'event_policy'):
+            policies.setdefault(field, defaults[d][field])
     for template in config('templates-standard-v1.json')['templates'][1:]:
         matches = ((template['level'] == 'industry' and template['scope']['industry_key'] == company.industry_key)
                    or (template['level'] == 'company' and company.id == template['scope']['company_id']))
@@ -61,20 +71,33 @@ def resolve_template(company, db=None, workspace_id=None, at=None):
     return result
 
 
-def merge_policy(parent, patch):
-    merged=json.loads(canonical(parent))
-    for key,value in patch.items():
-        merged[key]=merge_policy(merged.get(key,{}),value) if isinstance(value,dict) else value
-    return merged
-
-
 def apply_patches(result, patches, origin):
     result = json.loads(canonical(result))
+    registry = {e['dimension']: e for e in config('dimensions-standard-v1.json')['entries']}
+    seen = set()
     for patch in patches:
-        if set(patch) - {'dimension','weight','reason','baseline','quality_policy','event_policy'}:
+        if set(patch) - {'dimension','weight','reason','baseline','quality_policy','event_policy','disabled'}:
             raise ValueError('存在不支持的模板字段')
         d = patch['dimension']
         if not isinstance(d, str): raise ValueError('维度标识必须为字符串')
+        if d in seen: raise ValueError('同一维度不能重复patch')
+        seen.add(d)
+        if d not in registry: raise ValueError('维度尚未注册')
+        if result.get('industry_key') and result['industry_key'] not in registry[d]['applicable_industries']:
+            raise ValueError('维度不适用当前行业')
+        if 'disabled' in patch:
+            if patch['disabled'] is not True or set(patch) - {'dimension','disabled','reason'}:
+                raise ValueError('禁用不能混用其他覆盖字段')
+            if d in config('strategy-standard-v1.json')['quality_gates']['required_dimensions']:
+                raise ValueError('必需维度不可禁用')
+            for key in ('weights','baselines','dimension_policies'):
+                result.get(key, {}).pop(d, None)
+            result.setdefault('disabled_dimensions', {})[d] = origin
+            continue
+        if d not in result['weights']:
+            if not d.startswith('x_') or not {'weight','baseline'} <= set(patch):
+                raise ValueError('新增注册维度需要权重和完整baseline')
+            result.setdefault('dimension_policies', {})[d] = {f: registry[d][f] for f in ('quality_policy','event_policy')}
         for field in ('baseline','quality_policy','event_policy'):
             if field in patch and not isinstance(patch[field],dict): raise ValueError('模板政策必须是对象')
         if d not in result['weights'] and not d.startswith('x_'):
@@ -83,46 +106,73 @@ def apply_patches(result, patches, origin):
         if 'baseline' in patch: result['baselines'][d] = patch['baseline']
         if 'quality_policy' in patch:
             policies=result.setdefault('dimension_policies',{}).setdefault(d,{})
-            policies['quality_policy']=merge_policy(policies.get('quality_policy',{}),patch['quality_policy'])
+            policies['quality_policy']=patch['quality_policy']
         if 'event_policy' in patch:
             policies=result.setdefault('dimension_policies',{}).setdefault(d,{})
-            policies['event_policy']=merge_policy(policies.get('event_policy',{}),patch['event_policy'])
+            policies['event_policy']=patch['event_policy']
         result['origins'][d] = origin
+        origins = result.setdefault('field_origins', {}).setdefault(d, {f:'dimensions-standard-v1@1' for f in ('quality_policy','event_policy')})
+        for field in ('weight','baseline','quality_policy','event_policy'):
+            if field in patch:
+                for stale_key in list(origins):
+                    if stale_key.startswith(field+'.'): del origins[stale_key]
+                origins[field] = origin
+                if isinstance(patch[field], dict):
+                    for key, value in patch[field].items():
+                        origins[field+'.'+key] = origin
+                        if isinstance(value, dict):
+                            for subkey in value: origins[field+'.'+key+'.'+subkey] = origin
+        result.get('disabled_dimensions', {}).pop(d, None)
     if sum(dec(v) for v in result['weights'].values()) != 1:
         raise ValueError('维度权重之和必须为1')
     if any(not dec(v).is_finite() or dec(v)<0 for v in result['weights'].values()):
         raise ValueError('权重必须为非负有限数值')
-    catalog={**config('rubrics-standard-v1.json')['rubrics'],**config('rubrics-synthetic-v03.json')['rubrics']}
+    catalog=config('rubrics-standard-v1.json')['rubrics']
+    if data_mode.fixture_mode(): catalog={**catalog,**config('rubrics-synthetic-v03.json')['rubrics']}
     for d in result['weights']:
         if d not in result['baselines']:
             raise ValueError('新增维度需要完整baseline')
         baseline=result['baselines'][d]
+        if baseline.get('method') not in registry[d]['allowed_baseline_methods']:
+            raise ValueError('注册维度不允许该计算方法')
         if baseline.get('method')=='accepted_evidence_rubric':
             if baseline.get('rubric_ref') not in catalog: raise ValueError('rubric引用未发布')
         elif baseline.get('method')=='weighted_metric_rubric':
             metrics=baseline.get('metrics')
             if not isinstance(metrics,list) or not metrics: raise ValueError('需要完整指标定义')
-            registry=config('metric-definitions-v2.json')['metrics']
+            metric_registry=config('metric-definitions-v2.json')['metrics']
             for metric in metrics:
                 if not isinstance(metric,dict) or not {'key','weight','zero_at','full_at'} <= set(metric): raise ValueError('指标形状错误')
-                if metric['key'] not in registry: raise ValueError('指标尚未定义')
+                if metric['key'] not in metric_registry: raise ValueError('指标尚未定义')
                 numbers=[dec(metric[k]) for k in ('weight','zero_at','full_at')]
                 if not all(v.is_finite() for v in numbers) or numbers[0]<=0 or numbers[1]==numbers[2]: raise ValueError('指标数值不合法')
             if sum(dec(m['weight']) for m in metrics)!=1: raise ValueError('指标权重之和必须为1')
         else: raise ValueError('不支持的baseline方法')
         policies=result.get('dimension_policies',{}).get(d,{})
         event=policies.get('event_policy',{})
-        if set(event)-{'enabled','half_life_days'} or ('enabled' in event and type(event['enabled']) is not bool):
+        if type(event.get('enabled')) is not bool or (event['enabled'] and set(event) != {'enabled','half_life_days'}) or (not event['enabled'] and set(event) != {'enabled'}):
             raise ValueError('事件政策不合法')
-        if 'half_life_days' in event and (type(event['half_life_days']) is not int or event['half_life_days']<=0):
+        if 'half_life_days' in event and (type(event['half_life_days']) is not int or not 1<=event['half_life_days']<=730):
             raise ValueError('半衰期必须为正整数')
         quality=policies.get('quality_policy',{})
-        if quality and quality.get('evidence_requirement') not in ('accessible_original','issuer_or_regulator_original'):
+        if set(quality)!={'evidence_requirement','freshness'} or quality.get('evidence_requirement') not in ('accessible_original','issuer_or_regulator_original'):
             raise ValueError('证据要求不合法')
         freshness=quality.get('freshness',{})
-        if not isinstance(freshness,dict) or freshness.get('kind') not in (None,'age_days','report_obligation'): raise ValueError('新鲜度政策不合法')
-        if freshness.get('kind')=='age_days' and (type(freshness.get('max_age_days')) is not int or freshness['max_age_days']<=0):
+        if not isinstance(freshness,dict) or freshness.get('kind') not in ('age_days','report_obligation'): raise ValueError('新鲜度政策不合法')
+        if freshness.get('kind')=='age_days' and (type(freshness.get('max_age_days')) is not int or not 1<=freshness['max_age_days']<=3650):
             raise ValueError('证据龄期必须为正整数')
+        expected_kind='age_days' if baseline['method']=='accepted_evidence_rubric' else 'report_obligation'
+        if freshness['kind']!=expected_kind or set(freshness)!=({'kind','max_age_days'} if expected_kind=='age_days' else {'kind'}):
+            raise ValueError('新鲜度政策不符合维度计算方法')
+    for d, policies in result.get('dimension_policies',{}).items():
+        origins=result.setdefault('field_origins',{}).setdefault(d,{})
+        for field, values in policies.items():
+            for key,value in values.items():
+                origins.setdefault(field+'.'+key,origins.get(field,'base-standard@2'))
+                if isinstance(value,dict):
+                    for subkey in value: origins.setdefault(field+'.'+key+'.'+subkey,origins.get(field,'base-standard@2'))
+    result.pop('config_hash', None)
+    result['config_hash'] = digest(result)
     return result
 
 
@@ -162,20 +212,20 @@ def current_decisions(db, company_id, workspace_id, as_of, cutoff):
         revisions = db.scalars(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,
             JudgmentRevision.created_at <= cutoff).order_by(JudgmentRevision.created_at,JudgmentRevision.id)).all()
         # Published/effective bounds guard historical selection. Explicit release
-        # reverts to the latest still legal AUTO, rather than resurrecting HUMAN.
+        # clears prior AUTO/HUMAN; a subsequent legal reassessment is required.
         effective=None; auto=None
         for rev in revisions:
             if rev.effective_at and rev.effective_at>as_of: continue
             if rev.published_at and rev.published_at>as_of: continue
-            if rev.valid_until and as_of>=rev.valid_until: continue
             if rev.author_type=='auto' and rev.decision=='accepted':
                 auto=rev
                 if effective is None or effective.author_type=='auto': effective=rev
             elif rev.author_type=='human':
-                if rev.decision=='released': effective=auto
+                if rev.decision=='released': effective=None; auto=None
                 elif rev.decision=='accepted': effective=rev
-        if effective and (data_mode.fixture_mode() or data_mode.real_evidence(db,json.loads(effective.evidence_json),workspace_id,company_id,cutoff)):
+        if effective and not (effective.valid_until and as_of>=effective.valid_until) and (data_mode.fixture_mode() or data_mode.real_evidence(db,json.loads(effective.evidence_json),workspace_id,company_id,cutoff)):
             out.append((slot,effective,json.loads(effective.value_json)))
+    out.sort(key=lambda entry:(entry[1].effective_at or entry[1].created_at,entry[1].created_at,entry[1].id),reverse=True)
     return out
 
 
@@ -190,10 +240,11 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
     if financial and as_of>=datetime.fromisoformat(financial['obligation_valid_until']): financial=None
     metrics=metrics_from_financials(financial)
     decisions=current_decisions(db,company.id,workspace_id,as_of,cutoff)
-    rubric_catalog={**config('rubrics-standard-v1.json')['rubrics'],**config('rubrics-synthetic-v03.json')['rubrics']}
+    rubric_catalog=config('rubrics-standard-v1.json')['rubrics']
+    if data_mode.fixture_mode(): rubric_catalog={**rubric_catalog,**config('rubrics-synthetic-v03.json')['rubrics']}
     dimensions={};known={}
     for dim,weight in template['weights'].items():
-        method=template['baselines'][dim];baseline=None;subcoverage=Decimal(0);refs=[];events=[]
+        method=template['baselines'][dim];baseline=None;subcoverage=Decimal(0);refs=[];events=[];criterion_states=[];latest_age=None
         if method['method']=='weighted_metric_rubric':
             values=[]
             for metric in method['metrics']:
@@ -207,7 +258,10 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
             rubric=rubric_catalog[method['rubric_ref']];grades=[]
             for criterion in rubric['criteria']:
                 found=next(((s,r,v) for s,r,v in decisions if s.kind=='rubric' and s.dimension==dim
-                            and v.get('criterion')==criterion['key']),None)
+                            and v.get('criterion')==criterion['key'] and v.get('rubric_ref')==method['rubric_ref']
+                            and v.get('period_start','9999') <= as_of.date().isoformat() <= v.get('period_end','0000')),None)
+                criterion_state={'key':criterion['key'], 'anchors':criterion['anchors'], 'status':'missing', 'reason':'尚无适用期间的有效研判'}
+                criterion_states.append(criterion_state)
                 if found:
                     _,rev,value=found;evidence=json.loads(rev.evidence_json)
                     policy=template.get('dimension_policies',{}).get(dim,{}).get('quality_policy',{})
@@ -216,7 +270,12 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
                     allowed=evidence and as_of<acquired+__import__('datetime').timedelta(days=max_age)
                     if policy.get('evidence_requirement')=='issuer_or_regulator_original':
                         allowed=allowed and all(e.get('issuer_original') for e in evidence)
+                    age = max(0, (as_of-acquired).total_seconds()/86400)
+                    criterion_state.update({'status':'valid' if allowed else 'stale_or_ineligible',
+                        'reason':None if allowed else '证据类别或有效期限不满足当前模板',
+                        'grade':value['grade'],'revision_id':rev.id,'age_days':age})
                     if allowed:
+                        latest_age = max(latest_age or 0, age)
                         grades.append(dec(value['grade']));refs.append(rev.id)
             subcoverage=q(Decimal(len(grades))/len(rubric['criteria']))
             if grades and subcoverage>=dec(rubric['minimum_criterion_coverage']): baseline=q(sum(grades)/len(grades)/4*100)
@@ -243,19 +302,33 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
         score=q(max(Decimal(0),min(Decimal(100),baseline+contribution))) if baseline is not None else None
         if score is not None: known[dim]=score
         dimensions[dim]={'baseline':numeric(baseline) if baseline is not None else None,'event_contribution':numeric(contribution),
-                         'score':numeric(score) if score is not None else None,'subcoverage':numeric(subcoverage),'evidence_ids':refs,'events':events}
+                         'score':numeric(score) if score is not None else None,'subcoverage':numeric(subcoverage),'evidence_ids':refs,'events':events,
+                         'status':'valid' if score is not None else 'pending_evidence',
+                         'reason':None if score is not None else '标准财务科目不足' if method['method']=='weighted_metric_rubric' else '有效评价项不足',
+                         'criteria':criterion_states,'baseline_age_days':latest_age}
     coverage=q(sum(dec(template['weights'][d]) for d in known))
     observed=q(sum(dec(template['weights'][d])*known[d] for d in known)/coverage) if coverage else None
     quality=observed if coverage>=dec(template['minimum_company_coverage']) else None
+    missing=[]
+    if quality is None:
+        if not financial and any(template['baselines'][d]['method']=='weighted_metric_rubric' and d not in known for d in template['weights']):
+            missing.extend(observation.get('missing_data',[]) if observation else ['可追溯的财务报告（TTM利润、权益、债务、现金流及报告义务时间）'])
+        names={'business_model':'商业模式','governance':'治理与资本配置','growth_sustainability':'成长持续性'}
+        for d in template['weights']:
+            if template['baselines'][d]['method']=='accepted_evidence_rubric' and d not in known:
+                missing.append(names.get(d,d)+'：仍有评价项未获合格依据，详见逐项状态')
     return {'company_id':company.id,'company_name':company.name,'template':template,'coverage':float(coverage),
             'coverage_exact':numeric(coverage),'known_dimensions':list(known),'dimensions':dimensions,
             'quality_score':float(quality) if quality is not None else None,'quality_exact':numeric(quality) if quality is not None else None,
             'observed_quality':numeric(observed) if observed is not None else None,
+            'industry_key':company.industry_key,
+            'risk_status':'clear', 'hard_risks':[v for s,r,v in decisions if s.kind=='risk' and v.get('confirmed')],
+            'financial_valid':financial is not None,
             'metrics':{k:numeric(v) if v is not None else None for k,v in metrics.items()},
             'reasons':[] if quality is not None else ['INSUFFICIENT_EVIDENCE'],
             'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public',
             'financial_observations_available':observation is not None,
-            'missing_data':[] if quality is not None else (observation.get('missing_data',[]) if observation else ['可追溯的财务报告（TTM利润、权益、债务、现金流及报告义务时间）'])+['有原文定位的商业模式、治理、成长判断'],
+            'missing_data':missing,
             'as_of':as_of.isoformat(),'knowledge_cutoff':cutoff.isoformat(),
             'input_refs':[{'id':r.id,'hash':r.content_hash} for r in rows],
             'judgment_refs':[{'id':r.id,'slot':s.id,'generation':s.generation} for s,r,v in decisions]}
@@ -275,7 +348,7 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
     if security.currency!='CNY' and (not price or not price.get('fx_per_cny')):gaps.append('跨币种估值需要对应汇率')
     result={'security_id':security.id,'market':security.market,'ticker':security.ticker,'currency':security.currency,
             'pe_ttm':None,'valuation_score':None,'reason':'UNKNOWN_PE','latest_quote':price,
-            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows]}
+            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(f and f.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}
     if not f or not price: return result
     if not price.get('is_final') or (session and price['session']!=session):
         return {**result,'reason':'FINAL_PRICE_REQUIRED'}

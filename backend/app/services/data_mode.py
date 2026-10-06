@@ -72,7 +72,8 @@ def real_evidence(db, refs, workspace_id, company_id=None, cutoff=None):
             return False
         if cutoff and revision.created_at > cutoff:
             return False
-        if ref.get('hash') != revision.content_hash:
+        from app.services.transactions import digest
+        if digest(json.loads(revision.payload_json)) != revision.content_hash or ref.get('hash') != revision.content_hash:
             return False
         if company_id and not db.scalar(select(ItemCompanyLink.id).where(
             ItemCompanyLink.item_id == item.id, ItemCompanyLink.company_id == company_id,

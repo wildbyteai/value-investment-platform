@@ -284,6 +284,24 @@ export interface paths {
         /** List Effective */
         get: operations["list_effective_api_judgments_get"];
         put?: never;
+        /** Create Judgment */
+        post: operations["create_judgment_api_judgments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/judgments/catalog/{company_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Rubric Catalog */
+        get: operations["rubric_catalog_api_judgments_catalog__company_id__get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -489,7 +507,8 @@ export interface paths {
         put?: never;
         /** Add Watch */
         post: operations["add_watch_api_me_watchlist__security_id__post"];
-        delete?: never;
+        /** Remove Watch */
+        delete: operations["remove_watch_api_me_watchlist__security_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -581,6 +600,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/worker/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Source Runs */
+        get: operations["source_runs_api_worker_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api": {
         parameters: {
             query?: never;
@@ -602,6 +638,64 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CreateIn */
+        CreateIn: {
+            /** Company Id */
+            company_id: string;
+            /** Dimension */
+            dimension: string;
+            /** Rubric Ref */
+            rubric_ref: string;
+            /** Criterion */
+            criterion: string;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Grade */
+            grade: number;
+            /** Confidence */
+            confidence: number | string;
+            /** Reason */
+            reason: string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /**
+             * Valid Until
+             * Format: date-time
+             */
+            valid_until: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceIn"][];
+        };
+        /** EvidenceIn */
+        EvidenceIn: {
+            /** Source Revision Id */
+            source_revision_id: string;
+            /** Hash */
+            hash: string;
+            /** Start */
+            start: number;
+            /** End */
+            end: number;
+            /** Quote */
+            quote: string;
+            /**
+             * Relation
+             * @default supports
+             * @enum {string}
+             */
+            relation: "supports" | "contradicts";
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -635,6 +729,8 @@ export interface components {
              * @default 70
              */
             quality_threshold: string;
+            /** Simulation Token */
+            simulation_token?: string | null;
         };
         /** RunDetail */
         RunDetail: {
@@ -1143,6 +1239,72 @@ export interface operations {
             };
         };
     };
+    create_judgment_api_judgments_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rubric_catalog_api_judgments_catalog__company_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     override_api_judgments__slot_key__override_post: {
         parameters: {
             query?: never;
@@ -1504,6 +1666,37 @@ export interface operations {
             };
         };
     };
+    remove_watch_api_me_watchlist__security_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                security_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_watch_api_me_watchlist_get: {
         parameters: {
             query?: never;
@@ -1655,6 +1848,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    source_runs_api_worker_sources_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

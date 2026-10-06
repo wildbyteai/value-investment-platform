@@ -1,6 +1,6 @@
 # GPT Pro：当前产品UX设计完善与整体评审（只读GitHub）
 
-日期：2026-10-05，主干交接版。此入口承接docs/18修订1及当前产品整体交接，不使用附件、压缩包、本机路径或本地浏览器。下方完整提示词可直接发给GPT Pro。
+日期：2026-10-06，实施后主干交接版。此入口承接docs/18修订2及当前产品整体交接，不使用附件、压缩包、本机路径或本地浏览器。下方完整提示词可直接发给GPT Pro。
 
 ## 完整提示词
 
@@ -15,22 +15,22 @@
 以下链接帮助定位，实际读取时用解析到的commit SHA替换main部分。
 
 1. [PROJECT](https://github.com/wildbyteai/value-investment-platform/blob/main/PROJECT.md)、[README](https://github.com/wildbyteai/value-investment-platform/blob/main/README.md)、[AGENTS](https://github.com/wildbyteai/value-investment-platform/blob/main/AGENTS.md)：当前阶段、范围与规则。
-2. [18 UX/文案重设计修订1](https://github.com/wildbyteai/value-investment-platform/blob/main/docs/18-ux-and-copywriting-redesign.md)：本轮要参与完善的设计提案，重点读术语字典、七页流程、依赖和UX18验收。另读[既有评审处置索引](https://github.com/wildbyteai/value-investment-platform/blob/main/review/PRE-MAIN-DISPOSITION.md)，核对已修订与未实现的区别。
+2. [18 UX/文案重设计修订2](https://github.com/wildbyteai/value-investment-platform/blob/main/docs/18-ux-and-copywriting-redesign.md)：已评审实施的设计方案，重点读术语字典、七页流程、依赖和UX18验收。另读[既有评审处置索引](https://github.com/wildbyteai/value-investment-platform/blob/main/review/PRE-MAIN-DISPOSITION.md)，核对已修订与未实现的区别。
 3. [当前交接](https://github.com/wildbyteai/value-investment-platform/blob/main/review/CURRENT-HANDOFF.md)、[版本验证与缺口](https://github.com/wildbyteai/value-investment-platform/blob/main/versions/v0.0.1/VERIFICATION.md)、[真实数据证据](https://github.com/wildbyteai/value-investment-platform/blob/main/versions/v0.0.1/REAL-DATA.md)：当前真实主路径、历史检查和未完成能力。不要执行交接中的本机命令。
-4. 实际UI源码：[app.tsx](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/app.tsx)、[style.css](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/style.css)、[client.ts](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/client.ts)。这是当前产品；`prototype/`只是历史合成设计原型。
+4. 实际UI源码：[app.tsx](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/app.tsx)、[style.css](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/style.css)、[client.ts](https://github.com/wildbyteai/value-investment-platform/blob/main/frontend/src/client.ts)，以及拆分的ui.tsx、judgments.tsx、template.tsx。这是当前产品；`prototype/`只是历史合成设计原型。
 5. 业务依据：`docs/01-product-requirements.md`、`02-business-design.md`、`06-ux-and-design-system.md`、`11-templates-automation-and-roles.md`、`12-time-numerics-and-corrections.md`、`10-acceptance.md`、`13-first-slice.md`。字段/API问题按需读04/05/15/17、design/database-catalog.json及contracts/openapi-v0001.json。
-6. 核心逻辑与接口：`backend/app/services/scoring_service.py`、`strategy_service.py`、`state_machine.py`、`decision_service.py`、`research_pipeline.py`、`data_mode.py`、`baostock_financial.py`；`backend/app/api/collab.py`、`judgments.py`、`templates.py`、`strategy.py`、`research.py`、`intake.py`及对应models/tests。从实际代码确认18里标注的接口缺口，不假设它们已实现。
+6. 核心逻辑与接口：`backend/app/services/scoring_service.py`、`strategy_service.py`、`state_machine.py`、`decision_service.py`、`research_pipeline.py`、`data_mode.py`、`baostock_financial.py`；`backend/app/api/collab.py`、`judgments.py`、`templates.py`、`strategy.py`、`research.py`、`intake.py`及对应models/tests。另读judgment_authoring.py及test_ux18.py，并按review/UX18-IMPLEMENTATION.md核对UXR-01…12实际处置；不沿用旧基线缺口推定现状。
 7. 数字/政策真源：`config/scoring-standard-v1.json`、`templates-standard-v1.json`、`rubrics-standard-v1.json`、`metric-definitions-v2.json`、`strategy-standard-v1.json`、`roles-standard-v1.json`、`numeric-policy-v1.json`；必要时读其余Schema、config和原验收矩阵，不需要先读旧大包。
 
 `review/REVIEW-PACK.md`、`GPT-PRO-PROMPT.md`及PASTE系列是编码前历史快照，不能作为本轮当前状态。GitHub中`review/design-detail/*.png`是历史设计原型截图，不是当前React运行UI；只能据实际可读的GitHub图片评价该原型。当前真实UI截图留在本机且不作为你的输入。你没有实际当前像素/浏览器时，明确“本轮仅基于源码/文案/设计评估，当前视觉与实际操作未验证”，不要要求附件或打开127.0.0.1。
 
 ### 固定上下文与不能混淆的边界
 
-用户要真实源头数据，先跑通可用研究闭环。设计基线v0.3；本地产品v0.0.1部分实现，完整必选验收未通过。当前已有两家公司真实百科、38条A股日线、40条供应商财务指标、可读固定修订和可保存研究预览；完整原始财务科目/口径、真实定性研判、港股/正式FINAL/封存仍缺。Q/V/策略未知、运行partial，不是完整投资分析；67 passed是2026-10-02历史检查，不能说你重新运行通过。
+用户要真实源头数据，先跑通可用研究闭环。设计基线v0.3；本地产品v0.0.1部分实现，完整必选验收未通过。当前已有两家公司真实百科、38条A股日线、40条供应商财务指标、可读固定修订和可保存研究预览；首次有证据研判录入路径已实现并以原创夹具验证，未替真实公司填写判断；完整原始财务科目/口径、港股/正式FINAL/封存仍缺。Q/V/策略未知、运行partial，不是完整投资分析；81 passed是2026-10-06实施检查记录，不能说你亲自重新运行通过；67 passed保留为10-02历史。
 
-18是待评审提案，不是实现授权或完工证据。保留多人角色、三层模板、人工有效覆盖、模型proposal与DecisionService区分、A/H独立估值、时点/截止/不可变历史、通知后置、不交易。未知≠明确不符合；供应商比率≠完整财报；n/N≠加权coverage；研究预览≠正式封存；模拟满足≠正式入选。权重/锚点/指标从发布版本与config取，不用UI设计重新发明公式或固定数值。
+18修订2已经用户实施授权，最新逐项处置与验证见review/UX18-IMPLEMENTATION.md；文档本身不能替代代码与完整版本验收。保留多人角色、三层模板、人工有效覆盖、模型proposal与DecisionService区分、A/H独立估值、时点/截止/不可变历史、通知后置、不交易。未知≠明确不符合；供应商比率≠完整财报；n/N≠加权coverage；研究预览≠正式封存；模拟满足≠正式入选。权重/锚点/指标从发布版本与config取，不用UI设计重新发明公式或固定数值。
 
-本次修订已纠正：缺数误写“不满足准入”、错误五维权重、“三年平均ROE”、统一五档评级/无符号影响、写死报价/日期/条数、暗示调仓结算，以及无后端接口的按钮。请核对处置是否充分，不把旧问题直接当当前设计缺陷。
+修订1设计已纠正（本轮实现须从源码核对）：缺数误写“不满足准入”、错误五维权重、“三年平均ROE”、统一五档评级/无符号影响、写死报价/日期/条数、暗示调仓结算，以及无后端接口的按钮。请核对处置是否充分，不把旧问题直接当当前设计缺陷。
 
 ### 请参与设计，而不只列问题
 

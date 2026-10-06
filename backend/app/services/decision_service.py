@@ -100,7 +100,7 @@ def human_override(db: Session, slot_key: str, value: dict, if_match_generation:
             return db.get(JudgmentRevision, result['id']), "ok", result['generation']
     if slot.generation != if_match_generation:
         return None, "conflict", slot.generation
-    prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else None
+    prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='accepted').order_by(JudgmentRevision.created_at.desc()).limit(1))
     if not release:
         if prior is None or not json.loads(prior.evidence_json):
             raise ValueError('缺少该判断槽的有效输入证据')
@@ -121,29 +121,31 @@ def human_override(db: Session, slot_key: str, value: dict, if_match_generation:
             criterion = json.loads(prior.value_json).get('criterion') if prior else None
             if value.get('criterion', criterion) != criterion:
                 raise ValueError('不能修改判断槽的问题身份')
-            value = {**value, 'criterion': criterion}
+            for key in ('rubric_ref', 'period_start', 'period_end'):
+                if key in value and value[key] != inherited.get(key):
+                    raise ValueError('不能修改rubric或期间身份')
+            value = {**inherited, **value, 'criterion': criterion}
         else:
             raise ValueError('此接口不接受该判断类型')
     rev = JudgmentRevision(slot_id=slot.id, author_type="human", value_json=canonical(value),
                            decision="released" if release else "accepted")
     # Replacement inherits evidence scope/time; it cannot invent evidence.
-    prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else None
+    prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='accepted').order_by(JudgmentRevision.created_at.desc()).limit(1))
     if prior:
         rev.evidence_json = prior.evidence_json
         rev.effective_at, rev.published_at, rev.valid_until = prior.effective_at, prior.published_at, prior.valid_until
     db.add(rev)
     db.flush()
     if release:
-        auto = db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id == slot.id,
-                          JudgmentRevision.author_type == 'auto', JudgmentRevision.decision == 'accepted')
-                         .order_by(JudgmentRevision.created_at.desc()).limit(1))
-        slot.effective_revision_id = auto.id if auto else None
+        # Release clears the human lock; current legal inputs must be reviewed.
+        slot.effective_revision_id = None
     else:
         slot.effective_revision_id = rev.id
     slot.generation += 1
     record(db, workspace_id, actor_id, 'judgment.released' if release else 'judgment.overridden',
            'judgment_slot', slot.id, {'revision_id': rev.id, 'generation': slot.generation,
-                                     'recompute': 'read_with_current_revision'})
+                                     'recompute': 'pending_review' if release else 'read_with_current_revision',
+                                     'cutoff': db.scalar(select(func.clock_timestamp())).isoformat()})
     if command_key:
         db.add(CommandReceipt(workspace_id=workspace_id, command_key=command_key,
                               request_hash=request_hash, response_json=canonical({'id': rev.id, 'generation': slot.generation})))
@@ -152,7 +154,48 @@ def human_override(db: Session, slot_key: str, value: dict, if_match_generation:
 
 
 def effective_value(db: Session, slot: JudgmentSlot) -> dict | None:
-    if slot.effective_revision_id is None:
-        return None
-    rev = db.get(JudgmentRevision, slot.effective_revision_id)
-    return json.loads(rev.value_json) if rev else None
+    from datetime import datetime, timezone
+    from app.services.scoring_service import current_decisions
+    now=datetime.now(timezone.utc)
+    found=next((v for s,r,v in current_decisions(db,slot.company_id,slot.workspace_id,now,now) if s.id==slot.id),None)
+    return found
+
+
+def reevaluate_release(db, slot, cutoff):
+    """Revalidate a proposal at one fixed cutoff; never point back to its old revision."""
+    from datetime import datetime, timedelta, timezone
+    from app.models.company import Company
+    from app.services import data_mode
+    from app.services.scoring_service import config, resolve_template, dec
+    candidates=db.scalars(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,
+        JudgmentRevision.author_type=='auto',JudgmentRevision.decision=='accepted',JudgmentRevision.created_at<=cutoff)
+        .order_by(JudgmentRevision.created_at.desc())).all()
+    template=resolve_template(db.get(Company,slot.company_id),db,slot.workspace_id,cutoff)
+    policy=config('auto-review-policy-v1.json')
+    for candidate in candidates:
+        if candidate.effective_at and candidate.effective_at>cutoff: continue
+        if candidate.published_at and candidate.published_at>cutoff: continue
+        if candidate.valid_until and cutoff>=candidate.valid_until: continue
+        value=json.loads(candidate.value_json);evidence=json.loads(candidate.evidence_json)
+        if not evidence or slot.kind not in ('rubric','impact'): continue
+        if not data_mode.fixture_mode():
+            if not value.get('confidence_calibrated') or not data_mode.real_evidence(db,evidence,slot.workspace_id,slot.company_id,cutoff): continue
+        if dec(value.get('confidence','0'))<dec(policy[slot.kind]['minimum_confidence']): continue
+        if slot.dimension not in template['weights']: continue
+        if slot.kind=='rubric':
+            baseline=template['baselines'][slot.dimension]
+            if baseline.get('rubric_ref')!=value.get('rubric_ref'): continue
+            if not value.get('period_start','9999')<=cutoff.date().isoformat()<=value.get('period_end','0000'): continue
+            quality=template['dimension_policies'][slot.dimension]['quality_policy']
+            age=quality['freshness']['max_age_days']
+            if cutoff>=(candidate.effective_at or candidate.created_at)+timedelta(days=age): continue
+            if quality['evidence_requirement']=='issuer_or_regulator_original' and not all(e.get('issuer_original') for e in evidence): continue
+        revision=JudgmentRevision(slot_id=slot.id,author_type='auto',decision='accepted',
+            value_json=candidate.value_json,evidence_json=candidate.evidence_json,
+            effective_at=candidate.effective_at,published_at=candidate.published_at,valid_until=candidate.valid_until)
+        db.add(revision);db.flush();slot.effective_revision_id=revision.id;slot.generation+=1
+        record(db,slot.workspace_id,None,'judgment.reevaluated','judgment_slot',slot.id,
+            {'revision_id':revision.id,'generation':slot.generation,'cutoff':cutoff.isoformat(),
+             'prior_proposal':candidate.id,'policy_hash':digest(policy),'template_hash':template['config_hash']})
+        return 'reevaluated'
+    return 'pending_review'
