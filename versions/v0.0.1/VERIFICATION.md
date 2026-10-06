@@ -1,5 +1,7 @@
 # v0.0.1 交付修复：运行证据与剩余验收
 
+2026-10-06本次最新：194 passed（仅隔离合成test库，1条已有弃用warning）、UI构建及实际真实API回读通过；诺诚健华23标准事实/4有效指标，ECB22日真实参考FX完成。旧研究/修订hash与7项pending建议保持，未降低必选验收或自动确认建议。仍partial，真实seal=0；详细来源/原件/恢复/幂等与具体阻断见[本次缺口续建](../../review/REAL-GAP-CLOSURE.md)。以下记录保留各历史时点结果。
+
 ## 2026-10-06 UX18实施验证（最新）
 
 固定实施基线main c44d0afa8b4453ede35b25ae11edd8d6e6e52695，本次变更见收录本节与test_ux18.py的实施提交（最终SHA以Git提交/main回读为准）。用户已授权落实GPT Pro评审并合并主干。81 passed，1项已有Starlette/httpx警告；TS检查/构建、OpenAPI导出与TS生成通过。14项UX18回归使用本机专用vip_v0001_test原创合成夹具，真实资料库未用于写入验收；无schema迁移。

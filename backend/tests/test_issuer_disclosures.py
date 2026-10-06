@@ -52,3 +52,12 @@ def test_append_replay_and_revoked_policy(prepared):
         src=db.scalar(select(SourceRegistry).where(SourceRegistry.source_key=='cninfo-bounded-issuer-disclosures'))
         p=json.loads(src.policy_json);p['revoked']=True;src.policy_json=canonical(p);db.commit()
         with pytest.raises(ValueError,match='撤销'):import_snapshot(db,ws,s)
+
+
+def test_long_statutory_document_keeps_excerpt_bound():
+    s=snapshot();s['page_count']=89;s['pages'][0]['number']=74
+    validate(s)
+    s['page_count']=101
+    with pytest.raises(ValueError,match='页数'):validate(s)
+    s['page_count']=100;s['pages']=[{'number':n,'text':'诺诚健华医药有限公司合成页'} for n in range(1,32)]
+    with pytest.raises(ValueError,match='页数'):validate(s)

@@ -27,6 +27,10 @@ def source_stats(db,item,ref):
     original=payload.get('readable_text')
     if not original:return None
     data=payload.get('raw_capture')
+    if data and data.get('provider')=='ecb':
+        from app.services.ecb_fx import analysis
+        meta=json.loads(item.reading_metadata_json)
+        return analysis({**data,'observed_at':meta['source_observed_at']},ref)
     if data and data.get('provider')=='eodhd':
         from app.services.eodhd_source import validate
         meta=json.loads(item.reading_metadata_json)

@@ -238,6 +238,10 @@ def freeze(db,context,token):
         if row.kind=='price' and row.input_key=='price:'+security.ticker:
             add('price','research_input',row.id,row.content_hash)
             if json.loads(row.payload_json).get('fx_per_cny'):add('fx','research_input',row.id,row.content_hash)
+            elif security.currency=='HKD':
+                from app.services.ecb_fx import matching_fx
+                fx_row,_=matching_fx(selected,json.loads(row.payload_json).get('session'))
+                if fx_row:add('fx','research_input',fx_row.id,fx_row.content_hash)
         elif row.kind=='financials':
             for group in ('financials','share_capital','report_obligations'):add(group,'research_input',row.id,row.content_hash)
         for ref in json.loads(row.payload_json).get('evidence',[]) if isinstance(json.loads(row.payload_json).get('evidence'),list) else []:
@@ -261,7 +265,7 @@ def freeze(db,context,token):
     if data_mode.fixture_mode():groups['rights']={'quality':'not_applicable','inputs':[],'reason_codes':['original_disposable_fixture']}
     if conflicts:
         for key in conflicts:
-            group='price' if key.startswith('price:') else 'financials'
+            group='price' if key.startswith('price:') else 'fx' if key.startswith('fx:') else 'financials'
             groups[group]={'quality':'conflicting','inputs':[],'reason_codes':['same_knowledge_time_conflict']}
     quality=score_company(db,company,seal.workspace_id,seal.evaluation_as_of,seal.knowledge_cutoff,template,input_rows=selected,decision_rows=decisions)
     valuation=score_security(db,security,seal.workspace_id,seal.evaluation_as_of,seal.knowledge_cutoff,seal.market_session,input_rows=selected)

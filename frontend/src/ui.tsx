@@ -130,8 +130,8 @@ export function FinancialSummary({ data }: any) {
           </tbody>
         </table>
       </div>
-      {data.original_statement && data.available_metrics?.cfo_profit_3y != null && (
-        <p>三年累计经营现金流 / 同口径合并净利润：{data.available_metrics.cfo_profit_3y}；
+      {data.original_statement && data.available_metrics?.positive_cfo_year_share_3y != null && (
+        <p>三年累计经营现金流 / 同口径合并净利润：{data.available_metrics.cfo_profit_3y ?? "不适用（同期三年合并利润合计非正）"}；
           正经营现金流年度比例：{data.available_metrics.positive_cfo_year_share_3y}。
           根据三年原始科目计算；完整评分仍取决于其余口径与经营依据。</p>
       )}
@@ -195,6 +195,12 @@ export function ResearchResult({ run, read }: any) {
             <section key={a.source_revision_id}>
               {a.kind === "financial_summary" ? (
                 <FinancialSummary data={a} />
+              ) : a.kind === "fx_summary" ? (
+                <>
+                  <h4>人民币与港币参考汇率</h4>
+                  <p>{a.first_session} 至 {a.last_session}，{a.observations} 个日期；{a.last_session} 每1元人民币对应 {Number(a.last_rate).toFixed(6)} 港币。</p>
+                  <p className="muted">{a.meaning}</p>
+                </>
               ) : a.kind === "market_summary" ? (
                 <>
                   <h4>参考日线区间统计</h4>

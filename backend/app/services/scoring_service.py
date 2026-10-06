@@ -306,7 +306,7 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
         dimensions[dim]={'baseline':numeric(baseline) if baseline is not None else None,'event_contribution':numeric(contribution),
                          'score':numeric(score) if score is not None else None,'subcoverage':numeric(subcoverage),'evidence_ids':refs,'events':events,
                          'status':'valid' if score is not None else 'pending_evidence',
-                         'reason':None if score is not None else '标准财务科目不足' if method['method']=='weighted_metric_rubric' else '有效评价项不足',
+                         'reason':None if score is not None else '部分标准财务指标缺失或不适用，未达到最低有效指标覆盖' if method['method']=='weighted_metric_rubric' else '有效评价项不足',
                          'criteria':criterion_states,'baseline_age_days':latest_age}
     coverage=q(sum(dec(template['weights'][d]) for d in known))
     observed=q(sum(dec(template['weights'][d])*known[d] for d in known)/coverage) if coverage else None
@@ -317,6 +317,8 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
             missing.extend(observation.get('missing_data',[]) if observation else ['可追溯的财务报告（TTM利润、权益、债务、现金流及报告义务时间）'])
         names={'business_model':'商业模式','governance':'治理与资本配置','growth_sustainability':'成长持续性'}
         for d in template['weights']:
+            if financial and template['baselines'][d]['method']=='weighted_metric_rubric' and d not in known:
+                missing.append(('盈利质量' if d=='profit_quality' else '财务韧性' if d=='financial_resilience' else d)+'：部分指标缺失或不适用，未达到最低有效指标覆盖')
             if template['baselines'][d]['method']=='accepted_evidence_rubric' and d not in known:
                 missing.append(names.get(d,d)+'：仍有评价项未获合格依据，详见逐项状态')
     return {'company_id':company.id,'company_name':company.name,'template':template,'coverage':float(coverage),
@@ -342,6 +344,11 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
     rows=inputs(db,security.company_id,workspace_id,as_of,cutoff) if input_rows is None else input_rows
     f=next((json.loads(r.payload_json) for r in rows if r.kind=='financials'),None)
     price=next((json.loads(r.payload_json) for r in rows if r.input_key=='price:'+security.ticker),None)
+    if price and security.currency=='HKD' and not price.get('fx_per_cny'):
+        from app.services.ecb_fx import matching_fx
+        _,fx=matching_fx(rows,price.get('session'))
+        if fx:
+            price={**price,'fx_per_cny':fx['value'],'fx_reference':fx,'evidence':price.get('evidence',[])+fx['evidence']}
     observation=next((json.loads(r.payload_json) for r in rows if r.kind=='financial_observations'),None)
     shares_current=bool(f and (not f.get('ordinary_shares_valid_until') or as_of<datetime.fromisoformat(f['ordinary_shares_valid_until'])))
     shares_verified=bool(f and (not f.get('ordinary_shares_verified_through') or as_of.astimezone(ZoneInfo('Asia/Shanghai')).date().isoformat()<=f['ordinary_shares_verified_through']))
@@ -351,7 +358,9 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
     elif not price.get('is_final') or (session and price['session']!=session):gaps.append('已取得日线价格，但正式收盘最终性或对应交易日尚未核验')
     if not f:gaps.extend(observation.get('missing_data',[]) if observation else ['普通股TTM利润、等权股本及有效期'])
     if f and not shares_current:gaps.append('股数证据仅覆盖较早日期，需核对当前流通在外同权普通股数量' if not shares_verified else '已知期后股数变动，需核对最新流通在外同权普通股数量')
-    if security.currency!='CNY' and (not price or not price.get('fx_per_cny')):gaps.append('跨币种估值需要对应汇率')
+    if security.currency!='CNY' and (not price or not price.get('fx_per_cny')):
+        has_reference_fx=security.currency=='HKD' and any(r.kind=='fx' for r in rows)
+        gaps.append('已取得参考汇率；待证券行情确定后匹配同日汇率' if has_reference_fx and not price else '跨币种估值需要对应汇率')
     result={'security_id':security.id,'market':security.market,'ticker':security.ticker,'currency':security.currency,
             'pe_ttm':None,'valuation_score':None,'reason':'UNKNOWN_PE','latest_quote':price,
             'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(shares_current and f.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}

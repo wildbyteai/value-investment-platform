@@ -23,7 +23,7 @@ def validate(snapshot):
     if observed.tzinfo is None or observed>datetime.now(timezone.utc) or day>observed.date():raise ValueError('公告时间不合法')
     if not re.fullmatch('[0-9a-f]{64}',snapshot['pdf_sha256']):raise ValueError('公告PDF hash缺失')
     pages=snapshot['pages'];numbers=[p['number'] for p in pages]
-    if not 1<=snapshot['page_count']<=30 or not pages or len(set(numbers))!=len(numbers) or any(type(n)!=int or not 1<=n<=snapshot['page_count'] for n in numbers):raise ValueError('公告页数或页码不合法')
+    if not 1<=snapshot['page_count']<=100 or not pages or len(pages)>30 or len(set(numbers))!=len(numbers) or any(type(n)!=int or not 1<=n<=snapshot['page_count'] for n in numbers):raise ValueError('公告页数或页码不合法')
     if sum(len(p['text']) for p in pages)>200000 or any(not isinstance(p['text'],str) or not p['text'].strip() for p in pages):raise ValueError('公告原文不可读或超限')
     if snapshot.get('text_parser','pypdf_layout') not in ('pypdf_layout','pdfplumber_0.11.9'):raise ValueError('公告解析版本不支持')
     aliases=ISSUER_ALIASES.get(ticker,(issuer,))

@@ -18,6 +18,7 @@ case "${1:-help}" in
   issuer-import) shift; cd backend; exec .venv/bin/python scripts_issuer_reports.py "$@" ;;
   disclosure-import) shift; cd backend; exec .venv/bin/python scripts_issuer_disclosures.py "$@" ;;
   eodhd-import) shift; cd backend; exec .venv/bin/python scripts_eodhd.py "$@" ;;
+  ecb-fx-import) shift; cd backend; exec .venv/bin/python scripts_ecb_fx.py "$@" ;;
   public-import) cd backend; exec .venv/bin/python scripts_public.py --enable-wikimedia ;;
   *) echo 'Usage: tools/vip migrate | seed-synthetic | test | build-ui | dev | dev-api | dev-down | public-import | baostock-import/financial-import (--capture or --snapshot /absolute/path) | issuer-import/disclosure-import (--snapshot /absolute/path --workspace ID [--write]) | eodhd-import (--capture or --snapshot /absolute/path --workspace ID [--write]) | original-import | seal';;
 esac
