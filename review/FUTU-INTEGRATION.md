@@ -30,3 +30,15 @@
 捕获仅将SDK解码选定列保存在raw-data/futu，不声称原始wire bytes。入库须两份独立`currency-basis`对象（ticker、currency、reviewed、原文excerpt和已有可读evidence），CLI用`--snapshot`（最多两份）、`--workspace`、`--currency-basis`、`--write`在同事务追加。真实写入时复核实际本机库/备份，之后逐行复算、重放、旧hash、同日FX与真实API/UI回读；本次没有将这些待执行项写为通过。
 
 官方设置/来源限制见[富途已有账号设置](../research/futu-readonly-setup.md)。用户不清楚设置操作，主会话从官方动态入口下载10.11.7108 Mac包，仅在本机忽略目录准备；macOS原生tar解压后完整签名和Gatekeeper检查通过（Notarized Developer ID），未代本人启动/登录/接受协议。Python通用tar解压会把AppleDouble元数据作为额外文件影响资源封签，第一次副本未交用户执行；原生解压副本正确恢复元数据，没有重签、去隔离或绕过系统保护。当前股数、FINAL/批准日历和正式seal的旧缺口见[财务与FX续建](./REAL-GAP-CLOSURE.md)。
+
+## 本人登录后的实际验证
+
+后续基线main `173a78c6badb79d827edba7048776e3a49f2a526`。用户明确“已经登录”，本机只读探测listening=true；仅创建行情对象，对两精确代码basicinfo成功并通过名称/STOCK/HK_MAINBOARD/未退市/有效stock_id校验。总额度接口成功；没有查询账户/持仓、调用交易或读取OpenD个人配置。SDK额度响应是tuple，首次本机诊断脚本误按DataFrame解析，修正后真实回读成功；没有为此改产品合同。
+
+FT-03的报价币种证据已经落地：诺诚健华既有中报补入PDF物理第5/11页，82项原始财务事实不变；比亚迪唯一新增H股中报只摘录第2/5页，物理第5页对应印刷第4页，精确区分01211港币柜台与81211人民币柜台，不新增81211证券，不将该报告解析为新的财务事实。出处、原件hash及视觉核对见[本次来源核查](../research/futu-data-rights-and-currency.md)。在已授权本机真实库追加原文修订/效果与审计/outbox，未改schema或来源政策；写前复核实际PG/schema并创建可恢复备份。
+
+实际回读：两股币种依据均可通过现有API读取固定原文修订，独立工作区返回404；11个旧研究、41个旧原文修订、30个旧输入的ID/hash全部保持。比亚迪脚本在提交成功后输出时访问失效ORM对象，打印失败；没有把exit=1误判为未提交而盲重写，先只读回读确认效果存在，修正本机脚本输出变量。原件、原值、协议全文、账户额度、备份及私人日志保存在Git忽略目录。只涉及元数据/原件入库，未改产品代码，223项产品回归仍为前节已验证基线，不称本轮另跑。
+
+当前仍未请求、保存或导入富途日线。官方API协议入口本轮两次504且网页限频，停止重试，未取得本人实际适用协议全文；账户登录/免费额度不足以自动确认存储分析范围。已向本人请求核实“仅本机保存、个人研究、不对外分享”是否在所接受API协议范围内，这是上游权利事实核对，不是重新申请已有本机写库授权。没有生成通过的rights记录或用占位值绕过捕获门。币种依据文件已经准备，收到明确范围事实后才运行有限日线捕获与原值/FX/幂等/真实研究/UI验证。
+
+本机证据：`local-data/verification/futu-identity-probe.json`、`futu-before-import.json`、`futu-currency-readback.json`、`futu-evidence-api-readback.json`。备份经pg_restore --list校验；回退代码不删除追加证据，恢复真实库仍需明确恢复范围授权。诺诚健华当前普通股覆盖、两证券FINAL、批准日历/正式seal及pending经营建议保持既有未完成状态，没有虚构股份数量、最终价或确认判断。
