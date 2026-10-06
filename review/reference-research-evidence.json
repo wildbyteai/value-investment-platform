@@ -1,0 +1,84 @@
+{
+  "basis_revision": "a3a03ad212e1a0149b90713c2bd2f1a8d9de8f2c",
+  "verification_date": "2026-10-06",
+  "source_hashes": {
+    "backend/app/services/reference_research.py": "420917bd9906ba78bc7d7ef62336cee1adb944f7668ffbf6540ff0feee3010f5",
+    "backend/app/api/scoring.py": "f62de860c5f3e2c6a4d91748c52512b777435767a27d9735a9137aa12efa4af1",
+    "backend/app/services/research_pipeline.py": "89a2496fe0119c8d522c16b34c91a9af158b171e31b0476744a31cdec44403ad",
+    "backend/tests/test_reference_research.py": "7ef893a9a9fe57c1bb93480cf8d037e2809d2c27a3b68f3dcae4344784bddd0b",
+    "backend/tests/test_research_pipeline.py": "8f5228627def94d4829c3030576683924d9ef2eb587dd0d9355e6a079f332e37",
+    "frontend/src/app.tsx": "11693410a43d4d52b1eef2365b73cf23a53b09c119b8e1fcfb7655aaaa83c3e6",
+    "frontend/src/ui.tsx": "7bcdd1c961313388bb418c33c91d7d2fa34d86ba2c279804102b4536e434b945",
+    "backend/static/app.js": "9388a30be7f5134c5fcb1177107a1112a073354ad68679bf8a279db20e920d47"
+  },
+  "checks": {
+    "backend_full_suite": {
+      "command": ".venv/bin/python -m pytest tests/ -q",
+      "result": "257 passed, 1 pre-existing warning",
+      "environment": "verified local isolated synthetic test database",
+      "cwd": "backend"
+    },
+    "frontend_build": "passed",
+    "browser": "company A/H values, Innocare partial coverage, saved v3 research conditions and old/new snapshot comparison read back",
+    "staged_secret_pattern_scan": "passed; only 13 scoped files, no raw originals, local configuration or unrelated reports"
+  },
+  "real_readback": {
+    "local_real_target_verified": true,
+    "backup_verified": true,
+    "old_actual_content_hashes_unchanged": true,
+    "old_counts": {
+      "runs": 13,
+      "results": 13,
+      "revisions": 46,
+      "inputs": 35
+    },
+    "formal_and_judgment_state_unchanged": true,
+    "companies": 3,
+    "securities": 4,
+    "reference_pe_independently_verified": 4,
+    "innocare_three_year_cash_profit_ratio_not_applicable": true,
+    "uses_actual_release_version": 5,
+    "pending_proposals_not_counted": 7,
+    "cross_workspace_404": true,
+    "new_and_old_run_exact_replay": true,
+    "audit_and_outbox_once": true,
+    "real_sealed_evaluations": 0,
+    "run_id": "57a0b663-1f25-40e9-a272-0f9d2b553194",
+    "manifest_hash": "276196efc9f0c8883acd12c560a9a6af90c5b1bb92bf364bcebb16d7389364db",
+    "status": "partial",
+    "read_items": 28,
+    "security_results": [
+      {
+        "ticker": "002594.SZ",
+        "reference_status": "REFERENCE",
+        "strategy_result": "PARTIAL",
+        "pe_computed": true,
+        "conditions": 6
+      },
+      {
+        "ticker": "01211.HK",
+        "reference_status": "REFERENCE",
+        "strategy_result": "PARTIAL",
+        "pe_computed": true,
+        "conditions": 6
+      },
+      {
+        "ticker": "000651.SZ",
+        "reference_status": "REFERENCE",
+        "strategy_result": "PARTIAL",
+        "pe_computed": true,
+        "conditions": 6
+      },
+      {
+        "ticker": "09969.HK",
+        "reference_status": "REFERENCE",
+        "strategy_result": "PARTIAL",
+        "pe_computed": true,
+        "conditions": 6
+      }
+    ]
+  },
+  "formal_runtime_algorithms_modified": false,
+  "raw_data_and_secrets_committed": false,
+  "unrelated_work_preserved": true
+}

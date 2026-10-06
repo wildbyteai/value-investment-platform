@@ -14,6 +14,7 @@ from app.models.sealing import PrimaryListing, EvaluationSeal
 from app.services import data_mode
 from app.services.scoring_service import score_company, score_security, inputs, config, numeric
 from app.services.strategy_service import gates
+from app.services.reference_research import quality_reference, valuation_reference, strategy_reference, algorithm_basis
 from app.services.transactions import canonical, digest, record
 
 
@@ -137,6 +138,10 @@ def start_run(db,principal,command_key):
         securities=[]
         for security in db.scalars(select(Security).where(Security.company_id==company.id)).all():
             valuation=score_security(db,security,principal.workspace.id,cutoff,cutoff)
+            valuation['reference_valuation']=valuation_reference(security,rows,cutoff,cutoff)
+            valuation['reference_strategy']=strategy_reference(rules,quality,valuation,valuation['reference_valuation'],release)
+            for ref in (valuation['reference_valuation']['basis'] or {}).get('evidence',[]):
+                if ref not in refs:refs.append(ref)
             preview=gates(rules,quality,valuation)
             quote=quotes.get('price:'+security.ticker)
             outcome='UNKNOWN' if preview['passes'] is None else 'MATCH' if preview['passes'] else 'NO_MATCH'
@@ -146,19 +151,20 @@ def start_run(db,principal,command_key):
             securities.append({'security_id':security.id,'ticker':security.ticker,'market':security.market,'currency':security.currency,
                 'latest_quote':quote,'valuation':valuation,'formal_readiness':formal,'strategy':{**preview,'result':outcome,'applied':False,'release_id':release.id if release else None},
                 'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+[gap]})
+        quality['reference_quality']=quality_reference(quality)
         results.append({'company_id':company.id,'company_name':company.name,'analysis':stats_by_company.get(company.id,[]),'quality':quality,'securities':securities,'judgment_proposals':proposals})
         calculation_refs.append({'company_id':company.id,'inputs':quality['input_refs'],'judgments':quality['judgment_refs'],'template_hash':quality['template']['config_hash'],
                                  'pending_proposals':[{'id':p['revision_id'],'hash':p['hash']} for p in proposals]})
     status='partial' if any(c['quality']['quality_score'] is None or any(s['strategy']['result']=='UNKNOWN' or s['gaps'] for s in c['securities']) for c in results) else 'completed'
-    manifest={'algorithm':'local-research-preview-v2','mode':'real_research_preview','as_of':cutoff.isoformat(),'knowledge_cutoff':cutoff.isoformat(),
+    manifest={'algorithm':'local-research-preview-v3','reference_algorithm':algorithm_basis(),'mode':'real_research_preview','as_of':cutoff.isoformat(),'knowledge_cutoff':cutoff.isoformat(),
               'source_evidence':refs,'read_items':read_items,'calculation_refs':calculation_refs,
               'strategy':{'id':release.id if release else None,'version':release.version if release else None,'rules':rules,'hash':digest(rules)},
               'external_model':False,'membership_applied':False}
     result={'mode':'real_research_preview','status':status,'companies':results,'stages':[
         {'stage':'read_sources','status':'completed','detail':f'{len(read_items)}份可读真实资料，当前修订已固定'},
         {'stage':'analyze','status':'completed','detail':'实际行情/财务字段比较和原文摘录；财务口径与经营判断缺口明确保留'},
-        {'stage':'score','status':'partial' if any(c['quality']['quality_score'] is None or any(s['valuation']['valuation_score'] is None for s in c['securities']) for c in results) else 'completed','detail':'执行真实输入评分；缺失项保持UNKNOWN'},
-        {'stage':'strategy_preview','status':'partial','detail':'逐证券计算草稿规则；缺数为UNKNOWN，未正式封存或应用'},
+        {'stage':'score','status':'partial' if any(c['quality']['quality_score'] is None or any(s['valuation']['valuation_score'] is None for s in c['securities']) for c in results) else 'completed','detail':'展示已覆盖经营分和真实输入参考估值；正式评分缺口保留'},
+        {'stage':'strategy_preview','status':'partial','detail':'按已发布策略逐项参考比较；依据不足标明部分可评估，不推进正式入选'},
     ]}
     run=ResearchRun(workspace_id=principal.workspace.id,actor_id=principal.user.id,command_key=command_key,request_hash=request_hash,
         manifest_json=canonical(manifest),manifest_hash=digest(manifest),result_json=canonical(result),status=status)

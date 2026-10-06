@@ -68,6 +68,8 @@ def test_real_run_computes_stats_and_preserves_unknown(market):
     response=c.post('/api/research/runs',headers=h)
     assert response.status_code==200,response.text
     run=response.json();assert run['status']=='partial'
+    assert run['manifest']['algorithm']=='local-research-preview-v3'
+    assert run['manifest']['reference_algorithm']['version']=='reference-research-v1'
     assert run['manifest']['membership_applied'] is False
     assert run['manifest']['external_model'] is False
     assert run['manifest_hash']==digest(run['manifest'])
@@ -76,6 +78,8 @@ def test_real_run_computes_stats_and_preserves_unknown(market):
     assert summary['observations']==2 and summary['change_pct']=='10.000000000000'
     assert co['quality']['quality_score'] is None
     securities={s['market']:s for s in co['securities']}
+    assert co['quality']['reference_quality']['score_exact'] is None
+    assert all(s['valuation']['reference_strategy']['applied'] is False for s in securities.values())
     assert securities['CN_A']['latest_quote']['raw_close']=='11'
     assert securities['HK']['latest_quote'] is None
     assert all(s['valuation']['pe_ttm'] is None and s['strategy']['result']=='UNKNOWN' for s in securities.values())
@@ -114,6 +118,7 @@ def test_run_permissions_workspace_and_revocation(market):
         source=db.scalar(select(SourceRegistry).where(SourceRegistry.source_key=='baostock-a-daily'))
         source.policy_json=canonical({**json.loads(source.policy_json),'revoked':True});db.commit()
     assert c.get('/api/research/runs/'+run['id'],headers=headers(ws)).status_code==403
+    assert c.get(f"/api/companies/{run['result']['companies'][0]['company_id']}/score",headers=headers(ws)).status_code==404
     assert c.get('/api/research/runs',headers=headers(ws)).json()==[]
     assert c.post('/api/research/runs',headers=h).status_code==403
 

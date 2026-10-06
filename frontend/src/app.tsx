@@ -6,6 +6,8 @@ import {
   GapList,
   FinancialSummary,
   ResearchResult,
+  ReferenceQuality,
+  ReferenceValuation,
   CompareRuns,
   dimensionName,
   criterionName,
@@ -446,13 +448,14 @@ function Workspace({ identity }: any) {
                       }
                     >
                       {c.score.quality_score == null
-                        ? "资料可读 · 经营待评估"
+                        ? c.score.reference_quality?.score_exact != null ? "真实依据 · 部分可评估" : "资料可读 · 经营待评估"
                         : "经营依据可评估"}
                     </span>
                     <p>
                       经营质量：{human(c.score.quality_score)}；
                       {c.timeline.items.length} 份关联资料
                     </p>
+                    {c.score.reference_quality?.score_exact != null && <p>已覆盖经营分 {human(c.score.reference_quality.score_exact)} · 覆盖 {(c.score.coverage * 100).toFixed(0)}%</p>}
                     <GapList values={c.score.missing_data.slice(0, 2)} />
                     <button
                       disabled={busy}
@@ -709,6 +712,7 @@ function CompanyPanel({
           {Object.keys(c.score.dimensions).length} 个维度，加权覆盖{" "}
           {(c.score.coverage * 100).toFixed(0)}%。
         </p>
+        <ReferenceQuality value={c.score.reference_quality} />
         <GapList values={c.score.missing_data.slice(0, 2)} />
         {allow("analysis.override") && (
           <button disabled={busy || !c.catalog.length} onClick={startAuthor}>
@@ -737,8 +741,9 @@ function CompanyPanel({
                 </p>
               )}
               <p>
-                PE：{human(s.pe_ttm)}；估值：{human(s.valuation_score)}
+                正式PE：{human(s.pe_ttm)}；正式估值分：{human(s.valuation_score)}
               </p>
+              <ReferenceValuation valuation={s.reference_valuation} strategy={s.reference_strategy} />
               <p className="muted">正式状态：暂不提供，封存评估尚未就绪。</p>
               {allow("watchlist.own") && (
                 <button

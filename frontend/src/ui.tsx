@@ -26,6 +26,38 @@ export const criterionName = (k: string) =>
 export const human = (x: any) => (x == null ? "待评估" : Number(x).toFixed(1));
 export const when = (s: string) =>
   s ? new Date(s).toLocaleString("zh-CN") : "未留存";
+export function ReferenceQuality({ value }: any) {
+  if (!value) return null;
+  return <section aria-label="参考经营分">
+    <p>已覆盖维度参考分：{human(value.score_exact)}；加权覆盖 {(Number(value.coverage_exact) * 100).toFixed(0)}%。</p>
+    <p className="muted">{value.meaning}</p>
+    {value.missing_dimensions.length > 0 && <p>未覆盖：{value.missing_dimensions.map(dimensionName).join("、")}。</p>}
+  </section>;
+}
+export function ReferenceValuation({ valuation: v, strategy: s }: any) {
+  if (!v) return null;
+  const names: Record<string, string> = {"company.quality_score":"已覆盖经营分", "company.coverage":"经营依据覆盖", "security.valuation_score":"参考估值分", "metrics.roe_ttm":"ROE", "metrics.cfo_profit_3y":"三年现金利润比", "metrics.net_debt_ebitda":"净债务/EBITDA"};
+  const statuses: Record<string, string> = {PARTIAL:"部分可评估", MATCH:"参考条件满足", NO_MATCH:"参考条件未满足", RISK_EXCLUDED:"已确认风险排除", NOT_APPLICABLE:"策略不适用", SUSPENDED:"暂停评估", NO_RELEASE:"策略待发布"};
+  return <section aria-label="参考估值与策略">
+    <p><strong>参考PE：{v.status === "NOT_APPLICABLE" ? "不适用" : human(v.pe_exact)}；参考估值分：{human(v.valuation_exact)}</strong></p>
+    <p className="muted">研究时点 {when(v.as_of)}；知识截止 {when(v.knowledge_cutoff)}。</p>
+    {v.basis && <details><summary>参考计算依据</summary>
+      <p>价格 {v.basis.raw_close} {v.basis.currency} · {v.basis.price_session}；普通股TTM利润 {v.basis.ordinary_profit_ttm} 人民币元（期间截至 {v.basis.profit_period_end || "见固定原文"}），股数 {v.basis.ordinary_shares} 股。</p>
+      <p>股数结存日 {v.basis.shares_as_of || "未单列"}，覆盖至 {v.basis.shares_verified_through || "未单列"}；汇率 {v.basis.fx_per_cny ?? "缺失"} {v.basis.currency}/人民币。</p>
+      {v.basis.converted_eps && <p>PE = 价格 / 换算EPS {v.basis.converted_eps}。</p>}
+    </details>}
+    {v.assumptions.length > 0 && <GapList values={v.assumptions} />}
+    {v.missing_data.length > 0 && <GapList values={v.missing_data} />}
+    {s && <>
+      <h5>参考策略：{statuses[s.result] || s.result}{s.release_version != null && ` · 已发布版本 ${s.release_version}`}</h5>
+      <p className="muted">{s.meaning}</p>
+      <div className="table-scroll"><table><caption>逐项策略条件比较</caption><thead><tr><th>条件</th><th>实际值</th><th>门槛</th><th>结果</th></tr></thead>
+        <tbody>{s.conditions.map((c: any) => <tr key={c.field}><th scope="row">{names[c.field] || c.field}</th><td>{c.actual == null ? "缺失或不适用" : Number(c.actual).toLocaleString("zh-CN", {maximumFractionDigits:4})}</td><td>{c.op === "gte" ? "≥" : "≤"} {c.expected}</td><td>{c.result == null ? "待补依据或核对适用性" : c.result ? "满足" : c.field === "company.coverage" ? "覆盖不足" : "未满足"}</td></tr>)}</tbody>
+      </table></div>
+      {s.gaps.length > 0 && <GapList values={s.gaps.map((g: string) => g.replace(/business_model|profit_quality|financial_resilience|growth_sustainability|governance/g, dimensionName))} />}
+    </>}
+  </section>;
+}
 export function Dialog({ title, children, close }: any) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -226,6 +258,7 @@ export function ResearchResult({ run, read }: any) {
             </section>
           ))}
           <h4>经营质量：{human(c.quality.quality_score)}</h4>
+          <ReferenceQuality value={c.quality.reference_quality} />
           <GapList values={c.quality.missing_data} />
           {c.judgment_proposals?.length > 0 && <section>
             <h4>本次固定的经营研判建议</h4>
@@ -251,13 +284,14 @@ export function ResearchResult({ run, read }: any) {
                     : "行情待接入"}
                 </p>
                 <p>
-                  估值：{human(s.valuation.valuation_score)}；策略预览：
+                  正式估值分：{human(s.valuation.valuation_score)}；正式规则预览：
                   {s.strategy.result === "UNKNOWN"
                     ? "待评估"
                     : s.strategy.result === "MATCH"
                       ? "满足条件"
                       : "未满足条件"}
                 </p>
+                <ReferenceValuation valuation={s.valuation.reference_valuation} strategy={s.valuation.reference_strategy} />
                 <GapList values={s.gaps} />
               </section>
             ))}
@@ -323,6 +357,11 @@ export function CompareRuns({ left, right }: any) {
                     <td>{describe(b)}</td>
                   </tr>
                   <tr>
+                    <td>当次已覆盖维度参考分</td>
+                    <td>{a?.quality.reference_quality ? human(a.quality.reference_quality.score_exact) : "旧快照未留存"}</td>
+                    <td>{b?.quality.reference_quality ? human(b.quality.reference_quality.score_exact) : "旧快照未留存"}</td>
+                  </tr>
+                  <tr>
                     <td>当次待补依据</td>
                     <td>
                       <GapList values={a?.quality.missing_data} />
@@ -359,6 +398,11 @@ export function CompareRuns({ left, right }: any) {
                             {human(y?.valuation.valuation_score)} /{" "}
                             {strategy(y)}
                           </td>
+                        </tr>
+                        <tr>
+                          <td>{x?.ticker || y?.ticker}参考PE / 参考估值分</td>
+                          <td>{x?.valuation.reference_valuation ? `${human(x.valuation.reference_valuation.pe_exact)} / ${human(x.valuation.reference_valuation.valuation_exact)}` : "旧快照未留存"}</td>
+                          <td>{y?.valuation.reference_valuation ? `${human(y.valuation.reference_valuation.pe_exact)} / ${human(y.valuation.reference_valuation.valuation_exact)}` : "旧快照未留存"}</td>
                         </tr>
                       </React.Fragment>
                     );

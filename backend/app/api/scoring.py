@@ -8,6 +8,10 @@ from app.db import get_db
 from app.services import data_mode
 from app.models.company import Company, Security
 from app.services.scoring_service import score_company, score_security
+from app.services.scoring_service import inputs, config
+from app.models.strategy import StrategyVersion
+from app.services.reference_research import quality_reference, valuation_reference, strategy_reference
+import json
 
 router = APIRouter(prefix="/api/companies", tags=["scoring"])
 
@@ -32,4 +36,12 @@ def company_score(
     result = score_company(db, c, principal.workspace.id, as_of, cutoff)
     secs = db.scalars(select(Security).where(Security.company_id == c.id)).all()
     result["securities"] = [score_security(db, s, principal.workspace.id, as_of, cutoff) for s in secs]
+    result['reference_quality'] = quality_reference(result)
+    rows = inputs(db, c.id, principal.workspace.id, as_of, cutoff)
+    release = db.scalar(select(StrategyVersion).where(StrategyVersion.workspace_id == principal.workspace.id,
+        StrategyVersion.published.is_(True), StrategyVersion.created_at <= cutoff).order_by(StrategyVersion.version.desc()).limit(1))
+    rules = json.loads(release.rules_json) if release else config('strategy-standard-v1.json')
+    for security, value in zip(secs, result['securities']):
+        value['reference_valuation'] = valuation_reference(security, rows, as_of, cutoff)
+        value['reference_strategy'] = strategy_reference(rules, result, value, value['reference_valuation'], release)
     return result
