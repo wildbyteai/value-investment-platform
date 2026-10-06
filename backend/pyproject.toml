@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings>=2.3",
     "baostock==0.9.4",
     "pysocks==1.7.1",
+    "pypdf>=6.0,<7",
 ]
 
 [dependency-groups]

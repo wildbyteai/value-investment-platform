@@ -28,8 +28,27 @@ def fact(row,key,period_start,period_end):
     if row.get('reviewed') is not True:raise FinancialGap('原始科目尚未核对：'+key)
     evidence=row.get('evidence',[])
     if not evidence or any(not e.get('source_revision_id') or not e.get('hash') or not e.get('locator') or e.get('synthetic') is not False for e in evidence):raise FinancialGap('原文修订/hash/定位不完整：'+key)
+    if 'derivation' in row:
+        # A reviewed conversion retains its inputs; its result is never labelled
+        # an original value. Only bounded signed sums of same-period facts are
+        # supported, with a separate source-backed scope rationale.
+        conversion=row['derivation']
+        components=conversion.get('components',[])
+        if 'original_value' in row or conversion.get('method')!='reviewed_signed_sum_v1' or not conversion.get('basis') or not 1<=len(components)<=12:
+            raise FinancialGap('转换方法、口径依据或分量不完整：'+key)
+        seen=set();total=Decimal(0);refs=list(evidence)
+        for component in components:
+            ckey=component.get('key')
+            if not isinstance(ckey,str) or not ckey or ckey in seen or 'derivation' in component or type(component.get('coefficient')) is not int or component['coefficient'] not in (-1,1):
+                raise FinancialGap('转换分量重复、嵌套或系数不合法：'+key)
+            seen.add(ckey)
+            if (component.get('unit')=='shares')!=(key=='ordinary_shares'):
+                raise FinancialGap('股数与金额不能混合转换：'+key)
+            value,source=fact(component,ckey,period_start,period_end)
+            total+=component['coefficient']*value;refs.extend(source)
+        return total,refs
     unit=row.get('unit')
-    multiplier=Decimal(1) if key=='ordinary_shares' and unit=='shares' else MONEY_UNITS.get(unit) if key!='ordinary_shares' else None
+    multiplier=Decimal(1) if unit=='shares' and key in ('ordinary_shares','issued_ordinary_shares','treasury_shares') else MONEY_UNITS.get(unit) if key not in ('ordinary_shares','issued_ordinary_shares','treasury_shares') else None
     if multiplier is None:raise FinancialGap('科目单位不支持：'+key)
     return number(row.get('original_value'))*multiplier,evidence
 
@@ -57,6 +76,13 @@ def _normalize(bundle):
     if deadline.tzinfo is None:raise FinancialGap('报告义务时点必须有时区')
     obligations=bundle.get('report_obligation_evidence',[])
     if not obligations or any(not e.get('source_revision_id') or not e.get('hash') or not e.get('locator') or e.get('synthetic') is not False for e in obligations):raise FinancialGap('报告义务到期依据缺失')
+    share_until=bundle.get('ordinary_shares_valid_until')
+    share_evidence=bundle.get('share_change_evidence',[])
+    if share_until is not None:
+        try:share_deadline=datetime.fromisoformat(share_until)
+        except (ValueError,TypeError):raise FinancialGap('股数变动时点格式错误')
+        if share_deadline.tzinfo is None or share_deadline.date()<=current or not share_evidence or any(not e.get('source_revision_id') or not e.get('hash') or not e.get('locator') or e.get('synthetic') is not False for e in share_evidence):
+            raise FinancialGap('期后股数变动时点或原文依据缺失')
     rows=bundle.get('facts',[]);selected=[];refs=[]
     def get(key,end,start=None):
         matches=[r for r in rows if r.get('key')==key and r.get('period_end')==end and r.get('period_start')==start]
@@ -76,5 +102,9 @@ def _normalize(bundle):
         'obligation_valid_until':until,'evidence':[],
         'lineage':{'method':'annual_plus_current_minus_comparable_v1','facts':selected,'bundle_hash':digest(bundle)}}
     refs.extend(bundle['report_obligation_evidence'])
+    if share_until is not None:
+        output['ordinary_shares_valid_until']=share_until
+        output['share_change_evidence']=share_evidence
+        refs.extend(share_evidence)
     unique={digest(ref):ref for ref in refs};output['evidence']=list(unique.values())
     return output

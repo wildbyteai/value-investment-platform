@@ -27,3 +27,15 @@
 3. 真实库0010迁移及算法/政策登记批准；批准仅安装机制，不自动批准新来源或生成membership。
 
 以上是本轮未完成项，不是已取得数据；采购、联系供应商、注册账号、外发模型或改变原范围均未实施。
+
+## 2026-10-06 后续授权与实际来源进展
+
+本文件前文记录的是授权前只读阶段，已被本节后续实际结果补充。用户明确授权获取/本机写库，已从巨潮公开法定披露原件有限取得两家公司各4份报告，并核对固定页文/单位/原值/列期间；个人研究例外的范围判断不等于平台明示自动化、商业、再分发或外部模型许可。来源政策限制本机个人研究，原件和数值不入Git，未使用发行人官网/HKEX被明确限制的自动取数入口。发行人实际报告是财报原始证据，BaoStock比率未用于倒推原值。细证据与仍需匹配的附注见review/REAL-SOURCE-ACTIVATION.md。
+
+[深交所主板信息披露说明](https://www.szse.cn/www/investor/institute/rules/t20231012_604012.html)实际正文取得并固定修订，用于报告义务依据；三季报披露期限覆盖10月31日整天，系统exclusive expiry为11月1日00:00 +08，不伪造历史可知时间。
+
+[HKMA开放API](https://apidocs.hkma.gov.hk/gb_chi/documentation/market-data-and-statistics/monthly-statistical-bulletin/er-ir/er-eeri-daily/)实际无需注册，官方[条款](https://www.hkma.gov.hk/eng/other-information/terms-and-conditions.shtml)允许准确、署名的分析使用；实际取得40行响应，但最新数据只到8月31日，仍不能配到9月股票价或当作近30天新FX写库。
+
+[EODHD官方免费方案](https://eodhd.com/pricing)当前表明全球EOD一年历史、每日20次；[历史接口](https://eodhd.com/financial-apis/api-for-historical-data-and-volumes)区分close和adjusted_close；[个人使用条款](https://eodhd.com/financial-apis/terms-conditions)允许个人存储/分析，禁止向其他人或组分享、再分发，商业/组织使用另需授权。仍需注册token及真实取样；未注册/采购/调用收费接口，未猜供应商代码、未把EOD close自动提为CAS FINAL。待回复的注册问题未回答，本机未配置EODHD_API_TOKEN。注册/接受账号条款不能用本地数据库授权代替。
+
+真实库0010及artifact已启用；原范围三年/本地写入授权不再是缺口。剩余为具体口径匹配、最新股数、真实港股/同日FX与批准市场日历/最终性依据；不能将内部未完成工作统称为需要用户提供财报附件。

@@ -81,3 +81,9 @@ strategy服务内部[seal命令](../contracts/evaluation-seal.schema.json)固定
 最终事务校验manifest hash、cutoff≤sealed_at/generated_at、当前release/binding、seal generation、worker fence和最新risk/ACL generation；写immutable evaluation、seal_at/token、应用指针、transition解释、audit/outbox同事务。唯一token按seal slot稳定生成；幂等重试返回原结果。若release/session已更迭，封存历史可保留但application_status=superseded，不应用当前membership。实时硬风险仍独立优先，旧普通评估不能解除新风险。撤权使旧冻结输入不可读/不可应用，记录失效并走安全重算/纠错，不为复现保留违规正文。
 
 固定推演（T-43）：以本证券最终市场时点为+0；+15价已is_final只能provisional；一份published=−5min公告+40 observed、+50判断生效→在+60冻结时可用；+60生成manifest，+65实际完成则generated_at=+65，唯一封存且仅一次计数。+61才known的判断不进入此manifest；收盘后新公告也不因+60前observed进入本收盘。缺价封存UNKNOWN清pending；重试不把cutoff延到+70。状态/原子性是设计合同，尚无worker/数据库运行证据。
+
+### 2026-10-06 原始科目实现注记
+
+原始科目转换实现允许有界的`reviewed_signed_sum_v1`：同期间/合并范围/币种的原值分量按±1求和，保留各分量单位、原值、固定修订/hash/定位与独立转换依据；拒绝重复、嵌套、期间/币种/股数与金额混用及将转换结果标为original_value。TTM与指标公式不变。
+
+已知期后发行、回购或库存股过户会使报告期末股数不再适合后续价格。标准输入可保留有原文依据的`ordinary_shares_valid_until`和`share_change_evidence`；到该exclusive时点后，估值返回SHARE_BASIS_EXPIRED、同权股数门失败，直到取得更新股数证据。财报义务有效期和股数有效期分别判断，股数变化不抹去仍有效的合并现金/盈利指标。该字段不回填旧修订或知识截止；来源实际取得时间仍独立记录。

@@ -85,16 +85,18 @@ export function GapList({ values = [] }: any) {
 export function FinancialSummary({ data }: any) {
   return (
     <section>
-      <h4>提供商财务指标参考</h4>
+      <h4>{data.original_statement ? "发行人财报原始科目" : "提供商财务指标参考"}</h4>
       <p>
         {data.report_rows}{" "}
-        条记录；单位、统计范围与原始科目尚待核对，暂不用于标准财务评分。
+        {data.original_statement
+          ? "项核对科目；以下金额为人民币元，原值、单位与页码可在固定原文查看。标准评分及实际待补项见下方。"
+          : "条记录；单位、统计范围与原始科目尚待核对，暂不用于标准财务评分。"}
       </p>
       <div className="table-scroll">
         <table>
           <thead>
             <tr>
-              {[
+              {(data.original_statement ? ["报告期", "资料日期（来源目录）", "合并净利润（元）", "经营现金流（元）", "归母净利润（元）", "归母权益（元）", "利息费用（元）"] : [
                 "报告期",
                 "提供商披露日",
                 "利润原始字段",
@@ -102,7 +104,7 @@ export function FinancialSummary({ data }: any) {
                 "ROE原始字段",
                 "股本原始字段",
                 "CFO/利润原始字段",
-              ].map((t) => (
+              ]).map((t: string) => (
                 <th key={t}>{t}</th>
               ))}
             </tr>
@@ -118,7 +120,7 @@ export function FinancialSummary({ data }: any) {
                     ),
                   ].join(" / ")}
                 </td>
-                {["netProfit", "epsTTM", "roeAvg", "totalShare", "CFOToNP"].map(
+                {(data.original_statement ? ["consolidated_profit", "cfo", "parent_profit", "parent_equity", "interest_expense"] : ["netProfit", "epsTTM", "roeAvg", "totalShare", "CFOToNP"]).map(
                   (k) => (
                     <td key={k}>{p.values[k] ?? "缺失"}</td>
                   ),
@@ -128,6 +130,11 @@ export function FinancialSummary({ data }: any) {
           </tbody>
         </table>
       </div>
+      {data.original_statement && data.available_metrics?.cfo_profit_3y != null && (
+        <p>三年累计经营现金流 / 同口径合并净利润：{data.available_metrics.cfo_profit_3y}；
+          正经营现金流年度比例：{data.available_metrics.positive_cfo_year_share_3y}。
+          根据三年原始科目计算；完整评分仍取决于其余口径与经营依据。</p>
+      )}
       {data.annual_net_profit_field_change_pct != null && (
         <p>
           三个完整年度利润同名字段首末变化{" "}

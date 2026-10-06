@@ -27,6 +27,9 @@ def source_stats(db,item,ref):
     original=payload.get('readable_text')
     if not original:return None
     data=payload.get('raw_capture')
+    if data and data.get('report_type')=='reviewed_original_statements':
+        from app.services.issuer_reports import analysis
+        return analysis(data,ref)
     if data and data.get('report_type')=='financial_metrics':
         from app.services.baostock_financial import analysis
         meta=json.loads(item.reading_metadata_json)
@@ -94,7 +97,7 @@ def start_run(db,principal,command_key):
             # traceable research preview, never a membership decision.
             securities.append({'security_id':security.id,'ticker':security.ticker,'market':security.market,'currency':security.currency,
                 'latest_quote':quote,'valuation':valuation,'strategy':{**preview,'result':outcome,'applied':False,'release_id':release.id if release else None},
-                'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+['正式市场日历、FINAL收盘政策与封存能力尚未就绪']})
+                'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+['正式封存机制已实现；本证券的批准市场日历与FINAL收盘依据尚待接入']})
         results.append({'company_id':company.id,'company_name':company.name,'analysis':stats_by_company.get(company.id,[]),'quality':quality,'securities':securities})
         calculation_refs.append({'company_id':company.id,'inputs':quality['input_refs'],'judgments':quality['judgment_refs'],'template_hash':quality['template']['config_hash']})
     status='partial' if any(c['quality']['quality_score'] is None or any(s['strategy']['result']=='UNKNOWN' or s['gaps'] for s in c['securities']) for c in results) else 'completed'

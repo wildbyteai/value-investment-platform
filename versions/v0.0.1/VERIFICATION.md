@@ -82,3 +82,9 @@
 基线abac2a17fbe6bb81af3c4bc960b80b65588c9877，分支codex/real-data-sealing。新增原始科目/港股快照适配及显式内部封存worker；固定截止/提交阶段知识账本/一致性snapshot/完整manifest/租约fence/稳定token/不可变评估与状态变化事务实现。当前最新118项后端检查通过（合成test库，1项已有弃用警告），OpenAPI/TS生成和构建通过；迁移测试升级、降级、再升级通过。详细正常、失败、时点/恢复/权限证据见review/REAL-COMPLETION-PLAN.md与backend/tests/test_sealing.py、test_original_inputs.py。
 
 真实资料库仍0009，未执行本轮schema/来源/正式membership写入。8766只刷新API以匹配新静态产物，已授权原worker同PID保留，未启动正式worker；真实只读浏览器可见策略v5及“正式封存迁移尚未安装；研究预览仍可使用”，原两家公司和缺口页面仍可用。真实来源核查见research/real-completion-sources.md：核实比亚迪官网完整报告入口，未获取完整原始科目；港交所条款限制此类程序化接入，未绕过、未采购/注册。完整真实分析、真实正式封存与完整首slice仍未完成，不能将测试夹具或引用入口计为真实接入完成。
+
+## 2026-10-06 真实库启用与原始财报业务验证（最新）
+
+基线b38dfc7，分支codex/real-source-activation；用户已授权获取/本地写库。0010及artifact实际登记，旧11类记录hash不变；两家8份原报告、85科目入库，原文/单位/列/页PDF核对通过。格力23标准事实/5财务指标、盈利质量与财务韧性真实计算通过；普通股发生期后变动时停止沿用旧股数估值，其他经营维度仍缺。最新固定研究c0f95221-552f-4a27-8fc6-f3d6d5ea3e23重试ID与GET manifest相同；两家原值、三年现金指标、格力全部标准指标独立核算通过。最终144 passed（隔离原创合成test库，1已有warning）、TS/静态构建通过；浏览器检查及细证据见review/REAL-SOURCE-ACTIVATION.md。
+
+正式机制API available=true，但真实seal=0；没有批准日历/FINAL与同日FX，不生成猜测封存或会员状态。比亚迪完整权益工具/普通股/债务匹配、格力最新股数、HK token来源、经营判断仍未齐。财报真实取得不等同全部评分已完成；研究partial，完整首slice未通过。前一节未迁移/未取样表述保留为历史时点，最新状态以本节为准。原始数据仅本机，GitHub材料没有真实值或凭证。

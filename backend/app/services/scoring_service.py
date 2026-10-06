@@ -342,15 +342,18 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
     f=next((json.loads(r.payload_json) for r in rows if r.kind=='financials'),None)
     price=next((json.loads(r.payload_json) for r in rows if r.input_key=='price:'+security.ticker),None)
     observation=next((json.loads(r.payload_json) for r in rows if r.kind=='financial_observations'),None)
+    shares_current=bool(f and (not f.get('ordinary_shares_valid_until') or as_of<datetime.fromisoformat(f['ordinary_shares_valid_until'])))
     gaps=[]
     if not price:gaps.append('未取得对应证券正式收盘价')
     elif not price.get('is_final') or (session and price['session']!=session):gaps.append('已取得日线价格，但正式收盘最终性或对应交易日尚未核验')
     if not f:gaps.extend(observation.get('missing_data',[]) if observation else ['普通股TTM利润、等权股本及有效期'])
+    if f and not shares_current:gaps.append('已知期后股数变动，需核对最新流通在外同权普通股数量')
     if security.currency!='CNY' and (not price or not price.get('fx_per_cny')):gaps.append('跨币种估值需要对应汇率')
     result={'security_id':security.id,'market':security.market,'ticker':security.ticker,'currency':security.currency,
             'pe_ttm':None,'valuation_score':None,'reason':'UNKNOWN_PE','latest_quote':price,
-            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(f and f.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}
+            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(shares_current and f.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}
     if not f or not price: return result
+    if not shares_current:return {**result,'reason':'SHARE_BASIS_EXPIRED','common_equity':False}
     if not price.get('is_final') or (session and price['session']!=session):
         return {**result,'reason':'FINAL_PRICE_REQUIRED'}
     if any(k not in price for k in ('currency','fx_per_cny','raw_close','evidence')):
