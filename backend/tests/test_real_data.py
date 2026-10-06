@@ -93,3 +93,48 @@ def test_missing_strategy_input_has_priority_over_failed_coverage():
     assert result['passes'] is None
     assert any(c['result'] is False for c in result['conditions'])
     assert any(c['result'] is None for c in result['conditions'])
+
+
+def test_third_real_company_does_not_block_research_or_mix_workspace(real_mode):
+    from app.models.runtime import ResearchRun
+    from app.models.audit import AuditLog
+    from sqlalchemy import func
+    client, ws, isolated, ids = real_mode
+    with Session() as db:
+        added = []
+        for n in (2, 3):
+            company = Company(name=f'原创研究范围测试公司{n}', industry_key='biopharma')
+            db.add(company); db.flush()
+            item = InformationItem(workspace_id=ws, source_id=ids['source'],
+                entry_key=f'original-profile-{n}', title=company.name,
+                content_kind='article', body_state='available',
+                reading_metadata_json=canonical({'data_mode':'real_public'}))
+            db.add(item); db.flush()
+            observe(db, item, {'readable_text': f'原创身份测试记录{n}；没有财务或价格'})
+            db.add(ItemCompanyLink(item_id=item.id, company_id=company.id,
+                status='accepted', label_text=company.name))
+            db.add(Security(company_id=company.id, market='HK',
+                ticker=f'TEST.PROFILE{n}', currency='HKD'))
+            added.append(company.id)
+        db.commit()
+    h = {**headers(ws), 'Idempotency-Key':'original-three-companies'}
+    response = client.post('/api/research/runs', headers=h)
+    assert response.status_code == 200, response.text
+    run = response.json()
+    assert {c['company_id'] for c in run['result']['companies']} == {ids['company'], *added}
+    assert run['status'] == 'partial' and len(run['manifest']['read_items']) == 3
+    for c in run['result']['companies']:
+        assert c['quality']['quality_score'] is None
+        assert all(s['latest_quote'] is None and s['valuation']['pe_ttm'] is None
+                   and s['strategy']['result'] == 'UNKNOWN' for s in c['securities'])
+        if c['company_id'] in added:
+            assert c['quality']['template']['levels_applied'] == ['base']
+    replay = client.post('/api/research/runs', headers=h)
+    assert replay.status_code == 200 and replay.json()['manifest_hash'] == run['manifest_hash']
+    assert replay.json()['id'] == run['id']
+    assert client.get('/api/companies', headers=headers(isolated)).json() == []
+    assert client.get('/api/research/runs/'+run['id'], headers=headers(isolated)).status_code == 404
+    with Session() as db:
+        assert db.scalar(select(func.count(ResearchRun.id))) == 1
+        assert db.scalar(select(func.count(AuditLog.id)).where(
+            AuditLog.action == 'research.preview_completed')) == 1

@@ -90,7 +90,6 @@ def start_run(db,principal,command_key):
     if not refs:raise HTTPException(409,'尚无允许本地分析且可读的真实资料')
     companies=[c for c in data_mode.companies(db,principal.workspace.id) if c.id in company_ids]
     if not companies:raise HTTPException(409,'可读资料尚未关联到研究公司')
-    if len(companies)>2:raise HTTPException(409,'本次验证范围最多两家公司')
     release=db.scalar(select(StrategyVersion).where(StrategyVersion.workspace_id==principal.workspace.id,StrategyVersion.published.is_(True)).order_by(StrategyVersion.version.desc()).limit(1))
     rules=json.loads(release.rules_json) if release else config('strategy-standard-v1.json')
     results=[];calculation_refs=[]
