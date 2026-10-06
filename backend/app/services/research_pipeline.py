@@ -10,6 +10,7 @@ from app.models.runtime import ResearchRun, ItemRevision
 from app.models.company import Security, ItemCompanyLink
 from app.models.intake import InformationItem
 from app.models.strategy import StrategyVersion
+from app.models.sealing import PrimaryListing, EvaluationSeal
 from app.services import data_mode
 from app.services.scoring_service import score_company, score_security, inputs, config, numeric
 from app.services.strategy_service import gates
@@ -80,6 +81,21 @@ def source_stats(db,item,ref):
             'excerpt':original[:320],'meaning':'已取得资料的原文摘录；研判建议与有效评分分别展示','evidence':[ref]}
 
 
+def formal_readiness(db,security,workspace_id,release,cutoff):
+    listing=db.scalar(select(PrimaryListing).where(PrimaryListing.security_id==security.id,PrimaryListing.created_at<=cutoff))
+    if listing:
+        policy=json.loads(listing.close_policy_json)
+        if data_mode.real_evidence(db,policy.get('evidence'),workspace_id,security.company_id,cutoff):
+            slot=db.scalar(select(EvaluationSeal).where(EvaluationSeal.workspace_id==workspace_id,
+                EvaluationSeal.security_id==security.id,EvaluationSeal.release_id==release.id if release else False,
+                EvaluationSeal.state=='provisional',EvaluationSeal.knowledge_cutoff>cutoff)
+                .order_by(EvaluationSeal.knowledge_cutoff).limit(1))
+            if slot:
+                return {'phase':'provisional','market_session':slot.market_session,'planned_cutoff':slot.knowledge_cutoff.isoformat()},'日历已准备；等待计划会话截止，尚未封存或应用'
+            return {'phase':'calendar_prepared'},'日历已准备；本次研究仍未正式封存或应用'
+    return {'phase':'calendar_missing'},'正式封存机制已实现；本证券的批准市场日历与FINAL收盘依据尚待接入'
+
+
 def start_run(db,principal,command_key):
     request_hash=digest({'actor':principal.user.id,'mode':'real_research_preview','command_version':'1'})
     db.execute(select(func.pg_advisory_xact_lock(int(digest({'workspace':principal.workspace.id,'key':command_key})[:15],16))))
@@ -125,11 +141,11 @@ def start_run(db,principal,command_key):
             quote=quotes.get('price:'+security.ticker)
             outcome='UNKNOWN' if preview['passes'] is None else 'MATCH' if preview['passes'] else 'NO_MATCH'
             if release is None:outcome='UNKNOWN'
-            # No formal session/calendar/close policy is configured: this run is a
-            # traceable research preview, never a membership decision.
+            formal,gap=formal_readiness(db,security,principal.workspace.id,release,cutoff)
+            # Prepared calendar/tasks do not turn a research preview into a seal.
             securities.append({'security_id':security.id,'ticker':security.ticker,'market':security.market,'currency':security.currency,
-                'latest_quote':quote,'valuation':valuation,'strategy':{**preview,'result':outcome,'applied':False,'release_id':release.id if release else None},
-                'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+['正式封存机制已实现；本证券的批准市场日历与FINAL收盘依据尚待接入']})
+                'latest_quote':quote,'valuation':valuation,'formal_readiness':formal,'strategy':{**preview,'result':outcome,'applied':False,'release_id':release.id if release else None},
+                'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+[gap]})
         results.append({'company_id':company.id,'company_name':company.name,'analysis':stats_by_company.get(company.id,[]),'quality':quality,'securities':securities,'judgment_proposals':proposals})
         calculation_refs.append({'company_id':company.id,'inputs':quality['input_refs'],'judgments':quality['judgment_refs'],'template_hash':quality['template']['config_hash'],
                                  'pending_proposals':[{'id':p['revision_id'],'hash':p['hash']} for p in proposals]})

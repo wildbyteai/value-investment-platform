@@ -72,22 +72,83 @@ def test_t43_missing_price_provisional_fixed_manifest_lost_ack(prepared):
             assert db.scalar(select(func.count(cls.id)).where(field=='strategy.sealed'))==1
     assert claim(id)['evaluation_id']==result
 
-def price(ws,minute,published=0,key='price:600001.SH'):
+def price(ws,minute,published=0,key='price:600001.SH',kind='price'):
     with Session() as db:
         at(db,minute)
         payload={'ticker':'600001.SH','currency':'CNY','raw_close':str(10+minute),'fx_per_cny':'1','evidence':[{'fixture':True}],'session':'2026-10-07','is_final':True,'price_kind':'CLOSING'}
-        row=ResearchInput(workspace_id=ws,company_id='00000000-0000-4000-8000-000000000001',input_key=key,kind='price',payload_json=canonical(payload),content_hash=digest(payload),
+        row=ResearchInput(workspace_id=ws,company_id='00000000-0000-4000-8000-000000000001',input_key=key,kind=kind,payload_json=canonical(payload),content_hash=digest(payload),
             effective_at=CLOSE,published_at=CLOSE+timedelta(minutes=published),known_at=CLOSE+timedelta(minutes=minute),synthetic=True)
         db.add(row);db.commit();return row.id
 
 def test_t43_cutoff_and_publication_no_backfill(prepared):
     _,ws,_=prepared;id,_,_=arrange(ws)
-    usable=price(ws,40);late=price(ws,61);after_close=price(ws,50,published=1,key='late-announcement')
+    usable=price(ws,40,published=15);late=price(ws,61,published=40)
+    after_close=price(ws,50,published=1,key='late-announcement',kind='financial_observations')
     token=claim(id);f=freeze(token)
     refs={r['revision_id'] for group in f[2]['inputs'].values() for r in group['inputs']}
     assert usable in refs and late not in refs and after_close not in refs
     assert f[2]['inputs']['price']['quality']=='valid'
     finish(token,f)
+
+@pytest.mark.parametrize('minute',[15,40,60])
+def test_daily_quote_after_close_grace_period_shared_by_preview_and_seal(prepared,minute):
+    _,ws,_=prepared;id,_,_=arrange(ws)
+    usable=price(ws,minute,published=minute)
+    from app.services.scoring_service import inputs
+    with Session() as db:
+        chosen=inputs(db,'00000000-0000-4000-8000-000000000001',ws,CLOSE,CLOSE+timedelta(minutes=60))
+        assert usable in {r.id for r in chosen}
+    token=claim(id);f=freeze(token)
+    assert usable in {r['revision_id'] for r in f[2]['inputs']['price']['inputs']}
+    price(ws,70,published=70)
+    assert freeze(token)[0:2]==f[0:2]
+    finish(token,f)
+
+def test_after_close_approval_before_cutoff_is_a_known_decision(prepared):
+    _,ws,_=prepared;id,_,_=arrange(ws)
+    with Session() as db:
+        at(db,50)
+        slot=JudgmentSlot(slot_key='after-close-review',workspace_id=ws,company_id='00000000-0000-4000-8000-000000000001',kind='risk')
+        db.add(slot);db.flush()
+        rev=JudgmentRevision(slot_id=slot.id,author_type='human',decision='accepted',created_at=CLOSE+timedelta(minutes=50),
+            published_at=CLOSE+timedelta(minutes=50),effective_at=CLOSE,
+            value_json=canonical({'confirmed':True,'risk_code':'confirmed_fraud','target_kind':'company','target_id':slot.company_id}),evidence_json='[{"fixture":true}]')
+        db.add(rev);db.commit();revision_id=rev.id
+    token=claim(id);f=freeze(token)
+    assert revision_id in {r['revision_id'] for r in f[2]['inputs']['risks']['inputs']}
+    finish(token,f)
+
+def test_real_after_close_disclosure_not_legalized_by_early_approval(prepared,monkeypatch):
+    _,ws,_=prepared;_,item,ref=real_branch_fixture(ws)
+    from app.services.scoring_service import decision_evidence_published_by
+    from app.models.runtime import ItemRevision
+    from app.services import data_mode
+    monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
+    with Session() as db:
+        source=db.get(ItemRevision,ref['source_revision_id'])
+        payload=json.loads(source.payload_json);payload['raw_capture']={'disclosure_date':'2026-10-08'}
+        source.payload_json=canonical(payload)
+        assert not decision_evidence_published_by(db,[ref],CLOSE)
+        payload['raw_capture']['disclosure_date']='2026-10-06';source.payload_json=canonical(payload)
+        assert decision_evidence_published_by(db,[ref],CLOSE)
+        db.rollback()
+
+def test_independent_share_balance_frozen_with_original_reference(prepared):
+    _,ws,_=prepared;id,_,_=arrange(ws)
+    from test_share_capital import bundle
+    from app.services.share_capital import normalize
+    b=bundle();b.update(shares_as_of='2026-10-07',ordinary_shares_verified_through='2026-10-07')
+    value=normalize(b)
+    with Session() as db:
+        at(db,-10)
+        row=ResearchInput(workspace_id=ws,company_id='00000000-0000-4000-8000-000000000001',input_key='share_capital:c:2026-10-07',kind='share_capital',
+            payload_json=canonical(value),content_hash=digest(value),effective_at=CLOSE-timedelta(minutes=10),published_at=CLOSE-timedelta(minutes=10),known_at=CLOSE-timedelta(minutes=10),synthetic=True)
+        db.add(row);db.commit();row_id=row.id
+    token=claim(id);f=freeze(token)
+    assert row_id in {r['revision_id'] for r in f[2]['inputs']['share_capital']['inputs']}
+    result=finish(token,f)
+    with Session() as db:
+        assert json.loads(db.get(Evaluation,result).result_json)['valuation']['share_capital']['input_id']==row_id
 
 def test_two_claimers_expiry_old_fence_recovery(prepared):
     _,ws,_=prepared;id,_,_=arrange(ws)

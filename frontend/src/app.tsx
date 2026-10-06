@@ -756,6 +756,14 @@ function CompanyPanel({
               <details>
                 <summary>估值依据与缺口</summary>
                 <GapList values={s.missing_data} />
+                {s.share_capital && (
+                  <>
+                    <p>已核对股数：{s.share_capital.ordinary_shares} 股；结存日 {s.share_capital.shares_as_of}，证据覆盖至 {s.share_capital.ordinary_shares_verified_through}。覆盖之后需取得新的依据。</p>
+                    {s.share_capital.classes.map((row: any) => (
+                      <p key={row.class_key} className="muted">{row.class_key}：在外 {row.outstanding_shares} 股，库存 {row.treasury_shares} 股，已发行 {row.issued_shares} 股。</p>
+                    ))}
+                  </>
+                )}
                 {s.basis && (
                   <p>
                     利润 {s.basis.ordinary_profit_ttm} / 股本{" "}

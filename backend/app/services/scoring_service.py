@@ -5,7 +5,7 @@ from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from functools import wraps
-from sqlalchemy import select
+from sqlalchemy import select, and_, or_
 from app.models.runtime import ResearchInput, TemplateRelease
 from app.models.judgment import JudgmentSlot, JudgmentRevision
 from app.services import data_mode
@@ -177,10 +177,21 @@ def apply_patches(result, patches, origin):
     return result
 
 
+def input_time_bounds(as_of, cutoff):
+    """Daily quotes may be published during the fixed post-close grace period.
+
+    Business disclosures retain the close-time publication bound. Actual DB
+    knowledge and, for seals, the commit ledger still enforce the cutoff.
+    """
+    quote = and_(ResearchInput.kind == 'price', ResearchInput.input_key.like('price:%'))
+    return (ResearchInput.effective_at <= as_of, ResearchInput.known_at <= cutoff,
+            or_(and_(quote, ResearchInput.published_at <= cutoff),
+                and_(~quote, ResearchInput.published_at <= as_of)))
+
+
 def inputs(db, company_id, workspace_id, as_of, cutoff):
     rows = db.scalars(select(ResearchInput).where(ResearchInput.company_id == company_id,
-        ResearchInput.workspace_id == workspace_id, ResearchInput.effective_at <= as_of,
-        ResearchInput.published_at <= as_of, ResearchInput.known_at <= cutoff)
+        ResearchInput.workspace_id == workspace_id, *input_time_bounds(as_of, cutoff))
         .order_by(ResearchInput.known_at, ResearchInput.id)).all()
     latest = {}
     for row in rows:
@@ -205,6 +216,29 @@ def metrics_from_financials(f):
     return m
 
 
+def decision_evidence_published_by(db, refs, as_of):
+    """A judgment's approval time is not its underlying disclosure time.
+
+    Use immutable source publication dates conservatively at local end of day;
+    without such a date, only a source already acquired by close is provable.
+    """
+    if data_mode.fixture_mode():return True
+    from app.models.runtime import ItemRevision
+    from datetime import time
+    for ref in refs:
+        revision=db.get(ItemRevision,ref.get('source_revision_id',''))
+        if not revision:return False
+        raw=json.loads(revision.payload_json).get('raw_capture',{})
+        dates=([d.get('disclosure_date') for d in raw.get('documents',[])] or [raw.get('disclosure_date')])
+        if all(dates):
+            try:
+                bounds=[datetime.combine(__import__('datetime').date.fromisoformat(d),time.max,ZoneInfo('Asia/Shanghai')) for d in dates]
+            except (ValueError,TypeError):return False
+            if max(bounds)>as_of:return False
+        elif revision.created_at>as_of:return False
+    return bool(refs)
+
+
 def current_decisions(db, company_id, workspace_id, as_of, cutoff, revision_ids=None):
     slots = db.scalars(select(JudgmentSlot).where(JudgmentSlot.company_id == company_id,
                         JudgmentSlot.workspace_id == workspace_id)).all()
@@ -218,7 +252,7 @@ def current_decisions(db, company_id, workspace_id, as_of, cutoff, revision_ids=
         for rev in revisions:
             if revision_ids is not None and rev.id not in revision_ids: continue
             if rev.effective_at and rev.effective_at>as_of: continue
-            if rev.published_at and rev.published_at>as_of: continue
+            if rev.decision=='accepted' and not decision_evidence_published_by(db,json.loads(rev.evidence_json),as_of):continue
             if rev.author_type=='auto' and rev.decision=='accepted':
                 auto=rev
                 if effective is None or effective.author_type=='auto': effective=rev
@@ -350,34 +384,47 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
         if fx:
             price={**price,'fx_per_cny':fx['value'],'fx_reference':fx,'evidence':price.get('evidence',[])+fx['evidence']}
     observation=next((json.loads(r.payload_json) for r in rows if r.kind=='financial_observations'),None)
-    shares_current=bool(f and (not f.get('ordinary_shares_valid_until') or as_of<datetime.fromisoformat(f['ordinary_shares_valid_until'])))
-    shares_verified=bool(f and (not f.get('ordinary_shares_verified_through') or as_of.astimezone(ZoneInfo('Asia/Shanghai')).date().isoformat()<=f['ordinary_shares_verified_through']))
+    # An independent closing balance may supersede report-period capital,
+    # without changing a single report-period financial fact or metric.
+    capital_rows=[(r,json.loads(r.payload_json)) for r in rows if r.kind=='share_capital']
+    capital_row,capital=max(capital_rows,key=lambda pair:(pair[1]['shares_as_of'],getattr(pair[0],'known_at',as_of),pair[0].id)) if capital_rows else (None,None)
+    report_day=max((fact['period_end'] for fact in (f or {}).get('lineage',{}).get('facts',[]) if fact['key']=='ordinary_shares'),default='0001-01-01')
+    if capital and capital['shares_as_of']<report_day:capital_row,capital=None,None
+    share_basis=capital or f
+    shares_current=bool(share_basis and (not share_basis.get('ordinary_shares_valid_until') or as_of<datetime.fromisoformat(share_basis['ordinary_shares_valid_until'])))
+    # Preserve later known changes until a balance after that change is verified.
+    if capital and f and f.get('ordinary_shares_valid_until'):
+        change=datetime.fromisoformat(f['ordinary_shares_valid_until'])
+        if capital['shares_as_of']<change.astimezone(ZoneInfo('Asia/Shanghai')).date().isoformat() and as_of>=change:shares_current=False
+    shares_verified=bool(share_basis and (not share_basis.get('ordinary_shares_verified_through') or as_of.astimezone(ZoneInfo('Asia/Shanghai')).date().isoformat()<=share_basis['ordinary_shares_verified_through']))
     shares_current=shares_current and shares_verified
     gaps=[]
     if not price:gaps.append('未取得对应证券正式收盘价')
     elif not price.get('is_final') or (session and price['session']!=session):gaps.append('已取得日线价格，但正式收盘最终性或对应交易日尚未核验')
     if not f:gaps.extend(observation.get('missing_data',[]) if observation else ['普通股TTM利润、等权股本及有效期'])
-    if f and not shares_current:gaps.append('股数证据仅覆盖较早日期，需核对当前流通在外同权普通股数量' if not shares_verified else '已知期后股数变动，需核对最新流通在外同权普通股数量')
+    if share_basis and not shares_current:gaps.append('股数证据仅覆盖较早日期，需核对当前流通在外同权普通股数量' if not shares_verified else '已知期后股数变动，需核对最新流通在外同权普通股数量')
     if security.currency!='CNY' and (not price or not price.get('fx_per_cny')):
         has_reference_fx=security.currency=='HKD' and any(r.kind=='fx' for r in rows)
         gaps.append('已取得参考汇率；待证券行情确定后匹配同日汇率' if has_reference_fx and not price else '跨币种估值需要对应汇率')
     result={'security_id':security.id,'market':security.market,'ticker':security.ticker,'currency':security.currency,
             'pe_ttm':None,'valuation_score':None,'reason':'UNKNOWN_PE','latest_quote':price,
-            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(shares_current and f.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}
+            'share_capital':{**capital,'input_id':capital_row.id} if capital else None,
+            'missing_data':gaps, 'data_mode':'synthetic_test' if data_mode.fixture_mode() else 'real_public','input_refs':[r.id for r in rows], 'approved_inputs':bool(rows), 'price_final':bool(price and price.get('is_final')), 'price_lag_sessions':0 if price and price.get('is_final') and (not session or price.get('session')==session) else None, 'common_equity':bool(shares_current and share_basis.get('equivalent_share_rights')), 'suspended':bool(price and price.get('tradestatus')=='0')}
     if not f or not price: return result
     if not shares_current:return {**result,'reason':'SHARE_BASIS_NOT_CURRENT' if not shares_verified else 'SHARE_BASIS_EXPIRED','common_equity':False}
     if not price.get('is_final') or (session and price['session']!=session):
         return {**result,'reason':'FINAL_PRICE_REQUIRED'}
     if any(k not in price for k in ('currency','fx_per_cny','raw_close','evidence')):
         return {**result,'reason':'INCOMPLETE_PRICE_BASIS','missing_data':gaps+['行情币种、汇率或原始价格证据不完整']}
-    if (not f.get('equivalent_share_rights') or price['currency']!=security.currency
-        or dec(f['ordinary_shares'])<=0 or dec(f['ordinary_profit_ttm'])<=0 or dec(price['fx_per_cny'])<=0
+    if (not share_basis.get('equivalent_share_rights') or price['currency']!=security.currency
+        or dec(share_basis['ordinary_shares'])<=0 or dec(f['ordinary_profit_ttm'])<=0 or dec(price['fx_per_cny'])<=0
         or as_of>=datetime.fromisoformat(f['obligation_valid_until'])):
         return {**result,'reason':'INVALID_SHARE_FINANCIAL_OR_FX','missing_data':['股本/盈利/币种/汇率或报告有效期不满足估值条件']}
-    eps=q(dec(f['ordinary_profit_ttm'])/dec(f['ordinary_shares']));converted=q(eps*dec(price['fx_per_cny']))
+    eps=q(dec(f['ordinary_profit_ttm'])/dec(share_basis['ordinary_shares']));converted=q(eps*dec(price['fx_per_cny']))
     pe=q(dec(price['raw_close'])/converted);v=config('scoring-standard-v1.json')['valuation']
     return {**result,'pe_ttm':float(pe),'pe_exact':numeric(pe),'valuation_score':float(linear(pe,v['zero_score_at'],v['full_score_at'])),
             'valuation_exact':numeric(linear(pe,v['zero_score_at'],v['full_score_at'])),'reason':None,'missing_data':[],
-            'basis':{'ordinary_profit_ttm':f['ordinary_profit_ttm'],'ordinary_shares':f['ordinary_shares'],
+            'basis':{'ordinary_profit_ttm':f['ordinary_profit_ttm'],'ordinary_shares':share_basis['ordinary_shares'],
+                     'share_evidence':share_basis['evidence'],
                      'eps':numeric(eps),'fx':price['fx_per_cny'],'converted_eps':numeric(converted),'raw_final_close':price['raw_close'],
                      'session':price['session'],'evidence':price['evidence']}}

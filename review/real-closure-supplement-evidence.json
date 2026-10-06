@@ -1,0 +1,58 @@
+{
+  "basis_revision": "6ca37557cead1aa576450ab34d06ffe14b72a6da",
+  "verification_date": "2026-10-06",
+  "source_hashes": {
+    "backend/app/services/scoring_service.py": "ef3de324f042ea456232b9a8b68bf404fe5bbc300a9ec87ea884a9203751c22c",
+    "backend/app/services/sealing_service.py": "cb927a4ed8681e6409e07b38d4592cbfe5691d1c78acea8e3de558d4dfa0748d",
+    "backend/app/services/share_capital.py": "63d8eeb4784d821385af8fc6ad0d5ef249adbaff95b5f065c6d0a56bd6a93cb3",
+    "backend/app/services/research_pipeline.py": "8cec6ef58002d8bfd52aaeaac3faa6831a584d4a5f96330cc5ccd0e22086448d",
+    "backend/scripts_original_inputs.py": "f8002620483e51685d618a0f098e25804a9260599a26bfaacd7b622b47a2598d",
+    "frontend/src/app.tsx": "763b6b69b505ce42bd6a38520117a639a80b0bb824dc8e4e76902ea8b5389233",
+    "backend/static/app.js": "fe74aa92332cbeb9495fae626f911eab83ac3c340b35cbeebd6d501098ef0586"
+  },
+  "checks": {
+    "backend_full_suite": {
+      "result": "241 passed",
+      "environment": "project-isolated local synthetic database",
+      "stage": "before final manifest regression and calendar preview copy"
+    },
+    "final_related_suite": {
+      "command": "tests/test_sealing.py tests/test_research_pipeline.py tests/test_judgment_proposals.py",
+      "result": "38 passed"
+    },
+    "frontend_build": "passed",
+    "browser": "actual company share coverage/classes and two provisional rows read back"
+  },
+  "real_readback": {
+    "actual_local_real_target_verified": true,
+    "share_snapshots": 2,
+    "latest_verified_day": "2026-09-17",
+    "class_balances_and_source_rows_verified": true,
+    "coverage_not_extrapolated": true,
+    "input_replay_once": true,
+    "audit_and_outbox_once": true,
+    "old_actual_content_hashes_unchanged": true,
+    "old_counts": {
+      "runs": 12,
+      "revisions": 45,
+      "inputs": 33
+    },
+    "original_api_readback": true,
+    "cross_workspace_isolation": true,
+    "calendar_listings": 2,
+    "expected_sessions": 4,
+    "provisional_slots": 2,
+    "real_sealed_evaluations": 0,
+    "next_cutoff": "2026-10-08T16:30:00+08:00",
+    "research_preview_replay": true,
+    "pending_proposals": 7,
+    "run_id": "e5da8997-f91f-46db-a7f8-41c67b433792",
+    "manifest_hash": "7197bc20a2c7a6651d6e869a6116c7b02baf3e29f036cc9e9a67ec4e53ec70ab",
+    "status": "partial",
+    "read_items": 28
+  },
+  "raw_values_included": false,
+  "external_model_sent": false,
+  "membership_applied": false,
+  "complete_slice_acceptance": false
+}

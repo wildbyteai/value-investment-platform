@@ -15,7 +15,7 @@ from app.models.strategy import StrategyVersion, SecurityState, ChangeRecord
 from app.models.intake import SourceRegistry
 from app.services import data_mode
 from app.services.transactions import canonical, digest, record
-from app.services.scoring_service import inputs, current_decisions, resolve_template, score_company, score_security, config, ROOT
+from app.services.scoring_service import inputs, input_time_bounds, current_decisions, resolve_template, score_company, score_security, config, ROOT
 from app.services.strategy_service import gates
 from app.services.state_machine import Eval, apply_session
 
@@ -23,7 +23,7 @@ GROUPS=('identity','calendar','price','fx','share_capital','financials','report_
         'impacts','rubrics','risks','human_overrides','templates','decision_policies','algorithms','rights')
 CONFIGS=('numeric-policy-v1.json','auto-review-policy-v1.json','scoring-standard-v1.json',
          'rubrics-standard-v1.json','metric-definitions-v2.json','dimensions-standard-v1.json','templates-standard-v1.json')
-ALGORITHMS=('scoring_service.py','strategy_service.py','state_machine.py','sealing_service.py','knowledge_clock.py')
+ALGORITHMS=('scoring_service.py','strategy_service.py','state_machine.py','sealing_service.py','knowledge_clock.py','share_capital.py')
 
 
 @dataclass(frozen=True)
@@ -163,8 +163,8 @@ def freeze(db,context,token):
     selected=[]
     # Same recorded time with different values for one logical input is conflicting.
     all_rows=db.scalars(select(ResearchInput).where(ResearchInput.company_id==company.id,
-        ResearchInput.workspace_id==seal.workspace_id,ResearchInput.effective_at<=seal.evaluation_as_of,
-        ResearchInput.published_at<=seal.evaluation_as_of,ResearchInput.known_at<=seal.knowledge_cutoff)).all()
+        ResearchInput.workspace_id==seal.workspace_id,
+        *input_time_bounds(seal.evaluation_as_of,seal.knowledge_cutoff))).all()
     # Filter by the DB ledger before choosing the latest logical input.
     candidates=[r for r in all_rows if ('research_input',r.id) in knowledge]
     candidates.sort(key=lambda r:knowledge[('research_input',r.id)].sequence)
@@ -244,6 +244,7 @@ def freeze(db,context,token):
                 if fx_row:add('fx','research_input',fx_row.id,fx_row.content_hash)
         elif row.kind=='financials':
             for group in ('financials','share_capital','report_obligations'):add(group,'research_input',row.id,row.content_hash)
+        elif row.kind=='share_capital':add('share_capital','research_input',row.id,row.content_hash)
         for ref in json.loads(row.payload_json).get('evidence',[]) if isinstance(json.loads(row.payload_json).get('evidence'),list) else []:
             from app.models.runtime import ItemRevision
             from app.models.intake import InformationItem
@@ -265,7 +266,7 @@ def freeze(db,context,token):
     if data_mode.fixture_mode():groups['rights']={'quality':'not_applicable','inputs':[],'reason_codes':['original_disposable_fixture']}
     if conflicts:
         for key in conflicts:
-            group='price' if key.startswith('price:') else 'fx' if key.startswith('fx:') else 'financials'
+            group='price' if key.startswith('price:') else 'fx' if key.startswith('fx:') else 'share_capital' if key.startswith('share_capital:') else 'financials'
             groups[group]={'quality':'conflicting','inputs':[],'reason_codes':['same_knowledge_time_conflict']}
     quality=score_company(db,company,seal.workspace_id,seal.evaluation_as_of,seal.knowledge_cutoff,template,input_rows=selected,decision_rows=decisions)
     valuation=score_security(db,security,seal.workspace_id,seal.evaluation_as_of,seal.knowledge_cutoff,seal.market_session,input_rows=selected)

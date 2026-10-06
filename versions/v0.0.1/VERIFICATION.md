@@ -107,3 +107,9 @@
 基线debbbb36；本人已登录并对适用协议使用范围作出确认。01211.HK与09969.HK实际各22条9月未复权日线已在备份后追加真实库；原值/hash/独立币种/同日ECB Decimal计算/原文API/重放一次效果及审计/outbox/旧11研究43修订31输入实际内容hash/隔离404通过。修复官方SDK成交量字段TRADE_VOL并收紧夹具，针对性29 passed（1已有warning）；未重跑全套、不改UI/schema。新固定研究12676932-adda-45ea-b010-fb0261dc9b8d、hash f9c69af9229666825d7e3ced5993bad2f6c000657823df83bbbe07af2cc2f0d7，含27份可读资料，POST重放保持ID/hash，仍partial。8766 API已刷新，旧8765与原worker保留。协议依据为本人确认，未伪称取得全文；本轮未外发原值。FT-01…04执行详见[FUTU-INTEGRATION](../../review/FUTU-INTEGRATION.md#真实日线捕获入库与研究回读)。
 
 真实primary_listing=0、market_session=0、evaluation_seal=0。港股日线保持REFERENCE；当前同权普通股覆盖、FINAL与批准日历/正式seal尚未通过，7项经营建议仍pending不计分，PE/估值/策略UNKNOWN。行情贯通不等于完整真实判断或首slice签收。
+
+## 2026-10-06 真实闭环有界补齐
+
+基线6ca3755。价格+60宽限与判断批准/原文发表界限已按12修复，独立share_capital规范化、导入、估值、冻结manifest与UI已实施。真实诺诚健华8/31与9/17两份股本输入逐类对账入库、原文/API/权限隔离/精确重放一次及12旧研究/45旧修订/33旧输入实际hash保持通过。深交所2026规则/国庆公告登记，两深市挂牌、10/8–13四计划会话、10/8两个provisional任务已真实API/浏览器回读；采用全日终场15:30，固定cutoff16:30，尚未到期，真实封存结果仍0。
+
+全套隔离合成库241 passed；后续新增股本冻结与准备文案相关38 passed；UI构建通过。新研究28份真实可读资料，仍partial，7建议pending。本轮不伪造FINAL、当前股数、校准或历史knowledge；完整必选仍未通过。逐项证据、官方依据和后续停点见[补齐记录](../../review/REAL-CLOSURE-SUPPLEMENT.md)。原件/原值/备份和私人运行证据不入Git。
