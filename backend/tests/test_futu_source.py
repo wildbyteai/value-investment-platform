@@ -83,7 +83,8 @@ def install_fake_sdk(monkeypatch, snapshots, fail=False, pagination=False):
             s=next(s for s in snapshots if s['ticker'][:5]==code[3:])
             return 0,Frame(s['bars_rows']),b'next' if pagination else None
         def close(self):calls.append(('close',))
-    fields=SimpleNamespace(**{k:k for k in ('DATE_TIME','OPEN','HIGH','LOW','CLOSE','VOLUME')})
+    # SDK 10.11.7108 calls the volume request field TRADE_VOL; its returned column is volume.
+    fields=SimpleNamespace(DATE_TIME='1', OPEN='2', CLOSE='3', HIGH='4', LOW='5', TRADE_VOL='8')
     sdk=SimpleNamespace(OpenQuoteContext=Context,Market=SimpleNamespace(HK='HK'),SecurityType=SimpleNamespace(STOCK='STOCK'),
         KLType=SimpleNamespace(K_DAY='K_DAY'),AuType=SimpleNamespace(NONE='NONE'),KL_FIELD=fields,RET_OK=0)
     logger=SimpleNamespace(enable_console_log=lambda value:None)
@@ -105,6 +106,7 @@ def test_capture_explicit_unadjusted_two_symbols_and_no_trade(monkeypatch,tmp_pa
     histories=[call for call in calls if call[0]=='history']
     assert {call[1] for call in histories}=={'HK.01211','HK.09969'}
     assert all(call[2]['autype']=='NONE' and call[2]['max_count']==40 and call[2]['page_req_key'] is None for call in histories)
+    assert all(call[2]['fields']==['1','2','4','5','3','8'] for call in histories)
     assert calls[-1]==('close',)
     assert all('currency' not in s for _,s in captured)
 

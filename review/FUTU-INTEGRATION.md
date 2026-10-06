@@ -42,3 +42,19 @@ FT-03的报价币种证据已经落地：诺诚健华既有中报补入PDF物理
 当前仍未请求、保存或导入富途日线。官方API协议入口本轮两次504且网页限频，停止重试，未取得本人实际适用协议全文；账户登录/免费额度不足以自动确认存储分析范围。已向本人请求核实“仅本机保存、个人研究、不对外分享”是否在所接受API协议范围内，这是上游权利事实核对，不是重新申请已有本机写库授权。没有生成通过的rights记录或用占位值绕过捕获门。币种依据文件已经准备，收到明确范围事实后才运行有限日线捕获与原值/FX/幂等/真实研究/UI验证。
 
 本机证据：`local-data/verification/futu-identity-probe.json`、`futu-before-import.json`、`futu-currency-readback.json`、`futu-evidence-api-readback.json`。备份经pg_restore --list校验；回退代码不删除追加证据，恢复真实库仍需明确恢复范围授权。诺诚健华当前普通股覆盖、两证券FINAL、批准日历/正式seal及pending经营建议保持既有未完成状态，没有虚构股份数量、最终价或确认判断。
+
+## 真实日线捕获、入库与研究回读
+
+接续基线 main `debbbb36eff6e64c3a748e048f92a72ab7944b2f`。本人对前述适用API协议范围问题回复“可以写库，可以对外”。本机权利记录明确为owner_attestation，标记协议名称/版本和全文未由系统独立取得，不伪造条款编号。此次只执行两证券本机保存和确定性研究，外发及外部模型仍关闭；本人的对外授权没有自动扩大来源条款或实际产品出口。本轮没有把原值、账号或协议记录上传GitHub。
+
+首次捕获未发出历史请求：`KL_FIELD.VOLUME`并非官方SDK常量，隔离夹具曾错误模拟同名字段。查验已安装官方10.11.7108的`KL_FIELD`与字段映射，修为`TRADE_VOL`（响应列仍为`volume`），夹具按实际常量值收紧并断言所请求字段。针对`tests/test_futu_source.py`运行29 passed、1条既有Starlette/httpx弃用warning；不把本次针对性回归称为重跑全套223项。
+
+FT-01/02真实执行：通过项目CLI与已登录本机OpenD，固定两股、2026-09-01…09-30、日K、显式AuType.NONE、max_count=40、无分页/订阅/交易。两股各22条SDK解码行；原件/hash/日期/身份/OHLC/整数成交量验证通过，原值仅保存Git忽略目录。实际取得/知识时间为本次，不回填9月。
+
+FT-03真实写入：先核验实际本机PG、`vip_v0001_local`与schema0010，另存写前备份并通过pg_restore --list。用已有独立币种修订在事务内追加两price输入、两个可读原文修订及审计/outbox。原快照重放复用相同input/revision，两个效果各一份审计/outbox；旧11个研究、43个修订、31个输入逐ID重算实际manifest/payload内容hash不变。跨工作区原文与研究均404，无schema/权限改变。
+
+FT-04真实研究：原文API逐行等同选定SDK原值；两股区间统计独立Decimal复算通过；9月30日行情各自匹配同日ECB HKD/EUR、CNY/EUR参考值，逐日除法复核通过。只刷新8766 API，保留8765与原worker。新研究`12676932-adda-45ea-b010-fb0261dc9b8d`，manifest hash `f9c69af9229666825d7e3ced5993bad2f6c000657823df83bbbe07af2cc2f0d7`，27份可读资料；POST重放保持ID/hash，11个旧快照GET内容保持。7项建议仍pending、不计分；港股PE/估值与正式策略仍UNKNOWN，不因取得行情伪造当前股数或FINAL。
+
+实际浏览器刷新公司页可见09969参考日线、日期及未复权/最终性提示；研究快照页选中本次最新结果，两股区间统计、ECB参考换算、A/H独立价格和待补原因均可读。此项为本机产品页面真实读取，不是原型或health代替业务验证；本轮没有新增UI代码或重复前端构建。
+
+本机执行证据：`local-data/verification/futu-bars-before-import.json`（备份/写前基线）、`readback-futu-bars.py`、`futu-bars-readback.json`、`futu-live-research-run.json`；原件在`raw-data/futu/`，权利记录在`local-data/futu/rights.json`。数据库回退仍优先回退代码并保留追加事实；真实库恢复需要另有明确范围授权。此节关闭真实港股参考行情获取/入库/研究缺口，当前股数、FINAL、批准日历/正式seal和完整经营判断仍未通过，完整版本状态没有改变。

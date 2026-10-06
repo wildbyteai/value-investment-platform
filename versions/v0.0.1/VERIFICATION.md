@@ -101,3 +101,9 @@
 ## 2026-10-06 富途已有账号接续
 
 基线e2fad1a；新增富途两股显式参考行情入口。最终223项隔离合成库测试通过（新增29项），官方SDK实际导入/常量检查通过；本机socket只读检查确认OpenD未监听，未验证本人账户API权限、保存分析协议范围或独立报价币种原件。未取得真实港股bars、写真实库或正式seal，完整必选仍未通过。详细范围/场景/接续见[FT-01…04](../../review/FUTU-INTEGRATION.md)。此前测试数和真实结果保留为历史。
+
+## 2026-10-06 富途真实日线贯通（最新）
+
+基线debbbb36；本人已登录并对适用协议使用范围作出确认。01211.HK与09969.HK实际各22条9月未复权日线已在备份后追加真实库；原值/hash/独立币种/同日ECB Decimal计算/原文API/重放一次效果及审计/outbox/旧11研究43修订31输入实际内容hash/隔离404通过。修复官方SDK成交量字段TRADE_VOL并收紧夹具，针对性29 passed（1已有warning）；未重跑全套、不改UI/schema。新固定研究12676932-adda-45ea-b010-fb0261dc9b8d、hash f9c69af9229666825d7e3ced5993bad2f6c000657823df83bbbe07af2cc2f0d7，含27份可读资料，POST重放保持ID/hash，仍partial。8766 API已刷新，旧8765与原worker保留。协议依据为本人确认，未伪称取得全文；本轮未外发原值。FT-01…04执行详见[FUTU-INTEGRATION](../../review/FUTU-INTEGRATION.md#真实日线捕获入库与研究回读)。
+
+真实primary_listing=0、market_session=0、evaluation_seal=0。港股日线保持REFERENCE；当前同权普通股覆盖、FINAL与批准日历/正式seal尚未通过，7项经营建议仍pending不计分，PE/估值/策略UNKNOWN。行情贯通不等于完整真实判断或首slice签收。

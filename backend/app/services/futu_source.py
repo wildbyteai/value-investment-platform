@@ -164,7 +164,7 @@ def capture(start, end, rights):
             ret, bars, next_key = context.request_history_kline(
                 code, start=start.isoformat(), end=end.isoformat(), ktype=KLType.K_DAY,
                 autype=AuType.NONE, max_count=40, page_req_key=None, extended_time=False,
-                fields=[KL_FIELD.DATE_TIME, KL_FIELD.OPEN, KL_FIELD.HIGH, KL_FIELD.LOW, KL_FIELD.CLOSE, KL_FIELD.VOLUME])
+                fields=[KL_FIELD.DATE_TIME, KL_FIELD.OPEN, KL_FIELD.HIGH, KL_FIELD.LOW, KL_FIELD.CLOSE, KL_FIELD.TRADE_VOL])
             if ret != RET_OK:
                 raise SourceError('FUTU_HISTORY_FAILED_CHECK_LOCAL_PERMISSIONS_OR_QUOTA')
             if next_key is not None:
