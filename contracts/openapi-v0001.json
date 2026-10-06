@@ -573,6 +573,58 @@
         }
       }
     },
+    "/api/judgments/proposals": {
+      "post": {
+        "tags": [
+          "judgments"
+        ],
+        "summary": "Propose Judgment",
+        "operationId": "propose_judgment_api_judgments_proposals_post",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/judgments/catalog/{company_id}": {
       "get": {
         "tags": [
@@ -1717,6 +1769,119 @@
           "value"
         ],
         "title": "OverrideIn"
+      },
+      "ProposalIn": {
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "dimension": {
+            "type": "string",
+            "title": "Dimension"
+          },
+          "rubric_ref": {
+            "type": "string",
+            "title": "Rubric Ref"
+          },
+          "criterion": {
+            "type": "string",
+            "title": "Criterion"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "grade": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 0.0,
+            "title": "Grade"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 3,
+            "pattern": "\\S",
+            "title": "Reason"
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effective From"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid Until"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceIn"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Evidence"
+          },
+          "research_method": {
+            "type": "string",
+            "const": "local_evidence_review",
+            "title": "Research Method",
+            "default": "local_evidence_review"
+          },
+          "author_label": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Author Label"
+          },
+          "limitations": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 3,
+            "pattern": "\\S",
+            "title": "Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_id",
+          "dimension",
+          "rubric_ref",
+          "criterion",
+          "period_start",
+          "period_end",
+          "grade",
+          "confidence",
+          "reason",
+          "effective_from",
+          "valid_until",
+          "evidence",
+          "author_label",
+          "limitations"
+        ],
+        "title": "ProposalIn"
       },
       "PublishIn": {
         "properties": {

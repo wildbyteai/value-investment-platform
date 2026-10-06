@@ -101,6 +101,20 @@ def human_override(db: Session, slot_key: str, value: dict, if_match_generation:
     if slot.generation != if_match_generation:
         return None, "conflict", slot.generation
     prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='accepted').order_by(JudgmentRevision.created_at.desc()).limit(1))
+    if prior is None and slot.kind=='rubric' and not release:
+        prior=db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='pending')
+                        .order_by(JudgmentRevision.created_at.desc()).limit(1))
+        if prior:
+            from datetime import datetime, timezone
+            from app.models.company import Company
+            from app.services.judgment_authoring import catalog
+            now=datetime.now(timezone.utc);proposed=json.loads(prior.value_json)
+            if not prior.valid_until or now>=prior.valid_until:
+                raise ValueError('研判建议已过期，请用新证据重新研究')
+            rules=catalog(db,db.get(Company,slot.company_id),workspace_id)
+            if not any(r['dimension']==slot.dimension and r['rubric_ref']==proposed.get('rubric_ref') and
+                       any(c['key']==proposed.get('criterion') for c in r['criteria']) for r in rules):
+                raise ValueError('研判建议不属于当前模板')
     if not release:
         if prior is None or not json.loads(prior.evidence_json):
             raise ValueError('缺少该判断槽的有效输入证据')
@@ -130,7 +144,6 @@ def human_override(db: Session, slot_key: str, value: dict, if_match_generation:
     rev = JudgmentRevision(slot_id=slot.id, author_type="human", value_json=canonical(value),
                            decision="released" if release else "accepted")
     # Replacement inherits evidence scope/time; it cannot invent evidence.
-    prior = db.get(JudgmentRevision, slot.effective_revision_id) if slot.effective_revision_id else db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='accepted').order_by(JudgmentRevision.created_at.desc()).limit(1))
     if prior:
         rev.evidence_json = prior.evidence_json
         rev.effective_at, rev.published_at, rev.valid_until = prior.effective_at, prior.published_at, prior.valid_until

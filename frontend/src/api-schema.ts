@@ -309,6 +309,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/judgments/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Propose Judgment */
+        post: operations["propose_judgment_api_judgments_proposals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/judgments/catalog/{company_id}": {
         parameters: {
             query?: never;
@@ -789,6 +806,55 @@ export interface components {
              * @default false
              */
             release: boolean;
+        };
+        /** ProposalIn */
+        ProposalIn: {
+            /** Company Id */
+            company_id: string;
+            /** Dimension */
+            dimension: string;
+            /** Rubric Ref */
+            rubric_ref: string;
+            /** Criterion */
+            criterion: string;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Grade */
+            grade: number;
+            /** Confidence */
+            confidence: number | string;
+            /** Reason */
+            reason: string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /**
+             * Valid Until
+             * Format: date-time
+             */
+            valid_until: string;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceIn"][];
+            /**
+             * Research Method
+             * @default local_evidence_review
+             * @constant
+             */
+            research_method: "local_evidence_review";
+            /** Author Label */
+            author_label: string;
+            /** Limitations */
+            limitations: string;
         };
         /** PublishIn */
         PublishIn: {
@@ -1341,6 +1407,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    propose_judgment_api_judgments_proposals_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProposalIn"];
             };
         };
         responses: {

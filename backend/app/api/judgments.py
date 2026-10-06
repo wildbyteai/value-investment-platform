@@ -56,7 +56,8 @@ def list_effective(
             'effective':json.loads(rev.value_json) if rev else None,
             'identity':{k:json.loads((db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,JudgmentRevision.decision=='accepted').order_by(JudgmentRevision.created_at.desc()).limit(1)) or prior).value_json).get(k) for k in ('rubric_ref','criterion','period_start','period_end')} if prior else {},
             'status':'effective' if rev else 'pending_review',
-            'author_type':rev.author_type if rev else None})
+            'author_type':(rev or prior).author_type if rev or prior else None,
+            'proposal':json.loads(prior.value_json) if prior and prior.decision=='pending' else None})
     return out
 
 
@@ -82,6 +83,21 @@ class CreateIn(BaseModel):
     effective_from: datetime
     valid_until: datetime
     evidence: list[EvidenceIn] = Field(min_length=1,max_length=10)
+
+
+class ProposalIn(CreateIn):
+    research_method: Literal['local_evidence_review'] = 'local_evidence_review'
+    author_label: str = Field(min_length=1,max_length=120)
+    limitations: str = Field(min_length=3,max_length=4000,pattern=r'\S')
+
+
+@router.post('/proposals',status_code=201)
+def propose_judgment(body: ProposalIn, principal: Principal = Depends(require('analysis.override')),
+                     db: Session = Depends(get_db), command_key: str = Header(alias='Idempotency-Key',min_length=1,max_length=240)):
+    from app.services.judgment_authoring import create
+    result=create(db,principal,body,command_key,proposal=True)
+    db.commit()
+    return result
 
 
 @router.get('/catalog/{company_id}')

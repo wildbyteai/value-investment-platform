@@ -335,7 +335,7 @@ export function Judgment({ j, catalog = [], execute, editable }: any) {
       <p>
         {j.effective
           ? `当前有效值：${j.kind === "rubric" ? j.effective.grade : j.effective.magnitude}`
-          : "当前等待重评，无有效判断"}
+          : j.proposal ? "AI研判建议 · 待确认，尚未计入评分" : "当前等待重评，无有效判断"}
       </p>
       {identity.period_start && (
         <p className="muted">
@@ -343,10 +343,17 @@ export function Judgment({ j, catalog = [], execute, editable }: any) {
         </p>
       )}
       {j.effective?.reason && <p>理由：{j.effective.reason}</p>}
+      {j.proposal && <>
+        <p>建议 {j.proposal.grade} 档：{criterion?.anchors?.[j.proposal.grade]}</p>
+        <p>依据与判断：{j.proposal.reason}</p>
+        <p className="muted">局限与反证：{j.proposal.limitations}</p>
+        <p className="muted">{j.proposal.author_label} · 固定原文研究；尚无置信度校准结果。</p>
+      </>}
+      {j.evidence?.map((e: any, i: number) => <details key={i}><summary>{e.relation === "contradicts" ? "阅读反证或限制条件" : "阅读支持证据"}</summary><blockquote>{e.quote}</blockquote></details>)}
       <Diagnostic value={j} />
       {editable && (
         <details>
-          <summary>修改 / 解除人工覆盖</summary>
+          <summary>{j.proposal ? "确认或修改研判建议" : "修改 / 解除人工覆盖"}</summary>
           <label>
             {j.kind === "rubric"
               ? "选择新档位"
@@ -403,7 +410,7 @@ export function Judgment({ j, catalog = [], execute, editable }: any) {
             disabled={saving || value === "" || !reason.trim()}
             onClick={() => save()}
           >
-            保存人工覆盖
+            {j.proposal ? "确认并保存研判" : "保存人工覆盖"}
           </button>
           {j.author_type === "human" && (
             <button

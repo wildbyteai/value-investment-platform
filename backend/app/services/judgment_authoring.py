@@ -22,10 +22,30 @@ def catalog(db, company, workspace_id):
             for d, b in template['baselines'].items() if b['method']=='accepted_evidence_rubric' and b['rubric_ref'] in rubrics]
 
 
-def create(db, principal, body, command_key):
+def pending_proposals(db, company_id, workspace_id, cutoff):
+    """Freeze readable advice separately from accepted calculation decisions."""
+    rows=[]
+    slots=db.scalars(select(JudgmentSlot).where(JudgmentSlot.company_id==company_id,
+                       JudgmentSlot.workspace_id==workspace_id)).all()
+    for slot in slots:
+        revision=db.scalar(select(JudgmentRevision).where(JudgmentRevision.slot_id==slot.id,
+                         JudgmentRevision.created_at<=cutoff).order_by(JudgmentRevision.created_at.desc()).limit(1))
+        if not revision or revision.decision!='pending' or revision.author_type!='auto':continue
+        if revision.effective_at and revision.effective_at>cutoff:continue
+        if revision.published_at and revision.published_at>cutoff:continue
+        if not revision.valid_until or cutoff>=revision.valid_until:continue
+        evidence=json.loads(revision.evidence_json)
+        if not data_mode.fixture_mode() and not data_mode.real_evidence(db,evidence,workspace_id,company_id,cutoff):continue
+        value=json.loads(revision.value_json)
+        rows.append({'revision_id':revision.id,'dimension':slot.dimension,'value':value,'evidence':evidence,
+                     'hash':digest({'value':value,'evidence':evidence}),'status':'pending_review'})
+    return rows
+
+
+def create(db, principal, body, command_key, *, proposal=False):
     ws = principal.workspace.id
     request = body.model_dump(mode='json')
-    request_hash = digest({'actor':principal.user.id, 'request':request})
+    request_hash = digest({'actor':principal.user.id, 'request':request, **({'proposal':True} if proposal else {})})
     db.execute(select(func.pg_advisory_xact_lock(int(digest({'ws':ws, 'key':command_key})[:15],16))))
     receipt = db.scalar(select(CommandReceipt).where(CommandReceipt.workspace_id==ws, CommandReceipt.command_key==command_key))
     if receipt:
@@ -53,6 +73,15 @@ def create(db, principal, body, command_key):
         if not 0<=e.start<e.end<=len(original) or original[e.start:e.end]!=e.quote: raise HTTPException(422, '证据定位与原文不一致')
         policy=json.loads(db.get(SourceRegistry,item.source_id).policy_json)
         issuer=policy.get('evidence_category') in ('issuer_original','regulator_original')
+        # Validated statutory report bundles are issuer originals even though the
+        # original personal-study source registration predates category metadata.
+        from app.services.issuer_reports import POLICY,validate
+        raw=payload.get('raw_capture',{})
+        if db.get(SourceRegistry,item.source_id).source_key=='cninfo-reviewed-statements' and policy==POLICY and raw.get('report_type')=='reviewed_original_statements':
+            checked={**raw,'documents':[{**d,'observed_at':json.loads(item.reading_metadata_json)['source_observed_at']} for d in raw['documents']]}
+            try:validate(checked)
+            except (ValueError,KeyError,TypeError):raise HTTPException(422,'发行人原文载荷校验失败')
+            issuer=True
         ref={'synthetic':False,'source_revision_id':revision.id,'hash':revision.content_hash,
              'locator':f'readable_text[{e.start}:{e.end}]','quote':e.quote,'relation':e.relation,
              'issuer_original':issuer,'item_id':item.id}
@@ -69,15 +98,20 @@ def create(db, principal, body, command_key):
     db.add(slot);db.flush()
     value={'rubric_ref':body.rubric_ref,'criterion':body.criterion,'period_start':body.period_start.isoformat(),
            'period_end':body.period_end.isoformat(),'grade':body.grade,'confidence':str(body.confidence),'reason':body.reason.strip()}
-    revision=JudgmentRevision(slot_id=slot.id,author_type='human',decision='accepted',value_json=canonical(value),
+    if proposal:
+        value.update({'confidence_calibrated':False,'research_method':body.research_method,
+                      'author_label':body.author_label,'limitations':body.limitations.strip(),
+                      'acceptance_reason':'未经校准的AI研判建议，等待有权限人员确认'})
+    revision=JudgmentRevision(slot_id=slot.id,author_type='auto' if proposal else 'human',
+        decision='pending' if proposal else 'accepted',value_json=canonical(value),
         evidence_json=canonical(refs),effective_at=body.effective_from,published_at=now,valid_until=body.valid_until)
-    db.add(revision);db.flush();slot.effective_revision_id=revision.id
-    record(db,ws,principal.user.id,'judgment.created','judgment_slot',slot.id,{'revision_id':revision.id,'generation':1})
+    db.add(revision);db.flush();slot.effective_revision_id=None if proposal else revision.id
+    record(db,ws,principal.user.id,'judgment.proposed' if proposal else 'judgment.created','judgment_slot',slot.id,{'revision_id':revision.id,'generation':1})
     applicable = any(r.id==revision.id for s,r,v in current_decisions(db,company.id,ws,datetime.now(timezone.utc),datetime.now(timezone.utc)))
     current_score=score_company(db,company,ws)
     eligible=any(c.get('revision_id')==revision.id and c['status']=='valid' for d in current_score['dimensions'].values() for c in d.get('criteria',[]))
     result={'id':revision.id,'slot_key':key,'generation':1,'value':value,'saved':True,
-            'applicability':'eligible' if eligible else 'outside_period_or_evidence_policy',
+            'applicability':'pending_review' if proposal else 'eligible' if eligible else 'outside_period_or_evidence_policy',
             'score_status':'读取公司评分以核对质量门；已有研究快照不更新'}
     db.add(CommandReceipt(workspace_id=ws,command_key=command_key,request_hash=request_hash,response_json=canonical(result)))
     return result

@@ -221,6 +221,18 @@ export function ResearchResult({ run, read }: any) {
           ))}
           <h4>经营质量：{human(c.quality.quality_score)}</h4>
           <GapList values={c.quality.missing_data} />
+          {c.judgment_proposals?.length > 0 && <section>
+            <h4>本次固定的经营研判建议</h4>
+            <p className="muted">AI依据原文提出，待确认；未计入上述评分，历史建议保持当时结果。</p>
+            {c.judgment_proposals.map((p: any) => <section key={p.revision_id}>
+              <h5>{dimensionName(p.dimension)} · {criterionName(p.value.criterion)} · 建议{p.value.grade}档</h5>
+              <p>{p.value.reason}</p><p className="muted">局限与反证：{p.value.limitations}</p>
+              {p.evidence.map((e: any, i: number) => <div key={i}>
+                <details><summary>{e.relation === "contradicts" ? "阅读反证或限制条件" : "阅读支持证据"}</summary><blockquote>{e.quote}</blockquote></details>
+                <button className="quiet" onClick={() => read(e.item_id,e.source_revision_id)}>阅读研判固定原文</button>
+              </div>)}
+            </section>)}
+          </section>}
           <div className="securities">
             {c.securities.map((s: any) => (
               <section key={s.security_id}>

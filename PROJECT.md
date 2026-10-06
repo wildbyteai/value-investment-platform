@@ -2,6 +2,8 @@
 
 项目：value-investment-platform（价值投资策略管理系统）。项目标识不使用Matter ID。
 
+最新真实接入（2026-10-06）：三公司财报原始科目共179项，诺诚健华新增79项及4份原公告；原两家近30天A股日线更新。7项固定原文AI经营建议已入库并可在公司页/新研究快照阅读，明确pending且未校准，不自动计分。181项后端合成库回归、构建、真实API/原文/幂等/历史hash及浏览器核对通过。港股行情/同日FX、当前股数、诺诚健华标准口径及批准日历/FINAL仍有缺口，真实seal=0，完整必选尚未通过；详见[本轮实际结果与最低依赖](./review/REAL-DATA-AND-JUDGMENTS.md)。旧日期记录保留为历史证据。
+
 ## 项目归属与阶段
 
 本项目已从BYTEWATCHER事项迁出，独立目录、独立Git仓库、独立执行规则。项目根目录就是Git根目录，不再嵌套repo/。GitHub为wildbyteai/value-investment-platform，保持私有。

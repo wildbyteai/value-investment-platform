@@ -22,6 +22,23 @@ def test_original_unit_and_evidence_row_survive():
     assert a['original_statement'] and not a['standard_metrics_eligible']
     assert b['facts'][0]['original_value']=='1,234.56'
 
+@pytest.mark.parametrize('label',['单位:元 币种:人民币','单位:\t人民币元','单位：人民币元'])
+def test_explicit_unit_colon_layout_variants(label):
+    b=bundle();d=b['documents'][0]
+    d['pages'][0]['text']=d['pages'][0]['text'].replace('单位：人民币元',label)
+    validate(b)
+    d['pages'][0]['text']=d['pages'][0]['text'].replace(label,'单位:万元')
+    with pytest.raises(ValueError,match='单位原文'):validate(b)
+
+def test_hk_company_financials_remain_cny_with_separate_security_currency():
+    from app.services.issuer_reports import SECURITY_CURRENCIES
+    b=bundle();b['ticker']='09969.HK';b['issuer']='诺诚健华医药有限公司'
+    b['documents'][0]['pages'][0]['text']=b['documents'][0]['pages'][0]['text'].replace('珠海格力电器股份有限公司',b['issuer'])
+    validate(b)
+    assert b['facts'][0]['currency']=='CNY' and SECURITY_CURRENCIES[b['ticker']]=='HKD'
+    b['issuer']='另一家公司'
+    with pytest.raises(ValueError):validate(b)
+
 @pytest.mark.parametrize('defect',['column','row','unit','scope','nan','page','duplicate','unreviewed','host','future','missing_gap'])
 def test_misread_or_unreviewed_original_rejected(defect):
     b=deepcopy(bundle());r=b['facts'][0];d=b['documents'][0]

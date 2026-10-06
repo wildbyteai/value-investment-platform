@@ -16,7 +16,9 @@ from app.services.item_history import observe
 from app.services.transactions import canonical, digest, record
 from app.services.original_financials import number, MONEY_UNITS
 
-TARGETS={'002594.SZ':'比亚迪股份有限公司','000651.SZ':'珠海格力电器股份有限公司'}
+TARGETS={'002594.SZ':'比亚迪股份有限公司','000651.SZ':'珠海格力电器股份有限公司',
+         '09969.HK':'诺诚健华医药有限公司'}
+SECURITY_CURRENCIES={'002594.SZ':'CNY','000651.SZ':'CNY','09969.HK':'HKD'}
 POLICY={'license':'bounded-public-disclosure-personal-study',
     'basis':'https://www.ncac.gov.cn/xxfb/flfg/flfg_532/202103/t20210309_50530.html',
     'basis_description':'Copyright Law art24 personal study scope assessment; NOT an express platform licence',
@@ -43,7 +45,9 @@ def validate(bundle):
         if len(set(indices))!=len(indices) or any(type(n)!=int or not 1<=n<=doc['page_count'] for n in indices):raise ValueError('报告页码不合法')
         if not all(isinstance(p['text'],str) and p['text'] for p in pages):raise ValueError('报告摘录为空')
         if not any(bundle['issuer'] in p['text'].replace(' ','') for p in pages):raise ValueError('PDF正文发行人不匹配')
-        unit_page=next((p['text'].replace(' ','') for p in pages if p['number']==doc.get('unit_basis_page')),None)
+        # Colon glyphs and whitespace vary between PDF layouts; keep the
+        # original excerpt intact while matching the same explicit unit label.
+        unit_page=next((re.sub(r'\s+','',p['text']).replace(':','：') for p in pages if p['number']==doc.get('unit_basis_page')),None)
         marker='千元' if doc.get('money_unit')=='thousand_yuan' else '单位：人民币元' if doc.get('money_unit')=='yuan' and unit_page and '人民币元' in unit_page else '单位：元'
         if not unit_page or doc.get('money_unit') not in ('yuan','thousand_yuan') or marker not in unit_page:raise ValueError('报告单位原文未核验')
         known[key]=doc
@@ -116,7 +120,7 @@ def import_bundle(db,workspace_id,bundle):
     company=db.scalar(select(Company).where(Company.name==bundle['issuer']))
     if not company:raise ValueError('未登记研究公司')
     require_company(db,company.id,workspace_id)
-    if not db.scalar(select(Security.id).where(Security.company_id==company.id,Security.ticker==bundle['ticker'],Security.currency=='CNY')):raise ValueError('已登记证券身份不匹配')
+    if not db.scalar(select(Security.id).where(Security.company_id==company.id,Security.ticker==bundle['ticker'],Security.currency==SECURITY_CURRENCIES[bundle['ticker']])):raise ValueError('已登记证券身份不匹配')
     key='cninfo-reviewed-statements'
     db.execute(select(func.pg_advisory_xact_lock(int(digest({'source':key})[:15],16))))
     source=db.scalar(select(SourceRegistry).where(SourceRegistry.source_key==key))

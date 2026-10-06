@@ -61,7 +61,7 @@ def source_stats(db,item,ref):
                 'meaning':'首末供应商日线收盘价的描述统计；不是总回报、预测或投资评分','evidence':[ref]}
     # Exact excerpt with a locator; no keyword grading or invented impact/rubric.
     return {'kind':'source_excerpt','source_item_id':item.id,'source_revision_id':revision.id,
-            'excerpt':original[:320],'meaning':'引用已取得资料，尚未形成经营判断','evidence':[ref]}
+            'excerpt':original[:320],'meaning':'已取得资料的原文摘录；研判建议与有效评分分别展示','evidence':[ref]}
 
 
 def start_run(db,principal,command_key):
@@ -94,6 +94,11 @@ def start_run(db,principal,command_key):
     rules=json.loads(release.rules_json) if release else config('strategy-standard-v1.json')
     results=[];calculation_refs=[]
     for company in companies:
+        from app.services.judgment_authoring import pending_proposals
+        proposals=pending_proposals(db,company.id,principal.workspace.id,cutoff)
+        for proposal in proposals:
+            for ref in proposal['evidence']:
+                if ref not in refs:refs.append(ref)
         quality=score_company(db,company,principal.workspace.id,cutoff,cutoff)
         rows=inputs(db,company.id,principal.workspace.id,cutoff,cutoff)
         quotes={row.input_key:json.loads(row.payload_json) for row in rows if row.kind=='price'}
@@ -109,8 +114,9 @@ def start_run(db,principal,command_key):
             securities.append({'security_id':security.id,'ticker':security.ticker,'market':security.market,'currency':security.currency,
                 'latest_quote':quote,'valuation':valuation,'strategy':{**preview,'result':outcome,'applied':False,'release_id':release.id if release else None},
                 'gaps':list(valuation['missing_data'])+(['需要发布策略版本'] if release is None else [])+['正式封存机制已实现；本证券的批准市场日历与FINAL收盘依据尚待接入']})
-        results.append({'company_id':company.id,'company_name':company.name,'analysis':stats_by_company.get(company.id,[]),'quality':quality,'securities':securities})
-        calculation_refs.append({'company_id':company.id,'inputs':quality['input_refs'],'judgments':quality['judgment_refs'],'template_hash':quality['template']['config_hash']})
+        results.append({'company_id':company.id,'company_name':company.name,'analysis':stats_by_company.get(company.id,[]),'quality':quality,'securities':securities,'judgment_proposals':proposals})
+        calculation_refs.append({'company_id':company.id,'inputs':quality['input_refs'],'judgments':quality['judgment_refs'],'template_hash':quality['template']['config_hash'],
+                                 'pending_proposals':[{'id':p['revision_id'],'hash':p['hash']} for p in proposals]})
     status='partial' if any(c['quality']['quality_score'] is None or any(s['strategy']['result']=='UNKNOWN' or s['gaps'] for s in c['securities']) for c in results) else 'completed'
     manifest={'algorithm':'local-research-preview-v2','mode':'real_research_preview','as_of':cutoff.isoformat(),'knowledge_cutoff':cutoff.isoformat(),
               'source_evidence':refs,'read_items':read_items,'calculation_refs':calculation_refs,
