@@ -19,6 +19,7 @@ case "${1:-help}" in
   disclosure-import) shift; cd backend; exec .venv/bin/python scripts_issuer_disclosures.py "$@" ;;
   eodhd-import) shift; cd backend; exec .venv/bin/python scripts_eodhd.py "$@" ;;
   ecb-fx-import) shift; cd backend; exec .venv/bin/python scripts_ecb_fx.py "$@" ;;
+  futu-import) shift; cd backend; exec .venv/bin/python scripts_futu.py "$@" ;;
   public-import) cd backend; exec .venv/bin/python scripts_public.py --enable-wikimedia ;;
-  *) echo 'Usage: tools/vip migrate | seed-synthetic | test | build-ui | dev | dev-api | dev-down | public-import | baostock-import/financial-import (--capture or --snapshot /absolute/path) | issuer-import/disclosure-import (--snapshot /absolute/path --workspace ID [--write]) | eodhd-import (--capture or --snapshot /absolute/path --workspace ID [--write]) | original-import | seal';;
+  *) echo 'Usage: tools/vip migrate | seed-synthetic | test | build-ui | dev | dev-api | dev-down | public-import | baostock-import/financial-import (--capture or --snapshot /absolute/path) | issuer-import/disclosure-import (--snapshot /absolute/path --workspace ID [--write]) | eodhd-import (--capture or --snapshot /absolute/path --workspace ID [--write]) | ecb-fx-import | futu-import (--check or --capture --start YYYY-MM-DD --end YYYY-MM-DD --rights /absolute/local/path or --snapshot /absolute/path [--workspace ID --currency-basis /absolute/local/path --write]) | original-import | seal';;
 esac

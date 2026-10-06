@@ -31,6 +31,18 @@ def source_stats(db,item,ref):
         from app.services.ecb_fx import analysis
         meta=json.loads(item.reading_metadata_json)
         return analysis({**data,'observed_at':meta['source_observed_at']},ref)
+    if data and data.get('provider')=='futu':
+        from app.services.futu_source import validate
+        meta=json.loads(item.reading_metadata_json)
+        rows=validate({**data,'observed_at':meta['source_observed_at']})
+        first,last=rows[0],rows[-1]
+        with localcontext() as context:
+            context.prec=50
+            delta=numeric((Decimal(last['close'])/Decimal(first['close'])-1)*100)
+        return {'kind':'market_summary','data_mode':'real_public','source_item_id':item.id,'source_revision_id':revision.id,
+                'first_session':first['date'],'last_session':last['date'],'observations':len(rows),
+                'first_close':first['close'],'last_close':last['close'],'change_pct':delta,'currency':'HKD','adjustment':'unadjusted',
+                'meaning':'富途SDK解码的未复权日线描述统计，仅本机个人研究；报价币种有独立原文，正式最终性尚未确认','evidence':[ref]}
     if data and data.get('provider')=='eodhd':
         from app.services.eodhd_source import validate
         meta=json.loads(item.reading_metadata_json)

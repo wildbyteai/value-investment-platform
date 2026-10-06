@@ -16,7 +16,7 @@ def positive(value):
 
 def normalize_quote(snapshot,policy):
     if any(not policy.get(k) or policy[k]=='disabled' for k in ('license','fetch','store','analyze')) or policy.get('revoked'):raise MarketGap('行情来源使用范围未确认或已撤销')
-    if snapshot.get('ticker')!='01211.HK' or snapshot.get('currency')!='HKD' or snapshot.get('adjustment')!='none':raise MarketGap('本切片只接入比亚迪港股原始未复权HKD日线')
+    if snapshot.get('ticker') not in ('01211.HK','09969.HK') or snapshot.get('currency')!='HKD' or snapshot.get('adjustment')!='none':raise MarketGap('本切片只接入比亚迪/诺诚健华港股原始未复权HKD日线')
     session=date.fromisoformat(snapshot['session']);observed=datetime.fromisoformat(snapshot['observed_at'])
     if observed.tzinfo is None or observed.date()<session:raise MarketGap('实际取得时点必须明确且不早于交易日')
     refs=snapshot.get('evidence',[])
