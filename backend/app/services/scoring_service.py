@@ -204,7 +204,7 @@ def metrics_from_financials(f):
     return m
 
 
-def current_decisions(db, company_id, workspace_id, as_of, cutoff):
+def current_decisions(db, company_id, workspace_id, as_of, cutoff, revision_ids=None):
     slots = db.scalars(select(JudgmentSlot).where(JudgmentSlot.company_id == company_id,
                         JudgmentSlot.workspace_id == workspace_id)).all()
     out=[]
@@ -215,6 +215,7 @@ def current_decisions(db, company_id, workspace_id, as_of, cutoff):
         # clears prior AUTO/HUMAN; a subsequent legal reassessment is required.
         effective=None; auto=None
         for rev in revisions:
+            if revision_ids is not None and rev.id not in revision_ids: continue
             if rev.effective_at and rev.effective_at>as_of: continue
             if rev.published_at and rev.published_at>as_of: continue
             if rev.author_type=='auto' and rev.decision=='accepted':
@@ -230,16 +231,16 @@ def current_decisions(db, company_id, workspace_id, as_of, cutoff):
 
 
 @calculation
-def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, template=None):
+def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, template=None, input_rows=None, decision_rows=None):
     workspace_id=workspace(db,workspace_id);as_of=as_of or datetime.now(timezone.utc);cutoff=cutoff or as_of
     if cutoff<as_of: raise ValueError('知识截止不能早于评估时点')
     template=template or resolve_template(company,db,workspace_id,cutoff)
-    rows=inputs(db,company.id,workspace_id,as_of,cutoff)
+    rows=inputs(db,company.id,workspace_id,as_of,cutoff) if input_rows is None else input_rows
     financial=next((json.loads(r.payload_json) for r in rows if r.kind=='financials'),None)
     observation=next((json.loads(r.payload_json) for r in rows if r.kind=='financial_observations'),None)
     if financial and as_of>=datetime.fromisoformat(financial['obligation_valid_until']): financial=None
     metrics=metrics_from_financials(financial)
-    decisions=current_decisions(db,company.id,workspace_id,as_of,cutoff)
+    decisions=current_decisions(db,company.id,workspace_id,as_of,cutoff) if decision_rows is None else decision_rows
     rubric_catalog=config('rubrics-standard-v1.json')['rubrics']
     if data_mode.fixture_mode(): rubric_catalog={**rubric_catalog,**config('rubrics-synthetic-v03.json')['rubrics']}
     dimensions={};known={}
@@ -335,9 +336,9 @@ def score_company(db, company, workspace_id=None, as_of=None, cutoff=None, templ
 
 
 @calculation
-def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, session=None):
+def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, session=None, input_rows=None):
     workspace_id=workspace(db,workspace_id);as_of=as_of or datetime.now(timezone.utc);cutoff=cutoff or as_of
-    rows=inputs(db,security.company_id,workspace_id,as_of,cutoff)
+    rows=inputs(db,security.company_id,workspace_id,as_of,cutoff) if input_rows is None else input_rows
     f=next((json.loads(r.payload_json) for r in rows if r.kind=='financials'),None)
     price=next((json.loads(r.payload_json) for r in rows if r.input_key=='price:'+security.ticker),None)
     observation=next((json.loads(r.payload_json) for r in rows if r.kind=='financial_observations'),None)
@@ -352,6 +353,8 @@ def score_security(db, security, workspace_id=None, as_of=None, cutoff=None, ses
     if not f or not price: return result
     if not price.get('is_final') or (session and price['session']!=session):
         return {**result,'reason':'FINAL_PRICE_REQUIRED'}
+    if any(k not in price for k in ('currency','fx_per_cny','raw_close','evidence')):
+        return {**result,'reason':'INCOMPLETE_PRICE_BASIS','missing_data':gaps+['行情币种、汇率或原始价格证据不完整']}
     if (not f.get('equivalent_share_rights') or price['currency']!=security.currency
         or dec(f['ordinary_shares'])<=0 or dec(f['ordinary_profit_ttm'])<=0 or dec(price['fx_per_cny'])<=0
         or as_of>=datetime.fromisoformat(f['obligation_valid_until'])):

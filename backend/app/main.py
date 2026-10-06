@@ -2,13 +2,14 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.api import research, templates, auth, collab, companies, demo, health, intake, judgments, scoring, strategy
+from app.api import sealing, research, templates, auth, collab, companies, demo, health, intake, judgments, scoring, strategy
 from app.config import get_settings
 
 settings = get_settings()
 
 app = FastAPI(title="Value Investment Platform API", version="0.0.1")
 app.include_router(health.router)
+app.include_router(sealing.router)
 app.include_router(research.router)
 app.include_router(auth.router)
 app.include_router(demo.router)

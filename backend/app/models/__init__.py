@@ -9,3 +9,6 @@ from app.models.collab import Watchlist, Note  # noqa: F401
 from app.models.runtime import CommandReceipt, WorkEffect, ResearchInput, Evaluation, TemplateRelease, ItemRevision, ItemObservation  # noqa: F401
 
 from app.models.runtime import ResearchRun  # noqa: F401
+from app.models.sealing import KnowledgeEntry, SafetyGeneration, InstalledArtifact, PrimaryListing, MarketSession, EvaluationSeal, FrozenManifest  # noqa: F401
+from app.services.knowledge_clock import register_metadata_triggers
+register_metadata_triggers(Base.metadata)

@@ -13,6 +13,8 @@ case "${1:-help}" in
   build-ui) exec npm --prefix frontend run build ;;
   baostock-import) shift; cd backend; exec .venv/bin/python scripts_baostock.py "$@" ;;
   financial-import) shift; cd backend; exec .venv/bin/python scripts_financial.py "$@" ;;
+  seal) shift; cd backend; exec .venv/bin/python scripts_seal.py "$@" ;;
+  original-import) shift; cd backend; exec .venv/bin/python scripts_original_inputs.py "$@" ;;
   public-import) cd backend; exec .venv/bin/python scripts_public.py --enable-wikimedia ;;
   *) echo 'Usage: tools/vip migrate | seed-synthetic | test | build-ui | dev | dev-api | dev-down | public-import | baostock-import/financial-import (--capture or --snapshot /absolute/path)';;
 esac

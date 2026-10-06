@@ -24,6 +24,27 @@
         }
       }
     },
+    "/api/strategy/seals": {
+      "get": {
+        "tags": [
+          "strategy"
+        ],
+        "summary": "Status",
+        "operationId": "status_api_strategy_seals_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormalStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/research/runs": {
       "post": {
         "tags": [
@@ -1484,6 +1505,168 @@
           "quote"
         ],
         "title": "EvidenceIn"
+      },
+      "FormalRow": {
+        "properties": {
+          "seal_id": {
+            "type": "string",
+            "title": "Seal Id"
+          },
+          "security_id": {
+            "type": "string",
+            "title": "Security Id"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "release_id": {
+            "type": "string",
+            "title": "Release Id"
+          },
+          "market_session": {
+            "type": "string",
+            "title": "Market Session"
+          },
+          "phase": {
+            "type": "string",
+            "title": "Phase"
+          },
+          "evaluation_as_of": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Evaluation As Of"
+          },
+          "knowledge_cutoff": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Knowledge Cutoff"
+          },
+          "generated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generated At"
+          },
+          "evaluation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Id"
+          },
+          "manifest_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manifest Hash"
+          },
+          "validity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validity"
+          },
+          "application": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application"
+          },
+          "membership": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Membership"
+          },
+          "gaps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Gaps",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "seal_id",
+          "security_id",
+          "ticker",
+          "currency",
+          "release_id",
+          "market_session",
+          "phase",
+          "evaluation_as_of",
+          "knowledge_cutoff"
+        ],
+        "title": "FormalRow"
+      },
+      "FormalStatus": {
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/FormalRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "available",
+          "rows"
+        ],
+        "title": "FormalStatus"
       },
       "HTTPValidationError": {
         "properties": {

@@ -97,3 +97,7 @@ python3 tools/build_review_pack.py
 可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
 编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
+
+### 原始科目与正式封存续建（2026-10-06）
+
+本轮118项后端测试、构建及合成库迁移升降级通过。新增原始科目规范化、许可港股快照适配、内部worker与只读正式结果；真实来源与真实库启用尚未完成，详情见[实施与迁移审查](./review/REAL-COMPLETION-PLAN.md)及[来源核查](./research/real-completion-sources.md)。`./tools/vip original-import --snapshot /absolute/path --kind financials|hk-price --workspace ID --company ID`默认仅校验，`--write`是明确真实入库动作。`./tools/vip seal --prepare-artifacts`和按既有seal-id/批准挂牌日历排期的`seal`命令会写正式机制/状态，默认不随dev启动；真实库0010、artifact登记及正式任务需对应业务批准。不能用仅有参考价或猜测日历生成FINAL或封存时间。

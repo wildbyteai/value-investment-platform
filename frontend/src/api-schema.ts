@@ -16,6 +16,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/strategy/seals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_api_strategy_seals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/research/runs": {
         parameters: {
             query?: never;
@@ -696,6 +713,59 @@ export interface components {
              */
             relation: "supports" | "contradicts";
         };
+        /** FormalRow */
+        FormalRow: {
+            /** Seal Id */
+            seal_id: string;
+            /** Security Id */
+            security_id: string;
+            /** Ticker */
+            ticker: string;
+            /** Currency */
+            currency: string;
+            /** Release Id */
+            release_id: string;
+            /** Market Session */
+            market_session: string;
+            /** Phase */
+            phase: string;
+            /**
+             * Evaluation As Of
+             * Format: date-time
+             */
+            evaluation_as_of: string;
+            /**
+             * Knowledge Cutoff
+             * Format: date-time
+             */
+            knowledge_cutoff: string;
+            /** Generated At */
+            generated_at?: string | null;
+            /** Evaluation Id */
+            evaluation_id?: string | null;
+            /** Manifest Hash */
+            manifest_hash?: string | null;
+            /** Validity */
+            validity?: string | null;
+            /** Application */
+            application?: string | null;
+            /** Membership */
+            membership?: string | null;
+            /**
+             * Gaps
+             * @default []
+             */
+            gaps: string[];
+        };
+        /** FormalStatus */
+        FormalStatus: {
+            /** Available */
+            available: boolean;
+            /** Reason */
+            reason?: string | null;
+            /** Rows */
+            rows: components["schemas"]["FormalRow"][];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -825,6 +895,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    status_api_strategy_seals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FormalStatus"];
                 };
             };
         };

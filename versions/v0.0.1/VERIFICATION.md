@@ -76,3 +76,9 @@
 2026-10-02免费源切片：两家公司38条真实BaoStock A股日线已入本机资料库，可阅读固定修订、显示实际价格、核对区间统计并保存研究预览；本轮56 passed、固定修订补充15 passed、构建/迁移/真实API重试/浏览器执行与阅读通过。记录见[REAL-DATA](./REAL-DATA.md)和real-pipeline-readback.json。运行partial；真实财报/股本/经营判断、港股行情、正式日历/FINAL/封存仍缺失。前述完整版本必选未被降低，也没有正式策略应用。
 
 2026-10-02三年范围已获用户授权。新增两家公司40条免费真实财务指标，读原文/报告期/披露日/字段比较及研究v2保存通过；旧研究命令重试保留原v1输入。67 passed（1已有warning）、TS构建、真实回读与浏览器表格/固定原文通过。财务指标不是完整财报：原始科目、单位与范围、报告义务/rubric/正式封存等缺口仍未补齐，Q/V/策略UNKNOWN。证据见REAL-DATA与real-financial-readback.json，前述必选标准未降低。
+
+## 2026-10-06 原始科目/港股适配与正式封存机制
+
+基线abac2a17fbe6bb81af3c4bc960b80b65588c9877，分支codex/real-data-sealing。新增原始科目/港股快照适配及显式内部封存worker；固定截止/提交阶段知识账本/一致性snapshot/完整manifest/租约fence/稳定token/不可变评估与状态变化事务实现。当前最新118项后端检查通过（合成test库，1项已有弃用警告），OpenAPI/TS生成和构建通过；迁移测试升级、降级、再升级通过。详细正常、失败、时点/恢复/权限证据见review/REAL-COMPLETION-PLAN.md与backend/tests/test_sealing.py、test_original_inputs.py。
+
+真实资料库仍0009，未执行本轮schema/来源/正式membership写入。8766只刷新API以匹配新静态产物，已授权原worker同PID保留，未启动正式worker；真实只读浏览器可见策略v5及“正式封存迁移尚未安装；研究预览仍可使用”，原两家公司和缺口页面仍可用。真实来源核查见research/real-completion-sources.md：核实比亚迪官网完整报告入口，未获取完整原始科目；港交所条款限制此类程序化接入，未绕过、未采购/注册。完整真实分析、真实正式封存与完整首slice仍未完成，不能将测试夹具或引用入口计为真实接入完成。

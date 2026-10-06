@@ -178,6 +178,7 @@ function Workspace({ identity }: any) {
       return {
         rule: await api("/api/strategy/current"),
         changes: await api("/api/strategy/transitions"),
+        seals: await api("/api/strategy/seals"),
       };
     if (target === "mine") {
       const cs = await api("/api/companies");
@@ -1198,8 +1199,23 @@ function StrategyPage({ data, allow, busy, execute }: any) {
           )}
         </article>
       )}
+      <h3>正式评估</h3>
+      <p>研究预览与正式评估分别保存。缺少依据时，正式结果也会保留为待补资料；空记录不能推断未入选。</p>
+      {!data.seals.available && <p role="status">{data.seals.reason}</p>}
+      {data.seals.available && data.seals.rows.length === 0 && <p>尚无已排期的正式评估。需要先核验挂牌日历、最终收盘政策和已发布策略。</p>}
+      {data.seals.rows.map((r: any) => <article key={r.seal_id}>
+        <h4>{r.ticker} · {r.currency} · {r.market_session}</h4>
+        <p>{({sealed:"已封存",provisional:"截止时间未到",ready_to_seal:"正在冻结",blocked_safety:"权限、关联或模板已变化，暂停应用",session_due:"等待截止"} as Record<string,string>)[r.phase] || "等待处理"}
+          {r.validity === "UNKNOWN" ? " · 待补资料" : r.validity === "VALID" ? " · 依据有效" : ""}
+          {r.application === "superseded" ? " · 历史结果，未应用" : r.membership ? ` · 当前版本状态 ${r.membership}` : ""}</p>
+        <p>资料截止：{new Date(r.knowledge_cutoff).toLocaleString()}；{r.generated_at ? `生成：${new Date(r.generated_at).toLocaleString()}` : "尚未生成"}</p>
+        {r.gaps.length > 0 && <ul>{r.gaps.map((g:string) => <li key={g}>{g}</li>)}</ul>}
+        {r.evaluation_id && <button className="quiet" onClick={async () => {
+          const d=await execute(() => api(`/api/strategy/evaluations/${r.evaluation_id}`),undefined,false);
+          if(d)setHistorical(d);
+        }}>查看固定依据与解释</button>}
+      </article>)}
       <h3>正式变化记录</h3>
-      <p>当前正式入选状态暂不提供；空变化记录不能推断未入选。</p>
       {data.changes.map((t: any) => (
         <article key={t.id}>
           <p>
@@ -1225,11 +1241,11 @@ function StrategyPage({ data, allow, busy, execute }: any) {
           <h3>固定历史解释</h3>
           <p>
             当次结果：
-            {historical.result.risk
+            {(historical.result.risk || historical.result.rules?.status === "risk_excluded")
               ? "风险排除"
-              : historical.result.passes === true
+              : (historical.result.rules?.passes ?? historical.result.passes) === true
                 ? "满足条件"
-                : historical.result.passes === false
+                : (historical.result.rules?.passes ?? historical.result.passes) === false
                   ? "未满足条件"
                   : "待评估"}
             ；应用状态 {historical.application}。

@@ -156,7 +156,14 @@ def transitions(principal: Principal=Depends(require('research.read')),db=Depend
 def evaluation(evaluation_id:str,principal: Principal=Depends(require('research.read')),db=Depends(get_db)):
     row=db.get(Evaluation,evaluation_id)
     if row is None or row.workspace_id!=principal.workspace.id: raise HTTPException(404,'没有该评估')
-    if not data_mode.fixture_mode() and not data_mode.real_evidence(db,json.loads(row.manifest_json).get('source_evidence'),principal.workspace.id):
+    manifest=json.loads(row.manifest_json)
+    if manifest.get('inputs'):
+        from app.models.sealing import FrozenManifest
+        from app.api.sealing import readable
+        frozen=db.scalar(select(FrozenManifest).where(FrozenManifest.manifest_hash==row.manifest_hash))
+        security=db.get(Security,row.security_id)
+        if (json.loads(row.result_json).get('current_risk_evidence') and not data_mode.fixture_mode() and not data_mode.real_evidence(db,json.loads(row.result_json)['current_risk_evidence'],principal.workspace.id)) or not frozen or not readable(db,frozen,principal.workspace.id) or security.company_id not in {c.id for c in data_mode.companies(db,principal.workspace.id)}:raise HTTPException(404,'没有具备当前读取权限的封存结果')
+    elif not data_mode.fixture_mode() and not data_mode.real_evidence(db,manifest.get('source_evidence'),principal.workspace.id):
         raise HTTPException(404,'没有具备真实来源证据的评估')
     return {'id':row.id,'token':row.token,'manifest':json.loads(row.manifest_json),'manifest_hash':row.manifest_hash,
             'result':json.loads(row.result_json),'application':row.application_status,'generated_at':row.generated_at.isoformat()}
