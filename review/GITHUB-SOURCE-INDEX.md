@@ -4,6 +4,7 @@
 
 | 内容 | 入口 |
 |---|---|
+| 产品主线 | [产品主线](../docs/00-product-mainline.md)、[ADR-0005 主线与击球区](../docs/adr/0005-product-mainline-and-strike-zone.md) |
 | 当前状态、已验证与缺口 | [PROJECT](../PROJECT.md)、[版本验证](../versions/v0.0.1/VERIFICATION.md) |
 | 业务需求与确认合同 | [需求](../docs/01-product-requirements.md)、[业务设计](../docs/02-business-design.md)、[已确认选择](../docs/11-templates-automation-and-roles.md)、[时点与数值](../docs/12-time-numerics-and-corrections.md) |
 | 架构与接口/数据设计 | [架构](../docs/03-architecture.md)、[数据](../docs/04-data-design.md)、[接口](../docs/05-api-and-jobs.md)、[字段目录](../design/database-catalog.json)、[合同目录](../contracts/README.md) |
