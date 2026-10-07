@@ -48,147 +48,339 @@ function Check({ c }: any) {
 
 // ------------------------------------------------------------------ 资讯雷达
 
+const short = (v: any) => {
+  if (!v) return "—";
+  const d = new Date(v);
+  const today = new Date();
+  return d.toDateString() === today.toDateString()
+    ? d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false })
+    : d.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+};
+const tone = (v: any) => (v == null ? "" : v >= 0 ? "up" : "down");
+
+function Kpi({ label, value, hint }: any) {
+  return (
+    <div className="kpi">
+      <div className="label">{label}</div>
+      <div className="value">{value}</div>
+      {hint && <div className="hint">{hint}</div>}
+    </div>
+  );
+}
+
 export function NewsRadar({ allow, busy, execute }: Ctx) {
   const [filter, setFilter] = useState("");
   const events = useLoad<any[]>(`/api/news/events?limit=80${filter ? `&status=${filter}` : ""}`);
   const companies = useLoad<any[]>("/api/companies");
-  const [open, setOpen] = useState<any>(null);
+  const [selId, setSelId] = useState<string>("");
+  const [detail, setDetail] = useState<any>(null);
   const canReview = any(allow, "analysis.override", "quality.correct");
   const canScore = any(allow, "source.manage", "analysis.override");
+  const list = events.value || [];
+  const sel = list.find((e) => e.id === selId) || list[0];
+  useEffect(() => {
+    let live = true;
+    setDetail(null);
+    if (sel) api(`/api/news/events/${sel.id}`).then((d) => live && setDetail(d)).catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [sel?.id]);
   async function act(fn: () => Promise<any>, msg: string) {
     const r = await execute(fn, msg, false);
     if (r !== undefined) events.reload();
   }
+  const links = list.flatMap((e) => e.links);
+  const pending = links.filter((l: any) => l.status === "proposed").length;
+  const ups = list.filter((e) => e.impact_score != null && e.impact_score >= 0.3).length;
+  const downs = list.filter((e) => e.impact_score != null && e.impact_score <= -0.3).length;
+  const items = list.reduce((n, e) => n + (e.item_count || 0), 0);
   return (
     <>
       <p className="intro">每条资讯先合并成事件，再判断关联哪些公司、关联多紧（关联度 0–1）、影响多大（影响分 −1 到 1）。AI 先预判，研究员确认后才进入告警。</p>
-      <div className="filters">
-        <button className={filter ? "quiet" : ""} onClick={() => setFilter("")}>全部事件</button>
-        <button className={filter === "needs_review" ? "" : "quiet"} onClick={() => setFilter("needs_review")}>待确认</button>
-        {canScore && (
-          <button className="quiet" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
-            AI 打分待处理事件
-          </button>
-        )}
+      <div className="kpis">
+        <Kpi label="事件" value={list.length} hint={`${items} 条资讯合并而来`} />
+        <Kpi label="待确认关联" value={pending} hint="AI 已预判，等你拍板" />
+        <Kpi label="利好 / 利空" value={<><span className="up">{ups}</span> <span className="muted">/</span> <span className="down">{downs}</span></>} hint="影响分绝对值 ≥ 0.3" />
+        <Kpi label="已确认关联" value={links.filter((l: any) => l.status === "confirmed").length} hint="已确认的才会触发告警" />
       </div>
       <Failed error={events.error} />
-      {events.value && !events.value.length && <p>暂无资讯事件。在 后台设置 › 资讯源与导入 上传每日 Excel，或登记 RSS 源。</p>}
-      {events.value?.map((e) => (
-        <article key={e.id} className="event">
-          <div className="event-head">
-            <h3>{e.title}</h3>
-            {e.impact_score != null && <span className={`impact ${e.impact_score >= 0 ? "up" : "down"}`}>影响 {signed(e.impact_score)}</span>}
+      <div className="radar">
+        <div className="panel">
+          <div className="panel-head">
+            <h3>事件流</h3>
+            <div className="seg" role="group" aria-label="筛选事件">
+              <button aria-pressed={!filter} onClick={() => setFilter("")}>全部事件</button>
+              <button aria-pressed={filter === "needs_review"} onClick={() => setFilter("needs_review")}>待确认</button>
+            </div>
+            <div className="right">
+              {canScore && (
+                <button className="quiet small" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
+                  AI 打分待处理事件
+                </button>
+              )}
+            </div>
           </div>
-          <p className="muted">
-            {time(e.last_published_at)} · {e.item_count} 条来源{e.category ? ` · ${e.category}` : ""} ·{" "}
-            {e.ai_status === "scored" ? `AI 预判（${e.ai_model}）` : e.ai_status === "rule_only" ? `规则匹配${e.ai_error ? `（${e.ai_error}）` : ""}` : "待打分"}
-          </p>
-          <p>{e.summary.slice(0, 220)}{e.summary.length > 220 ? "…" : ""}</p>
-          {e.links.length ? (
-            <table>
-              <thead><tr><th>关联公司</th><th>关联度</th><th>影响分</th><th>理由</th><th>状态</th>{canReview && <th>操作</th>}</tr></thead>
-              <tbody>
-                {e.links.map((l: any) => (
-                  <LinkRow key={l.id} l={l} canReview={canReview} busy={busy} companies={companies.value || []}
-                    review={(body: any, msg: string) => act(() => post(`/api/news/links/${l.id}/review`, body), msg)} />
-                ))}
-              </tbody>
-            </table>
+          {events.value && !list.length ? (
+            <p className="empty">暂无资讯事件。在 后台设置 › 资讯源与导入 上传每日 Excel，或登记 RSS 源。</p>
           ) : (
-            <p className="muted">暂未识别到关联公司。</p>
+            <div className="table-scroll">
+              <table className="event-table">
+                <thead>
+                  <tr><th>时间</th><th>事件</th><th>关联公司</th><th>关联度</th><th>影响分</th><th>状态</th></tr>
+                </thead>
+                <tbody>
+                  {list.map((e) => {
+                    const top = Math.max(0, ...e.links.map((l: any) => Number(l.relevance) || 0));
+                    const waiting = e.links.some((l: any) => l.status === "proposed");
+                    return (
+                      <tr key={e.id} aria-selected={sel?.id === e.id} onClick={() => setSelId(e.id)}>
+                        <td className="num muted">{short(e.last_published_at)}</td>
+                        <td>
+                          <div className="event-title">{e.title}</div>
+                          <div className="event-meta">
+                            {e.category ? `${e.category} · ` : ""}{e.item_count} 条来源 ·{" "}
+                            {e.ai_status === "scored" ? "AI 预判" : e.ai_status === "rule_only" ? "规则匹配" : "待打分"}
+                          </div>
+                        </td>
+                        <td>
+                          {e.links.slice(0, 2).map((l: any) => (
+                            <span key={l.id} className="chip">{l.company}{l.ticker_hint && <span className="muted num"> {l.ticker_hint}</span>}</span>
+                          ))}
+                          {e.links.length > 2 && <span className="muted">+{e.links.length - 2}</span>}
+                          {!e.links.length && <span className="muted">—</span>}
+                        </td>
+                        <td className="num" style={{ whiteSpace: "nowrap" }}>
+                          {e.links.length ? <>{num(top)}<span className="bar"><i style={{ width: `${Math.round(top * 100)}%` }} /></span></> : "—"}
+                        </td>
+                        <td className={`num ${tone(e.impact_score)}`} style={{ fontWeight: 600 }}>{signed(e.impact_score)}</td>
+                        <td>{waiting ? <span className="pill pill-wait">待确认</span> : <span className="pill pill-ok">{e.links.length ? "已处理" : "无关联"}</span>}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
-          <button className="text-button" onClick={async () => setOpen(open?.id === e.id ? null : await api(`/api/news/events/${e.id}`))}>
-            {open?.id === e.id ? "收起来源" : "查看来源"}
-          </button>
-          {open?.id === e.id && (
-            <ul className="sources">
-              {open.items.map((i: any) => (
-                <li key={i.id}>
-                  <strong>{i.feed}</strong>：{i.title} <span className="muted">{time(i.published_at)}{i.source_text ? ` · ${i.source_text}` : ""}</span>
-                  {i.url && <a href={i.url} target="_blank" rel="noreferrer"> 原文</a>}
-                  {i.note && <div className="muted">备注：{i.note}</div>}
-                </li>
-              ))}
-            </ul>
-          )}
-        </article>
-      ))}
+        </div>
+        {sel && (
+          <aside className="panel detail" aria-label="事件详情">
+            <div className="panel-head">
+              <h3>事件详情</h3>
+              <span className="right">{pending ? `${pending} 个关联待确认` : "全部已处理"}</span>
+            </div>
+            <div className="panel-sec">
+              <div className="detail-title">{sel.title}</div>
+              <div className="muted" style={{ marginTop: 4 }}>
+                {time(sel.last_published_at)}{sel.category ? ` · ${sel.category}` : ""} ·{" "}
+                {sel.ai_status === "scored" ? `AI 预判（${sel.ai_model}）` : sel.ai_status === "rule_only" ? `规则匹配${sel.ai_error ? `（${sel.ai_error}）` : ""}` : "待打分"}
+              </div>
+              {sel.summary && <p style={{ marginTop: 10 }}>{sel.summary.slice(0, 400)}{sel.summary.length > 400 ? "…" : ""}</p>}
+            </div>
+            <div className="panel-sec">
+              <div className="sec-label">关联公司</div>
+              {sel.links.length ? (
+                sel.links.map((l: any) => (
+                  <LinkCard key={l.id} l={l} canReview={canReview} busy={busy} companies={companies.value || []}
+                    review={(body: any, msg: string) => act(() => post(`/api/news/links/${l.id}/review`, body), msg)} />
+                ))
+              ) : (
+                <p className="muted">暂未识别到关联公司。</p>
+              )}
+            </div>
+            <div className="panel-sec">
+              <div className="sec-label">合并的 {sel.item_count} 条来源</div>
+              {!detail ? (
+                <p className="muted">读取来源…</p>
+              ) : (
+                <ul className="sources">
+                  {detail.items.map((i: any) => (
+                    <li key={i.id}>
+                      <div><strong>{i.feed}</strong>：{i.title}</div>
+                      <div className="muted">
+                        {time(i.published_at)}{i.source_text ? ` · ${i.source_text}` : ""}
+                        {i.url && <> · <a href={i.url} target="_blank" rel="noreferrer">原文</a></>}
+                      </div>
+                      {i.note && <div className="muted">备注：{i.note}</div>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </aside>
+        )}
+      </div>
     </>
   );
 }
 
-function LinkRow({ l, canReview, busy, review, companies }: any) {
+function LinkCard({ l, canReview, busy, review, companies }: any) {
   const [impact, setImpact] = useState(l.impact ?? 0);
   const [relevance, setRelevance] = useState(l.relevance ?? 0.6);
   const [company, setCompany] = useState(l.company_id || "");
+  const editing = canReview && l.status === "proposed";
   const status = { proposed: "待确认", confirmed: "已确认", rejected: "已驳回" }[l.status as string] || l.status;
   return (
-    <tr className={`link-${l.status}`}>
-      <td>
-        {l.company}
-        {l.ticker_hint && <span className="muted"> {l.ticker_hint}</span>}
-        {!l.company_id && canReview && l.status === "proposed" && (
-          <select value={company} onChange={(e) => setCompany(e.target.value)} aria-label="对应公司档案">
-            <option value="">对应到公司档案…</option>
-            {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        )}
-      </td>
-      <td>{canReview && l.status === "proposed" ? <input type="number" min={0} max={1} step={0.05} value={relevance} onChange={(e) => setRelevance(Number(e.target.value))} aria-label="关联度" /> : num(l.relevance)}</td>
-      <td>{canReview && l.status === "proposed" ? <input type="number" min={-1} max={1} step={0.1} value={impact} onChange={(e) => setImpact(Number(e.target.value))} aria-label="影响分" /> : signed(l.impact)}</td>
-      <td className="rationale">{l.rationale}<div className="muted">{l.proposed_by.startsWith("ai:") ? "AI" : "规则"}</div></td>
-      <td>{status}</td>
+    <div className={`link-card link-${l.status}`}>
+      <div className="head">
+        <strong>{l.company}</strong>
+        {l.ticker_hint && <span className="muted num">{l.ticker_hint}</span>}
+        <span style={{ marginLeft: "auto" }} className={`pill ${l.status === "proposed" ? "pill-wait" : "pill-ok"}`}>{status}</span>
+      </div>
+      {!l.company_id && editing && (
+        <select value={company} onChange={(e) => setCompany(e.target.value)} aria-label="对应公司档案">
+          <option value="">对应到公司档案…</option>
+          {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+      )}
+      <div className="scores">
+        <div>
+          <div className="muted">关联度</div>
+          {editing ? (
+            <input type="number" min={0} max={1} step={0.05} value={relevance} onChange={(e) => setRelevance(Number(e.target.value))} aria-label="关联度" />
+          ) : (
+            <div className="big">{num(l.relevance)}</div>
+          )}
+        </div>
+        <div>
+          <div className="muted">影响分</div>
+          {editing ? (
+            <input type="number" min={-1} max={1} step={0.1} value={impact} onChange={(e) => setImpact(Number(e.target.value))} aria-label="影响分" />
+          ) : (
+            <div className={`big ${tone(l.impact)}`}>{signed(l.impact)}</div>
+          )}
+        </div>
+      </div>
+      {l.rationale && <div className="why">{l.rationale}（{l.proposed_by.startsWith("ai:") ? "AI" : "规则"}）</div>}
       {canReview && (
-        <td>
+        <div style={{ marginTop: 8 }}>
           {l.status !== "confirmed" && (
-            <button disabled={busy} onClick={() => review({ action: "confirm", impact, relevance, company_id: company || null }, "已确认关联；落进击球区会立即告警。")}>确认</button>
+            <button disabled={busy} onClick={() => review({ action: "confirm", impact, relevance, company_id: company || null }, "已确认关联；落进击球区会立即告警。")}>确认关联</button>
           )}
           {l.status !== "rejected" && (
             <button className="quiet" disabled={busy} onClick={() => review({ action: "reject" }, "已驳回该关联。")}>驳回</button>
           )}
-        </td>
+        </div>
       )}
-    </tr>
+    </div>
   );
 }
 
 // ------------------------------------------------------------------ 击球区
 
+function ZoneScatter({ rows, sweet, edge }: { rows: any[]; sweet: number; edge: number }) {
+  const pts = rows.filter((r) => r.margin_of_safety != null && r.quality_score != null);
+  const W = 560, H = 380, l = 44, b = 40, r = 18, t = 18;
+  const ms = pts.map((p) => Number(p.margin_of_safety));
+  const qs = pts.map((p) => Number(p.quality_score));
+  const x0 = Math.min(-0.2, Math.floor(Math.min(0, ...ms) * 10) / 10);
+  const x1 = Math.max(0.6, Math.ceil(Math.max(0, ...ms) * 10) / 10);
+  const y0 = Math.min(50, Math.floor(Math.min(100, ...qs) / 10) * 10);
+  const y1 = 100;
+  const X = (v: number) => l + ((v - x0) / (x1 - x0)) * (W - l - r);
+  const Y = (v: number) => H - b - ((v - y0) / (y1 - y0)) * (H - b - t);
+  const xt: number[] = [];
+  for (let v = Math.ceil(x0 * 5) / 5; v <= x1 + 1e-9; v += 0.2) xt.push(Math.round(v * 100) / 100);
+  const yt: number[] = [];
+  for (let v = y0; v <= y1; v += 10) yt.push(v);
+  return (
+    <svg className="scatter" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="击球区散点图：横轴安全边际，纵轴经营分">
+      <rect className="edge" x={X(edge)} y={t} width={X(sweet) - X(edge)} height={H - b - t} />
+      <rect className="sweet" x={X(sweet)} y={t} width={X(x1) - X(sweet)} height={H - b - t} />
+      {xt.map((v) => (
+        <g key={`x${v}`}>
+          <line className="grid" x1={X(v)} x2={X(v)} y1={t} y2={H - b} />
+          <text className="tick" x={X(v)} y={H - b + 16} textAnchor="middle">{Math.round(v * 100)}%</text>
+        </g>
+      ))}
+      {yt.map((v) => (
+        <g key={`y${v}`}>
+          <line className="grid" x1={l} x2={W - r} y1={Y(v)} y2={Y(v)} />
+          <text className="tick" x={l - 8} y={Y(v) + 4} textAnchor="end">{v}</text>
+        </g>
+      ))}
+      <text className="zlabel" x={(X(sweet) + X(x1)) / 2} y={t + 18} textAnchor="middle">甜区 · 可以挥棒</text>
+      <text className="zlabel soft" x={(X(edge) + X(sweet)) / 2} y={t + 18} textAnchor="middle">边角球</text>
+      <text className="tick" x={(l + W - r) / 2} y={H - 4} textAnchor="middle">安全边际 →</text>
+      <text className="tick" x={l + 6} y={t + 12}>↑ 经营分</text>
+      {pts.map((p) => (
+        <g key={p.security_id}>
+          <circle className={`dot dot-${p.zone}`} cx={X(Number(p.margin_of_safety))} cy={Y(Number(p.quality_score))} r={6}>
+            <title>{`${p.company} ${p.ticker}：安全边际 ${pct(p.margin_of_safety)}，经营分 ${num(p.quality_score, 1)}`}</title>
+          </circle>
+          <text className="name" x={X(Number(p.margin_of_safety)) + 10} y={Y(Number(p.quality_score)) + 4}>
+            {p.company}{p.market === "HK" ? " H" : ""}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 export function StrikeZone(_: Ctx) {
   const board = useLoad<any>("/api/strike-zone");
+  const [only, setOnly] = useState("");
   const b = board.value;
   const m = b?.policy?.margin_of_safety;
+  const rows = (b?.rows || []).filter((r: any) => !only || r.zone === only);
+  const plotted = (b?.rows || []).filter((r: any) => r.margin_of_safety != null && r.quality_score != null).length;
   return (
     <>
       <p className="intro">只在三件事同时满足时挥棒：看得懂（能力圈）、是好生意、价格够便宜（安全边际）。A 股和 H 股分别判断，硬风险一票否决。</p>
       <Failed error={board.error} />
       {b && (
         <>
-          <div className="zone-counts">
-            {Object.entries(ZONE).map(([k, label]) => (
-              <article key={k} className={`zone-card zone-${k}`}><h3>{b.counts[k] ?? 0}</h3><p>{label}</p></article>
-            ))}
+          <div className="kpis">
+            <Kpi label="甜区" value={<span style={{ color: "var(--accent)" }}>{b.counts.sweet ?? 0}</span>} hint={`安全边际 ≥ ${pct(m?.sweet_minimum)} 且三项都过`} />
+            <Kpi label="边角球" value={b.counts.edge ?? 0} hint={`${pct(m?.edge_minimum)}–${pct(m?.sweet_minimum)} 或依据不全，只观察`} />
+            <Kpi label="区外" value={b.counts.outside ?? 0} hint="只记录，不处理" />
+            <Kpi label="证券总数" value={b.rows.length} hint="A 股、H 股分别计" />
           </div>
-          <p className="muted">
-            安全边际 = 1 − 市盈率 ÷ 合理市盈率 {m?.fair_pe_ttm}；甜区要求 ≥ {pct(m?.sweet_minimum)}，{pct(m?.edge_minimum)}–{pct(m?.sweet_minimum)} 为边角球。能力圈要求评分覆盖度 ≥ {b.policy.circle_of_competence.minimum_coverage}。数字在后台配置，可调整。
-          </p>
-          <table>
-            <thead><tr><th>公司</th><th>证券</th><th>区域</th><th>安全边际</th><th>三项检查</th><th>经营分</th><th>市盈率</th></tr></thead>
-            <tbody>
-              {b.rows.map((r: any) => (
-                <tr key={r.security_id}>
-                  <td>{r.company}</td>
-                  <td>{r.ticker} <span className="muted">{r.market === "HK" ? "H股" : "A股"}</span></td>
-                  <td><ZoneBadge zone={r.zone} /></td>
-                  <td>{pct(r.margin_of_safety)}</td>
-                  <td className="checks">{r.checks.map((c: any) => <Check key={c.key} c={c} />)}</td>
-                  <td>{num(r.quality_score, 1)}</td>
-                  <td>{num(r.pe_ttm, 1)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="muted">鼠标停在检查项上可看具体原因。更新于 {time(b.as_of)}。</p>
+          <div className="zone-layout">
+            <div className="panel">
+              <div className="panel-head">
+                <h3>击球区</h3>
+                <span className="right">合理市盈率 {m?.fair_pe_ttm} · 甜区门槛 {pct(m?.sweet_minimum)}</span>
+              </div>
+              <div className="panel-body">
+                <ZoneScatter rows={b.rows} sweet={Number(m?.sweet_minimum ?? 0.3)} edge={Number(m?.edge_minimum ?? 0.1)} />
+                <p className="muted">
+                  安全边际 = 1 − 市盈率 ÷ 合理市盈率；能力圈要求评分覆盖度 ≥ {b.policy.circle_of_competence.minimum_coverage}。
+                  {plotted < b.rows.length && ` 另有 ${b.rows.length - plotted} 只证券缺安全边际或经营分，未画在图上。`}数字在后台配置，可调整。
+                </p>
+              </div>
+            </div>
+            <div className="panel">
+              <div className="panel-head">
+                <h3>证券列表</h3>
+                <div className="seg" role="group" aria-label="按区域筛选">
+                  <button aria-pressed={!only} onClick={() => setOnly("")}>全部</button>
+                  {Object.entries(ZONE).map(([k, label]) => (
+                    <button key={k} aria-pressed={only === k} onClick={() => setOnly(k)}>{label}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="table-scroll">
+                <table>
+                  <thead><tr><th>公司</th><th>区域</th><th>安全边际</th><th>市盈率</th><th>经营分</th><th>三项检查</th></tr></thead>
+                  <tbody>
+                    {rows.map((r: any) => (
+                      <tr key={r.security_id}>
+                        <td><strong>{r.company}</strong> <span className="muted num">{r.ticker} {r.market === "HK" ? "H股" : "A股"}</span></td>
+                        <td><ZoneBadge zone={r.zone} /></td>
+                        <td className="num" style={{ fontWeight: 600 }}>{pct(r.margin_of_safety)}</td>
+                        <td className="num">{num(r.pe_ttm, 1)}</td>
+                        <td className="num">{num(r.quality_score, 1)}</td>
+                        <td className="checks">{r.checks.map((c: any) => <Check key={c.key} c={c} />)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {!rows.length && <p className="empty">这个区域暂时没有证券。</p>}
+              </div>
+              <p className="muted" style={{ padding: "0 16px 12px" }}>鼠标停在检查项上可看具体原因。更新于 {time(b.as_of)}。</p>
+            </div>
+          </div>
         </>
       )}
     </>

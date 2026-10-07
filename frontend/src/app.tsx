@@ -75,14 +75,8 @@ function App() {
       })
       .catch((e) => setError(e.message));
   }, []);
-  return (
-    <>
-      <header>
-        <div>
-          <h1>价值投资研究</h1>
-          <p>查看公司、依据与下一步</p>
-        </div>
-        <details className="identity">
+  const identityPanel = (
+    <details className="identity">
           <summary>本地开发身份与工作区</summary>
           <p className="muted">仅供本机开发验证，尚未接入正式登录。</p>
           <label>
@@ -115,16 +109,17 @@ function App() {
             切换身份与工作区
           </button>
         </details>
-      </header>
-      {error && <p role="alert">{error}</p>}
+  );
+  return (
+    <>
+      {error && <p role="alert" className="notice danger">{error}</p>}
       {active && (
-        <Workspace key={active.login + active.workspace} identity={active} />
+        <Workspace key={active.login + active.workspace} identity={active} identityPanel={identityPanel} />
       )}
-      <footer>本地研究预览 · 真实资料 · A/H独立估值 · 不产生交易指令</footer>
     </>
   );
 }
-function Workspace({ identity }: any) {
+function Workspace({ identity, identityPanel }: any) {
   const [me, setMe] = useState<any>();
   const [tab, setTab] = useState("events");
   const [state, setState] = useState<any>();
@@ -341,48 +336,53 @@ function Workspace({ identity }: any) {
   }
   return (
     <div className="shell">
-      <nav aria-label="业务导航">
+      <nav aria-label="业务导航" className="sidebar">
+        <div className="brand">价投<span>宝</span></div>
         {sections
           .filter((sec) => sec.tabs.some(([k]) => canSee(k)))
           .map((sec) => (
             <button
               key={sec.key}
+              className="nav-item"
               disabled={busy}
               aria-current={sectionOf(tab).key === sec.key ? "page" : undefined}
               onClick={() => navigate(sec.tabs.find(([k]) => canSee(k))![0])}
             >
+              <span className="nav-icon" aria-hidden="true">{ICONS[sec.key]}</span>
               {sec.label}
               {sec.key === "monitor" && !!unread && <span className="unread">{unread}</span>}
             </button>
           ))}
-        <p className="muted">
-          {me?.user?.display_name}
-          <br />
-          {allow("research.read")
-            ? "已保存资料可阅读；评分依据不足时显示待评估。"
-            : "查看当前工作区的运维记录。"}
-        </p>
+        <div className="nav-foot">
+          <strong>{me?.user?.display_name}</strong>
+          <p className="muted">
+            {allow("research.read")
+              ? "已保存资料可阅读；评分依据不足时显示待评估。"
+              : "查看当前工作区的运维记录。"}
+          </p>
+          {identityPanel}
+        </div>
       </nav>
+      <div className="main-col">
+        <div className="topbar">
+          <div className="crumb">{reader ? "固定原文" : sectionOf(tab).label}</div>
+          <div className="subtabs" role="tablist" aria-label={sectionOf(tab).label}>
+            {sectionOf(tab)
+              .tabs.filter(([k]) => canSee(k))
+              .map(([k, l]) => (
+                <button key={k} role="tab" aria-selected={tab === k} disabled={busy} onClick={() => navigate(k)}>
+                  {l}
+                </button>
+              ))}
+          </div>
+          <div className="top-actions">
+            <button className="quiet small" disabled={busy} onClick={() => load().catch(() => {})}>
+              刷新
+            </button>
+            <ThemeToggle />
+          </div>
+        </div>
       <main>
-        <div className="subtabs" role="tablist" aria-label={sectionOf(tab).label}>
-          {sectionOf(tab)
-            .tabs.filter(([k]) => canSee(k))
-            .map(([k, l]) => (
-              <button key={k} role="tab" className={tab === k ? "" : "quiet"} aria-selected={tab === k} disabled={busy} onClick={() => navigate(k)}>
-                {l}
-              </button>
-            ))}
-        </div>
-        <div className="toolbar">
-          <h2>{reader ? "固定原文" : `${sectionOf(tab).label} · ${labels[tab]}`}</h2>
-          <button
-            className="quiet"
-            disabled={busy}
-            onClick={() => load().catch(() => {})}
-          >
-            刷新当前页
-          </button>
-        </div>
         {busy && <p role="status">正在读取或保存…</p>}
         {error && (
           <p className="notice danger" role="alert">
@@ -693,7 +693,24 @@ function Workspace({ identity }: any) {
           {!data && !busy && !error && <p>尚未读取当前页面，点击刷新重试。</p>}
         </div>
       </main>
+      <footer>本地研究预览 · 真实资料 · A/H独立估值 · 不产生交易指令</footer>
+      </div>
     </div>
+  );
+}
+const ICONS: Record<string, string> = { radar: "◉", company: "▤", strategy: "◎", monitor: "◬", settings: "⚙" };
+// 白天 / 黑夜模式：手动切换，记在本机浏览器。
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || "light");
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem("vip-theme", theme); } catch {}
+  }, [theme]);
+  const dark = theme === "dark";
+  return (
+    <button className="quiet small theme-toggle" aria-label={dark ? "切换到白天模式" : "切换到黑夜模式"} title={dark ? "白天模式" : "黑夜模式"} onClick={() => setTheme(dark ? "light" : "dark")}>
+      {dark ? "☀ 白天" : "☾ 黑夜"}
+    </button>
   );
 }
 function CompanyPanel({
@@ -1416,4 +1433,5 @@ function Mine({ data, busy, execute, openCompany }: any) {
     </>
   );
 }
+(() => { try { document.documentElement.dataset.theme = localStorage.getItem("vip-theme") || "light"; } catch {} })();
 createRoot(document.getElementById("root")!).render(<App />);
