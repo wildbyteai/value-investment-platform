@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     # Clock can be injected; default to wall clock.
     demo_mode: bool = False
     eodhd_api_token: SecretStr = Field(default=SecretStr(''), validation_alias='EODHD_API_TOKEN')
+    # Alert e-mail (R6). Unset host = e-mail deliveries are marked skipped, in-app still works.
+    smtp_host: str = ''
+    smtp_port: int = 465
+    smtp_user: str = ''
+    smtp_password: SecretStr = Field(default=SecretStr(''))
+    smtp_starttls: bool = False  # False = implicit TLS (465); True = STARTTLS (587)
+    alert_sender: str = ''       # overrides config/alerts-v1.json sender.address
 
 
 @lru_cache

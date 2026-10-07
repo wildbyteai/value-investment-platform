@@ -1,4 +1,4 @@
-"""后台设置 API: 数据源、资讯源、模型配置 (R6 adds notification settings)."""
+"""后台设置 API: 数据源、资讯源、模型配置、告警发送."""
 import json
 
 from fastapi import APIRouter, Depends
@@ -134,3 +134,23 @@ def update_provider(provider_id: str, body: ProviderIn, principal: Principal = D
         if row is None or row.workspace_id != principal.workspace.id:
             raise NotFound('没有该模型配置')
         return _save_provider(db, principal, body, row)
+
+
+# ------------------------------------------------------------------ 告警发送
+
+@router.get('/notify')
+def notify_settings(principal: Principal = Depends(require('system.configure')), db=Depends(get_db)):
+    from sqlalchemy import func
+    from app.config import get_settings
+    from app.domains.monitoring.models import Notification
+    from app.domains.monitoring.policy import policy as alert_policy, sender_address
+    from app.domains.monitoring.service import recipients
+    s = get_settings()
+    counts = dict(db.execute(select(Notification.status, func.count()).where(
+        Notification.workspace_id == principal.workspace.id, Notification.channel == 'email').group_by(Notification.status)).all())
+    return {'sender': sender_address(), 'sender_name': alert_policy()['sender']['display_name'],
+            'smtp_configured': bool(s.smtp_host), 'smtp_host': s.smtp_host or None, 'smtp_port': s.smtp_port,
+            'smtp_starttls': s.smtp_starttls, 'recipient_roles': alert_policy()['recipient_roles'],
+            'recipients': [{'login': u.login, 'name': u.display_name, 'email': st.email if st else None,
+                            'email_enabled': st.email_enabled if st else True} for u, st in recipients(db, principal.workspace.id)],
+            'email_counts': counts, 'policy': alert_policy()}

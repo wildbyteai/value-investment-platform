@@ -1,7 +1,8 @@
 """Scheduled jobs: ``python -m app.jobs news`` (cron, e.g. every morning 08:30 Asia/Shanghai).
 
 Runs every enabled RSS feed in every workspace, then scores pending events.
-R6 adds ``python -m app.jobs alerts``.
+``python -m app.jobs alerts`` (e.g. every 30 min in trading hours, and after the close):
+scans strike-zone changes and confirmed news in every workspace, then sends e-mails.
 """
 import argparse
 
@@ -27,9 +28,21 @@ def news() -> list[dict]:
     return out
 
 
+def alerts() -> list[dict]:
+    from app.domains.monitoring import service
+    from app.domains.monitoring.mailer import SmtpMailer
+    from app.models.identity import Workspace
+    out = []
+    with SessionLocal() as db:
+        for ws in db.scalars(select(Workspace.id)).all():
+            with unit_of_work(db):
+                out.append({'workspace': ws, **service.scan_all(db, ws, SmtpMailer())})
+    return out
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('job', choices=['news'])
+    parser.add_argument('job', choices=['news', 'alerts'])
     args = parser.parse_args()
-    for line in {'news': news}[args.job]():
+    for line in {'news': news, 'alerts': alerts}[args.job]():
         print(line)
