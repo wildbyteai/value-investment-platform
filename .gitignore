@@ -20,3 +20,6 @@ local-evidence/
 
 # 本机报告成品可能嵌入真实业务页面；源稿和合成图示单独纳入Git。
 output/
+
+# R2: 原型截图由 tools/verify_*prototype.cjs 本机生成，不再入库（历史版本见 archive/r2-pre-slimming 标签）。
+review/design-detail/*.png

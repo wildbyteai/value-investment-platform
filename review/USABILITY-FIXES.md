@@ -31,7 +31,7 @@
 
 检查发现并修正：冲突重绘使编辑面板意外折叠；HTML数字输入不接受前导`+`而显示空值；档位草稿未复制当前档位；资本配置第4档说明不完整；港股依据入口未选择港股。新闻增加快捷入口后，原文互链断言限定至事件列表，仍要求每篇对应原文与返回保留。未更改业务预期来适配错误实现。保留[第一次失败记录](./design-detail/prototype-checks-ui-refine-attempt-01.json)；最终通过报告记录当前输入。
 
-本轮已实际查看[桌面首页](./design-detail/desktop-changes.png)、[公司](./design-detail/desktop-company.png)、[判断](./design-detail/desktop-judgment.png)、[策略](./design-detail/desktop-strategy.png)、[原文](./design-detail/desktop-original.png)、[手机首屏](./design-detail/mobile-first-screen.png)和[手机资讯](./design-detail/mobile-news.png)。手机首屏能看到公司结论及A股缺价，分数位于后面；截图检查不等于真实研究者已经看懂。
+本轮已实际查看[桌面首页](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-changes.png)、[公司](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-company.png)、[判断](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-judgment.png)、[策略](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-strategy.png)、[原文](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-original.png)、[手机首屏](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-first-screen.png)和[手机资讯](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-news.png)。手机首屏能看到公司结论及A股缺价，分数位于后面；截图检查不等于真实研究者已经看懂。
 
 材料检查另见[validation-result](./validation-result.json)，检查引用、配置、合成合同与输入hash。没有执行真实用户5人计时、T-UX验收、屏幕阅读/真机、产品数据库/API/worker、真实权限、评分/模板/策略引擎、真实源或模型、部署；不得把本轮通过数写成这些验收通过。
 
@@ -41,7 +41,7 @@
 
 [GPT-PRO-PROMPT](./GPT-PRO-PROMPT.md)先冷读页面、走业务主线、核查8项处置，再检查会影响结果的必要工程一致性；不要求重写全仓库、重新全量开源选型、穷举防御代码或增加审批/评审轮次。结论限于设计是否可收口，不能冒充上线验收。
 
-优先使用已授权私有GitHub读取并固定实际commit；无连接时用[核心正文](./FINAL-REVIEW-PASTE.txt)，完整[REVIEW-PACK](./REVIEW-PACK.md)按疑问查阅。正文不含截图像素，无法看图必须明确视觉未执行。**GPT Pro终审尚未执行，本轮只准备提示与材料，没有对外模型调用。** 产品开发与真实接入仍需要单独授权。
+优先使用已授权私有GitHub读取并固定实际commit；无连接时用[核心正文](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/FINAL-REVIEW-PASTE.txt)，完整[REVIEW-PACK](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/REVIEW-PACK.md)按疑问查阅。正文不含截图像素，无法看图必须明确视觉未执行。**GPT Pro终审尚未执行，本轮只准备提示与材料，没有对外模型调用。** 产品开发与真实接入仍需要单独授权。
 
 ## 后续终审状态（2026-10-01）
 

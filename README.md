@@ -66,10 +66,10 @@ UX18阶段已运行（2026-10-06）：81项后端测试、TS构建与OpenAPI生�
 | [合同目录](./contracts/README.md) | 策略、分析结果、异步事件的机器可检查合同 |
 | [迁移后二轮评审](./review/ROUND-2-REVIEW.md) / [二轮请求](./review/ROUND-2-REQUEST.md) | 固定迁移基线复审，提案与已确认合同分开 |
 | [GPT Pro 终审提示词](./review/GPT-PRO-PROMPT.md) | 以业务闭环和UI可理解性为主，按实际影响选择必要工程核对 |
-| [整包评审材料](./review/REVIEW-PACK.md) | 完整单文件上下文，可读 GitHub 或粘贴正文 |
+| [整包评审材料](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/REVIEW-PACK.md) | 已归档（R2）：编码前快照，仅在归档标签中保留 |
 | [开源初步候选](./research/open-source-shortlist.md) / [第二轮核查](./research/second-review.md) | 固定源码核查、候选取舍与边界，尚未集成 |
 | [v0.2变更账本](./review/V02-CHANGELOG.md) / [v0.3处置](./review/V03-CHANGELOG.md) | 历史需求映射与二轮五项设计合同完善 |
-| [不附文件的使用方式](./review/PASTE-INSTRUCTIONS.md) | 私有 GitHub 直读提示词、完整正文及分段复制入口 |
+| [不附文件的使用方式](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/PASTE-INSTRUCTIONS.md) | 已归档（R2）：分段粘贴材料，仅在归档标签中保留 |
 
 ## 编码前授权与状态（历史）
 
@@ -99,7 +99,7 @@ python3 tools/build_review_pack.py
 
 设计细化入口：[本地交互原型](./prototype/index.html)、[字段目录](./design/database-catalog.json)、[本轮核对记录](./review/DESIGN-DETAIL-REVIEW.md)。原型浏览器交互检查与材料检查分别记录，不冒充产品或目标用户验收。
 
-可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](./review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
+可理解性收口：[独立评审](./review/USABILITY-REVIEW.md)、[8项处置与证据](./review/USABILITY-FIXES.md)、[终审正文备用](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/FINAL-REVIEW-PASTE.txt)。原型已按评审调整，GPT Pro终审已取得；其三项关键问题已修正，见[终审处置](./review/GPT-PRO-FINAL-DISPOSITION.md)。v0.3设计可收口，产品仍未开发。
 
 编码准备已完成：[收口记录](./review/CODING-READINESS.md)。新增资料解析/批次输出合同、摘要与多来源/时间精度、阅读独立分支及合成状态原型；T-44…49仍为未来产品预期。下一步按17推进授权后的M0/W-08，不再增加全套终审。
 
