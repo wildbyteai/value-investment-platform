@@ -3,7 +3,7 @@
 Classification follows source-backed items, never names or ticker resemblance.
 """
 import json
-from fastapi import HTTPException
+from app.core.errors import Forbidden, NotFound
 from sqlalchemy import select
 from sqlalchemy.engine import make_url
 from app.config import get_settings
@@ -20,7 +20,7 @@ def fixture_mode():
 
 def require_fixture():
     if not fixture_mode():
-        raise HTTPException(403, '合成操作仅允许在隔离测试库中执行')
+        raise Forbidden('合成操作仅允许在隔离测试库中执行')
 
 
 def real_item(db, item, workspace_id):
@@ -56,7 +56,7 @@ def companies(db, workspace_id):
 def require_company(db, company_id, workspace_id):
     row = next((c for c in companies(db, workspace_id) if c.id == company_id), None)
     if row is None:
-        raise HTTPException(404, '当前研究模式和工作区没有该公司')
+        raise NotFound('当前研究模式和工作区没有该公司')
     return row
 
 

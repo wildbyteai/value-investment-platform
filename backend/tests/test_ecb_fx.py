@@ -59,7 +59,7 @@ def test_fx_join_does_not_promote_reference_close_or_reuse_wrong_date():
 def test_import_replay_source_permissions_and_company_boundary(prepared,monkeypatch):
  from app.models.intake import SourceRegistry
  from app.models.runtime import ResearchInput
- from fastapi import HTTPException
+ from app.core.errors import DomainError
  _,ws,other=prepared
  with Session() as db:
   c=Company(name='原创合成FX测试公司');c2=Company(name='原创合成FX第二公司');db.add_all([c,c2]);db.flush();id=c.id;ids=[id,c2.id];db.commit()
@@ -70,7 +70,7 @@ def test_import_replay_source_permissions_and_company_boundary(prepared,monkeypa
   assert db.scalar(select(func.count(AuditLog.id)).where(AuditLog.action=='research.ecb_fx_imported'))==2
   r=db.get(ResearchInput,first['inputs'][0]['input_id']);assert r.published_at.date()>datetime.fromisoformat('2026-06-30').date()
   import uuid
-  with pytest.raises(HTTPException):import_snapshot(db,ws,[str(uuid.uuid4())],snapshot())
+  with pytest.raises(DomainError):import_snapshot(db,ws,[str(uuid.uuid4())],snapshot())
   db.rollback()
   src=db.scalar(select(SourceRegistry).where(SourceRegistry.source_key=='ecb-reference-fx'));policy=json.loads(src.policy_json);policy['revoked']=True;src.policy_json=canonical(policy);db.commit()
   with pytest.raises(ValueError,match='revoked'):import_snapshot(db,ws,[id],snapshot())

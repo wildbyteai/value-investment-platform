@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "strike-zone-standard",
+  "version": 1,
+  "name": "击球区 v1（能力圈 × 好生意 × 安全边际）",
+  "description": "只处理落进击球区的球。A股、H股按证券分别判断；硬风险一票否决。数字只在本文件维护，后台可调。",
+  "circle_of_competence": {
+    "industry_keys": [],
+    "company_ids": [],
+    "empty_list_means": "all_industries_in_strategy_universe",
+    "minimum_coverage": "0.80"
+  },
+  "good_business": {
+    "source": "strategy_enter_gates_except_valuation",
+    "ignore_fields": ["security.valuation_score", "company.coverage"]
+  },
+  "margin_of_safety": {
+    "method": "pe_vs_fair_pe",
+    "formula": "margin = 1 - pe_ttm / fair_pe_ttm",
+    "fair_pe_ttm": "15",
+    "sweet_minimum": "0.30",
+    "edge_minimum": "0.10",
+    "fallback_when_pe_missing": "valuation_score_proxy",
+    "valuation_score_proxy_minimum": "60"
+  },
+  "zones": {
+    "sweet": "甜区：三个条件都满足，可以挥棒",
+    "edge": "边角球：差一点或依据不全，只观察",
+    "outside": "区外：只记录，不处理"
+  }
+}

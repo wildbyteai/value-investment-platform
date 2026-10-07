@@ -5,7 +5,7 @@ Preview runs have no seal token and never advance market membership.
 import json
 from decimal import Decimal, localcontext
 from sqlalchemy import select, func
-from fastapi import HTTPException
+from app.core.errors import Conflict, Forbidden, NotFound
 from app.models.runtime import ResearchRun, ItemRevision
 from app.models.company import Security, ItemCompanyLink
 from app.models.intake import InformationItem
@@ -103,7 +103,7 @@ def start_run(db,principal,command_key):
     old=db.scalar(select(ResearchRun).where(ResearchRun.workspace_id==principal.workspace.id,ResearchRun.command_key==command_key))
     if old:
         legacy_hash=digest({'actor':principal.user.id,'mode':'real_research_preview','algorithm':'local-research-preview-v1'})
-        if old.request_hash not in (request_hash,legacy_hash):raise HTTPException(409,'运行命令已由其他请求使用')
+        if old.request_hash not in (request_hash,legacy_hash):raise Conflict('运行命令已由其他请求使用')
         readable_run(db,old,principal.workspace.id)
         return old
     cutoff=db.scalar(select(func.now()))
@@ -120,9 +120,9 @@ def start_run(db,principal,command_key):
         for link in links:
             if link.company_id:
                 company_ids.add(link.company_id);stats_by_company.setdefault(link.company_id,[]).append(stats)
-    if not refs:raise HTTPException(409,'尚无允许本地分析且可读的真实资料')
+    if not refs:raise Conflict('尚无允许本地分析且可读的真实资料')
     companies=[c for c in data_mode.companies(db,principal.workspace.id) if c.id in company_ids]
-    if not companies:raise HTTPException(409,'可读资料尚未关联到研究公司')
+    if not companies:raise Conflict('可读资料尚未关联到研究公司')
     release=db.scalar(select(StrategyVersion).where(StrategyVersion.workspace_id==principal.workspace.id,StrategyVersion.published.is_(True)).order_by(StrategyVersion.version.desc()).limit(1))
     rules=json.loads(release.rules_json) if release else config('strategy-standard-v1.json')
     results=[];calculation_refs=[]
@@ -174,9 +174,9 @@ def start_run(db,principal,command_key):
 
 
 def readable_run(db,run,workspace_id):
-    if not run or run.workspace_id!=workspace_id:raise HTTPException(404,'没有该工作区的研究运行')
+    if not run or run.workspace_id!=workspace_id:raise NotFound('没有该工作区的研究运行')
     manifest=json.loads(run.manifest_json)
-    if not data_mode.real_evidence(db,manifest.get('source_evidence'),workspace_id):raise HTTPException(403,'输入资料的读取或分析权限已不可用')
+    if not data_mode.real_evidence(db,manifest.get('source_evidence'),workspace_id):raise Forbidden('输入资料的读取或分析权限已不可用')
     return run
 
 

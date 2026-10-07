@@ -59,3 +59,16 @@ def require(permission: str):
         return principal
 
     return _dep
+
+
+def require_any(*permissions: str):
+    """Allow the call when the role holds at least one of ``permissions``."""
+    def _dep(principal: Principal = Depends(get_current_principal)) -> Principal:
+        if not any(role_has(principal.role, p) for p in permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"role '{principal.role}' lacks any of {', '.join(permissions)}",
+            )
+        return principal
+
+    return _dep
