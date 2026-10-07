@@ -8,11 +8,12 @@ from zoneinfo import ZoneInfo
 from app.services.scoring_service import calculation, config, dec, numeric, q, linear
 from app.services.strategy_service import gates
 from app.services.ecb_fx import matching_fx
+from app.services import algorithm_versions
 
 
 def algorithm_basis():
     return {'version': 'reference-research-v1', 'source_hashes': {
-        name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
+        name: algorithm_versions.fingerprint(name)
         for name in ('reference_research.py', 'scoring_service.py', 'strategy_service.py', 'ecb_fx.py')},
         'valuation_config_hash': hashlib.sha256((Path(__file__).resolve().parents[3] / 'config/scoring-standard-v1.json').read_bytes()).hexdigest()}
 

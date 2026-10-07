@@ -28,6 +28,10 @@ Session=sessionmaker(bind=engine)
 
 @pytest.fixture()
 def prepared():
+    yield from prepare_database()
+
+
+def prepare_database():
     Base.metadata.drop_all(engine);Base.metadata.create_all(engine);seed()
     with Session() as db:
         seed_companies(db);import_fixture(db);link_items(db);auto_decide(db);db.commit();ws=workspace(db)
