@@ -13,7 +13,7 @@ from app.models.company import Company, Security
 from app.models.runtime import Evaluation, ResearchInput
 from app.models.strategy import StrategyVersion, SecurityState, ChangeRecord
 from app.models.intake import SourceRegistry
-from app.services import data_mode
+from app.services import data_mode, algorithm_versions
 from app.services.transactions import canonical, digest, record
 from app.services.scoring_service import inputs, input_time_bounds, current_decisions, resolve_template, score_company, score_security, config, ROOT
 from app.services.strategy_service import gates
@@ -43,7 +43,8 @@ def clock(db): return db.scalar(select(func.vip_knowledge_now()))
 def runtime_artifacts():
     artifacts={name:config(name) for name in CONFIGS}
     for name in ALGORITHMS:
-        artifacts['algorithm:'+name]={'source_sha256':__import__('hashlib').sha256((Path(__file__).parent/name).read_bytes()).hexdigest()}
+        # Released fingerprint, not a live file hash: see algorithm_versions.
+        artifacts['algorithm:'+name]={'source_sha256':algorithm_versions.fingerprint(name)}
     return artifacts
 
 
