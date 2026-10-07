@@ -10,5 +10,6 @@ from app.models.runtime import CommandReceipt, WorkEffect, ResearchInput, Evalua
 
 from app.models.runtime import ResearchRun  # noqa: F401
 from app.models.sealing import KnowledgeEntry, SafetyGeneration, InstalledArtifact, PrimaryListing, MarketSession, EvaluationSeal, FrozenManifest  # noqa: F401
+from app.domains.news.models import NewsFeed, NewsEvent, NewsItem, NewsEventCompany, LlmProvider  # noqa: F401
 from app.services.knowledge_clock import register_metadata_triggers
 register_metadata_triggers(Base.metadata)

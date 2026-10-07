@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "news-radar-standard",
+  "version": 1,
+  "name": "资讯雷达 v1",
+  "timezone": "Asia/Shanghai",
+  "skip_title_patterns": ["今日无", "暂无重要", "无重要动态", "无新增"],
+  "dedupe": {
+    "window_days": 3,
+    "title_similarity_minimum": "0.45",
+    "method": "character_bigram_overlap_coefficient_on_normalized_title",
+    "calibration": "2026-09-29/30 six real feeds: true duplicates scored 0.51–0.81, first false pair 0.31"
+  },
+  "linking": {
+    "relevance_minimum_to_keep": "0.30",
+    "max_companies_per_event": 6,
+    "rule_fallback_relevance": "0.60",
+    "impact_range": ["-1", "1"],
+    "relevance_range": ["0", "1"]
+  },
+  "default_llm_provider": {
+    "provider_key": "deepseek",
+    "name": "DeepSeek",
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-chat",
+    "api_key_env": "VIP_DEEPSEEK_API_KEY"
+  },
+  "column_synonyms": {
+    "title": ["标题", "标题/事件", "事件"],
+    "summary": ["核心内容摘要", "演讲或采访核心内容摘要", "摘要", "内容"],
+    "source_text": ["信息来源", "场合/来源", "来源"],
+    "url": ["原文链接", "链接", "信息来源URL", "URL"],
+    "published": ["发布时间", "日期", "时间"],
+    "category": ["行业分类", "类别", "信息类型"],
+    "company_hint": ["公司（代码）", "公司/头衔", "公司"],
+    "note": ["简要解读", "价值评级"],
+    "person": ["人物"]
+  }
+}
