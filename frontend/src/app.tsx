@@ -16,15 +16,40 @@ import {
 } from "./ui";
 import { AuthorJudgment, Judgment } from "./judgments";
 import { TemplateEditor } from "./template";
+import {
+  NewsRadar,
+  StrikeZone,
+  CompanyMainline,
+  Inbox,
+  AlertsList,
+  NotifySettings,
+  Sources,
+  Feeds,
+  Models,
+  NotifyAdmin,
+  useUnread,
+} from "./mainline";
 import "./style.css";
-const labels = {
-  today: "今日概览",
-  companies: "公司研究",
-  research: "研究快照",
-  news: "资讯与研判",
-  strategy: "策略候选池",
-  mine: "我的工作台",
-  tasks: "系统支持",
+// 四个业务菜单 + 后台设置。每个菜单下的分页签复用原有研究页面。
+type Section = { key: string; label: string; tabs: [string, string][] };
+const sections: Section[] = [
+  { key: "radar", label: "资讯雷达", tabs: [["events", "事件与关联"], ["news", "原始资料与研判"]] },
+  { key: "company", label: "公司档案", tabs: [["companies", "公司"], ["today", "今日概览"], ["research", "研究快照"], ["mine", "我的自选与笔记"]] },
+  { key: "strategy", label: "策略（击球区）", tabs: [["zone", "击球区"], ["strategy", "策略规则"]] },
+  { key: "monitor", label: "监控告警", tabs: [["inbox", "我的通知"], ["alerts", "全部告警"], ["notify-settings", "通知设置"]] },
+  { key: "settings", label: "后台设置", tabs: [["sources", "数据源"], ["feeds", "资讯源与导入"], ["models", "模型配置"], ["notify", "告警发送"], ["tasks", "后台任务"]] },
+];
+const labels: Record<string, string> = Object.fromEntries(sections.flatMap((s) => s.tabs.map(([k, l]) => [k, l])));
+const sectionOf = (tab: string) => sections.find((s) => s.tabs.some(([k]) => k === tab)) || sections[0];
+// Tabs whose views load their own data (mainline.tsx).
+const SELF_LOADING = new Set(["events", "zone", "inbox", "alerts", "notify-settings", "sources", "feeds", "models", "notify"]);
+const tabPermission: Record<string, string[]> = {
+  tasks: ["ops.read"],
+  mine: ["watchlist.own"],
+  sources: ["source.manage", "system.configure"],
+  feeds: ["source.manage", "analysis.override", "system.configure"],
+  models: ["model.configure"],
+  notify: ["system.configure"],
 };
 const companyTabs = [
   "经营质量与待补依据",
@@ -101,7 +126,7 @@ function App() {
 }
 function Workspace({ identity }: any) {
   const [me, setMe] = useState<any>();
-  const [tab, setTab] = useState("today");
+  const [tab, setTab] = useState("events");
   const [state, setState] = useState<any>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -113,7 +138,7 @@ function Workspace({ identity }: any) {
   const [runKey, setRunKey] = useState(crypto.randomUUID());
   const scope = useRef(0),
     live = useRef(true),
-    route = useRef("today");
+    route = useRef("events");
   const gate = useRef(false);
   const allow = (p: string) => me?.permissions?.includes(p);
   const data = state?.route === tab ? state.value : null;
@@ -121,13 +146,14 @@ function Workspace({ identity }: any) {
     session.login = identity.login;
     session.workspace = identity.workspace;
     live.current = true;
-    load("today").catch(() => {});
+    load("events").catch(() => {});
     return () => {
       live.current = false;
       scope.current++;
     };
   }, []);
   async function fetchPage(target: string, user: any) {
+    if (SELF_LOADING.has(target)) return {};
     if (["today", "companies"].includes(target)) {
       const cs = await api("/api/companies");
       const companyResults = await Promise.allSettled(
@@ -209,7 +235,8 @@ function Workspace({ identity }: any) {
       const user = await api("/api/me");
       if (!live.current || token !== scope.current) return;
       setMe(user);
-      if (!user.permissions.includes("research.read")) target = "tasks";
+      if (!user.permissions.includes("research.read") && !(tabPermission[target] || []).some((p) => user.permissions.includes(p)))
+        target = "tasks";
       const value = await fetchPage(target, user);
       if (!live.current || token !== scope.current) return;
       route.current = target;
@@ -295,6 +322,9 @@ function Workspace({ identity }: any) {
       setReader(doc);
     }
   }
+  const canSee = (k: string) => (tabPermission[k] ? tabPermission[k].some((p) => allow(p)) : allow("research.read"));
+  const unread = useUnread([tab, message]);
+  const ctx = { allow, busy, execute };
   const watchIds = data?.watch
     ? new Set(data.watch.map((w: any) => w.security_id))
     : null;
@@ -311,33 +341,20 @@ function Workspace({ identity }: any) {
   }
   return (
     <div className="shell">
-      <nav aria-label="研究导航">
-        {Object.entries(labels)
-          .filter(([key]) =>
-            key === "tasks"
-              ? allow("ops.read")
-              : key === "mine"
-                ? allow("watchlist.own")
-                : allow("research.read"),
-          )
-          .map(([key, label], index) => (
+      <nav aria-label="业务导航">
+        {sections
+          .filter((sec) => sec.tabs.some(([k]) => canSee(k)))
+          .map((sec) => (
             <button
-              className={
-                index > 2 && key !== "mine"
-                  ? "secondary-nav" + (more ? " expanded" : "")
-                  : ""
-              }
-              key={key}
+              key={sec.key}
               disabled={busy}
-              aria-current={tab === key ? "page" : undefined}
-              onClick={() => navigate(key)}
+              aria-current={sectionOf(tab).key === sec.key ? "page" : undefined}
+              onClick={() => navigate(sec.tabs.find(([k]) => canSee(k))![0])}
             >
-              {label}
+              {sec.label}
+              {sec.key === "monitor" && !!unread && <span className="unread">{unread}</span>}
             </button>
           ))}
-        <button className="mobile-more quiet" onClick={() => setMore(!more)}>
-          更多
-        </button>
         <p className="muted">
           {me?.user?.display_name}
           <br />
@@ -347,8 +364,17 @@ function Workspace({ identity }: any) {
         </p>
       </nav>
       <main>
+        <div className="subtabs" role="tablist" aria-label={sectionOf(tab).label}>
+          {sectionOf(tab)
+            .tabs.filter(([k]) => canSee(k))
+            .map(([k, l]) => (
+              <button key={k} role="tab" className={tab === k ? "" : "quiet"} aria-selected={tab === k} disabled={busy} onClick={() => navigate(k)}>
+                {l}
+              </button>
+            ))}
+        </div>
         <div className="toolbar">
-          <h2>{reader ? "固定原文" : labels[tab]}</h2>
+          <h2>{reader ? "固定原文" : `${sectionOf(tab).label} · ${labels[tab]}`}</h2>
           <button
             className="quiet"
             disabled={busy}
@@ -529,6 +555,9 @@ function Workspace({ identity }: any) {
                     research={() => navigate("research")}
                   />
                 ))}
+              {!!data.companies.length && (
+                <CompanyMainline companyId={selected || data.companies[0].id} />
+              )}
               {!data.companies.length && <p>当前工作区暂无可研究公司。</p>}
             </>
           )}
@@ -605,6 +634,15 @@ function Workspace({ identity }: any) {
               }}
             />
           )}
+          {data && tab === "events" && <NewsRadar {...ctx} />}
+          {data && tab === "zone" && <StrikeZone {...ctx} />}
+          {data && tab === "inbox" && <Inbox {...ctx} />}
+          {data && tab === "alerts" && <AlertsList {...ctx} />}
+          {data && tab === "notify-settings" && <NotifySettings {...ctx} />}
+          {data && tab === "sources" && <Sources {...ctx} />}
+          {data && tab === "feeds" && <Feeds {...ctx} />}
+          {data && tab === "models" && <Models {...ctx} />}
+          {data && tab === "notify" && <NotifyAdmin {...ctx} />}
           {data && tab === "tasks" && (
             <>
               <p>当前工作区的接入记录与本地处理任务。这里只显示运维元数据。</p>

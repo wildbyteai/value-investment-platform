@@ -450,3 +450,65 @@ footer {
     scroll-behavior: auto;
   }
 }
+/* ---- 四层主线（R4） ---- */
+.subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-top: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.subtabs button {
+  margin: 0 0 -1px;
+  border-radius: 6px 6px 0 0;
+}
+.unread {
+  display: inline-block;
+  min-width: 20px;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+}
+.zone {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.zone-sweet { background: #d1fae5; color: var(--success); }
+.zone-edge { background: #fef3c7; color: var(--warning); }
+.zone-outside { background: #eef0f3; color: var(--muted); }
+.zone-counts { display: flex; gap: 16px; flex-wrap: wrap; }
+.zone-card { min-width: 140px; text-align: center; }
+.zone-card h3 { font-size: 32px; margin: 0; }
+.check { display: inline-block; margin-right: 10px; font-size: 13px; white-space: nowrap; cursor: help; }
+.check-ok { color: var(--success); }
+.check-no { color: var(--danger); }
+.check-unknown { color: var(--warning); }
+.checks { min-width: 220px; }
+.event-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+.impact { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.impact.up { color: var(--success); }
+.impact.down { color: var(--danger); }
+.rationale { max-width: 32ch; font-size: 13px; }
+.link-rejected td { color: var(--muted); text-decoration: line-through; }
+.link-rejected td:last-child, .link-rejected td:nth-last-child(2) { text-decoration: none; }
+td input[type="number"] { width: 80px; }
+td select { display: block; margin-top: 4px; max-width: 180px; }
+.sources { padding-left: 20px; font-size: 14px; }
+.sources li { margin: 6px 0; }
+.filters { margin-bottom: 8px; }
+.form { display: grid; gap: 8px; max-width: 560px; margin: 16px 0; }
+.form label { display: grid; gap: 4px; }
+.form label.inline { display: flex; align-items: center; gap: 8px; }
+.form input:not([type="checkbox"]), .form select { min-height: 40px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; }
+.company-mainline { margin-bottom: 16px; }
+.alert-news_hit h4, .alert-zone_enter h4 { color: var(--ink); }
+.alert-hard_risk { border-left: 4px solid var(--danger); }
+.alert .body-text { white-space: pre-wrap; font-size: 14px; }
