@@ -8,6 +8,6 @@
 | `review/design-detail/*.png` | 旧原型截图（约 3MB），由 `tools/verify_prototype.cjs`、`tools/verify_intake_prototype.cjs` 本机重新生成，现已加入 `.gitignore`；同目录的检查 JSON 保留 |
 | `reports/stakeholder/` 下 0.2–0.5 的源稿、方案、`build-v0.3/4/5.py`、`render-v0.5.py`、制作证据、`case-study-v0.4.json`，以及 `figures/v0.4`、`figures/v0.5`、`figures/F-*`、`figures/S-*-placeholder` | 历史版本快照与重复/废弃图示；当前入口为 `tools/build_stakeholder_report.py` + `business-narrative.md` + `figures/v0.6` |
 
-暂不移出：`backend/static`（后端直接托管的界面构建产物）。移出前需要在 CI 或启动流程中自动构建前端，留到 R4 前端重建时一起处理。
+暂不移出：`backend/static`（后端直接托管的界面构建产物）。R4 起 CI 的 `frontend-build` 会重新构建并校验它与 `frontend/src` 一致，因此保留在主干便于直接运行。
 
 找回某个文件：`git show archive/r2-pre-slimming:<路径>`，或在 GitHub 切换到该标签浏览。
