@@ -53,7 +53,7 @@
 | 验收和追踪 | [10](./docs/10-acceptance.md)，R/W/T标识继续使用 |
 | 决策与设计变更 | docs/adr/、review/V02-CHANGELOG.md、review/V03-CHANGELOG.md |
 | 机器配置与合同 | config/、contracts/；文档引用，不复制数值真源 |
-| 当前产品整体评估 | [当前交接](./review/CURRENT-HANDOFF.md)、[评估提示词](./review/CURRENT-REVIEW-PROMPT.md)；旧GPT Pro/REVIEW-PACK为编码前快照 |
+| 当前产品整体评估 | [当前交接](./review/CURRENT-HANDOFF.md)、[评估提示词](./review/CURRENT-REVIEW-PROMPT.md)；旧GPT Pro/REVIEW-PACK为编码前快照，已于R2归档（见[归档说明](./docs/archive.md)） |
 | 本机历史与迁移证据 | local-evidence/，忽略Git并持久保留 |
 
 日常工作直接在本项目创建分支、编写设计、执行已授权任务和记录证据，不再创建BYTEWATCHER Matter或依赖其registry/SOURCE_OF_TRUTH。代码开发分支默认codex/前缀，当前文档阶段在main提交；保留完整Git历史与原remote。

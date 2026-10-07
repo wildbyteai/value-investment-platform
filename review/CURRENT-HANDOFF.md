@@ -74,6 +74,6 @@
 
 ## 历史材料与传递
 
-旧`review/REVIEW-PACK.md`、`FINAL-REVIEW-PASTE.txt`和`PASTE-*`是编码前评审快照，含当时“未实现”叙述；不再用它们作为当前产品整包。历史design/USABILITY/GPT-PRO处置可用于理解来源，但问题是否仍存在需要独立核对当前代码。
+旧`review/REVIEW-PACK.md`、`FINAL-REVIEW-PASTE.txt`和`PASTE-*`是编码前评审快照，已于R2移出主干（见[归档说明](../docs/archive.md)），含当时“未实现”叙述；不再用它们作为当前产品整包。历史design/USABILITY/GPT-PRO处置可用于理解来源，但问题是否仍存在需要独立核对当前代码。
 
 当前推荐：将[评估提示词](./CURRENT-REVIEW-PROMPT.md)发给评估Agent，让其读取本项目当前提交；无仓库权限时，在允许处理源码的环境提供本地生成zip。构建：`python3 tools/build_current_review_bundle.py`，只从干净HEAD读取白名单已提交文件，不连接DB/网络；包内manifest固定提交和hash。不要把历史大包追加到当前包造成上下文冲突。

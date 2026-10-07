@@ -24,7 +24,7 @@ Pro明确实际看到截图为0/9，仅依据文案、源码、导航及合同�
 
 [原型检查](./design-detail/prototype-checks.json)执行于`2026-10-01T02:30:10.067Z`，运行时HEAD为`645ab64`，`source_sha256`绑定实际修改后的工作树。隔离无头系统Chrome、本地file原型、HTTP阻断；**76项通过**，无页面脚本错误与HTTP请求尝试。新增PD-FINAL-01…03，原73项业务交互与代表视口继续通过。材料检查另见[validation-result](./validation-result.json)，两份报告不代替产品验收。
 
-当前会话实际查看[历史评分依据](./design-detail/desktop-score-evidence.png)、[修改区](./design-detail/desktop-judgment-edit.png)、[发布后的策略](./design-detail/desktop-strategy-published.png)和[手机首屏](./design-detail/mobile-first-screen.png)。当前值和唯一新值输入区分清楚；发布后75门槛、等待提示、发布1历史表分区明确；手机公司结论及A股缺价继续先于大分数。这里是当前会话的截图核对，不能回填为Pro实际看过截图或目标用户验收。
+当前会话实际查看[历史评分依据](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-score-evidence.png)、[修改区](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-judgment-edit.png)、[发布后的策略](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-strategy-published.png)和[手机首屏](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-first-screen.png)。当前值和唯一新值输入区分清楚；发布后75门槛、等待提示、发布1历史表分区明确；手机公司结论及A股缺价继续先于大分数。这里是当前会话的截图核对，不能回填为Pro实际看过截图或目标用户验收。
 
 **本轮三项修正完成，v0.3设计可收口，进入后续开发准备。** 不再把可选详细评分解释、更多安全防御或追加终审列为前置。下一步优化是首个开发切片展示一项经营分的基础/贡献和一只证券的价格/分母/估值映射，沿用已有接口合同。
 

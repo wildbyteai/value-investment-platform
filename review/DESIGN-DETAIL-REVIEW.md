@@ -32,7 +32,7 @@
 
 实际浏览器检查时间：`2026-10-01T00:51:10.263Z`，运行时HEAD见prototype-checks.json，实际工作树输入由source_sha256绑定。隔离无头系统Chrome、本地file页面、阻断HTTP：**65项通过**，无页面脚本错误和HTTP请求尝试。新增7组资讯场景与4视口新闻/原文布局检查；保留原编辑、角色入口、预览失效、评分向量和恢复等检查。检查工具中的显示文字更新不弱化原业务预期。
 
-已查看桌面资讯、公司页、手机资讯与原文截图。当前prototype-checks.json和截图记录本次结果，上一版结果可从`0b8511b`读取，首轮导航等待失败证据仍保留。新增截图：[桌面资讯](./design-detail/desktop-news.png)、[逐篇原文](./design-detail/desktop-original.png)、[手机资讯](./design-detail/mobile-news.png)、[手机原文](./design-detail/mobile-original.png)。
+已查看桌面资讯、公司页、手机资讯与原文截图。当前prototype-checks.json和截图记录本次结果，上一版结果可从`0b8511b`读取，首轮导航等待失败证据仍保留。新增截图：[桌面资讯](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-news.png)、[逐篇原文](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-original.png)、[手机资讯](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-news.png)、[手机原文](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-original.png)。
 
 06/16、prototype README、PROJECT和V03账本同步；材料检查另见validation-result.json。本次没有产品/数据库/API/worker、真实采集/模型/行情/部署或外部发送；没有真实来源网址，也未声明完成5名目标用户验收。
 

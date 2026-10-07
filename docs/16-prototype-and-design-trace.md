@@ -78,7 +78,7 @@
 
 原型：运行 `node tools/verify_prototype.cjs <Playwright模块路径> <浏览器可执行路径>`，在独立无头浏览器中打开本地file原型，阻断HTTP请求，检查固定维度向量/总分与实际模板配置一致、资讯顺序/筛选/逐篇正文/返回/同事件原文互链/虚构风险隔离、导航、完整人工值/冲突保留、角色入口、预览失效、自选笔记、失败项恢复、合成更正、当前/历史分开、已发布评分入口、主动编辑、档位锚点、自选A/H及手机首屏，以及1440/1280/390/430宽度。结果见[prototype-checks](../review/design-detail/prototype-checks.json)。这些是原型交互与页面布局检查，不是T-UX-01…04的5人计时任务，也不证明真实权限/DB/评分引擎。
 
-截图：[股票候选](../review/design-detail/desktop-strategy.png)、[只读判断](../review/design-detail/desktop-judgment.png)、[新闻资讯](../review/design-detail/desktop-news.png)、[资讯原文](../review/design-detail/desktop-original.png)、[手机资讯](../review/design-detail/mobile-news.png)、[桌面变化](../review/design-detail/desktop-changes.png)、[公司研究](../review/design-detail/desktop-company.png)、[模板](../review/design-detail/desktop-template.png)、[手机公司页](../review/design-detail/mobile-company.png)。截图代表对应合成正常状态，不表示所有设计状态均经过人类可用性验证。
+截图：[股票候选](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-strategy.png)、[只读判断](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-judgment.png)、[新闻资讯](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-news.png)、[资讯原文](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-original.png)、[手机资讯](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-news.png)、[桌面变化](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-changes.png)、[公司研究](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-company.png)、[模板](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-template.png)、[手机公司页](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/mobile-company.png)。截图代表对应合成正常状态，不表示所有设计状态均经过人类可用性验证。
 
 本轮成果足以对照流程、字段和主用户路径；实现选型时再落实PG版本/迁移、生成类型合同及cutoff提交可见性协议，沿用原T预期。无需为了可选平台或新增全量评审暂停设计收口。
 
@@ -88,7 +88,7 @@
 
 09-29固定评分/A-H估值使用历史财务原文`byd-report-historical`（09-27发布/取得）；09-30的`byd-report`仍在新闻中作为后来更新。评分页后续订单/资本配置判断不作为该旧评分输入。修改区保留当前有效值和唯一的新值输入，去除重复新值摘要。策略发布固定版本/门槛，新评估等待，固定旧结果明确归发布1；公司研究对照也标发布1。发布新模板不强制更新旧策略。
 
-三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](../review/design-detail/desktop-score-evidence.png)、[修改区](../review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](../review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
+三项已执行检查为PD-FINAL-01…03，证据及边界见[终审处置](../review/GPT-PRO-FINAL-DISPOSITION.md)。新增截图：[历史评分依据](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-score-evidence.png)、[修改区](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-judgment-edit.png)、[新规则与历史结果](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/design-detail/desktop-strategy-published.png)。更详细的基础/贡献/财务分母解释留在已有开发切片，不要求增加终审轮次。
 
 ## 7. 编码准备新增的资料阅读状态
 

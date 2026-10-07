@@ -2,7 +2,7 @@
 
 ## 使用方式
 
-把下面“完整提示词”复制给 GPT Pro，使用已授权的 GitHub 连接读取私有仓库。连接不可用时，复制[终审正文材料](./FINAL-REVIEW-PASTE.txt)，它已包含提示词和本轮核心材料；无需附件。截图若无法实际查看，应明确视觉检查未执行，不要把源代码阅读当作看过页面。完整工程材料另见[REVIEW-PACK](./REVIEW-PACK.md)，按具体疑问查阅，不要求为终审重写全套文档。
+把下面“完整提示词”复制给 GPT Pro，使用已授权的 GitHub 连接读取私有仓库。连接不可用时，复制[终审正文材料](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/FINAL-REVIEW-PASTE.txt)，它已包含提示词和本轮核心材料；无需附件。截图若无法实际查看，应明确视觉检查未执行，不要把源代码阅读当作看过页面。完整工程材料另见[REVIEW-PACK](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/review/REVIEW-PACK.md)，按具体疑问查阅，不要求为终审重写全套文档。
 
 本提示词是本轮终审入口，取代旧的“全面重写v0.3、穷举跨模块反例、重新比较开源框架”评审任务。历史提示词仍可从Git历史读取。2026-10-01已取得该提示词对应的GPT Pro共享终审，固定旧基线645ab64；三项局部修正及验证见[终审处置](./GPT-PRO-FINAL-DISPOSITION.md)。提示词保留为历史交接与按需复核入口，不要求再次终审；终审意见不授权产品开发、部署或真实接入。
 

@@ -6,6 +6,6 @@
 
 6张信息图替代大幅截图占位，页面结构图明确标为示意。附件D补六张实际截图；完整报价和用户签收后续补充。产品局部实现与合成推演各按其证据说明。
 
-[设计方案](../../docs/20-stakeholder-report-design.md)说明结构和检查标准，[目录说明](./README.md)提供成品与制作方式。0.3入口稿保留在[历史底稿](./content-draft-v0.3.md)。
+[设计方案](../../docs/20-stakeholder-report-design.md)说明结构和检查标准，[目录说明](./README.md)提供成品与制作方式。0.3入口稿保留在[历史底稿](https://github.com/wildbyteai/value-investment-platform/blob/archive/r2-pre-slimming/reports/stakeholder/content-draft-v0.3.md)。
 
 技术自主权说明强调开放标准、许可及数据权利，保留已采用与候选的区别。新增措辞不改变业务合同、数值门槛或真实验收状态。0.4入口稿保留在content-draft-v0.4.md。
