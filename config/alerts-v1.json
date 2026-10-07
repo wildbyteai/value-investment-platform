@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "alerts-standard",
+  "version": 1,
+  "name": "监控告警 v1（只处理落进击球区的球）",
+  "sender": {
+    "address": "admin@bytewatcher.xyz",
+    "display_name": "价投宝",
+    "env_override": "VIP_ALERT_SENDER"
+  },
+  "channels": [
+    "inapp",
+    "email"
+  ],
+  "recipient_roles": [
+    "researcher",
+    "strategy_manager",
+    "system_admin"
+  ],
+  "news_hit": {
+    "zones": [
+      "sweet"
+    ],
+    "minimum_relevance": "0.50",
+    "minimum_abs_impact": "0.30",
+    "major_negative_zones": [
+      "edge"
+    ],
+    "major_negative_impact": "-0.50",
+    "lookback_days": 7
+  },
+  "zone_change": {
+    "notify_on_enter": [
+      "sweet"
+    ],
+    "notify_on_exit_from": [
+      "sweet"
+    ],
+    "hard_risk_from": [
+      "sweet",
+      "edge"
+    ],
+    "initial_baseline_notify": false
+  },
+  "email": {
+    "max_attempts": 5,
+    "subject_prefix": "【价投宝】"
+  }
+}

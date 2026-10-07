@@ -48,3 +48,22 @@ jobs:
       - name: Run all backend tests
         working-directory: backend
         run: uv run pytest -q
+
+  frontend-build:
+    # The UI bundle in backend/static is served by FastAPI; it must match frontend/src.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Type-check and build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+      - name: Committed bundle matches source
+        run: git diff --exit-code -- backend/static

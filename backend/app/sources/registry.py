@@ -66,6 +66,8 @@ for _spec in (
     SourceSpec('cninfo-', '巨潮法定报告摘录', 'companies', 'statement_excerpt', 'app.services.issuer_reports', 'manual_script', ('CN_A',), key_is_prefix=True),
     SourceSpec('cninfo-bounded-issuer-disclosures', '巨潮发行人公告', 'news', 'issuer_announcement', 'app.services.issuer_disclosures', 'manual_script', ('CN_A',)),
     SourceSpec('wikimedia-en-text', 'Wikipedia 英文百科', 'companies', 'business_description', 'app.services.real_source', 'manual_script'),
+    SourceSpec('news-excel-upload', '每日资讯 Excel（人工定时任务产出）', 'news', 'news_items', 'app.domains.news.normalize', 'upload', notes='后台上传或接口导入'),
+    SourceSpec('news-rss', 'RSS / Atom 资讯源', 'news', 'news_items', 'app.domains.news.service', 'scheduled', notes='python -m app.jobs news'),
     SourceSpec('local-fixture', '合成演示资料', 'news', 'synthetic_items', 'app.services.intake_service', 'manual_script', notes='仅测试库'),
 ):
     register(_spec)
