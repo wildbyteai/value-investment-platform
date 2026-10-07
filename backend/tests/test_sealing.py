@@ -9,7 +9,7 @@ import pytest
 from jsonschema import Draft202012Validator,FormatChecker
 from sqlalchemy import select,func,text
 from sqlalchemy.exc import DBAPIError
-from fastapi import HTTPException
+from app.core.errors import DomainError
 from sqlalchemy import event
 from app.db import engine
 from test_remediation import prepare_database,Session,headers
@@ -182,7 +182,7 @@ def test_two_claimers_expiry_old_fence_recovery(prepared):
     replacement=claim(id,68,CTX);assert replacement['fence']==old['fence']+1
     with Session() as db:
         at(db,68)
-        with pytest.raises(HTTPException,match='fence'):seal.leased(db,CTX,old)
+        with pytest.raises(DomainError,match='fence'):seal.leased(db,CTX,old)
     f=freeze(replacement,68);assert finish(replacement,f,68)
 
 def test_finish_atomic_rollback_and_append_only(prepared):
@@ -223,8 +223,8 @@ def test_new_release_historical_only_and_unknown_calendar_rejected(prepared):
     result=finish(token,f,66)
     with Session() as db:
         assert db.get(Evaluation,result).application_status=='superseded'
-        with pytest.raises(HTTPException):seal.schedule(db,CTX,ws,release,security,'no-calendar')
-        with pytest.raises(HTTPException):seal.claim(db,seal.WorkerContext('user',frozenset()),id)
+        with pytest.raises(DomainError):seal.schedule(db,CTX,ws,release,security,'no-calendar')
+        with pytest.raises(DomainError):seal.claim(db,seal.WorkerContext('user',frozenset()),id)
 
 def test_a_h_distinct_slots(prepared):
     _,ws,_=prepared;a,_,_=arrange(ws)
@@ -370,7 +370,7 @@ def test_new_permission_cannot_be_backfilled_to_frozen_cutoff(prepared,monkeypat
     from app.services import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     token=claim(id)
-    with pytest.raises(HTTPException,match='新许可'):freeze(token)
+    with pytest.raises(DomainError,match='新许可'):freeze(token)
 
 def test_late_link_does_not_make_old_input_known_at_cutoff(prepared,monkeypatch):
     _,ws,_=prepared;source,item,ref=real_branch_fixture(ws);id,_,_=arrange(ws,evidence_refs=[ref]);add_original_fixture_input(ws,ref)

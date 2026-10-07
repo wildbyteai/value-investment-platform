@@ -1,3 +1,4 @@
+from app.core.errors import DomainError
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 from typing import Any, Literal
@@ -29,7 +30,7 @@ def list_runs(principal:Principal=Depends(require('research.read')),db=Depends(g
     out=[]
     for row in rows:
         try:readable_run(db,row,principal.workspace.id)
-        except HTTPException:continue
+        except DomainError:continue
         out.append({'id':row.id,'status':row.status,'manifest_hash':row.manifest_hash,'created_at':row.created_at.isoformat()})
     return out
 

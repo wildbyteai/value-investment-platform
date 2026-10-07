@@ -4,7 +4,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
-from fastapi import HTTPException
+from app.core.errors import Conflict, Forbidden, NotFound
 from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import insert
 from app.models.sealing import (EvaluationSeal, FrozenManifest, PrimaryListing, MarketSession,
@@ -34,7 +34,7 @@ class WorkerContext:
 
 def authorize(context):
     if not isinstance(context,WorkerContext) or 'strategy.seal' not in context.capabilities:
-        raise HTTPException(403,'仅受限策略worker可以冻结与封存')
+        raise Forbidden('仅受限策略worker可以冻结与封存')
 
 
 def clock(db): return db.scalar(select(func.vip_knowledge_now()))
@@ -65,17 +65,17 @@ def schedule(db,context,workspace_id,release_id,security_id,session_id):
     listing=db.scalar(select(PrimaryListing).where(PrimaryListing.security_id==security_id))
     session=db.get(MarketSession,session_id)
     if not release or release.workspace_id!=workspace_id or not release.published or not security:
-        raise HTTPException(404,'发布策略/证券不属于此工作区')
+        raise NotFound('发布策略/证券不属于此工作区')
     data_mode.require_company(db,security.company_id,workspace_id)
     if not listing or not session or listing.calendar_ref!=session.calendar_ref:
-        raise HTTPException(409,'未批准挂牌日历，不能猜测封存时点')
+        raise Conflict('未批准挂牌日历，不能猜测封存时点')
     policy=json.loads(listing.close_policy_json)
     if not policy.get('approved') or not policy.get('price_kinds') or not policy.get('evidence') or not json.loads(session.evidence_json):
-        raise HTTPException(409,'日历或最终收盘政策缺少已批准依据')
+        raise Conflict('日历或最终收盘政策缺少已批准依据')
     if not data_mode.fixture_mode():
         if not data_mode.real_evidence(db,policy['evidence'],workspace_id) or not data_mode.real_evidence(db,json.loads(session.evidence_json),workspace_id):
-            raise HTTPException(409,'挂牌政策或日历来源无分析许可')
-    if listing.currency!=security.currency:raise HTTPException(409,'挂牌币种与证券不一致')
+            raise Conflict('挂牌政策或日历来源无分析许可')
+    if listing.currency!=security.currency:raise Conflict('挂牌币种与证券不一致')
     # Cutoff is derived server-side, never supplied by an HTTP request or retry.
     values={'id':str(uuid.uuid4()),'workspace_id':workspace_id,'release_id':release_id,'security_id':security_id,
             'listing_id':listing.id,'market_session':session.market_session,'mode':'live',
@@ -91,7 +91,7 @@ def schedule(db,context,workspace_id,release_id,security_id,session_id):
 def claim(db,context,seal_id,lease_seconds=120):
     authorize(context)
     row=db.scalar(select(EvaluationSeal).where(EvaluationSeal.id==seal_id).with_for_update().execution_options(populate_existing=True))
-    if not row:raise HTTPException(404,'没有此封存任务')
+    if not row:raise NotFound('没有此封存任务')
     now=clock(db)
     if row.state=='sealed':return {'seal_id':row.id,'state':'sealed','evaluation_id':row.evaluation_id}
     if row.state=='blocked_safety':return {'seal_id':row.id,'state':'blocked_safety'}
@@ -110,8 +110,8 @@ def leased(db,context,token):
     authorize(context)
     row=db.scalar(select(EvaluationSeal).where(EvaluationSeal.id==token['seal_id']).with_for_update().execution_options(populate_existing=True))
     if not row or row.fence!=token.get('fence') or row.lease_owner!=context.owner or token.get('owner')!=context.owner:
-        raise HTTPException(409,'封存worker租约fence已失效')
-    if row.lease_until is None or row.lease_until<=clock(db):raise HTTPException(409,'封存worker租约已到期')
+        raise Conflict('封存worker租约fence已失效')
+    if row.lease_until is None or row.lease_until<=clock(db):raise Conflict('封存worker租约已到期')
     return row
 
 
@@ -125,11 +125,11 @@ def _knowledge(db,cutoff):
 def freeze(db,context,token):
     # Caller must establish a fresh REPEATABLE READ transaction before any statement.
     if db.connection().exec_driver_sql('SHOW transaction_isolation').scalar()!='repeatable read':
-        raise HTTPException(409,'冻结必须使用PG一致性snapshot事务')
+        raise Conflict('冻结必须使用PG一致性snapshot事务')
     seal=leased(db,context,token)
-    if clock(db)<seal.knowledge_cutoff:raise HTTPException(409,'尚未到固定封存截止')
+    if clock(db)<seal.knowledge_cutoff:raise Conflict('尚未到固定封存截止')
     if seal.manifest_id:return db.get(FrozenManifest,seal.manifest_id)
-    if seal.generation!=token['generation']:raise HTTPException(409,'冻结generation已变化')
+    if seal.generation!=token['generation']:raise Conflict('冻结generation已变化')
     knowledge,watermark=_knowledge(db,seal.knowledge_cutoff)
     security=db.get(Security,seal.security_id);company=db.get(Company,security.company_id)
     listing=db.get(PrimaryListing,seal.listing_id)
@@ -143,24 +143,24 @@ def freeze(db,context,token):
         if group=='rights' and not data_mode.fixture_mode():
             past=json.loads(json.loads(entry.snapshot_json)['policy_json'])
             current=json.loads(db.get(SourceRegistry,id).policy_json)
-            if past!=current:raise HTTPException(409,'来源政策在cutoff后改变，不能把新许可回填旧manifest')
+            if past!=current:raise Conflict('来源政策在cutoff后改变，不能把新许可回填旧manifest')
         ref={'revision_id':id,'sha256':sha or entry.sha256,'known_at':entry.recorded_at.isoformat()}
         if ref not in groups[group]['inputs']:groups[group]['inputs'].append(ref)
         groups[group].update(quality='valid',reason_codes=[])
         return True
     for kind,id in [('company',company.id),('security',security.id),('primary_listing',listing.id),('strategy_version',release.id)]:
-        if not add('identity',kind,id):raise HTTPException(409,'身份或发布版本在固定cutoff前尚未可知')
+        if not add('identity',kind,id):raise Conflict('身份或发布版本在固定cutoff前尚未可知')
         entry=knowledge[(kind,id)]
         snap=json.loads(entry.snapshot_json)
         # Mutable identity cannot silently substitute post-cutoff values.
-        if kind=='company' and snap['industry_key']!=company.industry_key:raise HTTPException(409,'公司行业已改变，需固定合法身份版本')
-        if kind=='security' and any(snap[k]!=getattr(security,k) for k in ('ticker','market','currency','company_id')):raise HTTPException(409,'证券身份已改变')
-    if not add('calendar','market_session',session.id):raise HTTPException(409,'批准日历在cutoff前未知')
+        if kind=='company' and snap['industry_key']!=company.industry_key:raise Conflict('公司行业已改变，需固定合法身份版本')
+        if kind=='security' and any(snap[k]!=getattr(security,k) for k in ('ticker','market','currency','company_id')):raise Conflict('证券身份已改变')
+    if not add('calendar','market_session',session.id):raise Conflict('批准日历在cutoff前未知')
     for key in CONFIGS+tuple('algorithm:'+name for name in ALGORITHMS):
         expected=runtime_artifacts()[key]
         artifact=db.scalar(select(InstalledArtifact).where(InstalledArtifact.artifact_key==key,InstalledArtifact.sha256==digest(expected)))
         if not artifact or not add('algorithms' if key.startswith('algorithm:') else 'decision_policies','installed_artifact',artifact.id,artifact.sha256):
-            raise HTTPException(409,'算法/政策版本未在cutoff前发布，不能回填')
+            raise Conflict('算法/政策版本未在cutoff前发布，不能回填')
     selected=[]
     # Same recorded time with different values for one logical input is conflicting.
     all_rows=db.scalars(select(ResearchInput).where(ResearchInput.company_id==company.id,
@@ -233,7 +233,7 @@ def freeze(db,context,token):
         from app.models.intake import InformationItem
         revision=db.get(ItemRevision,ref.get('source_revision_id',''))
         if revision:
-            if ('item_revision',revision.id) not in knowledge:raise HTTPException(409,'日历或收盘政策依据在cutoff前不可知')
+            if ('item_revision',revision.id) not in knowledge:raise Conflict('日历或收盘政策依据在cutoff前不可知')
             item=db.get(InformationItem,revision.item_id);add('rights','source_registry',item.source_id)
     for row in selected:
         if row.kind=='price' and row.input_key=='price:'+security.ticker:
@@ -302,14 +302,14 @@ def finish(db,context,token,manifest_id,manifest_hash):
     if existing and existing.state=='sealed' and existing.fence==token.get('fence') and existing.lease_owner==context.owner and token.get('owner')==context.owner:
         prior=db.get(FrozenManifest,existing.manifest_id)
         if prior.id==manifest_id and prior.manifest_hash==manifest_hash:return db.get(Evaluation,existing.evaluation_id)
-        raise HTTPException(409,'封存已完成，manifest不能替换')
+        raise Conflict('封存已完成，manifest不能替换')
     seal=leased(db,context,token)
     frozen=db.get(FrozenManifest,manifest_id)
     if not frozen or seal.manifest_id!=manifest_id or frozen.manifest_hash!=manifest_hash or frozen.generation!=seal.generation:
-        raise HTTPException(409,'manifest身份/hash/generation不匹配')
+        raise Conflict('manifest身份/hash/generation不匹配')
     manifest=json.loads(frozen.manifest_json);snapshot=json.loads(frozen.snapshot_json)
-    if digest(manifest)!=frozen.manifest_hash or digest(snapshot)!=frozen.snapshot_hash:raise HTTPException(409,'冻结内容完整性不通过')
-    if clock(db)<seal.knowledge_cutoff:raise HTTPException(409,'不能提前封存')
+    if digest(manifest)!=frozen.manifest_hash or digest(snapshot)!=frozen.snapshot_hash:raise Conflict('冻结内容完整性不通过')
+    if clock(db)<seal.knowledge_cutoff:raise Conflict('不能提前封存')
     guard=db.scalar(select(SafetyGeneration).where(SafetyGeneration.key=='safety').with_for_update().execution_options(populate_existing=True))
     # Serialize with all safety mutations, then check current permissions/identity/
     # binding and hard risks independently from historical frozen inputs.
