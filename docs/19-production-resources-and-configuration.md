@@ -112,6 +112,7 @@ flowchart LR
 | `VIP_DEMO_MODE` | Settings 已支持；合成操作另受本机指定 test 库限制 | 保持 false；**它不关闭 mock 身份认证**，不能以此作为公网安全开关 |
 | `EODHD_API_TOKEN` | 当前未提交 Settings/适配已支持 SecretStr | 只在采用且获准的数据源任务中注入；SecretStr 不会自动避免 URL/代理日志泄露，日志仍需脱敏 |
 | `VIP_DEEPSEEK_API_KEY`（及后台登记的其他模型密钥变量） | R5 资讯雷达读取；后台 › 模型配置只保存变量名 | 只用环境变量/secret manager 注入；未配置时资讯关联退回规则匹配并在事件上标注原因 |
+| `VIP_SMTP_HOST/PORT/USER/PASSWORD/STARTTLS`、`VIP_ALERT_SENDER` | R6 告警邮件；发件人缺省 admin@bytewatcher.xyz（config/alerts-v1.json） | 密码只经 secret manager 注入；未配置主机时邮件记为跳过、站内通知照常；发件域需配置 SPF/DKIM |
 | `VIP_REAL_SOURCE_ENABLED` | Wikimedia adapter 的显式采集开关 | 只用于批准任务，不在 API/普通 Worker 启动时默认打开 |
 | `VIP_HTTP_PORT` | 仅本机 `tools/local_manage.py` 读取 | 生产端口由进程/容器入口配置，不能假定这是全局 API Settings |
 | OIDC issuer/JWKS/audience/client、回调/登出 URL、会话策略 | 当前没有相应认证配置和实现 | 需要新增可信登录与服务端验证；精确注册 HTTPS 回调。用户映射用可信 `sub`，workspace 成员/角色仍由本项目服务端校验 |

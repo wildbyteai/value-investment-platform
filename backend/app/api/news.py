@@ -19,6 +19,7 @@ MAX_UPLOAD = 5 * 1024 * 1024
 
 
 class LinkOut(BaseModel):
+    alerts: int | None = None
     id: str
     company_id: str | None
     company: str
@@ -120,6 +121,11 @@ def review(link_id: str, body: ReviewIn, principal: Principal = Depends(require_
         link = service.review_link(db, principal.workspace.id, link_id, principal.user.id, body.action,
                                    body.relevance, body.impact, body.company_id)
         out = service.link_dict(link, service.company_names(db))
+    if out['status'] == 'confirmed':
+        # A confirmed ball goes straight to the monitor: alert only if it lands in the strike zone.
+        from app.domains.monitoring import service as monitoring
+        with unit_of_work(db):
+            out['alerts'] = monitoring.scan_news(db, principal.workspace.id, link_ids=[link_id])['alerts']
     return out
 
 
