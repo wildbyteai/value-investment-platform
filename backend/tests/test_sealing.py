@@ -10,7 +10,9 @@ from jsonschema import Draft202012Validator,FormatChecker
 from sqlalchemy import select,func,text
 from sqlalchemy.exc import DBAPIError
 from fastapi import HTTPException
-from test_remediation import prepared,Session,headers
+from sqlalchemy import event
+from app.db import engine
+from test_remediation import prepare_database,Session,headers
 from app.models.company import Company,Security
 from app.models.runtime import ResearchInput,Evaluation
 from app.models.strategy import StrategyVersion,SecurityState,ChangeRecord
@@ -22,6 +24,26 @@ from app.services.scoring_service import config,ROOT
 from app.services import sealing_service as seal
 CLOSE=datetime(2026,10,7,8,tzinfo=timezone.utc)
 CTX=seal.WorkerContext('seal-a',frozenset({'strategy.seal'}))
+# Fixture seeding must be known before the fixed CLOSE cutoff. Without this, seeding
+# used the real wall clock and every test failed once real time passed CLOSE+60min
+# (a date bomb that went off on 2026-10-07).
+SEED_CLOCK=CLOSE-timedelta(hours=6)
+
+
+def _seed_clock(conn):
+    conn.exec_driver_sql("SELECT set_config('vip.test_clock',%(v)s,true)",{'v':SEED_CLOCK.isoformat()})
+
+
+@pytest.fixture()
+def prepared():
+    event.listen(engine,'begin',_seed_clock)
+    try:
+        gen=prepare_database()
+        value=next(gen)
+    finally:
+        event.remove(engine,'begin',_seed_clock)
+    yield value
+    next(gen,None)
 
 def at(db,minute):db.execute(text("SELECT set_config('vip.test_clock',:v,true)"),{'v':(CLOSE+timedelta(minutes=minute)).isoformat()})
 
@@ -317,6 +339,8 @@ def real_branch_fixture(ws):
         item.reading_metadata_json=canonical({'data_mode':'real_public','test_only':'original disposable fixture'});item.body_state='available'
         source=db.get(SourceRegistry,item.source_id);source.policy_json=canonical({'license':'original disposable fixture only','fetch':True,'store':True,'analyze':True,'export':False})
         revision=db.scalar(select(ItemRevision).where(ItemRevision.item_id==item.id))
+        # server_default now() is wall-clock; pin the fixture revision before the fixed cutoff.
+        revision.created_at=SEED_CLOCK
         ref={'synthetic':False,'source_revision_id':revision.id,'hash':revision.content_hash,'locator':'original disposable test document table 1'}
         db.commit();return source.id,item.id,ref
 
