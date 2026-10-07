@@ -1,0 +1,50 @@
+# Runs the full backend suite, including every PostgreSQL test, on each PR and push to main.
+# The database is a disposable local PostgreSQL on the runner, never a real database.
+name: backend-tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      VIP_TEST_DB_URL: postgresql+psycopg2://vip_app@127.0.0.1:5432/vip_v0001_test
+    steps:
+      - uses: actions/checkout@v4
+
+      # Runner-local PostgreSQL: conftest requires the server to report 127.0.0.1,
+      # which a Docker service container would not.
+      - name: Start disposable PostgreSQL
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -v ON_ERROR_STOP=1 -c "CREATE ROLE vip_app LOGIN SUPERUSER" -c "CREATE DATABASE vip_v0001_test OWNER vip_app"
+          PGCONF=$(sudo -u postgres psql -tAc "SHOW hba_file")
+          echo "host all vip_app 127.0.0.1/32 trust" | sudo tee "$PGCONF.new" >/dev/null
+          sudo cat "$PGCONF" | sudo tee -a "$PGCONF.new" >/dev/null
+          sudo mv "$PGCONF.new" "$PGCONF"
+          sudo systemctl reload postgresql.service
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install backend
+        working-directory: backend
+        run: uv sync --frozen
+
+      - name: Migrate a fresh database
+        working-directory: backend
+        env:
+          VIP_DB_URL: ${{ env.VIP_TEST_DB_URL }}
+        run: uv run alembic upgrade head
+
+      - name: Run all backend tests
+        working-directory: backend
+        run: uv run pytest -q
