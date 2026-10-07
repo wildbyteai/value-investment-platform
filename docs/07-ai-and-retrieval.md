@@ -25,11 +25,11 @@ contracts/analysis-result.schema.json 是最小跨阶段 Schema：schema_version
 
 ## 4. 混合检索
 
-搜索默认股票代码／名称精确路径；自然语言则 BM25 和语义候选并行，按 RRF 合并（起始 k=60），可选择本地 reranker。source_policy 与 workspace ACL 在两路查询之前过滤，返回前按 PG 再校验；后过滤不是唯一保护，禁止分页、计数和高亮泄露不可见资料。候选列表为空返回解释，不让 LLM 填补。
+搜索默认股票代码／名称精确路径；自然语言先用 BM25 全文基线；语义通过效果门禁并启用后，两路候选并行并按 RRF 合并（起始 k=60），可选择本地 reranker。优先评估 Elasticsearch 同平台向量检索，pgvector 为替代候选，不默认同时维护两套向量索引。RRF 可在应用检索服务合并；若使用 Elasticsearch 原生融合排序、模型推理或细粒度权限特性，按选定版本核对订阅要求，不能据 Basic 免费概括全部能力。source_policy 与 workspace ACL 在两路查询之前过滤，返回前按 PG 再校验；后过滤不是唯一保护，禁止分页、计数和高亮泄露不可见资料。候选列表为空返回解释，不让 LLM 填补。
 
 默认返回事件或讯息摘要、来源、发生/发布时间、公司、关联与可点击证据。可选问答在首个研究闭环之后实施，每句关键回答引用可访问 evidence，资料不足明确说明，不能生成投资指令。引用数不代表结论真实性。
 
-OpenSearch projection_version 与 watermark 在 meta 返回。PG 变更后索引晚于 5 min 标为 delayed，超过目标给运营告警；事件明细仍从 PG 查。ACL 撤权优先同步拒绝缓存，然后异步删除索引；证据请求始终再验证。向量 model 切换新 namespace、影子召回评估，再切 active，不复用旧向量。索引不存未经许可全文。
+Elasticsearch projection_version 与 watermark 在 meta 返回。PG 变更后索引晚于 5 min 标为 delayed，超过目标给运营告警；事件明细仍从 PG 查。ACL 撤权优先同步拒绝缓存，然后异步删除索引；证据请求始终再验证。向量 model 切换新 namespace、影子召回评估，再切 active，不复用旧向量。索引不存未经许可全文。
 
 ## 5. 质量评估与模型版本门禁
 

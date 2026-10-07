@@ -1,0 +1,169 @@
+{
+  "as_of_client_date": "2026-10-06",
+  "scope": "Repository inspection and local deployment inventory documentation only",
+  "repository_head": "a3d1a4ef87148a051762d6253f5bc01b38ca21d1",
+  "branch": "main",
+  "basis": "HEAD plus pre-existing uncommitted working-tree modifications; source hashes below",
+  "pre_existing_modified_paths": [
+    "backend/.env.example",
+    "backend/app/config.py",
+    "backend/app/services/issuer_reports.py",
+    "backend/app/services/original_financials.py",
+    "backend/app/services/research_pipeline.py",
+    "backend/app/services/scoring_service.py",
+    "backend/tests/test_issuer_reports.py",
+    "backend/tests/test_original_inputs.py",
+    "tools/vip"
+  ],
+  "pre_existing_untracked_paths": [
+    "backend/app/services/eodhd_source.py",
+    "backend/scripts_eodhd.py",
+    "backend/tests/test_eodhd_source.py"
+  ],
+  "source_sha256": {
+    "AGENTS.md": "b92a33776e6ec9a2a92a4d3a20bd5e68171898279abfc75c97d8dc53ce0d54ca",
+    "CONTEXT.md": "2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6",
+    "docs/01-product-requirements.md": "a2b196962b3cd2609313bb5d5f5b32af7a21a5d41fd8511c28a356d441c3192a",
+    "docs/03-architecture.md": "781d694744a424bd4f8ff30548007cecb9c23d734cc2b6d2cb236ed2fbed1555",
+    "docs/05-api-and-jobs.md": "9285da46349924acaa24171b0ac75b9201800e23b6b3d0fad0efe2b259d8ae89",
+    "docs/08-security-and-operations.md": "0baad6b8d56280e7127ce447d88f2e1406657e9c273e2d04a7dc25efd2d847c1",
+    "docs/09-delivery-plan.md": "982d248098231269eaabc7ba7e838eab82510a27c5f1dc02567cc5a17af79f64",
+    "docs/10-acceptance.md": "c41c2ed4e8eaf6b39f066399fb4feb9f292f5bdb85c20de2ea36118e6790a8a5",
+    "docs/11-templates-automation-and-roles.md": "771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de",
+    "docs/17-coding-readiness.md": "dd1ddde98cd72ff7fab69acc0760649bc12966fd8fd0a1f3c48ca26fd532d30e",
+    "versions/v0.0.1/SCOPE.md": "22ebb2bdcc6921a6a1e5f296acdd0a5344d4bd059d56ce91b1e0dff0e4206e44",
+    "versions/v0.0.1/VERIFICATION.md": "8f3c3a0ebf5adacd086019a76cdbef41b3c5c90ba886afd45869e76a1e5385e7",
+    "review/REAL-SOURCE-ACTIVATION.md": "7b083aece23919057a6495179559ec46e89cb66294141cb079ecb67af2fe8933",
+    "backend/pyproject.toml": "9d3ab20c2f93fc0757cb5557112f8c757f59dbf569fba60f8d753330d0adb59f",
+    "backend/uv.lock": "6c7d3f469f33319601ca4bb3cf3cae463e4912088e5fc3fa8ee8e9c926208526",
+    "frontend/package.json": "8172843676a69e02f1037d4e215f9b9839d0d765c2238e5f40266e7222e1aded",
+    "frontend/package-lock.json": "cebd69ce8754c16fcc0646ae56dc00336200961249e9fae49bbec55cb8fb7b7c",
+    "frontend/build.mjs": "803e60447afaaf397457706c4a4b0d284334f17585558b55604055e3ec55557d",
+    "frontend/src/client.ts": "4116ef2a1b11eed7188c25e10607fdbb8eb524d5ec05ce7d21e6f4b8c7091b82",
+    "backend/app/config.py": "4b8a0a5b876b64c2d094cbbb9a3c51a841258ed67c2c22404e8b6b7b82a7748a",
+    "backend/app/main.py": "da9d8ed9825ae8c92d834efde11399c0e6cd8206b5a7a92bff466c58ea0c5b8a",
+    "backend/app/db.py": "d1e16b2623fdf597958df3c17fc452ba8cf389f78dd01c348d925d2605c42e4a",
+    "backend/app/api/deps.py": "753b45deb77462e83b030e33d39e9d602d15d26eba2519a39f0fd6a346e82f51",
+    "backend/app/api/auth.py": "7e7a7d06e93b2110ecce163f4b58ef8c9096f62f3b202e2725cb2d2dcd67a8ac",
+    "backend/app/api/health.py": "80f019c9b8a486344c0b9c9c12669fa6dce5195ce942ac4258913d2029de5367",
+    "backend/app/worker.py": "99e5dd46303fda41d6a80430551b1af23974ac37e8256e1c7cb9bf1011e8d201",
+    "backend/app/services/worker_service.py": "0da6156dd30abd509ab4fff9d4da153e25ce08962e92880e8986ba2b1b9aa6a2",
+    "backend/app/services/seal_worker.py": "15fc82f9f173ab0bf2c7c1f8efaed019d7322726a18e350633c65f856974653f",
+    "backend/scripts_seal.py": "3c1ae82edf467740f65820af651a7948d135842a819cecd3d24999ce7d10069a",
+    "backend/scripts_original_inputs.py": "57a7c2aa71fcfd38c706645be5e8e53db16a751b3e42758a733bc8ff0519b91d",
+    "backend/scripts_issuer_reports.py": "c99880548f16f01d480abe6638be7d4013266b1c566545c9ad18dac8e6caf4d4",
+    "backend/app/services/real_source.py": "0aa50582769856ee99307df3a2094bea12d2f617e6c2cef7f0f9ae12bb8a6c06",
+    "backend/app/services/baostock_source.py": "09c9ddc1df85fff2c32ca2c86a5497877ceb34e3eb66e025067d811059a75bd0",
+    "backend/app/services/baostock_financial.py": "77e49cff736cf5af1620c6a40b1c3d8667b35059b16e2e9b83cb470a140f3a75",
+    "backend/app/services/eodhd_source.py": "485c0abad1051e8aa8f40a74518bd2cde3e91a260761b5f53b212f424890cdba",
+    "backend/app/services/issuer_reports.py": "9b3d64d9a99e6a9a9c879506dfba5d6c3cf5a90c8b180bd0f8fcd4e2cf0515ca",
+    "backend/app/services/scoring_service.py": "0c33a8fa6f7b6ef43905d2b222fed67b4980a1e22f8518ef7a72a0126e575da4",
+    "backend/alembic/versions/0010_formal_sealing.py": "1058b7ff95ba4446b1c83afef86217e26d2f91bc6c38d1e061d2dc2bff7799ff",
+    "tools/local_manage.py": "ad320bf15ceb87defa64b51767fd71bce61b162c628ed05b46cb06c2dbbd9525",
+    "tools/vip": "ff29f8353a0d1bbd3112343cd009e4bb8ba4e7df954aed0f49f8743342376cb3"
+  },
+  "deliverable_sha256": {
+    "README.md": "a0bfaad16798b01b25a4143da466a24f832aff59bfb5fa907b67ffff6857d769",
+    "PROJECT.md": "d982b0f6108cf2b655f11e583ba73cdc475c832836bd8467c34375e1e132f4b9",
+    "docs/19-production-resources-and-configuration.md": "053107a23d15601ceae4e3fd4f0bcd1b4c3b7fcab0bb61d3e46c19e0462bfde6"
+  },
+  "runtime_observation": {
+    "python_venv_cfg": "3.12.13",
+    "node_command_version": "26.3.1",
+    "npm_command_version": "11.16.0",
+    "postgresql": "14.23 in prior SCOPE/verification; not queried this turn",
+    "python_lock_requirement": "==3.12.*"
+  },
+  "locked_package_versions": {
+    "fastapi": "0.141.1",
+    "uvicorn": "0.53.0",
+    "sqlalchemy": "2.1.1",
+    "alembic": "1.20.0",
+    "pydantic": "2.13.5",
+    "pydantic-settings": "2.15.0",
+    "psycopg2-binary": "2.9.13",
+    "pypdf": "6.19.0",
+    "baostock": "0.9.4",
+    "pysocks": "1.7.1"
+  },
+  "checks": [
+    {
+      "check": "locked_runtime_versions",
+      "result": "pass",
+      "detail": "Doc versions compared with backend/uv.lock, no installation"
+    },
+    {
+      "check": "frontend_actual_build",
+      "result": "pass",
+      "detail": "React static build from npm lock and build script; no Vite service inferred"
+    },
+    {
+      "check": "mock_identity_release_gap",
+      "result": "pass",
+      "detail": "Header-based identity and anonymous identity listing inspected statically; no requests or user data read"
+    },
+    {
+      "check": "pg_worker_not_celery",
+      "result": "pass",
+      "detail": "Existing worker polls PG; Redis/Celery described as target/incremental resources"
+    },
+    {
+      "check": "minimal_health_not_pipeline",
+      "result": "pass",
+      "detail": "Current /api/health scope separated from target liveness/readiness/pipeline endpoints"
+    },
+    {
+      "check": "source_changes_preserved",
+      "result": "pass",
+      "detail": "13 relevant source/lock files unchanged since initial hash capture; pre-existing runtime diff filenames unchanged"
+    },
+    {
+      "check": "no_existing_production_templates",
+      "result": "pass",
+      "detail": "Checked repository template locations and initial recursive file inventory; no deployment artifact generated"
+    },
+    {
+      "check": "production_not_claimed",
+      "result": "pass",
+      "detail": "Estimates, proposed configurations and unverified production criteria explicit"
+    },
+    {
+      "check": "local_document_links",
+      "result": "pass",
+      "detail": {
+        "checked_count": 89,
+        "broken": []
+      }
+    },
+    {
+      "check": "navigation_entries",
+      "result": "pass",
+      "detail": "README and PROJECT navigate to resource/configuration inventory"
+    },
+    {
+      "check": "tracked_document_diff_check",
+      "result": "pass",
+      "detail": "No whitespace errors"
+    },
+    {
+      "check": "new_document_whitespace",
+      "result": "pass",
+      "detail": "New markdown has final newline and no trailing whitespace"
+    }
+  ],
+  "verification_level": "Static source/lockfile/documentation checks; not production acceptance",
+  "not_executed": [
+    "database connections or writes",
+    "application restarts",
+    "package installs or UI builds",
+    "backend tests or performance tests",
+    "source capture or raw-data reads",
+    "domain/DNS/TLS/cloud configuration",
+    "production deployment or Java implementation",
+    "production restore drill",
+    "external uploads, model calls, notifications or transactions"
+  ],
+  "capacity_values": "Estimates for procurement/planning; no new load/SLO measurements",
+  "framework_maturity": "Qualitative assessment; no market-share ranking or supplier SLA verification",
+  "production_release_passed": false
+}

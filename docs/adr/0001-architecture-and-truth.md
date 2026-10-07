@@ -7,3 +7,5 @@
 公司经营评分属于 company，价格与估值属于 security；A/H 共用经营事实并分开策略评估。历史记录采用业务有效时间与系统知悉时间，避免重放使用后来才公布的事实。初期不是完整 event sourcing；保存不可变业务修订和必要审计即可。
 
 OpenSearch 从首个含全文检索的生产切片纳入；M0/M1 合成闭环可以用 PG 结构化查询验证领域流程，但不能据此宣称 R-02 混合检索已完成。Redis 丢消息依靠 PG ledger 重建，不能宣称 exactly-once 投递。
+
+2026-10-07：本文保留原始检索选型记录；后续全文平台已按用户要求调整为 Elasticsearch，产品选择以[ADR-0004](./0004-elasticsearch-search-platform.md)为准，事实与检索投影边界不变。

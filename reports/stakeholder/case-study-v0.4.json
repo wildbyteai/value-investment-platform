@@ -1,0 +1,23 @@
+{
+ "kind":"synthetic_business_walkthrough_not_product_acceptance",
+ "company":"远景制造","securities":["SYN-A","SYN-H"],
+ "ordinary_profit_ttm_cny":"1000000000","same_rights_ordinary_shares":"1000000000",
+ "prior_year_revenue_cny":"10000000000","order_amount_cny":"2000000000",
+ "roe_ttm":"0.17","cfo_profit_3y":"1.2","positive_cfo_year_share_3y":"1",
+ "net_debt_ebitda":"1","interest_coverage":"8",
+ "rubric_scores":{"business_model":"70","governance":"75","growth_sustainability":"60"},
+ "coverage":"1","event_factors":{"impact":"0.5","relevance":"1","confidence":"0.8","source_quality":"1","age_days":"0"},
+ "fx_cny_per_hkd":"0.90","a_price_cny":"20",
+ "calendar":"synthetic_adjacent_expected_sessions_D0_to_D6_not_real_exchange_calendar",
+ "conditions":"supported non-financial industry, verified same ordinary rights, all required inputs valid, no hard risk until D7",
+ "sessions":[
+  {"id":"D0","h_price_hkd":"20","event":"首次有效结果，建立区间外基线","display":"区间外","last_confirmed":"区间外","counter":"0/2"},
+  {"id":"D1","h_price_hkd":"16","event":"20亿元订单；5篇报道归为1个事实","display":"待入选","last_confirmed":"区间外","counter":"1/2"},
+  {"id":"D2","h_price_hkd":null,"event":"应有收盘报价缺失，连续计数清零","display":"待评估","last_confirmed":"区间外","counter":"0/2"},
+  {"id":"D3","h_price_hkd":"16","event":"行情恢复，重新从1次开始","display":"待入选","last_confirmed":"区间外","counter":"1/2"},
+  {"id":"D4","h_price_hkd":"16.2","event":"与D3相邻且再次满足，确认入选","display":"入选","last_confirmed":"入选","counter":"2/2"},
+  {"id":"D5","h_price_hkd":"18.7","event":"未达进入门，但仍达保持门","display":"保持入选","last_confirmed":"入选","counter":"—"},
+  {"id":"D6","h_price_hkd":"18.7","event":"财报及有效基准吸收订单，不再叠加","display":"保持入选","last_confirmed":"入选","counter":"—"},
+  {"id":"D7","h_price_hkd":null,"event":"确认1亿元到期债务未偿，公司级风险生效","display":"风险退出","last_confirmed":"区间外","counter":"不等普通确认"}
+ ]
+}

@@ -14,7 +14,7 @@
 
 沿用模块化单体、React/TypeScript、FastAPI/Pydantic、SQLAlchemy/Alembic、PostgreSQL、ledger/outbox。M0目标运行线为Python 3.12、PostgreSQL 17、Node 24 LTS、pnpm 10；Redis 7.4/Celery 5用于合成后台与恢复场景。本阶段不安装这些运行依赖。M0第一次启动时固定patch版本/镜像digest和锁文件，验证实际兼容；生成锁文件和启动验证是实施任务，不伪称准备文档已证明运行可用。若这些目标线与当时实际依赖冲突，先说明具体影响，选择兼容受支持patch，不改变领域合同。
 
-使用项目自有最小骨架，选择性参考已审源码fastapi/full-stack-fastapi-template `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7`（MIT）；不整包照搬其Python≥3.14/SQLModel/密码认证依赖。生成客户端、组件模式和CI做法按本项目适配。研究证据见research/second-review.md，不重新比较一批框架。Refine/Prefect、OpenSearch、向量、真实OIDC、生产分区和通知均不作为W-08前置。
+使用项目自有最小骨架，选择性参考已审源码fastapi/full-stack-fastapi-template `cb740b656d7a0a6c5e12c7bf8e50343ec94ee9c7`（MIT）；不整包照搬其Python≥3.14/SQLModel/密码认证依赖。生成客户端、组件模式和CI做法按本项目适配。研究证据见research/second-review.md，不重新比较一批框架。Refine/Prefect、Elasticsearch、向量、真实OIDC、生产分区和通知均不作为W-08前置。
 
 开发环境仅本机项目隔离Compose，数据为原创合成；对象存储先本地适配器，与raw_object合同一致。mock身份和模型，clock/calendar可注入；模型适配器保留真实外部能力但本slice不外发。运行前验证服务实际位置/用途/数据分类，项目命名和端口避开已有服务；没有真实凭证和默认远程地址。数据库不可用/分类未知时只暂停相关启动。
 

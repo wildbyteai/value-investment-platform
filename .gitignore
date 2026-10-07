@@ -17,3 +17,6 @@ local-evidence/
 
 # Local process state; only this project's processes are managed.
 .runtime/
+
+# 本机报告成品可能嵌入真实业务页面；源稿和合成图示单独纳入Git。
+output/

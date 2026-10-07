@@ -1,0 +1,1054 @@
+{
+  "schema_version": "1.0",
+  "recorded_at": "2026-10-06T11:26:40+08:00",
+  "task_scope": "Local stakeholder report design and content/cost drafts; public-source research; no product implementation",
+  "report_status": "Draft design complete; screenshots, rendered figures and final PDF/Word not created",
+  "report_source_snapshot": {
+    "head": "887a054cdf08fd941a1965b120fa3174b33e9795",
+    "branch": "main",
+    "status": "?? docs/19-production-resources-and-configuration.md\n?? review/production-resource-inventory-evidence.json",
+    "source_sha256": {
+      "PROJECT.md": "5792e9470a69280cd5f7d984ebcb4d257b156cfb69479003ca36e7bc82cc049e",
+      "README.md": "e4200908accc9c29c199969fea0d8c4ef13b66705ad9dc7b9c3233997a4b33f0",
+      "CONTEXT.md": "2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6",
+      "AGENTS.md": "b92a33776e6ec9a2a92a4d3a20bd5e68171898279abfc75c97d8dc53ce0d54ca",
+      "backend/app/services/research_pipeline.py": "288c71bf3f12b94f2b50dbf7cbaea2def8c1f3644088a32844026f0545274fd9",
+      "backend/tests/test_real_data.py": "8cc68289949cd3681ab1e749506bdcd93b82d723c7090930e5e6f933e6268c96",
+      "frontend/src/app.tsx": "26a78c68d17363a669179c5e79e9e959e493bdb62752bd6ed8e65ddda7a30ef6",
+      "backend/app/config.py": "4b8a0a5b876b64c2d094cbbb9a3c51a841258ed67c2c22404e8b6b7b82a7748a",
+      "backend/app/api/deps.py": "753b45deb77462e83b030e33d39e9d602d15d26eba2519a39f0fd6a346e82f51",
+      "backend/app/api/auth.py": "7e7a7d06e93b2110ecce163f4b58ef8c9096f62f3b202e2725cb2d2dcd67a8ac",
+      "backend/pyproject.toml": "9d3ab20c2f93fc0757cb5557112f8c757f59dbf569fba60f8d753330d0adb59f",
+      "backend/uv.lock": "6c7d3f469f33319601ca4bb3cf3cae463e4912088e5fc3fa8ee8e9c926208526",
+      "frontend/package.json": "8172843676a69e02f1037d4e215f9b9839d0d765c2238e5f40266e7222e1aded",
+      "frontend/package-lock.json": "cebd69ce8754c16fcc0646ae56dc00336200961249e9fae49bbec55cb8fb7b7c",
+      "docs/01-product-requirements.md": "a2b196962b3cd2609313bb5d5f5b32af7a21a5d41fd8511c28a356d441c3192a",
+      "docs/02-business-design.md": "4ac024eaaeec85f275376b7032241f2ce45e7c624aed8abfa39c65d6c4abb69b",
+      "docs/03-architecture.md": "781d694744a424bd4f8ff30548007cecb9c23d734cc2b6d2cb236ed2fbed1555",
+      "docs/10-acceptance.md": "c41c2ed4e8eaf6b39f066399fb4feb9f292f5bdb85c20de2ea36118e6790a8a5",
+      "docs/11-templates-automation-and-roles.md": "771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de",
+      "docs/12-time-numerics-and-corrections.md": "edefff37aa3e148cbef11a120959e759383d7af408d51d1b9f7ad2d9ceb76d0b",
+      "docs/14-domain-and-business-flows.md": "b04deadb9e217ad06139bd6766ea0359966c7938623e4344ef53bdfe451a8a62",
+      "docs/19-production-resources-and-configuration.md": "053107a23d15601ceae4e3fd4f0bcd1b4c3b7fcab0bb61d3e46c19e0462bfde6",
+      "versions/v0.0.1/VERIFICATION.md": "c185020d9182619356461ab53f6d41d177bcb5e77b8844427a636ca42584b5a1",
+      "review/REAL-FINANCIAL-CONTINUATION.md": "71ff24c1401068ffa819bd6ef7c5d660c222ae8f0e6a55e299dd63ef3869f505",
+      "review/COMPANY-09969-ADDITION.md": "d2ca6387f843f7ce1d33817de6b0496cddfb544fad531bd33013c64bcfaf1597"
+    }
+  },
+  "validation_repository": {
+    "head": "887a054cdf08fd941a1965b120fa3174b33e9795",
+    "branch": "main",
+    "working_tree_status": "M README.md\n M backend/app/api/judgments.py\n M backend/app/services/decision_service.py\n M backend/app/services/issuer_reports.py\n M backend/app/services/judgment_authoring.py\n M backend/app/services/research_pipeline.py\n M backend/static/app.js\n M backend/tests/test_issuer_reports.py\n M contracts/openapi-v0001.json\n M frontend/src/api-schema.ts\n M frontend/src/judgments.tsx\n M frontend/src/ui.tsx\n M tools/vip\n?? backend/app/services/issuer_disclosures.py\n?? backend/scripts_issuer_disclosures.py\n?? backend/tests/test_issuer_disclosures.py\n?? backend/tests/test_judgment_proposals.py\n?? docs/19-production-resources-and-configuration.md\n?? docs/20-stakeholder-report-design.md\n?? reports/\n?? research/report-component-cost-basis.md\n?? review/REAL-DATA-AND-JUDGMENTS.md\n?? review/production-resource-inventory-evidence.json"
+  },
+  "source_sha256_at_validation": {
+    "PROJECT.md": "5792e9470a69280cd5f7d984ebcb4d257b156cfb69479003ca36e7bc82cc049e",
+    "README.md": "6f7daa6b26df63015079b704cb94ccc996b2798f5ef8a8e2264cd3f3522f8435",
+    "CONTEXT.md": "2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6",
+    "AGENTS.md": "b92a33776e6ec9a2a92a4d3a20bd5e68171898279abfc75c97d8dc53ce0d54ca",
+    "backend/app/services/research_pipeline.py": "9935a3b83792bfc947b8b3ec526e5aa2c7e08f4c7848fc601b2d1c4ab4bd4daa",
+    "backend/tests/test_real_data.py": "8cc68289949cd3681ab1e749506bdcd93b82d723c7090930e5e6f933e6268c96",
+    "frontend/src/app.tsx": "26a78c68d17363a669179c5e79e9e959e493bdb62752bd6ed8e65ddda7a30ef6",
+    "backend/app/config.py": "4b8a0a5b876b64c2d094cbbb9a3c51a841258ed67c2c22404e8b6b7b82a7748a",
+    "backend/app/api/deps.py": "753b45deb77462e83b030e33d39e9d602d15d26eba2519a39f0fd6a346e82f51",
+    "backend/app/api/auth.py": "7e7a7d06e93b2110ecce163f4b58ef8c9096f62f3b202e2725cb2d2dcd67a8ac",
+    "backend/pyproject.toml": "9d3ab20c2f93fc0757cb5557112f8c757f59dbf569fba60f8d753330d0adb59f",
+    "backend/uv.lock": "6c7d3f469f33319601ca4bb3cf3cae463e4912088e5fc3fa8ee8e9c926208526",
+    "frontend/package.json": "8172843676a69e02f1037d4e215f9b9839d0d765c2238e5f40266e7222e1aded",
+    "frontend/package-lock.json": "cebd69ce8754c16fcc0646ae56dc00336200961249e9fae49bbec55cb8fb7b7c",
+    "docs/01-product-requirements.md": "a2b196962b3cd2609313bb5d5f5b32af7a21a5d41fd8511c28a356d441c3192a",
+    "docs/02-business-design.md": "4ac024eaaeec85f275376b7032241f2ce45e7c624aed8abfa39c65d6c4abb69b",
+    "docs/03-architecture.md": "781d694744a424bd4f8ff30548007cecb9c23d734cc2b6d2cb236ed2fbed1555",
+    "docs/10-acceptance.md": "c41c2ed4e8eaf6b39f066399fb4feb9f292f5bdb85c20de2ea36118e6790a8a5",
+    "docs/11-templates-automation-and-roles.md": "771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de",
+    "docs/12-time-numerics-and-corrections.md": "edefff37aa3e148cbef11a120959e759383d7af408d51d1b9f7ad2d9ceb76d0b",
+    "docs/14-domain-and-business-flows.md": "b04deadb9e217ad06139bd6766ea0359966c7938623e4344ef53bdfe451a8a62",
+    "docs/19-production-resources-and-configuration.md": "053107a23d15601ceae4e3fd4f0bcd1b4c3b7fcab0bb61d3e46c19e0462bfde6",
+    "versions/v0.0.1/VERIFICATION.md": "c185020d9182619356461ab53f6d41d177bcb5e77b8844427a636ca42584b5a1",
+    "review/REAL-FINANCIAL-CONTINUATION.md": "71ff24c1401068ffa819bd6ef7c5d660c222ae8f0e6a55e299dd63ef3869f505",
+    "review/COMPANY-09969-ADDITION.md": "d2ca6387f843f7ce1d33817de6b0496cddfb544fad531bd33013c64bcfaf1597",
+    "backend/app/api/judgments.py": "69b6b26e18a366b18072a10b5c7589e87a4627f8b9038cf2da247a152acd4b1b",
+    "backend/app/services/decision_service.py": "ccacc5bfdc3e486b3c216dc44ce8f632df29a35ea8a642b393d48ecd5a64e412",
+    "backend/app/services/issuer_reports.py": "6fc3013083aa450b077a82a989a154d5214d98719f7934a22fcca37a10bd89cc",
+    "backend/app/services/judgment_authoring.py": "d13663b7fcfb61821e6bb6b580f70e81e8411761b833c47678b2d720e498c05a",
+    "frontend/src/judgments.tsx": "bc743d3ca03c2709fd59ec6cbc6228a886cd24d33734ebea0b98c3e77a267af0",
+    "frontend/src/ui.tsx": "052d23d7c2d8a751aa73b5dc54be42edb0b75ac7d5f338ac6f7c5801ad50cd33",
+    "review/REAL-DATA-AND-JUDGMENTS.md": "4a30d8cbadb474dbaaaed0963e7c33d734a0b320f73a1224cf48803d675e412b"
+  },
+  "source_drift_since_report_read": [
+    {
+      "file": "README.md",
+      "report_source_sha256": "e4200908accc9c29c199969fea0d8c4ef13b66705ad9dc7b9c3233997a4b33f0",
+      "validation_sha256": "6f7daa6b26df63015079b704cb94ccc996b2798f5ef8a8e2264cd3f3522f8435",
+      "ownership_note": "README report navigation edited by this task"
+    },
+    {
+      "file": "backend/app/services/research_pipeline.py",
+      "report_source_sha256": "288c71bf3f12b94f2b50dbf7cbaea2def8c1f3644088a32844026f0545274fd9",
+      "validation_sha256": "9935a3b83792bfc947b8b3ec526e5aa2c7e08f4c7848fc601b2d1c4ab4bd4daa",
+      "ownership_note": "Observed outside this task; no reset/overwrite performed"
+    }
+  ],
+  "concurrency_note": "Working tree includes other ongoing product work. Facts refer to report-read snapshot and cited completed verification; refresh before final report.",
+  "deliverable_sha256": {
+    "docs/20-stakeholder-report-design.md": "60b86eddb32bbf62eb059e2b8a84338d9848c8d72ae15cc2a35215215d3c6150",
+    "reports/stakeholder/content-draft.md": "0d295c2ef694945ef5153cf71c7c7e5ff8f3ba391d5a632691bca9ad13f1e635",
+    "reports/stakeholder/components-and-costs.md": "73b275c16d83c191add5a23f213e089370404a0e02b488cd2d9a0c49be91cd43",
+    "research/report-component-cost-basis.md": "a9561ae71533bd8cdc66460c7e1bde23574e8bd64d3c4fc34213ed83793273e2",
+    "README.md": "6f7daa6b26df63015079b704cb94ccc996b2798f5ef8a8e2264cd3f3522f8435"
+  },
+  "owned_files": [
+    "docs/20-stakeholder-report-design.md",
+    "reports/stakeholder/content-draft.md",
+    "reports/stakeholder/components-and-costs.md",
+    "research/report-component-cost-basis.md",
+    "README.md",
+    "review/stakeholder-report-design-evidence.json"
+  ],
+  "prior_stage_files_preserved": [
+    "docs/19-production-resources-and-configuration.md",
+    "review/production-resource-inventory-evidence.json"
+  ],
+  "local_markdown_references": [
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "PROJECT.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "docs/11-templates-automation-and-roles.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "docs/12-time-numerics-and-corrections.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "versions/v0.0.1/VERIFICATION.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "reports/stakeholder/content-draft.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "reports/stakeholder/components-and-costs.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "research/report-component-cost-basis.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "reports/stakeholder/content-draft.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "reports/stakeholder/components-and-costs.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "research/report-component-cost-basis.md",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "review/stakeholder-report-design-evidence.json",
+      "exists": true
+    },
+    {
+      "document": "docs/20-stakeholder-report-design.md",
+      "target": "review/stakeholder-report-design-evidence.json",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "docs/20-stakeholder-report-design.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "reports/stakeholder/components-and-costs.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "review/REAL-FINANCIAL-CONTINUATION.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "review/COMPANY-09969-ADDITION.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "versions/v0.0.1/VERIFICATION.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "docs/11-templates-automation-and-roles.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "docs/12-time-numerics-and-corrections.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "docs/19-production-resources-and-configuration.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "target": "reports/stakeholder/components-and-costs.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/components-and-costs.md",
+      "target": "docs/20-stakeholder-report-design.md",
+      "exists": true
+    },
+    {
+      "document": "reports/stakeholder/components-and-costs.md",
+      "target": "research/report-component-cost-basis.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "docs/20-stakeholder-report-design.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "reports/stakeholder/components-and-costs.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "docs/19-production-resources-and-configuration.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "review/REAL-FINANCIAL-CONTINUATION.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "docs/19-production-resources-and-configuration.md",
+      "exists": true
+    },
+    {
+      "document": "research/report-component-cost-basis.md",
+      "target": "docs/19-production-resources-and-configuration.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/CURRENT-HANDOFF.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/CURRENT-REVIEW-PROMPT.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/GPT-PRO-UX18-PROMPT.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/18-ux-and-copywriting-redesign.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/UX18-IMPLEMENTATION.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/PRE-MAIN-DISPOSITION.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "versions/v0.0.1/VERIFICATION.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "versions/v0.0.1/REAL-DATA.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/REAL-SOURCE-ACTIVATION.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "PROJECT.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "AGENTS.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "CONTEXT.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/01-product-requirements.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/02-business-design.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/03-architecture.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/04-data-design.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/05-api-and-jobs.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/06-ux-and-design-system.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/07-ai-and-retrieval.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/08-security-and-operations.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/09-delivery-plan.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/10-acceptance.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/11-templates-automation-and-roles.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/12-time-numerics-and-corrections.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/13-first-slice.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/14-domain-and-business-flows.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/15-database-dictionary.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/16-prototype-and-design-trace.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/17-coding-readiness.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/19-production-resources-and-configuration.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/20-stakeholder-report-design.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/adr/0002-v02-confirmed-scope.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "config/strategy-standard-v1.json",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "contracts/README.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/ROUND-2-REVIEW.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/ROUND-2-REQUEST.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/GPT-PRO-PROMPT.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/REVIEW-PACK.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "research/open-source-shortlist.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "research/second-review.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/V02-CHANGELOG.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/V03-CHANGELOG.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/PASTE-INSTRUCTIONS.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "docs/adr/0003-independent-project.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/V03-CHANGELOG.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/V03-COUNTEREXAMPLES.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "prototype/index.html",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "design/database-catalog.json",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/DESIGN-DETAIL-REVIEW.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/USABILITY-REVIEW.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/USABILITY-FIXES.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/FINAL-REVIEW-PASTE.txt",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/GPT-PRO-FINAL-DISPOSITION.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/CODING-READINESS.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/REAL-COMPLETION-PLAN.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "research/real-completion-sources.md",
+      "exists": true
+    },
+    {
+      "document": "README.md",
+      "target": "review/REAL-FINANCIAL-CONTINUATION.md",
+      "exists": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "local_markdown_references",
+      "result": "pass",
+      "details": {
+        "count": 86,
+        "generated_evidence_reference": "review/stakeholder-report-design-evidence.json"
+      }
+    },
+    {
+      "check": "markdown_fences",
+      "result": "pass",
+      "details": "Fence pairing only; no Mermaid syntax/render acceptance"
+    },
+    {
+      "check": "mermaid_sources",
+      "result": "pass",
+      "details": {
+        "count": 5,
+        "rendered": false
+      }
+    },
+    {
+      "check": "seven_pages_match_source_navigation",
+      "result": "pass",
+      "details": {
+        "source": "frontend/src/app.tsx",
+        "navigation": [
+          "今日概览",
+          "公司研究",
+          "研究快照",
+          "资讯与研判",
+          "策略候选池",
+          "我的工作台",
+          "系统支持"
+        ],
+        "draft_pages": [
+          "今日概览",
+          "公司研究",
+          "资讯与研判",
+          "研究快照",
+          "策略候选池",
+          "我的工作台",
+          "系统支持"
+        ],
+        "company_tabs": [
+          "经营质量与待补依据",
+          "财务与估值依据",
+          "资料与研判",
+          "评分规则"
+        ],
+        "role_purpose_next_step_limits": "Reviewed in content table"
+      }
+    },
+    {
+      "check": "company_template_is_tab",
+      "result": "pass",
+      "details": "Four source company tabs; template editing is inside company research"
+    },
+    {
+      "check": "screenshot_plan_only",
+      "result": "pass",
+      "details": {
+        "planned_assets": 12,
+        "report_directory_media": [],
+        "capture_performed": false
+      }
+    },
+    {
+      "check": "component_inventory",
+      "result": "pass",
+      "details": {
+        "component_rows": 37,
+        "data_source_rows": 6,
+        "scope": "Major/direct components; not SBOM"
+      }
+    },
+    {
+      "check": "backend_installed_versions_match_lock",
+      "result": "pass",
+      "details": {
+        "packages": 13,
+        "python": "3.12.13"
+      }
+    },
+    {
+      "check": "frontend_manifest_versions_match_lock",
+      "result": "pass",
+      "details": {
+        "packages": 7
+      }
+    },
+    {
+      "check": "component_version_labels",
+      "result": "pass",
+      "details": {
+        "labels": [
+          "19.1.1",
+          "0.141.1",
+          "0.53.0",
+          "2.13.5",
+          "2.15.0",
+          "2.1.1",
+          "1.20.0",
+          "2.9.13",
+          "6.19.0",
+          "0.9.4",
+          "1.7.1",
+          "5.9.2",
+          "0.25.9",
+          "7.8.0"
+        ],
+        "pg14": "Cited prior verification; no DB query this turn",
+        "pg17": "Target, not deployed"
+      }
+    },
+    {
+      "check": "decimal_price_recalculation",
+      "result": "pass",
+      "details": {
+        "compute_usd_month": "96.00",
+        "daily_vm_backup_usd_month": "28.80",
+        "object_storage_usd_month": "5.00",
+        "subtotal_usd_month": "129.80",
+        "same_monthly_price_12_months_usd": "1557.60",
+        "budget_assumed_cny_per_usd": "7.2",
+        "budget_subtotal_cny_month": "934.560",
+        "budget_subtotal_cny_year": "11214.720",
+        "weekly_backup_variant_usd_month": "120.20"
+      }
+    },
+    {
+      "check": "price_conditions_and_exclusions",
+      "result": "pass",
+      "details": {
+        "type": "Official reference, not complete quote",
+        "FX": "Budget assumption, not live",
+        "billing_checked": false
+      }
+    },
+    {
+      "check": "implementation_target_verification_separation",
+      "result": "pass",
+      "details": {
+        "facts": "Report-read snapshot and cited completed verification; runtime not rechecked this turn"
+      }
+    },
+    {
+      "check": "license_distinctions",
+      "result": "pass",
+      "details": "Targeted review; BaoStock/PySocks BSD subtype and final-distribution terms remain unresolved"
+    },
+    {
+      "check": "targeted_secret_pattern_check",
+      "result": "pass",
+      "details": {
+        "findings": [],
+        "scope": [
+          "docs/20-stakeholder-report-design.md",
+          "reports/stakeholder/content-draft.md",
+          "reports/stakeholder/components-and-costs.md",
+          "research/report-component-cost-basis.md",
+          "README.md"
+        ],
+        "limitation": "Pattern scan plus manual review; not full DLP audit"
+      }
+    }
+  ],
+  "mermaid_sources": [
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "line_start": 33,
+      "line_end": 41,
+      "source_sha256": "35e1082c0b8c272e69311de1cb00abd036c405f796bb5eaaeea9388b0a5afb9c",
+      "declared_type": "flowchart LR",
+      "render_status": "not_rendered"
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "line_start": 65,
+      "line_end": 80,
+      "source_sha256": "8aecac608ad81e32cac5bcc37bc4dbe7aab78a9ba2d744a71d24c56eec158309",
+      "declared_type": "flowchart TB",
+      "render_status": "not_rendered"
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "line_start": 99,
+      "line_end": 108,
+      "source_sha256": "43c47c7a4ca436daef53e7c816ba6e4af6e4e72e39d240fbb639f6e8cf782091",
+      "declared_type": "flowchart LR",
+      "render_status": "not_rendered"
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "line_start": 116,
+      "line_end": 125,
+      "source_sha256": "b46af60ccc9e0658ded1c8df8d228de4d5c731046c0190f75ac61f31b26b1099",
+      "declared_type": "flowchart TB",
+      "render_status": "not_rendered"
+    },
+    {
+      "document": "reports/stakeholder/content-draft.md",
+      "line_start": 131,
+      "line_end": 143,
+      "source_sha256": "8bad6cb6327e9fe504404f27c98dca22f4ae2078fedede53067ff00125b86129",
+      "declared_type": "flowchart TB",
+      "render_status": "not_rendered"
+    }
+  ],
+  "screenshot_assets": [
+    {
+      "asset_id": "S-01",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-02",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-03",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-04",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-05",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-06",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-07",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-08",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-09",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-10",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-11",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    },
+    {
+      "asset_id": "S-12",
+      "status": "planned",
+      "captured_at": null,
+      "file": null
+    }
+  ],
+  "package_metadata": {
+    "python": "3.12.13",
+    "backend": [
+      {
+        "name": "fastapi",
+        "version": "0.141.1",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "uvicorn",
+        "version": "0.53.0",
+        "license_expression": "BSD-3-Clause",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "pydantic",
+        "version": "2.13.5",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "pydantic-settings",
+        "version": "2.15.0",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": [
+          "License :: OSI Approved :: MIT License"
+        ]
+      },
+      {
+        "name": "SQLAlchemy",
+        "version": "2.1.1",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "alembic",
+        "version": "1.20.0",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "psycopg2-binary",
+        "version": "2.9.13",
+        "license_expression": null,
+        "license_field": "LGPL with exceptions",
+        "license_classifiers": [
+          "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)"
+        ]
+      },
+      {
+        "name": "pypdf",
+        "version": "6.19.0",
+        "license_expression": "BSD-3-Clause",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "baostock",
+        "version": "0.9.4",
+        "license_expression": null,
+        "license_field": "BSD License",
+        "license_classifiers": [
+          "License :: OSI Approved :: BSD License"
+        ]
+      },
+      {
+        "name": "PySocks",
+        "version": "1.7.1",
+        "license_expression": null,
+        "license_field": "BSD",
+        "license_classifiers": []
+      },
+      {
+        "name": "pytest",
+        "version": "9.1.1",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      },
+      {
+        "name": "httpx",
+        "version": "0.28.1",
+        "license_expression": null,
+        "license_field": "BSD-3-Clause",
+        "license_classifiers": [
+          "License :: OSI Approved :: BSD License"
+        ]
+      },
+      {
+        "name": "jsonschema",
+        "version": "4.26.0",
+        "license_expression": "MIT",
+        "license_field": null,
+        "license_classifiers": []
+      }
+    ],
+    "frontend": [
+      {
+        "name": "react",
+        "group": "dependencies",
+        "declared_version": "19.1.1",
+        "resolved_version": "19.1.1",
+        "license": "MIT"
+      },
+      {
+        "name": "react-dom",
+        "group": "dependencies",
+        "declared_version": "19.1.1",
+        "resolved_version": "19.1.1",
+        "license": "MIT"
+      },
+      {
+        "name": "@types/react",
+        "group": "devDependencies",
+        "declared_version": "19.1.12",
+        "resolved_version": "19.1.12",
+        "license": "MIT"
+      },
+      {
+        "name": "@types/react-dom",
+        "group": "devDependencies",
+        "declared_version": "19.1.9",
+        "resolved_version": "19.1.9",
+        "license": "MIT"
+      },
+      {
+        "name": "esbuild",
+        "group": "devDependencies",
+        "declared_version": "0.25.9",
+        "resolved_version": "0.25.9",
+        "license": "MIT"
+      },
+      {
+        "name": "typescript",
+        "group": "devDependencies",
+        "declared_version": "5.9.2",
+        "resolved_version": "5.9.2",
+        "license": "Apache-2.0"
+      },
+      {
+        "name": "openapi-typescript",
+        "group": "devDependencies",
+        "declared_version": "7.8.0",
+        "resolved_version": "7.8.0",
+        "license": "MIT"
+      }
+    ]
+  },
+  "validation_method": {
+    "command": "backend/.venv/bin/python -B /private/tmp/validate-stakeholder-report-20261006.py",
+    "collector_sha256": "4e814b079190c0da40891de1954214de0d96597c398a3db2b976bdae8db76a90",
+    "database_or_app_imports": false
+  },
+  "official_references": {
+    "date": "2026-10-06",
+    "evidence": "research/report-component-cost-basis.md",
+    "research_agent": {
+      "task": "report_cost_check_sol",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "high"
+    },
+    "prior_astra_agent": "Interrupted after service errors; no result used",
+    "scope": "Public product/license/pricing only; no private project material uploaded"
+  },
+  "report_criteria_review": [
+    {
+      "id": "RC-01",
+      "result": "pass_for_draft",
+      "basis": "Seven source navigation labels; roles/purpose/next step/limits in table"
+    },
+    {
+      "id": "RC-02",
+      "result": "pass_for_read_snapshot",
+      "basis": "Implemented/verified/target separated; 166 and 16 checks not added"
+    },
+    {
+      "id": "RC-03",
+      "result": "manual_review_pass_for_draft",
+      "basis": "Company/security, proposal/decision, UNKNOWN, preview/formal, time, human override described"
+    },
+    {
+      "id": "RC-04",
+      "result": "pass_for_plan",
+      "basis": "12 planned assets; no screenshot or pixel claims; final media review pending"
+    },
+    {
+      "id": "RC-05",
+      "result": "pass_for_reference",
+      "basis": "Reference/budget/unknown separated; Decimal check; full quote pending"
+    },
+    {
+      "id": "RC-06",
+      "result": "scoped_review_pass",
+      "basis": "Public queries and local work; targeted pattern check; no external delivery"
+    },
+    {
+      "id": "RC-07",
+      "result": "pass_for_draft",
+      "basis": "Existing R/W/T referenced; no new product acceptance or measured recovery claimed"
+    }
+  ],
+  "not_performed": [
+    "database access/writes",
+    "business API calls or real data capture",
+    "product tests/build",
+    "production configuration/deployment",
+    "procurement or billing inspection",
+    "external model analysis of project material",
+    "screenshots",
+    "Mermaid rendering",
+    "final PDF/Word creation or page/pixel review",
+    "sending to stakeholders",
+    "git commit/push"
+  ],
+  "remaining_for_final_report": [
+    "Freeze revision and refresh completed business acceptance",
+    "Capture authorized actual UI; register/redact local assets",
+    "Render diagrams; finalize layout and page review",
+    "Refresh prices; obtain applicable data/cloud/model quotations"
+  ]
+}

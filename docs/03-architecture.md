@@ -20,10 +20,10 @@ flowchart TB
   AW --> PG
   AW --> MG[受控模型网关]
   SW --> PG
-  IW --> OS[(OpenSearch 全文投影)]
-  IW --> V[(pgvector 热向量投影)]
+  IW --> OS[(Elasticsearch 全文投影)]
+  IW -. 替代路径 .-> V[(可选 pgvector 热向量投影)]
   API --> OS
-  API --> V
+  API -. 选用后 .-> V
 ```
 
 ## 2. 技术栈提案与取舍
@@ -36,7 +36,7 @@ flowchart TB
 | 后端 | Python + FastAPI + Pydantic + SQLAlchemy + Alembic | 抓取与 AI 工具生态、类型合同和事务；领域逻辑不依赖框架 |
 | 事实库 | PostgreSQL，decimal、JSONB、分区与行级安全 | 原子状态／outbox、时点查询与版本，避免双真源 |
 | 异步 | Celery + Redis broker，Postgres job ledger / outbox | 适合中等规模；Redis 不是持久任务真源，丢队列可从 ledger 重建 |
-| 检索 | OpenSearch 中文分词 + 原生 BM25；pgvector 热语义 | 股票代码精确检索与全文是必需；向量选配并按需分层 |
+| 检索 | Elasticsearch 中文分词 + 原生 BM25；语义选配优先评估 Elasticsearch 向量能力，pgvector 为替代候选 | 股票代码精确检索与全文是必需；向量验证增益后启用，不默认双套索引 |
 | 证据 | S3 兼容对象存储 | 哈希快照、保留权限；商业发行版／自建许可和费用上线前核实 |
 | 身份 | OIDC 适配器，开发隔离模拟身份 | 服务端验证 issuer/audience/expiry；不得把开发入口部署生产 |
 | 工程 | uv、pnpm、pytest、Ruff、mypy、Vitest、Playwright、Storybook | 锁版本、可复现、边界测试；不预填未来“最新版本” |
@@ -87,7 +87,7 @@ qa/                      # 合成场景、E2E、负载与演练
 
 ## 6. 扩容与降级
 
-先以 10 万份合成讯息校准，达到 100 万、1,000 万量级分别测索引、查询、重建。财务／评分按时间和 workspace 分区，search 按月份 rollover，原始对象 lifecycle 按来源权利配置。热向量最多 90 天起步，pgvector 达瓶颈后再评估独立向量库；跨库迁移按相同 chunk ID 双写影子比较后切读，PG 仍是真源。
+先以 10 万份合成讯息校准，达到 100 万、1,000 万量级分别测索引、查询、重建。财务／评分按时间和 workspace 分区，search 按月份 rollover，原始对象 lifecycle 按来源权利配置。热向量最多 90 天起步；先评估 Elasticsearch 向量能力，pgvector 为替代路径，所选向量后端达瓶颈再评估独立向量库；跨库迁移按相同 chunk ID 双写影子比较后切读，PG 仍是真源。
 
 全文故障：业务公司列表与时间线从 PG 使用结构化索引可用，搜索页面明确降级；语义故障退回全文；模型故障保留规范化证据和人工队列；行情源失败策略 UNKNOWN；后续通知故障保留变化主记录。不能把采集失败显示成“无新闻”。
 
@@ -97,3 +97,5 @@ qa/                      # 合成场景、E2E、负载与演练
 
 
 v0.3不新增服务或平台：analysis拥有类型化人工修订/slot、risk目标校验；scoring拥有冻结registry与policy解析；strategy拥有risk适用集合和evaluation seal。公开应用服务可加入同一PG事务，不能由队列先更新baseline/membership再补audit。开源候选与固定源码依据沿用research/second-review.md，本轮未联网刷新或安装；正式兼容/传递许可核验留在授权实施M0。
+
+2026-10-07全文检索产品选择按[ADR-0004](./adr/0004-elasticsearch-search-platform.md)改为Elasticsearch，仅更新设计，未接入运行服务。默认发行物与免费源码的许可分别核对；语义召回选配，优先评估同平台能力，pgvector作为替代候选。

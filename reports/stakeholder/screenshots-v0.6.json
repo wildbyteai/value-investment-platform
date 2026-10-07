@@ -1,0 +1,127 @@
+{
+  "captured_date": "2026-10-07",
+  "method": "CUA browser viewport screenshots; navigation/read-only; original pixels stored under Git-ignored local-data",
+  "app_writes_triggered": false,
+  "images": [
+    {
+      "id": "S-01",
+      "file": "local-data/report-screenshots/v0.6/S-01-overview.jpg",
+      "page": "今日概览",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "932417682534bfa6a0fa9495729ffff4fc865d78324e550300fb165698ed3680",
+      "captured_at": "2026-10-07T15:50:09+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "公司研究入口、参考经营分与覆盖度",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    },
+    {
+      "id": "S-02",
+      "file": "local-data/report-screenshots/v0.6/S-02-company.jpg",
+      "page": "公司研究",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "cb82d5a7fa838967a6472e2051cab67d0b0ac74bd8620983b3817871eb2fa73e",
+      "captured_at": "2026-10-07T15:51:09+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "经营质量与未覆盖维度，截图为首屏局部",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    },
+    {
+      "id": "S-03",
+      "file": "local-data/report-screenshots/v0.6/S-03-judgments.jpg",
+      "page": "资讯与研判",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "3481f8f34665be26082198fe52de7b76b1572d4ce79a41d72d00ef79b1bf5445",
+      "captured_at": "2026-10-07T15:51:53+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "当前研判区域的待确认建议、证据局限与适用期",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    },
+    {
+      "id": "S-04",
+      "file": "local-data/report-screenshots/v0.6/S-04-snapshot.jpg",
+      "page": "研究快照",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "108ecde12e040873250f78f202bb021339fe9f0fcc0b3c2e6c7ca94dac6ca24a",
+      "captured_at": "2026-10-07T15:52:44+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "已保存预览及历史比较入口，未触发生成或比较",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    },
+    {
+      "id": "S-05",
+      "file": "local-data/report-screenshots/v0.6/S-05-strategy.jpg",
+      "page": "策略候选池",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "2fc5233d9cc3ffb6c368ba19091a1a9f2ffb3ac097778951cfc5882d5a295c71",
+      "captured_at": "2026-10-07T15:53:31+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "已发布版本5的准入门槛，经营分进入门为75",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    },
+    {
+      "id": "S-06",
+      "file": "local-data/report-screenshots/v0.6/S-06-workbench.jpg",
+      "page": "我的工作台",
+      "pixel_size": [
+        380,
+        853
+      ],
+      "sha256": "773169e1586e967d8461bb411cc7fcd883a9faf2271f536c36394bbeefe63717",
+      "captured_at": "2026-10-07T15:54:39+08:00",
+      "source_revision": "4f9577891941c16eb7a58f7444d9dad1aea65a3b",
+      "environment": "local_development_running_application",
+      "viewport": "default_narrow_browser_viewport",
+      "scope": "证券自选与研究笔记入口，当前为空态",
+      "actual_screenshot": true,
+      "role": "existing_local_research_identity",
+      "content": "real_public_source_research_preview_not_synthetic_case",
+      "redaction": "identity section collapsed; no credentials, account identifiers, positions or private service URLs visible",
+      "edited_pixels": false
+    }
+  ]
+}

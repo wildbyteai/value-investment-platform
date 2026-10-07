@@ -1,0 +1,226 @@
+{
+  "report_version": "0.3",
+  "created_at": "2026-10-06T15:53:16+08:00",
+  "content_revision": "6ca37557cead1aa576450ab34d06ffe14b72a6da",
+  "head_at_build": "6ca37557cead1aa576450ab34d06ffe14b72a6da",
+  "planned_sections": [
+    "封面",
+    "01 系统帮助人完成什么工作",
+    "02 业务架构：五项职责怎样协作",
+    "03 研究对象：一家公司，可以对应不同证券",
+    "04 一份材料怎样成为有效研究依据",
+    "05 两条评价线怎样汇合",
+    "06 从研究预览到正式跟踪",
+    "07 用“示例制造”串起完整过程",
+    "08 人与系统怎样分工，历史怎样保持可信",
+    "09 用户怎样日常使用，目前做到哪里",
+    "界面说明 概览与公司研究",
+    "界面说明 证券与财务依据",
+    "界面说明 原文与研判",
+    "界面说明 快照与策略",
+    "界面说明 规则与个人工作台",
+    "界面说明 系统支持与缺失状态",
+    "当前实现架构",
+    "生产访问目标架构",
+    "生产资源与域名配置",
+    "费用构成与预算占位",
+    "组件成熟度与Java备选",
+    "下一阶段与缺失材料占位",
+    "附件 当前主要框架",
+    "附件 生产平台与基础设施",
+    "附件 扩展框架与Java备选",
+    "附件 数据服务与费用",
+    "附件 版本依据与公开来源",
+    "附件 框架许可与恢复依据"
+  ],
+  "main_sections": 22,
+  "component_count": 14,
+  "inventory_level": "framework_and_platform",
+  "source_count": 6,
+  "diagram_count": 8,
+  "figures": [
+    {
+      "figure_id": "F-01",
+      "file": "reports/stakeholder/figures/F-01.png",
+      "pixel_size": [
+        1800,
+        760
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-02",
+      "file": "reports/stakeholder/figures/F-02.png",
+      "pixel_size": [
+        1800,
+        780
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-03",
+      "file": "reports/stakeholder/figures/F-03.png",
+      "pixel_size": [
+        1800,
+        1140
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-04",
+      "file": "reports/stakeholder/figures/F-04.png",
+      "pixel_size": [
+        1800,
+        1470
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-05",
+      "file": "reports/stakeholder/figures/F-05.png",
+      "pixel_size": [
+        1800,
+        820
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-06",
+      "file": "reports/stakeholder/figures/F-06.png",
+      "pixel_size": [
+        1800,
+        700
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-07",
+      "file": "reports/stakeholder/figures/F-07.png",
+      "pixel_size": [
+        1800,
+        920
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    },
+    {
+      "figure_id": "F-08",
+      "file": "reports/stakeholder/figures/F-08.png",
+      "pixel_size": [
+        1800,
+        790
+      ],
+      "kind": "locally_drawn_business_diagram",
+      "not_a_screenshot": true
+    }
+  ],
+  "screenshot_assets": [
+    {
+      "asset_id": "S-01",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-01-placeholder.png"
+    },
+    {
+      "asset_id": "S-02",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-02-placeholder.png"
+    },
+    {
+      "asset_id": "S-03",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-03-placeholder.png"
+    },
+    {
+      "asset_id": "S-04",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-04-placeholder.png"
+    },
+    {
+      "asset_id": "S-05",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-05-placeholder.png"
+    },
+    {
+      "asset_id": "S-06",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-06-placeholder.png"
+    },
+    {
+      "asset_id": "S-07",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-07-placeholder.png"
+    },
+    {
+      "asset_id": "S-08",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-08-placeholder.png"
+    },
+    {
+      "asset_id": "S-09",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-09-placeholder.png"
+    },
+    {
+      "asset_id": "S-10",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-10-placeholder.png"
+    },
+    {
+      "asset_id": "S-11",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-11-placeholder.png"
+    },
+    {
+      "asset_id": "S-12",
+      "status": "placeholder",
+      "actual_capture": false,
+      "file": "reports/stakeholder/figures/S-12-placeholder.png"
+    }
+  ],
+  "docx": "output/documents/value-investment-system-report-v0.3.docx",
+  "docx_sha256": "13e0570e2de36c5435adfe17a36ae48a704c3a6f59bee8460701375066fea9e7",
+  "source_hashes": {
+    "PROJECT.md": "a97af9b5b6a536a80da6aa501275c7e218e3746387a55a4fab05627e724906bf",
+    "README.md": "e15e2e5a1a9d306e64a40b910e128473f11b6a1862656fa2ec8dfd5f8fea2e82",
+    "CONTEXT.md": "2f4d0b6789cea8d471ddadf0b37eadd1177e4a7e3a93dc0e18bd3f4dec4448f6",
+    "docs/02-business-design.md": "4ac024eaaeec85f275376b7032241f2ce45e7c624aed8abfa39c65d6c4abb69b",
+    "docs/11-templates-automation-and-roles.md": "771203c68f6a67e21aedf86c3b4fe12e1c7af7afe5cf999258096a61b08976de",
+    "docs/12-time-numerics-and-corrections.md": "edefff37aa3e148cbef11a120959e759383d7af408d51d1b9f7ad2d9ceb76d0b",
+    "docs/14-domain-and-business-flows.md": "b04deadb9e217ad06139bd6766ea0359966c7938623e4344ef53bdfe451a8a62",
+    "versions/v0.0.1/VERIFICATION.md": "6a784e2e6b207db75046f1b50fce76bdeddc1b1c9e4baec953507ff7f5da2f64",
+    "review/REAL-DATA-AND-JUDGMENTS.md": "3856b1ea77bd7038857ffd73a20ee8b56f80fa644375b10489e0247d39f78749",
+    "review/REAL-GAP-CLOSURE.md": "72739b99b07b770cc45c9247e2ff2bf635d1f7671e7db92cd58002b241f074ba",
+    "review/FUTU-INTEGRATION.md": "95a67c28df45755ee884b27654a67ca2062ebeddc99bdd0b07e4a1f644d4a50d",
+    "reports/stakeholder/business-narrative.md": "da82a13ca4d1492258b856fc6d78ff763b1224b1e9d4106d5590b2a10845f7fa",
+    "reports/stakeholder/components-and-costs.md": "100d8a5a6bfeac13cd55cff235d2b2c207a1a5edd6274decb054b88b045c9f46",
+    "reports/stakeholder/frameworks-and-costs.md": "6722145fa8972c1db43260d28a728501a40b7dbb3aff2a3125dd65bb52621207",
+    "research/report-component-cost-basis.md": "a9561ae71533bd8cdc66460c7e1bde23574e8bd64d3c4fc34213ed83793273e2",
+    "research/official-fx-hk-recheck.md": "b6e3577ac90f91c9db6583769f342f8db8476f56c434e7032844bebef7b16972",
+    "backend/pyproject.toml": "e09ce38b3580815cac8ae653bbd19899203e4af5fdfb5c17f36199e09dc26285",
+    "backend/uv.lock": "12dbc976d7bd6c91d7c8fdfb611566cac7c23e00a450ba921f12b7ada2a1ad29",
+    "frontend/package.json": "8172843676a69e02f1037d4e215f9b9839d0d765c2238e5f40266e7222e1aded"
+  },
+  "source_changed_during_build": [],
+  "business_text_source": "reports/stakeholder/business-narrative.md",
+  "network": false,
+  "database_access": false,
+  "product_tests_run": false,
+  "qa_status": "awaiting_render_and_visual_inspection"
+}

@@ -12,7 +12,7 @@ W-08：合成端到端切片。设计任务书，尚未实施；批准设计不�
 
 - 项目隔离且无真实业务数据的本机PostgreSQL、Redis及本地对象存储；启动前核验实际服务器、用途和数据分类。远程/共享/未知DB保持只读。
 - 从固定开源脚手架选择性复用认证接口、生成客户端、基础UI、CI；mock身份和外部模型，无真实外发。先用一套简单执行方式贯通主路径；Refine/Prefect适配属于可选实验，主路径完成前不作为依赖，也不叠加调度器。
-- 首个slice实现身份/RBAC、ingestion、analysis/decision、scoring/templates、strategy、ledger/outbox和必要审计。PG提供结构化检索，OpenSearch全文/语义在W-03；不得把结构化查询冒充完成R-02全部检索。
+- 首个slice实现身份/RBAC、ingestion、analysis/decision、scoring/templates、strategy、ledger/outbox和必要审计。PG提供结构化检索，Elasticsearch全文/语义在W-03；不得把结构化查询冒充完成R-02全部检索。
 - Schema/Pydantic/OpenAPI和生成TypeScript客户端同源。04逻辑表落实本slice物理迁移，数据库变更与outbox同事务；clock/calendar显式注入。
 
 ## 3. 连续用户路径

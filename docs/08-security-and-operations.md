@@ -22,9 +22,9 @@ OIDC 验证服务端 issuer/audience/signature/expiry，首版简单RBAC，MFA�
 
 ## 4. 部署与升级
 
-开发：项目隔离 Compose、合成 fixtures、mock source/model/channel、无外部出站为默认。启动前 verify DB host/environment/data classification，不能因为 localhost 就假定可删。生产：TLS reverse proxy、API、分配额 Worker、PG、Redis、OpenSearch、S3、可观测性；数据库／索引管理端口不公网暴露。
+开发：项目隔离 Compose、合成 fixtures、mock source/model/channel、无外部出站为默认。启动前 verify DB host/environment/data classification，不能因为 localhost 就假定可删。生产：TLS reverse proxy、API、分配额 Worker、PG、Redis、Elasticsearch、S3、可观测性；数据库／索引管理端口不公网暴露。
 
-生产 sizing 待基线压测，不建议在一个低内存节点同时承诺 OpenSearch 与 8,760 万向量。初步 PoC 可用 8–16 vCPU/32–64 GB 总资源分配且独立磁盘额度，均为估算；根据实测决定托管 PG、检索和存储。region、供应商、实际价格、备份流量与许可证上线前决定。
+生产 sizing 待基线压测，不建议在一个低内存节点同时承诺 Elasticsearch 与 8,760 万向量。初步 PoC 可用 8–16 vCPU/32–64 GB 总资源分配且独立磁盘额度，均为估算；根据实测决定托管 PG、检索和存储。region、供应商、实际价格、备份流量与许可证上线前决定。
 
 迁移遵循 expand→双版本兼容→验证→切换→contract，DDL / index build 评估锁影响；不能把一次数据库迁移和多个破坏性 API 改动绑一起。发布先 staging 合成或已批准脱敏数据、金丝雀、观测窗口、再全量。所有生产写入另需授权。
 
