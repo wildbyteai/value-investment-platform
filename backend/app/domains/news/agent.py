@@ -103,6 +103,9 @@ def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: 
                   'input': [{'role': m['role'], 'content': m['content']} for m in messages if m['role'] != 'system']}
     if system:
         body['instructions'] = system
+    effort = (provider.options or {}).get('reasoning_effort') or cfg.get('reasoning_effort')
+    if effort:
+        body['reasoning'] = {'effort': effort}
     temperature = (provider.options or {}).get('temperature')
     if temperature:  # reasoning models reject temperature; only send a non-default value
         body['temperature'] = temperature
@@ -132,7 +135,8 @@ def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTr
         raise LlmError(f'不支持的联网方式：{mode}')
     cfg = policy()
     if mode == 'openai_web_search':
-        with httpx.Client(transport=transport, timeout=timeout or cfg['request_timeout_seconds']) as client:
+        mode_timeout = cfg['search_modes'][mode].get('request_timeout_seconds') or cfg['request_timeout_seconds']
+        with httpx.Client(transport=transport, timeout=timeout or mode_timeout) as client:
             return _openai_responses(client, provider, messages)
     url = provider.base_url.rstrip('/') + '/chat/completions'
     body: dict = {'model': provider.model, 'messages': list(messages)}

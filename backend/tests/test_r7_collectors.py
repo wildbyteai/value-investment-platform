@@ -119,7 +119,7 @@ def test_openai_responses_web_search(monkeypatch):
     assert seen['path'] == '/v1/responses' and seen['auth'] == 'Bearer oa-key'
     assert seen['body']['tools'] == [{'type': 'web_search'}] and seen['body']['tool_choice'] == 'required'
     assert seen['body']['instructions'] == 'S' and seen['body']['input'] == [{'role': 'user', 'content': 'U'}]
-    assert 'temperature' not in seen['body']
+    assert 'temperature' not in seen['body'] and seen['body']['reasoning'] == {'effort': 'max'}
     assert r.content == '{"items":[]}' and r.searches == ['合成甲制造 订单']
     empty = lambda req: httpx.Response(200, json={'status': 'incomplete', 'output': []})
     with pytest.raises(llm.LlmError, match='截断'):

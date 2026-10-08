@@ -575,7 +575,7 @@ const PRESETS = [
   { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY", search_mode: "qwen_enable_search" },
   { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-air", api_key_env: "VIP_ZHIPU_API_KEY", search_mode: "zhipu_web_search" },
   { provider_key: "kimi", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "kimi-k3", api_key_env: "VIP_MOONSHOT_API_KEY", search_mode: "kimi_search" },
-  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-5.5", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
+  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-6-luna", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
 ];
 const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索", openai_web_search: "OpenAI · web_search" };
 

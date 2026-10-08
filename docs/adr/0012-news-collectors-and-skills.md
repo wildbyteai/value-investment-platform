@@ -15,7 +15,7 @@
    - `qwen_enable_search`：通义千问 OpenAI 兼容接口 `enable_search: true` + `search_options`（默认 `forced_search: true`、`search_strategy: max`）。
    - `zhipu_web_search`：智谱 GLM 对话接口 `tools: [{"type":"web_search", ...}]`（默认 `search_pro`、近一天）。
    - `kimi_search`：Kimi 的 `$web_search` 内置工具官方预计 2026-10-20 下线，因此不用它；改为向模型声明一个 `web_search` 函数，模型发起调用时平台用同一个 Key 请求 Kimi 官方 `POST /v1/tools/search_pro`，把结果回传给模型，最多 `max_tool_rounds` 轮。
-   - `openai_web_search`：OpenAI Responses 接口 `POST /v1/responses` 的托管 `web_search` 工具（`tool_choice: required`，确保每次都搜），默认模型 `gpt-5.5`。国内服务器需能访问 api.openai.com，或在“接口地址”填可用的代理地址。
+   - `openai_web_search`：OpenAI Responses 接口 `POST /v1/responses` 的托管 `web_search` 工具（`tool_choice: required`，确保每次都搜），默认模型 `gpt-6-luna`，推理等级 `max`（`reasoning.effort`，可在模型的 options.reasoning_effort 覆盖），单次请求超时 900 秒。国内服务器需能访问 api.openai.com，或在“接口地址”填可用的代理地址。
    - `none`：不联网（DeepSeek 等；DeepSeek 官方 API 目前没有联网搜索）。采集定时器不能选不联网的模型。
 2. **Skill**（`agent_skill`）：名称、说明、执行流程（Markdown）、启用状态、版本号。修改流程正文版本 +1；每次执行记录用的是哪个 Skill 的哪一版。被定时器引用的 Skill 不能删除。
 3. **采集定时器**（`collector_task`）：名称、提示词、模型、可选 Skill、周期（每天定时可多个时间并可选星期，或固定间隔，不少于 60 分钟），时区 Asia/Shanghai。每个定时器自动拥有一个 `kind=agent` 的资讯源，采到的条目可追溯到定时器。
