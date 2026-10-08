@@ -31,6 +31,7 @@ class ProviderConfig:
     model: str
     api_key_env: str
     options: dict | None = None
+    search_mode: str = 'none'
 
     @property
     def api_key(self) -> str:

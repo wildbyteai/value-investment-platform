@@ -129,8 +129,12 @@ def resolve_provider(db, workspace_id) -> llm.ProviderConfig:
                     .order_by(LlmProvider.is_default.desc(), LlmProvider.created_at).limit(1))
     if row is None:
         return llm.default_provider()
+    return provider_config(row)
+
+
+def provider_config(row: LlmProvider) -> llm.ProviderConfig:
     return llm.ProviderConfig(row.provider_key, row.name, row.base_url, row.model, row.api_key_env,
-                              json.loads(row.options_json or '{}'))
+                              json.loads(row.options_json or '{}'), row.search_mode or 'none')
 
 
 def _rule_links(index, text) -> list[llm.ProposedLink]:

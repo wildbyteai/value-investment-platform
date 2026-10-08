@@ -26,6 +26,8 @@ import {
   Sources,
   Feeds,
   Models,
+  Collectors,
+  Skills,
   NotifyAdmin,
   useUnread,
 } from "./mainline";
@@ -37,18 +39,20 @@ const sections: Section[] = [
   { key: "company", label: "公司档案", tabs: [["companies", "公司"], ["today", "今日概览"], ["research", "研究快照"], ["mine", "我的自选与笔记"]] },
   { key: "strategy", label: "策略（击球区）", tabs: [["zone", "击球区"], ["strategy", "策略规则"]] },
   { key: "monitor", label: "监控告警", tabs: [["inbox", "我的通知"], ["alerts", "全部告警"], ["notify-settings", "通知设置"]] },
-  { key: "settings", label: "后台设置", tabs: [["sources", "数据源"], ["feeds", "资讯源与导入"], ["models", "模型配置"], ["notify", "告警发送"], ["tasks", "后台任务"]] },
+  { key: "settings", label: "后台设置", tabs: [["sources", "数据源"], ["feeds", "资讯源与导入"], ["collectors", "采集定时器"], ["skills", "Skill"], ["models", "模型配置"], ["notify", "告警发送"], ["tasks", "后台任务"]] },
 ];
 const labels: Record<string, string> = Object.fromEntries(sections.flatMap((s) => s.tabs.map(([k, l]) => [k, l])));
 const sectionOf = (tab: string) => sections.find((s) => s.tabs.some(([k]) => k === tab)) || sections[0];
 // Tabs whose views load their own data (mainline.tsx).
-const SELF_LOADING = new Set(["events", "zone", "inbox", "alerts", "notify-settings", "sources", "feeds", "models", "notify"]);
+const SELF_LOADING = new Set(["events", "zone", "inbox", "alerts", "notify-settings", "sources", "feeds", "collectors", "skills", "models", "notify"]);
 const tabPermission: Record<string, string[]> = {
   tasks: ["ops.read"],
   mine: ["watchlist.own"],
   sources: ["source.manage", "system.configure"],
   feeds: ["source.manage", "analysis.override", "system.configure"],
   models: ["model.configure"],
+  collectors: ["source.manage", "system.configure"],
+  skills: ["source.manage", "system.configure"],
   notify: ["system.configure"],
 };
 const companyTabs = [
@@ -641,6 +645,8 @@ function Workspace({ identity, identityPanel }: any) {
           {data && tab === "notify-settings" && <NotifySettings {...ctx} />}
           {data && tab === "sources" && <Sources {...ctx} />}
           {data && tab === "feeds" && <Feeds {...ctx} />}
+          {data && tab === "collectors" && <Collectors {...ctx} />}
+          {data && tab === "skills" && <Skills {...ctx} />}
           {data && tab === "models" && <Models {...ctx} />}
           {data && tab === "notify" && <NotifyAdmin {...ctx} />}
           {data && tab === "tasks" && (

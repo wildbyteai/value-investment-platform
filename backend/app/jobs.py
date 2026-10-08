@@ -3,6 +3,8 @@
 Runs every enabled RSS feed in every workspace, then scores pending events.
 ``python -m app.jobs alerts`` (e.g. every 30 min in trading hours, and after the close):
 scans strike-zone changes and confirmed news in every workspace, then sends e-mails.
+``python -m app.jobs collect`` (cron every 5 minutes): runs every 采集定时器 whose next run is
+due; each collector keeps its own schedule (set in 后台设置 › 采集定时器).
 """
 import argparse
 
@@ -28,6 +30,11 @@ def news() -> list[dict]:
     return out
 
 
+def collect() -> list[dict]:
+    from app.domains.news.collector import run_due
+    return run_due(SessionLocal)
+
+
 def alerts() -> list[dict]:
     from app.domains.monitoring import service
     from app.domains.monitoring.mailer import SmtpMailer
@@ -42,7 +49,7 @@ def alerts() -> list[dict]:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('job', choices=['news', 'alerts'])
+    parser.add_argument('job', choices=['news', 'alerts', 'collect'])
     args = parser.parse_args()
-    for line in {'news': news, 'alerts': alerts}[args.job]():
+    for line in {'news': news, 'alerts': alerts, 'collect': collect}[args.job]():
         print(line)
