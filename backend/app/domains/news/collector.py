@@ -184,7 +184,7 @@ def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None
     schedule = validate_schedule(data['schedule'])
     provider = _provider_row(db, workspace_id, data.get('provider_id'))
     if (provider.search_mode or 'none') == 'none':
-        raise Invalid('采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi）')
+        raise Invalid('采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi / OpenAI）')
     if data.get('skill_id'):
         _skill(db, workspace_id, data['skill_id'])
     if task_id is None:

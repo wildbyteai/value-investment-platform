@@ -575,9 +575,9 @@ const PRESETS = [
   { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY", search_mode: "qwen_enable_search" },
   { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-air", api_key_env: "VIP_ZHIPU_API_KEY", search_mode: "zhipu_web_search" },
   { provider_key: "kimi", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "kimi-k3", api_key_env: "VIP_MOONSHOT_API_KEY", search_mode: "kimi_search" },
-  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-4o-mini", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "none" },
+  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-5.5", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
 ];
-const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索" };
+const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索", openai_web_search: "OpenAI · web_search" };
 
 export function Models({ busy, execute }: Ctx) {
   const list = useLoad<any>("/api/admin/llm-providers");
@@ -662,7 +662,7 @@ export function Collectors({ busy, execute }: Ctx) {
     <>
       <p className="intro">像 Agent 定时任务一样采集资讯：写好提示词、选一个能联网的模型（可再选一个 Skill 让模型按流程走），到点自动执行。采到的资讯进入资讯雷达，和 Excel、RSS 一样去重、关联公司、等你确认。时间按北京时间。</p>
       <Failed error={list.error || opts.error} />
-      {opts.value && !searchable.length && <p className="notice">还没有能联网的模型。先到 模型配置 添加通义、智谱或 Kimi，并选择联网方式。</p>}
+      {opts.value && !searchable.length && <p className="notice">还没有能联网的模型。先到 模型配置 添加通义、智谱、Kimi 或 OpenAI，并选择联网方式。</p>}
       <table>
         <thead><tr><th>定时器</th><th>模型 / Skill</th><th>周期</th><th>下次执行</th><th>最近一次</th><th></th></tr></thead>
         <tbody>

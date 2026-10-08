@@ -7,6 +7,8 @@ Each search mode uses the vendor's own search with the same API key as the chat:
 * ``kimi_search``         Kimi：模型以函数调用发起搜索，平台用同一个 Key 调用
                           Kimi 官方 ``POST /v1/tools/search_pro``，结果回传给模型
                           （``$web_search`` 内置工具预计 2026-10-20 下线，因此不用它）
+* ``openai_web_search``   OpenAI Responses 接口（``POST {base_url}/responses``）的托管
+                          ``web_search`` 工具，搜索由 OpenAI 服务端执行
 * ``none``                不联网
 
 The key is read from the environment variable named on the provider; it never reaches
@@ -22,7 +24,7 @@ import httpx
 from app.domains.news.collector_policy import policy
 from app.domains.news.llm import LlmError, ProviderConfig
 
-SEARCH_MODES = ('none', 'qwen_enable_search', 'zhipu_web_search', 'kimi_search')
+SEARCH_MODES = ('none', 'qwen_enable_search', 'zhipu_web_search', 'kimi_search', 'openai_web_search')
 
 KIMI_TOOL = {
     'type': 'function',
@@ -94,6 +96,33 @@ def _kimi_search(client: httpx.Client, provider: ProviderConfig, args: dict) -> 
     return {'results': out}
 
 
+def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: list[dict]) -> ChatResult:
+    cfg = policy()['search_modes']['openai_web_search']
+    system = '\n\n'.join(m['content'] for m in messages if m['role'] == 'system')
+    body: dict = {'model': provider.model, 'tools': [dict(cfg['tool'])], 'tool_choice': cfg['tool_choice'],
+                  'input': [{'role': m['role'], 'content': m['content']} for m in messages if m['role'] != 'system']}
+    if system:
+        body['instructions'] = system
+    temperature = (provider.options or {}).get('temperature')
+    if temperature:  # reasoning models reject temperature; only send a non-default value
+        body['temperature'] = temperature
+    data = _post(client, provider.base_url.rstrip('/') + cfg['endpoint'], provider.api_key, body)
+    if data.get('status') == 'failed':
+        raise LlmError('模型返回失败：' + str((data.get('error') or {}).get('message') or '')[:200])
+    result = ChatResult(content='', rounds=1)
+    texts = []
+    for item in data.get('output') or []:
+        if item.get('type') == 'web_search_call':
+            action = item.get('action') or {}
+            result.searches.extend([q for q in ([action.get('query')] + list(action.get('queries') or [])) if q])
+        elif item.get('type') == 'message':
+            texts.extend(c.get('text', '') for c in item.get('content') or [] if c.get('type') == 'output_text')
+    result.content = ''.join(texts) or str(data.get('output_text') or '')
+    if not result.content:
+        raise LlmError('模型没有返回文本' + ('（输出被截断）' if data.get('status') == 'incomplete' else ''))
+    return result
+
+
 def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTransport | None = None,
          timeout: float | None = None, json_mode: bool = False) -> ChatResult:
     if not provider.configured:
@@ -102,6 +131,9 @@ def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTr
     if mode not in SEARCH_MODES:
         raise LlmError(f'不支持的联网方式：{mode}')
     cfg = policy()
+    if mode == 'openai_web_search':
+        with httpx.Client(transport=transport, timeout=timeout or cfg['request_timeout_seconds']) as client:
+            return _openai_responses(client, provider, messages)
     url = provider.base_url.rstrip('/') + '/chat/completions'
     body: dict = {'model': provider.model, 'messages': list(messages)}
     temperature = (provider.options or {}).get('temperature')

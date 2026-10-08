@@ -104,6 +104,28 @@ def test_kimi_search_loop_uses_same_key(monkeypatch):
     assert json.loads(tool_msg['content'])['results'][0]['text'] == '正文'
 
 
+def test_openai_responses_web_search(monkeypatch):
+    monkeypatch.setenv('VIP_TEST_LLM_KEY', 'oa-key')
+    seen = {}
+
+    def handler(req):
+        seen['path'], seen['auth'], seen['body'] = req.url.path, req.headers['authorization'], json.loads(req.content)
+        return httpx.Response(200, json={'status': 'completed', 'output': [
+            {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search', 'query': '合成甲制造 订单'}},
+            {'type': 'message', 'role': 'assistant', 'content': [{'type': 'output_text', 'text': '{"items":', 'annotations': []},
+                                                                 {'type': 'output_text', 'text': '[]}'}]}]})
+    r = agent.chat(provider('openai_web_search', 'https://api.openai.com/v1'),
+                   [{'role': 'system', 'content': 'S'}, {'role': 'user', 'content': 'U'}], transport=httpx.MockTransport(handler))
+    assert seen['path'] == '/v1/responses' and seen['auth'] == 'Bearer oa-key'
+    assert seen['body']['tools'] == [{'type': 'web_search'}] and seen['body']['tool_choice'] == 'required'
+    assert seen['body']['instructions'] == 'S' and seen['body']['input'] == [{'role': 'user', 'content': 'U'}]
+    assert 'temperature' not in seen['body']
+    assert r.content == '{"items":[]}' and r.searches == ['合成甲制造 订单']
+    empty = lambda req: httpx.Response(200, json={'status': 'incomplete', 'output': []})
+    with pytest.raises(llm.LlmError, match='截断'):
+        agent.chat(provider('openai_web_search'), [{'role': 'user', 'content': 'U'}], transport=httpx.MockTransport(empty))
+
+
 def test_chat_errors(monkeypatch):
     monkeypatch.delenv('VIP_TEST_LLM_KEY', raising=False)
     with pytest.raises(llm.LlmError, match='未配置模型密钥'):

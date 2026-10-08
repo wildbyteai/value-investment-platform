@@ -83,7 +83,7 @@ class ProviderIn(BaseModel):
     is_default: bool = False
     enabled: bool = True
     temperature: float = Field(0, ge=0, le=2)
-    search_mode: str = Field('none', pattern='^(none|qwen_enable_search|zhipu_web_search|kimi_search)$')
+    search_mode: str = Field('none', pattern='^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search)$')
 
 
 def _provider(p: LlmProvider) -> dict:
