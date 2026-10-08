@@ -218,6 +218,29 @@ def review_link(db, workspace_id, link_id, actor_id, action, relevance=None, imp
     return link
 
 
+def review_links_batch(db, workspace_id, link_ids: list[str], actor_id, action) -> dict:
+    """Accept (or reject) the AI's proposals as they stand, many at once. A link that cannot be
+    confirmed as-is (not matched to a company profile, already handled) is skipped with a reason
+    instead of failing the whole batch; the researcher fixes those one by one."""
+    if action not in ('confirm', 'reject'):
+        raise Invalid('只能确认或驳回')
+    names = company_names(db)
+    done, skipped = [], []
+    for link_id in dict.fromkeys(link_ids):
+        link = db.get(NewsEventCompany, link_id)
+        label = names.get(link.company_id, link.company_label) if link else None
+        if link is not None and link.status != 'proposed':
+            skipped.append({'id': link_id, 'company': label, 'reason': '已处理过'})
+            continue
+        try:
+            with db.begin_nested():
+                review_link(db, workspace_id, link_id, actor_id, action)
+            done.append(link_id)
+        except (NotFound, Invalid, Conflict) as exc:
+            skipped.append({'id': link_id, 'company': label, 'reason': str(exc)})
+    return {'action': action, 'done': done, 'skipped': skipped}
+
+
 # ---------------------------------------------------------------- reads
 
 def link_dict(link: NewsEventCompany, names: dict) -> dict:

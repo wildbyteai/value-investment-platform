@@ -236,3 +236,30 @@ def test_admin_models_and_feeds(env):
     assert f.status_code == 200
     assert any(x['feed_key'] == 'rss-2' for x in c.get('/api/news/feeds', headers=h(ws, 'viewer@demo')).json())
     assert any(s['key'] == 'news-rss' for s in c.get('/api/admin/sources', headers=h(ws, 'data@demo')).json())
+
+
+def test_batch_review_accepts_ai_results(env):
+    c, ws, Session = env
+    from app.domains.news.models import NewsEvent, NewsEventCompany
+    with Session() as s:
+        e = NewsEvent(workspace_id=ws, title='批量确认测试事件', fingerprint='批量确认测试事件', item_count=1, ai_status='scored')
+        s.add(e); s.flush()
+        ok = NewsEventCompany(event_id=e.id, company_label='合成甲制造', company_id='00000000-0000-4000-8000-000000000001',
+                              relevance=0.9, impact=0.4, status='proposed', proposed_by='ai:test')
+        orphan = NewsEventCompany(event_id=e.id, company_label='档案外公司', relevance=0.6, impact=-0.1,
+                                  status='proposed', proposed_by='ai:test')
+        s.add_all([ok, orphan]); s.commit()
+        ok_id, orphan_id, event_id = ok.id, orphan.id, e.id
+    body = {'action': 'confirm', 'link_ids': [ok_id, orphan_id, ok_id]}
+    assert c.post('/api/news/links/review-batch', headers=h(ws, 'viewer@demo'), json=body).status_code == 403
+    r = c.post('/api/news/links/review-batch', headers=h(ws, 'research@demo'), json=body)
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out['done'] == [ok_id] and [x['id'] for x in out['skipped']] == [orphan_id]
+    assert '公司档案' in out['skipped'][0]['reason']
+    again = c.post('/api/news/links/review-batch', headers=h(ws, 'research@demo'), json={'action': 'confirm', 'link_ids': [ok_id]}).json()
+    assert again['done'] == [] and again['skipped'][0]['reason'] == '已处理过'
+    rej = c.post('/api/news/links/review-batch', headers=h(ws, 'research@demo'), json={'action': 'reject', 'link_ids': [orphan_id]}).json()
+    assert rej['done'] == [orphan_id]
+    links = {l['id']: l for l in c.get(f'/api/news/events/{event_id}', headers=h(ws, 'viewer@demo')).json()['links']}
+    assert links[ok_id]['status'] == 'confirmed' and links[ok_id]['impact'] == 0.4 and links[orphan_id]['status'] == 'rejected'

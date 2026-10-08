@@ -73,6 +73,7 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
   const events = useLoad<any[]>(`/api/news/events?limit=80${filter ? `&status=${filter}` : ""}`);
   const companies = useLoad<any[]>("/api/companies");
   const [selId, setSelId] = useState<string>("");
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<any>(null);
   const canReview = any(allow, "analysis.override", "quality.correct");
   const canScore = any(allow, "source.manage", "analysis.override");
@@ -92,12 +93,35 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
   }
   const links = list.flatMap((e) => e.links);
   const pending = links.filter((l: any) => l.status === "proposed").length;
+  const waitingIds = (es: any[]) => es.flatMap((e) => e.links.filter((l: any) => l.status === "proposed").map((l: any) => l.id));
+  const pickedEvents = list.filter((e) => picked.has(e.id));
+  const reviewable = list.filter((e) => e.links.some((l: any) => l.status === "proposed"));
+  const allPicked = reviewable.length > 0 && reviewable.every((e) => picked.has(e.id));
+  function toggle(id: string) {
+    const next = new Set(picked);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setPicked(next);
+  }
+  async function batch(ids: string[], action: "confirm" | "reject") {
+    if (!ids.length) return;
+    const verb = action === "confirm" ? "确认" : "驳回";
+    const r = await execute(() => post("/api/news/links/review-batch", { action, link_ids: ids }), (r: any) => {
+      const alerts = r.alerts?.length ? `，触发 ${r.alerts.length} 条告警` : "";
+      const skipped = r.skipped?.length
+        ? `；${r.skipped.length} 个没处理（${r.skipped.slice(0, 3).map((x: any) => `${x.company}：${x.reason}`).join("；")}），请逐条修改后再确认`
+        : "";
+      return `已${verb} ${r.done.length} 个关联${alerts}${skipped}`;
+    }, false);
+    if (r === undefined) return;
+    setPicked(new Set());
+    events.reload();
+  }
   const ups = list.filter((e) => e.impact_score != null && e.impact_score >= 0.3).length;
   const downs = list.filter((e) => e.impact_score != null && e.impact_score <= -0.3).length;
   const items = list.reduce((n, e) => n + (e.item_count || 0), 0);
   return (
     <>
-      <p className="intro">每条资讯先合并成事件，再判断关联哪些公司、关联多紧（关联度 0–1）、影响多大（影响分 −1 到 1）。AI 先预判，研究员确认后才进入告警。</p>
+      <p className="intro">每条资讯先合并成事件，再判断关联哪些公司、关联多紧（关联度 0–1）、影响多大（影响分 −1 到 1）。AI 先预判，研究员确认、批量确认或修改后才进入告警。</p>
       <div className="kpis">
         <Kpi label="事件" value={list.length} hint={`${items} 条资讯合并而来`} />
         <Kpi label="待确认关联" value={pending} hint="AI 已预判，等你拍板" />
@@ -114,6 +138,13 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               <button aria-pressed={filter === "needs_review"} onClick={() => setFilter("needs_review")}>待确认</button>
             </div>
             <div className="right">
+              {canReview && picked.size > 0 && (
+                <>
+                  <span className="muted small">已选 {picked.size} 个事件</span>{" "}
+                  <button className="small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "confirm")}>批量确认 AI 结果</button>{" "}
+                  <button className="quiet small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "reject")}>批量驳回</button>{" "}
+                </>
+              )}
               {canScore && (
                 <button className="quiet small" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
                   AI 打分待处理事件
@@ -127,7 +158,11 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
             <div className="table-scroll">
               <table className="event-table">
                 <thead>
-                  <tr><th>时间</th><th>事件</th><th>关联公司</th><th>关联度</th><th>影响分</th><th>状态</th></tr>
+                  <tr>
+                    {canReview && <th><input type="checkbox" aria-label="全选待确认事件" checked={allPicked}
+                      onChange={() => setPicked(allPicked ? new Set() : new Set(reviewable.map((e) => e.id)))} /></th>}
+                    <th>时间</th><th>事件</th><th>关联公司</th><th>关联度</th><th>影响分</th><th>状态</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {list.map((e) => {
@@ -135,6 +170,9 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
                     const waiting = e.links.some((l: any) => l.status === "proposed");
                     return (
                       <tr key={e.id} aria-selected={sel?.id === e.id} onClick={() => setSelId(e.id)}>
+                        {canReview && <td onClick={(ev) => ev.stopPropagation()}>
+                          {waiting && <input type="checkbox" aria-label={`选择 ${e.title}`} checked={picked.has(e.id)} onChange={() => toggle(e.id)} />}
+                        </td>}
                         <td className="num muted">{short(e.last_published_at)}</td>
                         <td>
                           <div className="event-title">{e.title}</div>
@@ -178,7 +216,14 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               {sel.summary && <p style={{ marginTop: 10 }}>{sel.summary.slice(0, 400)}{sel.summary.length > 400 ? "…" : ""}</p>}
             </div>
             <div className="panel-sec">
-              <div className="sec-label">关联公司</div>
+              <div className="sec-label">
+                关联公司
+                {canReview && waitingIds([sel]).length > 1 && (
+                  <button className="small" style={{ float: "right" }} disabled={busy} onClick={() => batch(waitingIds([sel]), "confirm")}>
+                    全部确认 AI 结果
+                  </button>
+                )}
+              </div>
               {sel.links.length ? (
                 sel.links.map((l: any) => (
                   <LinkCard key={l.id} l={l} canReview={canReview} busy={busy} companies={companies.value || []}

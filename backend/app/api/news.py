@@ -129,6 +129,24 @@ def review(link_id: str, body: ReviewIn, principal: Principal = Depends(require_
     return out
 
 
+class BatchReviewIn(BaseModel):
+    action: str
+    link_ids: list[str] = Field(..., min_length=1, max_length=500)
+
+
+@router.post('/links/review-batch')
+def review_batch(body: BatchReviewIn, principal: Principal = Depends(require_any(*REVIEW)), db=Depends(get_db)):
+    """批量确认 / 驳回 AI 预判结果（按 AI 给出的公司、关联度、影响分原样确认）。"""
+    with unit_of_work(db):
+        out = service.review_links_batch(db, principal.workspace.id, body.link_ids, principal.user.id, body.action)
+    out['alerts'] = []
+    if body.action == 'confirm' and out['done']:
+        from app.domains.monitoring import service as monitoring
+        with unit_of_work(db):
+            out['alerts'] = monitoring.scan_news(db, principal.workspace.id, link_ids=out['done'])['alerts']
+    return out
+
+
 @router.post('/feeds/{feed_id}/run')
 def run_feed(feed_id: str, principal: Principal = Depends(require_any(*WRITE)), db=Depends(get_db)):
     feed = db.get(NewsFeed, feed_id)
