@@ -114,4 +114,69 @@ class LlmProvider(Base):
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     options_json: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
+    # How the model reaches the web: none | qwen_enable_search | zhipu_web_search | kimi_search
+    search_mode: Mapped[str] = mapped_column(String(30), nullable=False, default='none', server_default='none')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class AgentSkill(Base):
+    """A reusable procedure (markdown steps) the model follows when a collector runs."""
+    __tablename__ = 'agent_skill'
+    __table_args__ = (UniqueConstraint('workspace_id', 'skill_key', name='uq_agent_skill_key'),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    skill_key: Mapped[str] = mapped_column(String(80), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    body: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    updated_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class CollectorTask(Base):
+    """A scheduled news collector: prompt + model (+ optional skill) on a schedule.
+
+    Each collector writes into its own ``news_feed`` (kind ``agent``) so items stay attributable."""
+    __tablename__ = 'collector_task'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    prompt: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_id: Mapped[str | None] = mapped_column(ForeignKey('llm_provider.id'), nullable=True)
+    skill_id: Mapped[str | None] = mapped_column(ForeignKey('agent_skill.id'), nullable=True)
+    feed_id: Mapped[str] = mapped_column(ForeignKey('news_feed.id'), nullable=False)
+    # schedule: {"type": "daily", "times": ["08:30"], "weekdays": [1..7]} | {"type": "interval", "minutes": 120}
+    schedule_json: Mapped[str] = mapped_column(Text, nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_status: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class CollectorRun(Base):
+    """One execution of a collector, kept for troubleshooting."""
+    __tablename__ = 'collector_run'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    task_id: Mapped[str] = mapped_column(ForeignKey('collector_task.id'), nullable=False, index=True)
+    trigger: Mapped[str] = mapped_column(String(20), nullable=False)  # schedule | manual
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default='running')  # running | succeeded | failed
+    model: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    search_mode: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    skill_key: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    skill_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    items_found: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    stats_json: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
+    error: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    output_excerpt: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

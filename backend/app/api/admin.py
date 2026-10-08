@@ -10,6 +10,7 @@ from app.core.errors import Conflict, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
 from app.domains.news import llm
+from app.domains.news.collector_policy import policy as collector_policy
 from app.domains.news.models import LlmProvider, NewsFeed
 from app.services.transactions import canonical, record
 from app.sources import registry
@@ -82,13 +83,14 @@ class ProviderIn(BaseModel):
     is_default: bool = False
     enabled: bool = True
     temperature: float = Field(0, ge=0, le=2)
+    search_mode: str = Field('none', pattern='^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search)$')
 
 
 def _provider(p: LlmProvider) -> dict:
     cfg = llm.ProviderConfig(p.provider_key, p.name, p.base_url, p.model, p.api_key_env)
     return {'id': p.id, 'provider_key': p.provider_key, 'name': p.name, 'base_url': p.base_url, 'model': p.model,
             'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'is_default': p.is_default,
-            'enabled': p.enabled, 'options': json.loads(p.options_json or '{}')}
+            'enabled': p.enabled, 'options': json.loads(p.options_json or '{}'), 'search_mode': p.search_mode or 'none'}
 
 
 @router.get('/llm-providers')
@@ -98,6 +100,8 @@ def list_providers(principal: Principal = Depends(require('model.configure')), d
     return {'providers': [_provider(p) for p in rows],
             'builtin_default': {'provider_key': default.provider_key, 'name': default.name, 'base_url': default.base_url,
                                 'model': default.model, 'api_key_env': default.api_key_env, 'key_configured': default.configured},
+            'search_modes': {k: v['label'] for k, v in collector_policy()['search_modes'].items()},
+            'presets': collector_policy()['provider_presets'],
             'active': None if not rows else next((p.provider_key for p in sorted(rows, key=lambda r: (not r.is_default, r.created_at)) if p.enabled), None)}
 
 

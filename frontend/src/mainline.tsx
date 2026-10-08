@@ -73,6 +73,7 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
   const events = useLoad<any[]>(`/api/news/events?limit=80${filter ? `&status=${filter}` : ""}`);
   const companies = useLoad<any[]>("/api/companies");
   const [selId, setSelId] = useState<string>("");
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<any>(null);
   const canReview = any(allow, "analysis.override", "quality.correct");
   const canScore = any(allow, "source.manage", "analysis.override");
@@ -92,12 +93,35 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
   }
   const links = list.flatMap((e) => e.links);
   const pending = links.filter((l: any) => l.status === "proposed").length;
+  const waitingIds = (es: any[]) => es.flatMap((e) => e.links.filter((l: any) => l.status === "proposed").map((l: any) => l.id));
+  const pickedEvents = list.filter((e) => picked.has(e.id));
+  const reviewable = list.filter((e) => e.links.some((l: any) => l.status === "proposed"));
+  const allPicked = reviewable.length > 0 && reviewable.every((e) => picked.has(e.id));
+  function toggle(id: string) {
+    const next = new Set(picked);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setPicked(next);
+  }
+  async function batch(ids: string[], action: "confirm" | "reject") {
+    if (!ids.length) return;
+    const verb = action === "confirm" ? "确认" : "驳回";
+    const r = await execute(() => post("/api/news/links/review-batch", { action, link_ids: ids }), (r: any) => {
+      const alerts = r.alerts?.length ? `，触发 ${r.alerts.length} 条告警` : "";
+      const skipped = r.skipped?.length
+        ? `；${r.skipped.length} 个没处理（${r.skipped.slice(0, 3).map((x: any) => `${x.company}：${x.reason}`).join("；")}），请逐条修改后再确认`
+        : "";
+      return `已${verb} ${r.done.length} 个关联${alerts}${skipped}`;
+    }, false);
+    if (r === undefined) return;
+    setPicked(new Set());
+    events.reload();
+  }
   const ups = list.filter((e) => e.impact_score != null && e.impact_score >= 0.3).length;
   const downs = list.filter((e) => e.impact_score != null && e.impact_score <= -0.3).length;
   const items = list.reduce((n, e) => n + (e.item_count || 0), 0);
   return (
     <>
-      <p className="intro">每条资讯先合并成事件，再判断关联哪些公司、关联多紧（关联度 0–1）、影响多大（影响分 −1 到 1）。AI 先预判，研究员确认后才进入告警。</p>
+      <p className="intro">每条资讯先合并成事件，再判断关联哪些公司、关联多紧（关联度 0–1）、影响多大（影响分 −1 到 1）。AI 先预判，研究员确认、批量确认或修改后才进入告警。</p>
       <div className="kpis">
         <Kpi label="事件" value={list.length} hint={`${items} 条资讯合并而来`} />
         <Kpi label="待确认关联" value={pending} hint="AI 已预判，等你拍板" />
@@ -114,6 +138,13 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               <button aria-pressed={filter === "needs_review"} onClick={() => setFilter("needs_review")}>待确认</button>
             </div>
             <div className="right">
+              {canReview && picked.size > 0 && (
+                <>
+                  <span className="muted small">已选 {picked.size} 个事件</span>{" "}
+                  <button className="small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "confirm")}>批量确认 AI 结果</button>{" "}
+                  <button className="quiet small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "reject")}>批量驳回</button>{" "}
+                </>
+              )}
               {canScore && (
                 <button className="quiet small" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
                   AI 打分待处理事件
@@ -127,7 +158,11 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
             <div className="table-scroll">
               <table className="event-table">
                 <thead>
-                  <tr><th>时间</th><th>事件</th><th>关联公司</th><th>关联度</th><th>影响分</th><th>状态</th></tr>
+                  <tr>
+                    {canReview && <th><input type="checkbox" aria-label="全选待确认事件" checked={allPicked}
+                      onChange={() => setPicked(allPicked ? new Set() : new Set(reviewable.map((e) => e.id)))} /></th>}
+                    <th>时间</th><th>事件</th><th>关联公司</th><th>关联度</th><th>影响分</th><th>状态</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {list.map((e) => {
@@ -135,6 +170,9 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
                     const waiting = e.links.some((l: any) => l.status === "proposed");
                     return (
                       <tr key={e.id} aria-selected={sel?.id === e.id} onClick={() => setSelId(e.id)}>
+                        {canReview && <td onClick={(ev) => ev.stopPropagation()}>
+                          {waiting && <input type="checkbox" aria-label={`选择 ${e.title}`} checked={picked.has(e.id)} onChange={() => toggle(e.id)} />}
+                        </td>}
                         <td className="num muted">{short(e.last_published_at)}</td>
                         <td>
                           <div className="event-title">{e.title}</div>
@@ -178,7 +216,14 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               {sel.summary && <p style={{ marginTop: 10 }}>{sel.summary.slice(0, 400)}{sel.summary.length > 400 ? "…" : ""}</p>}
             </div>
             <div className="panel-sec">
-              <div className="sec-label">关联公司</div>
+              <div className="sec-label">
+                关联公司
+                {canReview && waitingIds([sel]).length > 1 && (
+                  <button className="small" style={{ float: "right" }} disabled={busy} onClick={() => batch(waitingIds([sel]), "confirm")}>
+                    全部确认 AI 结果
+                  </button>
+                )}
+              </div>
               {sel.links.length ? (
                 sel.links.map((l: any) => (
                   <LinkCard key={l.id} l={l} canReview={canReview} busy={busy} companies={companies.value || []}
@@ -571,12 +616,13 @@ export function Feeds({ allow, busy, execute }: Ctx) {
 }
 
 const PRESETS = [
-  { provider_key: "deepseek", name: "DeepSeek", base_url: "https://api.deepseek.com", model: "deepseek-chat", api_key_env: "VIP_DEEPSEEK_API_KEY" },
-  { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY" },
-  { provider_key: "moonshot", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "moonshot-v1-8k", api_key_env: "VIP_MOONSHOT_API_KEY" },
-  { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-plus", api_key_env: "VIP_ZHIPU_API_KEY" },
-  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-4o-mini", api_key_env: "VIP_OPENAI_API_KEY" },
+  { provider_key: "deepseek", name: "DeepSeek", base_url: "https://api.deepseek.com", model: "deepseek-chat", api_key_env: "VIP_DEEPSEEK_API_KEY", search_mode: "none" },
+  { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY", search_mode: "qwen_enable_search" },
+  { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-air", api_key_env: "VIP_ZHIPU_API_KEY", search_mode: "zhipu_web_search" },
+  { provider_key: "kimi", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "kimi-k3", api_key_env: "VIP_MOONSHOT_API_KEY", search_mode: "kimi_search" },
+  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-6-luna", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
 ];
+const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索", openai_web_search: "OpenAI · web_search" };
 
 export function Models({ busy, execute }: Ctx) {
   const list = useLoad<any>("/api/admin/llm-providers");
@@ -597,10 +643,11 @@ export function Models({ busy, execute }: Ctx) {
         <>
           <p>当前使用：<strong>{v.active || `${v.builtin_default.name}（内置默认）`}</strong>{!v.providers.length && !v.builtin_default.key_configured && <span className="notice"> 服务器尚未设置 {v.builtin_default.api_key_env}，资讯关联暂用规则匹配。</span>}</p>
           <table>
-            <thead><tr><th>模型</th><th>地址</th><th>密钥变量</th><th>状态</th><th></th></tr></thead>
+            <thead><tr><th>模型</th><th>地址</th><th>密钥变量</th><th>联网</th><th>状态</th><th></th></tr></thead>
             <tbody>
               {v.providers.map((p: any) => (
                 <tr key={p.id}><td>{p.name}<div className="muted">{p.model}</div></td><td>{p.base_url}</td><td>{p.api_key_env} {p.key_configured ? "✓ 已设置" : "✗ 未设置"}</td>
+                  <td>{SEARCH_LABEL[p.search_mode] || p.search_mode}</td>
                   <td>{p.enabled ? (p.is_default ? "默认" : "可用") : "停用"}</td>
                   <td><button className="quiet" onClick={() => { setEditing(p.id); setForm({ ...p, temperature: p.options?.temperature ?? 0 }); }}>编辑</button></td></tr>
               ))}
@@ -614,8 +661,151 @@ export function Models({ busy, execute }: Ctx) {
         {["provider_key", "name", "base_url", "model", "api_key_env"].map((k) => (
           <label key={k}>{{ provider_key: "标识", name: "名称", base_url: "接口地址", model: "模型名", api_key_env: "密钥环境变量" }[k]}<input required value={form[k] || ""} disabled={k === "provider_key" && !!editing} onChange={(e) => setForm({ ...form, [k]: e.target.value })} /></label>
         ))}
+        <label>联网方式<select value={form.search_mode || "none"} onChange={(e) => setForm({ ...form, search_mode: e.target.value })}>
+          {Object.entries((v?.search_modes as Record<string, string>) || SEARCH_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+        </select></label>
+        <p className="muted">采集定时器只能选能联网的模型。联网用的是厂商自带的搜索，和对话共用同一个密钥，不需要另配搜索服务。</p>
         <label>温度<input type="number" min={0} max={2} step={0.1} value={form.temperature} onChange={(e) => setForm({ ...form, temperature: Number(e.target.value) })} /></label>
         <label className="inline"><input type="checkbox" checked={form.is_default} onChange={(e) => setForm({ ...form, is_default: e.target.checked })} /> 设为默认</label>
+        <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
+        <button disabled={busy}>保存</button>
+        {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+      </form>
+    </>
+  );
+}
+
+// ------------------------------------------------------------------ 采集定时器 / Skill
+
+const WEEK = ["一", "二", "三", "四", "五", "六", "日"];
+const RUN_STATUS: Record<string, string> = { running: "执行中", succeeded: "成功", failed: "失败" };
+
+export function Collectors({ busy, execute }: Ctx) {
+  const list = useLoad<any[]>("/api/admin/collectors");
+  const opts = useLoad<any>("/api/admin/collectors/options");
+  const blank = { name: "", prompt: "", provider_id: "", skill_id: "", enabled: true, kind: "daily", times: "08:30", weekdays: [1, 2, 3, 4, 5, 6, 7], minutes: 240 };
+  const [form, setForm] = useState<any>(blank);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [runsOf, setRunsOf] = useState<string | null>(null);
+  const runs = useLoad<any[]>(runsOf ? `/api/admin/collectors/${runsOf}/runs` : "/api/admin/collectors", [runsOf]);
+  const searchable = (opts.value?.providers || []).filter((p: any) => p.search_mode !== "none");
+  const body = () => ({
+    name: form.name, prompt: form.prompt, provider_id: form.provider_id || searchable[0]?.id, skill_id: form.skill_id || null, enabled: form.enabled,
+    schedule: form.kind === "daily" ? { type: "daily", times: String(form.times).split(/[,，\s]+/).filter(Boolean), weekdays: form.weekdays } : { type: "interval", minutes: Number(form.minutes) },
+  });
+  async function save(e: any) {
+    e.preventDefault();
+    const r = await execute(() => (editing ? api(`/api/admin/collectors/${editing}`, { method: "PUT", body: JSON.stringify(body()) }) : post("/api/admin/collectors", body())), "采集定时器已保存。", false);
+    if (r !== undefined) { setEditing(null); setForm(blank); list.reload(); }
+  }
+  function edit(t: any) {
+    setEditing(t.id);
+    setForm({ name: t.name, prompt: t.prompt, provider_id: t.provider_id || "", skill_id: t.skill_id || "", enabled: t.enabled, kind: t.schedule.type,
+      times: (t.schedule.times || ["08:30"]).join(", "), weekdays: t.schedule.weekdays || [1, 2, 3, 4, 5, 6, 7], minutes: t.schedule.minutes || 240 });
+  }
+  return (
+    <>
+      <p className="intro">像 Agent 定时任务一样采集资讯：写好提示词、选一个能联网的模型（可再选一个 Skill 让模型按流程走），到点自动执行。采到的资讯进入资讯雷达，和 Excel、RSS 一样去重、关联公司、等你确认。时间按北京时间。</p>
+      <Failed error={list.error || opts.error} />
+      {opts.value && !searchable.length && <p className="notice">还没有能联网的模型。先到 模型配置 添加通义、智谱、Kimi 或 OpenAI，并选择联网方式。</p>}
+      <table>
+        <thead><tr><th>定时器</th><th>模型 / Skill</th><th>周期</th><th>下次执行</th><th>最近一次</th><th></th></tr></thead>
+        <tbody>
+          {list.value?.map((t) => (
+            <tr key={t.id}>
+              <td>{t.name}<div className="muted">{t.prompt.slice(0, 60)}{t.prompt.length > 60 ? "…" : ""}</div></td>
+              <td>{t.provider || "—"}<div className="muted">{t.skill ? `Skill：${t.skill}` : "不用 Skill"}</div></td>
+              <td>{t.enabled ? t.schedule_text : "已停用"}</td>
+              <td>{t.enabled ? time(t.next_run_at) : "—"}</td>
+              <td>{t.last_status || "尚未执行"}<div className="muted">{t.last_run_at ? time(t.last_run_at) : ""}</div></td>
+              <td className="actions">
+                <button className="quiet" disabled={busy} onClick={async () => { const r = await execute(() => post(`/api/admin/collectors/${t.id}/run`, {}), (x: any) => (x.status === "succeeded" ? `采集完成：采到 ${x.items_found} 条，新增 ${x.stats.new_items} 条。` : `采集失败：${x.error}`), false); if (r !== undefined) { list.reload(); runs.reload(); } }}>立即执行</button>
+                <button className="quiet" onClick={() => edit(t)}>编辑</button>
+                <button className="quiet" onClick={() => setRunsOf(runsOf === t.id ? null : t.id)}>{runsOf === t.id ? "收起记录" : "执行记录"}</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {runsOf && (
+        <section>
+          <h4>执行记录</h4>
+          <table>
+            <thead><tr><th>开始</th><th>触发</th><th>结果</th><th>模型 / Skill</th><th>说明</th></tr></thead>
+            <tbody>
+              {(runs.value || []).map((r: any) => (
+                <tr key={r.id}><td>{time(r.started_at)}</td><td>{r.trigger === "manual" ? "手动" : "定时"}</td>
+                  <td>{RUN_STATUS[r.status] || r.status}{r.status === "succeeded" && ` · ${r.items_found} 条`}</td>
+                  <td>{r.model || "—"}<div className="muted">{r.skill_key ? `${r.skill_key} v${r.skill_version}` : ""}</div></td>
+                  <td>{r.error || (r.stats?.searches?.length ? `搜索：${r.stats.searches.join("；")}` : r.stats?.new_items != null ? `新增 ${r.stats.new_items}，重复 ${r.stats.duplicate_items}` : "—")}
+                    {r.output_excerpt && <details><summary>模型原始输出</summary><pre>{r.output_excerpt}</pre></details>}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+      <form className="form" onSubmit={save}>
+        <h4>{editing ? "编辑采集定时器" : "新建采集定时器"}</h4>
+        <label>名称<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="创新药重点公司早报" /></label>
+        <label>提示词<textarea required value={form.prompt} onChange={(e) => setForm({ ...form, prompt: e.target.value })} placeholder="采集过去 24 小时内诺诚健华、百济神州、信达生物的公告、临床进展和重要新闻……" /></label>
+        <label>模型<select required value={form.provider_id || searchable[0]?.id || ""} onChange={(e) => setForm({ ...form, provider_id: e.target.value })}>
+          {searchable.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
+        </select></label>
+        <label>Skill（可选）<select value={form.skill_id} onChange={(e) => setForm({ ...form, skill_id: e.target.value })}>
+          <option value="">不用 Skill</option>
+          {(opts.value?.skills || []).map((s: any) => <option key={s.id} value={s.id}>{s.name}{s.enabled ? "" : "（已停用）"}</option>)}
+        </select></label>
+        <label>周期<select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })}><option value="daily">每天定时</option><option value="interval">固定间隔</option></select></label>
+        {form.kind === "daily" ? (
+          <>
+            <label>执行时间（可多个，逗号分隔）<input value={form.times} onChange={(e) => setForm({ ...form, times: e.target.value })} placeholder="08:30, 17:00" /></label>
+            <div className="chips">{WEEK.map((w, i) => (
+              <label key={w} className="inline"><input type="checkbox" checked={form.weekdays.includes(i + 1)} onChange={(e) => setForm({ ...form, weekdays: e.target.checked ? [...form.weekdays, i + 1].sort() : form.weekdays.filter((d: number) => d !== i + 1) })} /> 周{w}</label>
+            ))}</div>
+          </>
+        ) : (
+          <label>间隔分钟（不少于 {opts.value?.min_interval_minutes ?? 60}）<input type="number" min={opts.value?.min_interval_minutes ?? 60} step={30} value={form.minutes} onChange={(e) => setForm({ ...form, minutes: e.target.value })} /></label>
+        )}
+        <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
+        <button disabled={busy || !searchable.length}>保存</button>
+        {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+        <p className="muted">定时执行需要服务器每 5 分钟跑一次 python -m app.jobs collect。</p>
+      </form>
+    </>
+  );
+}
+
+export function Skills({ busy, execute }: Ctx) {
+  const list = useLoad<any[]>("/api/admin/skills");
+  const blank = { skill_key: "", name: "", description: "", body: "", enabled: true };
+  const [form, setForm] = useState<any>(blank);
+  const [editing, setEditing] = useState<string | null>(null);
+  async function save(e: any) {
+    e.preventDefault();
+    const r = await execute(() => (editing ? api(`/api/admin/skills/${editing}`, { method: "PUT", body: JSON.stringify(form) }) : post("/api/admin/skills", form)), "Skill 已保存。", false);
+    if (r !== undefined) { setEditing(null); setForm(blank); list.reload(); }
+  }
+  return (
+    <>
+      <p className="intro">Skill 是一段可复用的执行流程（按步骤写清楚先查什么、怎么筛、怎么判断）。采集定时器选了 Skill，模型就按它的流程执行。修改步骤会升版本，执行记录里能看到用的是哪一版。</p>
+      <Failed error={list.error} />
+      <table>
+        <thead><tr><th>Skill</th><th>说明</th><th>版本</th><th>被引用</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          {list.value?.map((s) => (
+            <tr key={s.id}><td>{s.name}<div className="muted">{s.skill_key}</div></td><td>{s.description || "—"}</td><td>v{s.version}</td>
+              <td>{s.used_by} 个定时器</td><td>{s.enabled ? "启用" : "停用"}</td>
+              <td className="actions"><button className="quiet" onClick={() => { setEditing(s.id); setForm({ skill_key: s.skill_key, name: s.name, description: s.description, body: s.body, enabled: s.enabled }); }}>编辑</button>
+                <button className="quiet" disabled={busy || s.used_by > 0} title={s.used_by ? "还有定时器在用" : ""} onClick={async () => { if (!confirm(`删除 Skill「${s.name}」？`)) return; (await execute(() => api(`/api/admin/skills/${s.id}`, { method: "DELETE" }), "Skill 已删除。", false)) !== undefined && list.reload(); }}>删除</button></td></tr>
+          ))}
+        </tbody>
+      </table>
+      <form className="form" onSubmit={save}>
+        <h4>{editing ? "编辑 Skill" : "新建 Skill"}</h4>
+        <label>标识（小写字母、数字、-）<input required pattern="[a-z0-9_\-]+" value={form.skill_key} onChange={(e) => setForm({ ...form, skill_key: e.target.value })} placeholder="pharma-daily" /></label>
+        <label>名称<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="创新药公司日报流程" /></label>
+        <label>说明<input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
+        <label>执行流程（Markdown）<textarea required rows={12} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} placeholder={"1. 逐个公司检索过去 24 小时的交易所公告\n2. 再检索临床试验、医保谈判、BD 授权新闻\n3. 只保留可能影响长期价值的事件，删掉股价异动类快讯\n4. 每条写清楚涉及的公司和代码"} /></label>
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
         <button disabled={busy}>保存</button>
         {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}

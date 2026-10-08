@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "news-collector-standard",
+  "version": 1,
+  "name": "资讯采集定时器 v1",
+  "timezone": "Asia/Shanghai",
+  "max_items_per_run": 40,
+  "max_tool_rounds": 8,
+  "request_timeout_seconds": 240,
+  "min_interval_minutes": 60,
+  "scheduler_tick_minutes": 5,
+  "stale_run_minutes": 30,
+  "output_excerpt_chars": 4000,
+  "score_after_collect": true,
+  "search_modes": {
+    "none": {
+      "label": "不联网"
+    },
+    "qwen_enable_search": {
+      "label": "通义千问 · 内置联网（enable_search）",
+      "search_options": {
+        "forced_search": true,
+        "search_strategy": "max"
+      }
+    },
+    "zhipu_web_search": {
+      "label": "智谱 GLM · web_search 工具",
+      "web_search": {
+        "enable": true,
+        "search_engine": "search_pro",
+        "search_result": true,
+        "search_recency_filter": "oneDay",
+        "count": 20
+      }
+    },
+    "kimi_search": {
+      "label": "Kimi · 官方搜索接口（同一个 Key）",
+      "endpoint": "/tools/search_pro",
+      "limit": 8,
+      "timeout_seconds": 30
+    },
+    "openai_web_search": {
+      "label": "OpenAI · Responses 接口 web_search 工具",
+      "endpoint": "/responses",
+      "tool": {
+        "type": "web_search"
+      },
+      "tool_choice": "required",
+      "reasoning_effort": "max",
+      "request_timeout_seconds": 900
+    }
+  },
+  "provider_presets": [
+    {
+      "provider_key": "qwen",
+      "name": "通义千问",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-plus",
+      "api_key_env": "VIP_QWEN_API_KEY",
+      "search_mode": "qwen_enable_search"
+    },
+    {
+      "provider_key": "zhipu",
+      "name": "智谱 GLM",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "glm-4-air",
+      "api_key_env": "VIP_ZHIPU_API_KEY",
+      "search_mode": "zhipu_web_search"
+    },
+    {
+      "provider_key": "kimi",
+      "name": "Kimi",
+      "base_url": "https://api.moonshot.cn/v1",
+      "model": "kimi-k3",
+      "api_key_env": "VIP_MOONSHOT_API_KEY",
+      "search_mode": "kimi_search"
+    },
+    {
+      "provider_key": "openai",
+      "name": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-6-luna",
+      "api_key_env": "VIP_OPENAI_API_KEY",
+      "search_mode": "openai_web_search"
+    }
+  ],
+  "notes": "Kimi 的 $web_search 内置工具预计 2026-10-20 下线，所以 kimi_search 用 Kimi 官方 /v1/tools/search_pro 接口（与对话同一个 Key）以函数调用方式接入。"
+}
