@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "company-aliases",
+  "version": 1,
+  "name": "公司别名种子 v1",
+  "verified_on": "2026-10-09",
+  "note": "迁移 0016 与 admin_cli seed-aliases（R11）读取：按 name 或任一 ticker 找到公司档案里的公司，把这些别名写进 company_alias（source=seed，已有的跳过）。公司档案里没有的公司不会被自动创建。kind：name 正式中文名 | short 简称 | en 英文名 | former 曾用名/旧代码 | ticker 证券代码（market 为 SH/SZ/BJ/HK/US）。归一化规则见 backend/app/domains/news/matching/normalize.py。代码与更名信息与 config/collector-presets-v1.json「重点创新药公司动态」及 ADR 0012 补充一致。",
+  "companies": [
+    {
+      "name": "诺诚健华",
+      "aliases": [
+        {"alias": "诺诚健华医药", "kind": "short"},
+        {"alias": "InnoCare Pharma", "kind": "en"},
+        {"alias": "InnoCare", "kind": "short"},
+        {"alias": "688428.SH", "kind": "ticker", "market": "SH"},
+        {"alias": "09969.HK", "kind": "ticker", "market": "HK"}
+      ]
+    },
+    {
+      "name": "百济神州",
+      "aliases": [
+        {"alias": "BeOne Medicines", "kind": "en"},
+        {"alias": "BeOne", "kind": "short"},
+        {"alias": "BeiGene", "kind": "former"},
+        {"alias": "百济", "kind": "short"},
+        {"alias": "ONC", "kind": "ticker", "market": "US"},
+        {"alias": "BGNE", "kind": "ticker", "market": "US"},
+        {"alias": "06160.HK", "kind": "ticker", "market": "HK"},
+        {"alias": "688235.SH", "kind": "ticker", "market": "SH"}
+      ]
+    },
+    {
+      "name": "英矽智能",
+      "aliases": [
+        {"alias": "Insilico Medicine", "kind": "en"},
+        {"alias": "Insilico", "kind": "short"},
+        {"alias": "03696.HK", "kind": "ticker", "market": "HK"}
+      ]
+    },
+    {
+      "name": "信达生物",
+      "aliases": [
+        {"alias": "信达生物制药", "kind": "short"},
+        {"alias": "Innovent Biologics", "kind": "en"},
+        {"alias": "Innovent", "kind": "short"},
+        {"alias": "01801.HK", "kind": "ticker", "market": "HK"}
+      ]
+    },
+    {
+      "name": "劲方医药",
+      "aliases": [
+        {"alias": "GenFleet Therapeutics", "kind": "en"},
+        {"alias": "GenFleet", "kind": "short"},
+        {"alias": "02595.HK", "kind": "ticker", "market": "HK"}
+      ]
+    },
+    {
+      "name": "中国生物制药",
+      "aliases": [
+        {"alias": "中生制药", "kind": "short"},
+        {"alias": "Sino Biopharmaceutical", "kind": "en"},
+        {"alias": "Sino Biopharm", "kind": "short"},
+        {"alias": "01177.HK", "kind": "ticker", "market": "HK"}
+      ]
+    },
+    {
+      "name": "翰森制药",
+      "aliases": [
+        {"alias": "Hansoh Pharmaceutical", "kind": "en"},
+        {"alias": "Hansoh Pharma", "kind": "short"},
+        {"alias": "Hansoh", "kind": "short"},
+        {"alias": "03692.HK", "kind": "ticker", "market": "HK"}
+      ]
+    }
+  ]
+}

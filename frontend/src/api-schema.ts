@@ -915,7 +915,7 @@ export interface paths {
         get: operations["model_scene_list_api_admin_model_scenes_get"];
         /**
          * Model Scene Save
-         * @description 整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。
+         * @description 整体替换本工作区的场景绑定（模型 + 推理强度）；没列出的场景改为使用默认模型与推荐强度。
          */
         put: operations["model_scene_save_api_admin_model_scenes_put"];
         post?: never;
@@ -1479,6 +1479,247 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/watchlist/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Watch List
+         * @description 本工作区关注的公司（只有 active 的参与第二段匹配）。
+         */
+        get: operations["watch_list_api_watchlist_companies_get"];
+        put?: never;
+        /**
+         * Watch Add
+         * @description 关注一家公司（公司档案里没有就按名称新建，并写入别名）。
+         */
+        post: operations["watch_add_api_watchlist_companies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/watchlist/companies/{watch_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Watch Delete
+         * @description 取消关注（已有关联保留）。
+         */
+        delete: operations["watch_delete_api_watchlist_companies__watch_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Watch Update
+         * @description 改状态（active / archived）或备注。
+         */
+        patch: operations["watch_update_api_watchlist_companies__watch_id__patch"];
+        trace?: never;
+    };
+    "/api/companies/{company_id}/aliases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Alias List */
+        get: operations["alias_list_api_companies__company_id__aliases_get"];
+        put?: never;
+        /** Alias Add */
+        post: operations["alias_add_api_companies__company_id__aliases_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/companies/{company_id}/aliases/{alias_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Alias Delete */
+        delete: operations["alias_delete_api_companies__company_id__aliases__alias_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/companies/{company_id}/news": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Company News
+         * @description 公司资讯流：已确认 + 待确认的关联，按时间倒序，游标分页。
+         */
+        get: operations["company_news_api_companies__company_id__news_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/events/{event_id}/mentions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Event Mentions
+         * @description 第一段抽取出的全部公司提及（关注与否），及第二段匹配结果。
+         */
+        get: operations["event_mentions_api_news_events__event_id__mentions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/suggested-companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggested
+         * @description 建议关注：近期被多条资讯提及、但本工作区未关注的公司。
+         */
+        get: operations["suggested_api_news_suggested_companies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/suggested-companies/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suggested Add
+         * @description 一键关注（没有就新建公司并写入别名）。
+         */
+        post: operations["suggested_add_api_news_suggested_companies_add_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/match-jobs/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Match Estimate
+         * @description 执行前预估：涉及事件数与预计大模型调用次数。
+         */
+        post: operations["match_estimate_api_news_match_jobs_estimate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/match-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Match Jobs */
+        get: operations["match_jobs_api_news_match_jobs_get"];
+        put?: never;
+        /**
+         * Match Job Create
+         * @description 排队一个 重新匹配（rematch）或 重新研判（reassess，需 news.reassess）任务，后台执行。
+         */
+        post: operations["match_job_create_api_news_match_jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/match-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Match Job */
+        get: operations["match_job_api_news_match_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news/match-jobs/{job_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Match Job Cancel
+         * @description 取消排队中或执行中的任务（已处理的部分保留）。
+         */
+        post: operations["match_job_cancel_api_news_match_jobs__job_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api": {
         parameters: {
             query?: never;
@@ -1500,6 +1741,57 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AliasIn */
+        AliasIn: {
+            /** Alias */
+            alias: string;
+            /**
+             * Kind
+             * @default short
+             * @enum {string}
+             */
+            kind: "name" | "short" | "en" | "former" | "ticker";
+            /**
+             * Market
+             * @description kind=ticker 时可指明市场；不填按代码形状推断
+             */
+            market?: ("SH" | "SZ" | "BJ" | "HK" | "US") | null;
+        };
+        /** AliasListOut */
+        AliasListOut: {
+            /** Company Id */
+            company_id: string;
+            /** Items */
+            items: components["schemas"]["AliasOut"][];
+        };
+        /** AliasOut */
+        AliasOut: {
+            /** Id */
+            id: string;
+            /** Company Id */
+            company_id: string;
+            /** Alias */
+            alias: string;
+            /**
+             * Alias Norm
+             * @description 归一化结果（matching/normalize.py），匹配时比较的就是它
+             */
+            alias_norm: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "name" | "short" | "en" | "former" | "ticker";
+            /** Market */
+            market: ("SH" | "SZ" | "BJ" | "HK" | "US") | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "seed" | "manual" | "suggested";
+            /** Created At */
+            created_at: string;
+        };
         /** BatchReviewIn */
         BatchReviewIn: {
             /** Action */
@@ -1536,6 +1828,66 @@ export interface components {
              * @default true
              */
             enabled: boolean;
+            /**
+             * Scope Kind
+             * @description general=行业/主题采集；targeted=定向公司采集（目标公司作为识别提示，ADR 0016）。不填：新建为 general，修改时保持原值
+             */
+            scope_kind?: ("general" | "targeted") | null;
+            /**
+             * Target Company Ids
+             * @description scope_kind=targeted 时的目标公司（公司档案 id），至少一个；不填保持原值
+             */
+            target_company_ids?: string[] | null;
+            /**
+             * Industry
+             * @description 行业/主题，可选；不填保持原值
+             */
+            industry?: string | null;
+        };
+        /** CompanyNewsItemOut */
+        CompanyNewsItemOut: {
+            /** Link Id */
+            link_id: string;
+            /** Event Id */
+            event_id: string;
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Published At */
+            published_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "proposed" | "confirmed";
+            /** Relevance */
+            relevance: number | null;
+            /** Impact */
+            impact: number | null;
+            /** Key Point */
+            key_point: string;
+            /** Evidence */
+            evidence: string;
+            /** Match Method */
+            match_method: ("ticker" | "alias" | "contains") | null;
+            /**
+             * Url
+             * @description 代表性原文链接
+             */
+            url: string | null;
+        };
+        /** CompanyNewsOut */
+        CompanyNewsOut: {
+            /** Company Id */
+            company_id: string;
+            /** Items */
+            items: components["schemas"]["CompanyNewsItemOut"][];
+            /**
+             * Next Cursor
+             * @description 下一页游标；null = 没有更多
+             */
+            next_cursor: string | null;
         };
         /** CreateIn */
         CreateIn: {
@@ -1758,6 +2110,168 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** MatchEstimateOut */
+        MatchEstimateOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "rematch" | "reassess";
+            /** Events */
+            events: number;
+            /**
+             * Estimated Calls
+             * @description 预计调用大模型次数；rematch 为 0
+             */
+            estimated_calls: number;
+        };
+        /** MatchJobIn */
+        MatchJobIn: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "rematch" | "reassess";
+            /**
+             * Date From
+             * @description 按事件最后发布时间筛选（北京时间日期，含）
+             */
+            date_from?: string | null;
+            /**
+             * Date To
+             * @description 含当天
+             */
+            date_to?: string | null;
+            /**
+             * Event Ids
+             * @description 只处理这些事件；与日期范围可同时给出（取交集）
+             */
+            event_ids?: string[] | null;
+        };
+        /** MatchJobOut */
+        MatchJobOut: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "rematch" | "reassess";
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "failed" | "cancelled";
+            /** Total */
+            total: number;
+            /** Processed */
+            processed: number;
+            /** Links Added */
+            links_added: number;
+            /** Links Updated */
+            links_updated: number;
+            /** Estimated Calls */
+            estimated_calls: number;
+            /** Error */
+            error: string | null;
+            /** Created By */
+            created_by: string | null;
+            /** Created At */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+        };
+        /** MatchJobPage */
+        MatchJobPage: {
+            /** Items */
+            items: components["schemas"]["MatchJobOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** MentionListOut */
+        MentionListOut: {
+            /** Event Id */
+            event_id: string;
+            /**
+             * Extract Status
+             * @enum {string}
+             */
+            extract_status: "pending" | "done" | "rule_only" | "failed";
+            /** Extract Version */
+            extract_version: string | null;
+            /** Extracted At */
+            extracted_at: string | null;
+            /** Items */
+            items: components["schemas"]["MentionOut"][];
+        };
+        /** MentionOut */
+        MentionOut: {
+            /** Id */
+            id: string;
+            /** Event Id */
+            event_id: string;
+            /**
+             * Name
+             * @description 原文写法
+             */
+            name: string;
+            /** Name Norm */
+            name_norm: string;
+            /** Ticker Raw */
+            ticker_raw: string | null;
+            /** Ticker Norm */
+            ticker_norm: string | null;
+            /** Market */
+            market: ("SH" | "SZ" | "BJ" | "HK" | "US") | null;
+            /**
+             * Relevance
+             * @description 0..1
+             */
+            relevance: number | null;
+            /**
+             * Impact
+             * @description -1..1
+             */
+            impact: number | null;
+            /**
+             * Key Point
+             * @description ≤80 字要点
+             */
+            key_point: string;
+            /**
+             * Evidence
+             * @description 原文证据（短引文）
+             */
+            evidence: string;
+            /**
+             * Extractor
+             * @description llm:<provider>/<model>@news-extract:v1 | rule:v1
+             */
+            extractor: string;
+            /**
+             * Company Id
+             * @description 第二段匹配到的关注公司；null = 未关注或未匹配
+             */
+            company_id: string | null;
+            /** Link Id */
+            link_id: string | null;
+            /** Link Status */
+            link_status: ("proposed" | "confirmed" | "rejected") | null;
+            /** Match Method */
+            match_method: ("ticker" | "alias" | "contains") | null;
+            /** Created At */
+            created_at: string;
+        };
         /** ModelPresetOut */
         ModelPresetOut: {
             /** Provider Key */
@@ -1778,6 +2292,23 @@ export interface components {
             note: string;
             /** Doc Url */
             doc_url: string;
+            /**
+             * Reasoning Style
+             * @description openai | deepseek；空 = 不发送推理强度
+             */
+            reasoning_style?: string | null;
+            /**
+             * Reasoning Efforts
+             * @description 该预设允许的推理强度
+             */
+            reasoning_efforts?: string[];
+            /**
+             * Model Reasoning Efforts
+             * @description 按模型名覆盖允许的推理强度
+             */
+            model_reasoning_efforts?: {
+                [key: string]: string[];
+            };
         };
         /** ModelPresetsOut */
         ModelPresetsOut: {
@@ -2094,13 +2625,21 @@ export interface components {
         };
         /** SceneBindingIn */
         SceneBindingIn: {
-            /** Scene */
+            /**
+             * Scene
+             * @description 场景键；旧键 news_analysis 等同 news_extract
+             */
             scene: string;
             /**
              * Provider Id
              * @description 不填 = 使用默认模型
              */
             provider_id?: string | null;
+            /**
+             * Reasoning Effort
+             * @description 推理强度；不填 = 场景推荐强度。须在所选模型允许的强度内（allowed_efforts_by_provider），且需要指定模型
+             */
+            reasoning_effort?: ("none" | "low" | "medium" | "high" | "xhigh" | "max") | null;
         };
         /** SceneBindingsIn */
         SceneBindingsIn: {
@@ -2130,10 +2669,49 @@ export interface components {
             label: string;
             /** Description */
             description: string;
+            /**
+             * Aliases
+             * @description 旧场景键，读取与保存时自动换成 key
+             */
+            aliases: string[];
+            /**
+             * Status
+             * @description active=已有调用代码 | planned=接口已定、调用代码在 planned_in 的 PR 落地
+             */
+            status: string;
+            /** Planned In */
+            planned_in: string | null;
             /** Requires Search */
             requires_search: boolean;
             /** Provider Id */
             provider_id: string | null;
+            /**
+             * Reasoning Effort
+             * @description 场景绑定里填的推理强度；null = 按推荐
+             */
+            reasoning_effort: string | null;
+            /**
+             * Effective Reasoning Effort
+             * @description 实际会发送的强度（已按厂商映射并过滤）；null = 不发送
+             */
+            effective_reasoning_effort: string | null;
+            /**
+             * Effort Source
+             * @description scene=场景绑定 | provider_options=模型自身配置 | recommended=场景推荐 | none
+             */
+            effort_source: string;
+            /**
+             * Allowed Efforts
+             * @description 当前生效模型允许的推理强度
+             */
+            allowed_efforts: string[];
+            /**
+             * Recommended
+             * @description 推荐模型与强度，第一项为首选
+             */
+            recommended: components["schemas"]["SceneRecommendationOut"][];
+            /** Cost Note */
+            cost_note: string;
             /**
              * Source
              * @description scene=场景绑定 | workspace_default=工作区默认模型 | builtin=内置默认
@@ -2143,10 +2721,38 @@ export interface components {
             /** Problem */
             problem: string | null;
         };
+        /** SceneRecommendationOut */
+        SceneRecommendationOut: {
+            /**
+             * Preset
+             * @description config/model-presets-v1.json 的 provider_key
+             */
+            preset: string;
+            /** Preset Name */
+            preset_name: string;
+            /** Model */
+            model: string;
+            /** Reasoning Effort */
+            reasoning_effort: string | null;
+            /** Why */
+            why: string;
+        };
         /** ScenesOut */
         ScenesOut: {
             /** Version */
             version: number;
+            /**
+             * Efforts
+             * @description 全部推理强度取值
+             */
+            efforts: string[];
+            /**
+             * Allowed Efforts By Provider
+             * @description 本工作区每个模型（id）允许的推理强度；空列表 = 该模型不发送推理强度
+             */
+            allowed_efforts_by_provider: {
+                [key: string]: string[];
+            };
             /** Items */
             items: components["schemas"]["SceneOut"][];
         };
@@ -2170,6 +2776,13 @@ export interface components {
              * @default 20
              */
             limit: number;
+        };
+        /** SecurityRef */
+        SecurityRef: {
+            /** Market */
+            market: string;
+            /** Ticker */
+            ticker: string;
         };
         /** SettingIn */
         SettingIn: {
@@ -2204,6 +2817,66 @@ export interface components {
              * @default true
              */
             enabled: boolean;
+        };
+        /** SuggestedAddIn */
+        SuggestedAddIn: {
+            /** Name Norm */
+            name_norm: string;
+            /**
+             * Name
+             * @description 新建公司时用的名称；不填取最常见写法
+             */
+            name?: string | null;
+            /** Ticker */
+            ticker?: string | null;
+        };
+        /** SuggestedAddOut */
+        SuggestedAddOut: {
+            watch: components["schemas"]["WatchCompanyOut"];
+            /** Company Created */
+            company_created: boolean;
+            /** Aliases Added */
+            aliases_added: number;
+        };
+        /** SuggestedCompanyOut */
+        SuggestedCompanyOut: {
+            /** Name */
+            name: string;
+            /** Name Norm */
+            name_norm: string;
+            /** Ticker Norm */
+            ticker_norm: string | null;
+            /** Market */
+            market: ("SH" | "SZ" | "BJ" | "HK" | "US") | null;
+            /**
+             * Events
+             * @description 近 days 天内提及它的事件数
+             */
+            events: number;
+            /** Last Seen At */
+            last_seen_at: string | null;
+            /** Sample Event Ids */
+            sample_event_ids: string[];
+            /**
+             * Company Id
+             * @description 公司档案里已有（但本工作区未关注）时的公司 id
+             */
+            company_id: string | null;
+        };
+        /** SuggestedCompanyPage */
+        SuggestedCompanyPage: {
+            /** Min Events */
+            min_events: number;
+            /** Days */
+            days: number;
+            /** Items */
+            items: components["schemas"]["SuggestedCompanyOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
         };
         /** TemplateIn */
         TemplateIn: {
@@ -2250,6 +2923,81 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WatchCompanyIn */
+        WatchCompanyIn: {
+            /**
+             * Company Id
+             * @description 关注已有公司；与 name 二选一
+             */
+            company_id?: string | null;
+            /**
+             * Name
+             * @description 公司档案里没有时按名称新建
+             */
+            name?: string | null;
+            /**
+             * Tickers
+             * @description 新建公司时的证券代码，如 688428.SH、09969.HK
+             */
+            tickers?: string[];
+            /** Aliases */
+            aliases?: components["schemas"]["AliasIn"][];
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /** WatchCompanyOut */
+        WatchCompanyOut: {
+            /** Id */
+            id: string;
+            /** Company Id */
+            company_id: string;
+            /**
+             * Company
+             * @description 公司名
+             */
+            company: string;
+            /** Securities */
+            securities: components["schemas"]["SecurityRef"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "archived";
+            /** Note */
+            note: string;
+            /** Alias Count */
+            alias_count: number;
+            /**
+             * Links 30D
+             * @description 近 30 天关联（确认 + 待确认）的事件数
+             */
+            links_30d: number;
+            /** Added By */
+            added_by: string | null;
+            /** Added At */
+            added_at: string;
+        };
+        /** WatchCompanyPage */
+        WatchCompanyPage: {
+            /** Items */
+            items: components["schemas"]["WatchCompanyOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** WatchCompanyPatch */
+        WatchCompanyPatch: {
+            /** Status */
+            status?: ("active" | "archived") | null;
+            /** Note */
+            note?: string | null;
         };
         /** ZoneBoard */
         ZoneBoard: {
@@ -5017,6 +5765,641 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    watch_list_api_watchlist_companies_get: {
+        parameters: {
+            query?: {
+                status?: ("active" | "archived") | null;
+                q?: string | null;
+                /** @description 每页条数 */
+                limit?: number;
+                /** @description 跳过条数 */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WatchCompanyPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    watch_add_api_watchlist_companies_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WatchCompanyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WatchCompanyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    watch_delete_api_watchlist_companies__watch_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                watch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    watch_update_api_watchlist_companies__watch_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                watch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WatchCompanyPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WatchCompanyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    alias_list_api_companies__company_id__aliases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AliasListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    alias_add_api_companies__company_id__aliases_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AliasIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AliasOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    alias_delete_api_companies__company_id__aliases__alias_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: string;
+                alias_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    company_news_api_companies__company_id__news_get: {
+        parameters: {
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyNewsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    event_mentions_api_news_events__event_id__mentions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentionListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    suggested_api_news_suggested_companies_get: {
+        parameters: {
+            query?: {
+                /** @description 每页条数 */
+                limit?: number;
+                /** @description 跳过条数 */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestedCompanyPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    suggested_add_api_news_suggested_companies_add_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuggestedAddIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestedAddOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    match_estimate_api_news_match_jobs_estimate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MatchJobIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchEstimateOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    match_jobs_api_news_match_jobs_get: {
+        parameters: {
+            query?: {
+                /** @description 每页条数 */
+                limit?: number;
+                /** @description 跳过条数 */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchJobPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    match_job_create_api_news_match_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MatchJobIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    match_job_api_news_match_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    match_job_cancel_api_news_match_jobs__job_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description 契约已发布、实现尚未合入（错误码 not_implemented） */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

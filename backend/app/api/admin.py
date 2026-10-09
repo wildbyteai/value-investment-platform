@@ -2,6 +2,8 @@
 import json
 from urllib.parse import urlsplit
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field, SecretStr
 from sqlalchemy import select, update
@@ -10,7 +12,7 @@ from app.api.deps import Principal, require, require_any
 from app.core.errors import Conflict, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
-from app.domains.news import llm, model_presets, model_scenes
+from app.domains.news import llm, model_presets, model_scenes, reasoning
 from app.domains.news.agent import SEARCH_MODES
 from app.domains.news.collector_policy import policy as collector_policy
 from app.models.news import LlmProvider, NewsFeed
@@ -97,7 +99,8 @@ def _provider(p: LlmProvider) -> dict:
             'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'key_source': cfg.key_source,
             'key_saved': bool(p.api_key_ciphertext), 'key_hint': f'••••{p.api_key_hint}' if p.api_key_hint else None,
             'key_problem': cfg.key_problem, 'blocked': cfg.blocked, 'is_default': p.is_default,
-            'enabled': p.enabled, 'options': json.loads(p.options_json or '{}'), 'search_mode': p.search_mode or 'none'}
+            'enabled': p.enabled, 'options': json.loads(p.options_json or '{}'), 'search_mode': p.search_mode or 'none',
+            'reasoning_efforts': reasoning.allowed_efforts(p.base_url, p.model)}
 
 
 @router.get('/llm-providers')
@@ -125,6 +128,9 @@ class ModelPresetOut(BaseModel):
     search_mode: str
     note: str
     doc_url: str
+    reasoning_style: str | None = Field(None, description='openai | deepseek；空 = 不发送推理强度')
+    reasoning_efforts: list[str] = Field(default_factory=list, description='该预设允许的推理强度')
+    model_reasoning_efforts: dict[str, list[str]] = Field(default_factory=dict, description='按模型名覆盖允许的推理强度')
 
 
 class ModelPresetsOut(BaseModel):
@@ -224,9 +230,13 @@ def clear_provider_key(provider_id: str, principal: Principal = Depends(require(
 
 # ------------------------------------------------------------------ 按场景配置模型
 
+Effort = Literal['none', 'low', 'medium', 'high', 'xhigh', 'max']
+
+
 class SceneBindingIn(BaseModel):
-    scene: str = Field(min_length=1, max_length=60)
+    scene: str = Field(min_length=1, max_length=60, description='场景键；旧键 news_analysis 等同 news_extract')
     provider_id: str | None = Field(None, max_length=36, description='不填 = 使用默认模型')
+    reasoning_effort: Effort | None = Field(None, description='推理强度；不填 = 场景推荐强度。须在所选模型允许的强度内（allowed_efforts_by_provider），且需要指定模型')
 
 
 class SceneBindingsIn(BaseModel):
@@ -242,12 +252,29 @@ class SceneModelOut(BaseModel):
     key_source: str
 
 
+class SceneRecommendationOut(BaseModel):
+    preset: str = Field(description='config/model-presets-v1.json 的 provider_key')
+    preset_name: str
+    model: str
+    reasoning_effort: str | None
+    why: str
+
+
 class SceneOut(BaseModel):
     key: str
     label: str
     description: str
+    aliases: list[str] = Field(description='旧场景键，读取与保存时自动换成 key')
+    status: str = Field(description='active=已有调用代码 | planned=接口已定、调用代码在 planned_in 的 PR 落地')
+    planned_in: str | None
     requires_search: bool
     provider_id: str | None
+    reasoning_effort: str | None = Field(description='场景绑定里填的推理强度；null = 按推荐')
+    effective_reasoning_effort: str | None = Field(description='实际会发送的强度（已按厂商映射并过滤）；null = 不发送')
+    effort_source: str = Field(description='scene=场景绑定 | provider_options=模型自身配置 | recommended=场景推荐 | none')
+    allowed_efforts: list[str] = Field(description='当前生效模型允许的推理强度')
+    recommended: list[SceneRecommendationOut] = Field(description='推荐模型与强度，第一项为首选')
+    cost_note: str
     source: str = Field(description='scene=场景绑定 | workspace_default=工作区默认模型 | builtin=内置默认')
     effective: SceneModelOut
     problem: str | None
@@ -255,6 +282,8 @@ class SceneOut(BaseModel):
 
 class ScenesOut(BaseModel):
     version: int
+    efforts: list[str] = Field(description='全部推理强度取值')
+    allowed_efforts_by_provider: dict[str, list[str]] = Field(description='本工作区每个模型（id）允许的推理强度；空列表 = 该模型不发送推理强度')
     items: list[SceneOut]
 
 
@@ -266,13 +295,14 @@ def model_scene_list(principal: Principal = Depends(require('model.configure')),
 
 @router.put('/model-scenes', response_model=ScenesOut)
 def model_scene_save(body: SceneBindingsIn, principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
-    """整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。"""
-    keys = [b.scene for b in body.bindings]
+    """整体替换本工作区的场景绑定（模型 + 推理强度）；没列出的场景改为使用默认模型与推荐强度。"""
+    keys = [model_scenes.canonical_key(b.scene) for b in body.bindings]
     if len(set(keys)) != len(keys):
         raise Invalid('同一个场景只能出现一次')
     with unit_of_work(db):
         return model_scenes.save(db, principal.workspace.id, principal.user.id,
-                                 {b.scene: b.provider_id for b in body.bindings})
+                                 {b.scene: {'provider_id': b.provider_id, 'reasoning_effort': b.reasoning_effort}
+                                  for b in body.bindings})
 
 
 # ------------------------------------------------------------------ 告警发送

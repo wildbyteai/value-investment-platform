@@ -44,8 +44,14 @@ class Invalid(DomainError):
     code = 'invalid'
 
 
+class NotImplementedYet(DomainError):
+    """The route is part of the published contract but its PR has not landed yet (ADR 0016)."""
+    status_code = 501
+    code = 'not_implemented'
+
+
 CODES = {400: 'bad_request', 401: 'unauthorized', 403: 'forbidden', 404: 'not_found', 405: 'method_not_allowed',
-         409: 'conflict', 413: 'too_large', 422: 'invalid', 429: 'rate_limited', 500: 'internal', 503: 'unavailable'}
+         409: 'conflict', 413: 'too_large', 422: 'invalid', 429: 'rate_limited', 500: 'internal', 501: 'not_implemented', 503: 'unavailable'}
 
 
 def body(status: int, message, request_id: str | None = None, code: str | None = None, details=None) -> dict:

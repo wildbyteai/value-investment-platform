@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "news-matching",
+  "version": 1,
+  "name": "资讯→公司匹配 v1",
+  "note": "两段式匹配（ADR 0016、docs/24）：第一段 news_extract 抽取每条事件里出现的全部公司（news_mention），第二段按 company_alias 在本工作区关注列表（watch_company status=active）里确定性查找，命中写 news_event_company（status=proposed）。人工确认/驳回的关联永不被覆盖。数字只放这里。",
+  "extract": {
+    "max_mentions_per_event": 12,
+    "key_point_max_chars": 80,
+    "evidence_max_chars": 200,
+    "relevance_range": ["0", "1"],
+    "impact_range": ["-1", "1"],
+    "rule_extractor": "rule:v1",
+    "rule_fallback_relevance": "0.5"
+  },
+  "resolve": {
+    "rule_version": "resolve:v1",
+    "order": ["ticker", "alias", "contains"],
+    "contains_min_length": 3,
+    "fuzzy": false
+  },
+  "suggest": {
+    "min_events": 3,
+    "days": 30,
+    "max_items": 50
+  },
+  "jobs": {
+    "kinds": ["rematch", "reassess"],
+    "reassess_calls_per_event": 1,
+    "reassess_max_events": 2000,
+    "batch_size": 50
+  }
+}

@@ -37,6 +37,13 @@ class ProviderConfig:
     # Page-saved key: ciphertext + the row it is bound to. Decrypted lazily, never kept in repr.
     api_key_ciphertext: str | None = field(default=None, repr=False)
     row_id: str | None = None
+    # Resolved for the scene that is calling (model_scenes.resolve); mapped per vendor by reasoning.py.
+    reasoning_effort: str | None = None
+
+    @property
+    def effort(self) -> str | None:
+        """Scene-resolved effort, else the model's own ``options.reasoning_effort`` (older config)."""
+        return self.reasoning_effort or (self.options or {}).get('reasoning_effort') or None
 
     @property
     def blocked(self) -> str | None:
@@ -164,6 +171,8 @@ def propose_links(provider: ProviderConfig, event_text: str, watchlist: list[str
             {'role': 'user', 'content': '关注公司名单：\n' + '\n'.join(watchlist or ['（暂无）']) + '\n\n事件：\n' + event_text},
         ],
     }
+    from app.domains.news import reasoning
+    body.update(reasoning.chat_params(provider.base_url, provider.model, provider.effort))
     url = provider.base_url.rstrip('/') + '/chat/completions'
     try:
         with httpx.Client(transport=transport, timeout=timeout) as client:

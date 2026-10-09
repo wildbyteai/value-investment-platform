@@ -82,3 +82,7 @@
 - designed：本节。
 - implemented：`config/model-presets-v1.json`、`backend/app/domains/news/model_presets.py`、`backend/app/api/admin.py`（`/llm-presets`、`search_mode` 校验改由 `agent.SEARCH_MODES` 生成）、`backend/app/core/secret_guard.py`、前端 `pages/settings.tsx`；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建；`deploy/secrets-example/app.env` 增加各厂商变量名示例。
 - verified：`tests/test_r9_model_presets.py`（配置字段齐全、provider_key 唯一、search_mode 与代码一致、每个域名在白名单、需联网场景有可联网预设、前端无硬编码、接口权限与内容、每个预设可原样保存且不被拦截）；本机无 PostgreSQL，非数据库测试本机通过，数据库相关测试以 CI 为准。**未用真实厂商 Key 联调。**
+
+## 补充（2026-10-09）：场景扩展与推理强度
+
+见 ADR 0016：`news_analysis` 改名 `news_extract`（旧键为别名，迁移 0016 改名已有绑定）；新增 planned 场景 `news_reassess` / `company_digest` / `zone_review`（放宽本 ADR A.1“只登记确有调用代码的场景”）；每个场景带推荐模型与推理强度，场景绑定可单独设推理强度（`llm_scene_binding.reasoning_effort`）；DeepSeek 预设与内置默认模型改为 `deepseek-flash`。

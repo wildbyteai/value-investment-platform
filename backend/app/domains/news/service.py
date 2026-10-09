@@ -69,6 +69,7 @@ def ingest(db, workspace_id, feed: NewsFeed, records: list[Record], actor_id=Non
                 event.summary = rec.summary
             if event.ai_status != 'pending':
                 event.ai_status = 'pending'  # new evidence: re-score, human decisions are kept
+                event.extract_status = 'pending'
         event.item_count += 1
         db.add(NewsItem(workspace_id=workspace_id, feed_id=feed.id, event_id=event.id, title=rec.title,
                         summary=rec.summary, source_text=rec.source_text, url=rec.url, category=rec.category,
@@ -125,9 +126,10 @@ def _event_text(db, event: NewsEvent) -> str:
 # ---------------------------------------------------------------- AI scoring
 
 def resolve_provider(db, workspace_id) -> llm.ProviderConfig:
-    """Model for 资讯研判打分 (scene ``news_analysis``): scene binding → workspace default → built-in."""
+    """Model for 资讯识别与研判 (scene ``news_extract``, formerly ``news_analysis``): scene binding →
+    workspace default → built-in, with the scene's reasoning effort."""
     from app.domains.news import model_scenes
-    return model_scenes.resolve(db, workspace_id, model_scenes.NEWS_ANALYSIS)
+    return model_scenes.resolve(db, workspace_id, model_scenes.NEWS_EXTRACT)
 
 
 def provider_config(row: LlmProvider) -> llm.ProviderConfig:
@@ -159,11 +161,13 @@ def score_events(db, workspace_id, limit=20, transport=None, event_ids=None) -> 
         try:
             links = llm.propose_links(provider, text, names, transport=transport)
             event.ai_status, event.ai_model, event.ai_error = 'scored', f'{provider.provider_key}/{provider.model}', None
+            event.extract_status = 'done'  # mirror until the R10b pipeline writes it itself
             proposed_by = f'ai:{provider.provider_key}/{provider.model}'
             stats['ai_scored'] += 1
         except llm.LlmError as exc:
             links = _rule_links(index, text)
             event.ai_status, event.ai_model, event.ai_error = 'rule_only', None, str(exc)[:500]
+            event.extract_status = 'rule_only'
             proposed_by = 'rule:name_or_ticker'
             stats['rule_only'] += 1
             stats['error'] = str(exc)

@@ -4,7 +4,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Numeric, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -53,6 +53,10 @@ class NewsEvent(Base):
     ai_status: Mapped[str] = mapped_column(String(30), nullable=False, default='pending')  # pending | scored | rule_only | failed
     ai_model: Mapped[str | None] = mapped_column(String(120), nullable=True)
     ai_error: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # Stage 1 (news_extract, ADR 0016). ai_status is kept for older pages and mirrors this.
+    extract_status: Mapped[str] = mapped_column(String(20), nullable=False, default='pending', server_default='pending')  # pending | done | rule_only | failed
+    extract_version: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    extracted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
 
 
@@ -95,6 +99,31 @@ class NewsEventCompany(Base):
     proposed_by: Mapped[str] = mapped_column(String(120), nullable=False)
     reviewed_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Stage 2 provenance (ADR 0016): which mention produced the link, how, under which rule version.
+    mention_id: Mapped[str | None] = mapped_column(ForeignKey('news_mention.id'), nullable=True)
+    match_method: Mapped[str | None] = mapped_column(String(20), nullable=True)  # ticker | alias | contains
+    rule_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class NewsMention(Base):
+    """Stage 1 output: one company mentioned in one event, watched or not (ADR 0016)."""
+    __tablename__ = 'news_mention'
+    __table_args__ = (UniqueConstraint('event_id', 'name_norm', name='uq_news_mention_event_name'),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    event_id: Mapped[str] = mapped_column(ForeignKey('news_event.id'), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)  # as written
+    name_norm: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    ticker_raw: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    ticker_norm: Mapped[str | None] = mapped_column(String(30), nullable=True, index=True)
+    market: Mapped[str | None] = mapped_column(String(10), nullable=True)  # SH | SZ | BJ | HK | US
+    relevance: Mapped[float | None] = mapped_column(Numeric(6, 4), nullable=True)  # 0..1
+    impact: Mapped[float | None] = mapped_column(Numeric(6, 4), nullable=True)  # -1..1
+    key_point: Mapped[str] = mapped_column(String(200), nullable=False, default='', server_default='')  # ≤80 chars by policy
+    evidence: Mapped[str] = mapped_column(Text, nullable=False, default='', server_default='')
+    extractor: Mapped[str] = mapped_column(String(160), nullable=False)  # llm:<provider>/<model>@<skill> | rule:v1
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
 
 
@@ -132,6 +161,8 @@ class LlmSceneBinding(Base):
     workspace_id: Mapped[str] = mapped_column(String(36), nullable=False)
     scene_key: Mapped[str] = mapped_column(String(60), nullable=False)
     provider_id: Mapped[str] = mapped_column(ForeignKey('llm_provider.id'), nullable=False)
+    # none | low | medium | high | xhigh | max; NULL = the scene's recommended effort (ADR 0016)
+    reasoning_effort: Mapped[str | None] = mapped_column(String(20), nullable=True)
     updated_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
 
@@ -169,6 +200,10 @@ class CollectorTask(Base):
     feed_id: Mapped[str] = mapped_column(ForeignKey('news_feed.id'), nullable=False)
     # schedule: {"type": "daily", "times": ["08:30"], "weekdays": [1..7]} | {"type": "interval", "minutes": 120}
     schedule_json: Mapped[str] = mapped_column(Text, nullable=False)
+    # general = an industry / theme; targeted = named companies passed to news_extract as hints (ADR 0016)
+    scope_kind: Mapped[str] = mapped_column(String(20), nullable=False, default='general', server_default='general')
+    target_company_ids: Mapped[str] = mapped_column(Text, nullable=False, default='[]', server_default='[]')  # JSON list of company.id
+    industry: Mapped[str | None] = mapped_column(String(80), nullable=True)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     next_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
     last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -196,4 +231,55 @@ class CollectorRun(Base):
     error: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     output_excerpt: Mapped[str] = mapped_column(Text, nullable=False, default='')
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class WatchCompany(Base):
+    """A company on a workspace's watchlist; only active rows take part in stage-2 matching."""
+    __tablename__ = 'watch_company'
+    __table_args__ = (UniqueConstraint('workspace_id', 'company_id', name='uq_watch_company'),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    company_id: Mapped[str] = mapped_column(ForeignKey('company.id'), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default='active', server_default='active')  # active | archived
+    note: Mapped[str] = mapped_column(Text, nullable=False, default='', server_default='')
+    added_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class CompanyAlias(Base):
+    """A name, short name, English name, former name or ticker a company is written as."""
+    __tablename__ = 'company_alias'
+    __table_args__ = (UniqueConstraint('company_id', 'alias_norm', name='uq_company_alias_norm'),
+                      Index('ix_company_alias_alias_norm', 'alias_norm'))
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    company_id: Mapped[str] = mapped_column(ForeignKey('company.id'), nullable=False)
+    alias: Mapped[str] = mapped_column(String(200), nullable=False)
+    alias_norm: Mapped[str] = mapped_column(String(200), nullable=False)  # matching/normalize.py
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)  # name | short | en | former | ticker
+    market: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default='manual')  # seed | manual | suggested
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class MatchJob(Base):
+    """A background re-match (stage 2 only) or re-assess (stage 1 + 2, LLM) run with progress."""
+    __tablename__ = 'match_job'
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)  # rematch | reassess
+    params: Mapped[str] = mapped_column(Text, nullable=False, default='{}', server_default='{}')  # JSON
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default='queued', server_default='queued')  # queued | running | done | failed | cancelled
+    total: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default='0')
+    processed: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default='0')
+    links_added: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default='0')
+    links_updated: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default='0')
+    estimated_calls: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default='0')
+    error: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    created_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -167,6 +167,8 @@ frontend/src/
 
 ## 7. 模型调用与密钥（2026-10-09 起，ADR 0015）
 
-- **新增调用大模型的代码，先在 `config/model-scenes-v1.json` 登记一个场景**（key、中文名、说明、`requires_search`、代码位置），代码里用 `model_scenes.resolve(db, workspace_id, '<scene>')` 取模型，不要自己查默认模型。测试 `test_scene_config_maps_real_code_paths` 检查每个场景的代码位置存在。
+- **新增调用大模型的代码，先在 `config/model-scenes-v1.json` 登记一个场景**（key、中文名、说明、`requires_search`、代码位置、`recommended` 推荐模型与推理强度、`cost_note`），代码里用 `model_scenes.resolve(db, workspace_id, '<scene>')` 取模型（已带场景的推理强度），不要自己查默认模型、不要写死模型名或强度。接口已定、调用代码在后续 PR 的场景标 `status: planned` + `planned_in`（ADR 0016）。测试 `test_scene_config_maps_real_code_paths` 检查每个 active 场景的代码位置存在。
+- 推理强度只经 `domains/news/reasoning.py` 写进请求（各厂商取值与映射不同）；新厂商要支持强度，在 `config/model-presets-v1.json` 给预设加 `reasoning_efforts` / `reasoning_style`。
+- 契约先行、实现未合入的接口抛 `app.core.errors.NotImplementedYet`（501，`code: not_implemented`），权限依赖照常生效。
 - 模型的 Key 只通过 `ProviderConfig.api_key` 取得（页面加密 Key 优先，其次环境变量，都经过出站白名单）；不得把 Key 写进日志、审计、执行记录、错误信息或接口响应。接口只返回 `key_source` / `key_hint`。
 - 需要加密保存的其他机密以后也用 `app/core/secret_box.py`（AES-GCM，主密钥 `VIP_SECRET_KEY`，关联数据绑定所在行），不要另起一套。

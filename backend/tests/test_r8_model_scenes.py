@@ -36,11 +36,17 @@ def ok(content):
 def test_scene_config_maps_real_code_paths():
     scenes = model_scenes.scenes()
     keys = [s['key'] for s in scenes]
-    assert keys == ['news_collect', 'news_analysis'] and len(set(keys)) == len(keys)
+    assert keys == ['news_collect', 'news_extract', 'news_reassess', 'company_digest', 'zone_review']
+    assert len(set(keys)) == len(keys)
     collect = model_scenes.scene('news_collect')
-    assert collect['requires_search'] is True and model_scenes.scene('news_analysis')['requires_search'] is False
+    assert collect['requires_search'] is True and model_scenes.scene('news_extract')['requires_search'] is False
+    # the old key (ADR 0015) is an alias of news_extract
+    assert model_scenes.scene('news_analysis')['key'] == 'news_extract' == model_scenes.canonical_key('news_analysis')
     for s in scenes:
-        assert s['label'] and s['description'] and s['code_paths']
+        assert s['label'] and s['description'] and s['code_paths'] and s['status'] in ('active', 'planned')
+        if s['status'] == 'planned':
+            assert s['planned_in']           # planned scenes name the PR that adds the call
+            continue
         for path in s['code_paths']:
             assert (ROOT / path.split(' ')[0]).is_file(), path
     with pytest.raises(Invalid):
@@ -164,7 +170,7 @@ def test_scene_endpoints_need_model_configure(env):
 def test_resolution_starts_at_builtin(env):
     c, ws, Session = env
     view = c.get('/api/admin/model-scenes', headers=h(ws, 'admin@demo')).json()
-    assert [i['source'] for i in view['items']] == ['builtin', 'builtin']
+    assert {i['source'] for i in view['items']} == {'builtin'} and len(view['items']) == 5
     collect = view['items'][0]
     assert collect['effective']['id'] is None and '不能联网' in collect['problem']
     with Session() as s:
@@ -266,7 +272,7 @@ def test_resolution_order(env, monkeypatch):
     ids = _ids(c, ws)
     # workspace default (plain, is_default) before any binding
     view = c.get('/api/admin/model-scenes', headers=h(ws, 'admin@demo')).json()
-    assert [(i['source'], i['effective']['id']) for i in view['items']] == [('workspace_default', ids['plain'])] * 2
+    assert [(i['source'], i['effective']['id']) for i in view['items']] == [('workspace_default', ids['plain'])] * len(view['items'])
     r = c.put('/api/admin/model-scenes', headers=h(ws, 'admin@demo'),
               json={'bindings': [{'scene': 'news_collect', 'provider_id': ids['qwen']},
                                  {'scene': 'news_analysis', 'provider_id': ids['qwen']}]})
@@ -292,10 +298,10 @@ def test_resolution_order(env, monkeypatch):
     # PUT replaces: leaving news_analysis out resets it to the default
     r = c.put('/api/admin/model-scenes', headers=h(ws, 'admin@demo'),
               json={'bindings': [{'scene': 'news_collect', 'provider_id': ids['qwen']}]}).json()
-    assert [i['source'] for i in r['items']] == ['scene', 'workspace_default']
+    assert [i['source'] for i in r['items']][:2] == ['scene', 'workspace_default']
     with Session() as s:
         actions = s.execute(text("SELECT detail_json FROM audit_log WHERE action='admin.model_scene.saved'")).scalars().all()
-    assert len(actions) == 2 and json.loads(actions[-1])['changed'] == {'news_analysis': {'from': ids['qwen'], 'to': None}}
+    assert len(actions) == 2 and json.loads(actions[-1])['changed'] == {'news_extract': {'from': ids['qwen'], 'to': None}}
 
 
 def test_collector_without_model_follows_scene(env):

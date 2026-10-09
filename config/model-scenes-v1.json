@@ -1,23 +1,88 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "policy_key": "model-scenes",
-  "version": 1,
-  "name": "按场景配置模型 v1",
-  "note": "每个场景对应后端一处真实调用大模型的代码。取用顺序：场景绑定的模型 → 工作区默认模型 → 内置默认（config/news-radar-v1.json default_llm_provider，环境变量密钥）。requires_search=true 的场景只能绑定能联网的模型。新增场景须先有调用它的代码。",
+  "version": 2,
+  "name": "按场景配置模型 v1（2026-10-09 起含推荐模型与推理强度）",
+  "verified_on": "2026-10-09",
+  "sources": [
+    "https://developers.openai.com/api/docs/models",
+    "https://api-docs.deepseek.com/quick_start/pricing",
+    "https://api-docs.deepseek.com/guides/thinking_mode/"
+  ],
+  "note": "每个场景对应后端一处调用大模型的代码（status=active 已有调用；planned 为已定接口、调用代码在 planned_in 所列 PR 落地）。取用顺序：场景绑定的模型 → 工作区默认模型 → 内置默认（config/news-radar-v1.json default_llm_provider，环境变量密钥）。推理强度：场景绑定里填的强度 → 模型自身 options.reasoning_effort（旧配置，兼容）→ 本场景对该厂商的推荐强度 → 不发送。recommended 只是推荐默认值，第一项为首选；实际用哪个模型始终由 模型配置 页的场景绑定决定，业务代码不写死模型。requires_search=true 的场景只能绑定能联网的模型。aliases 为旧场景键（读取与保存时自动换成新键）。",
   "scenes": [
     {
       "key": "news_collect",
-      "label": "资讯采集",
-      "description": "采集定时器到点让模型联网搜索并整理当天资讯。定时器自己选了模型时以定时器为准；没选则用这里的模型。",
+      "label": "资讯采集（联网）",
+      "description": "采集定时器到点让模型联网搜索并整理当天资讯。定时器自己选了模型时以定时器为准；没选则用这里的模型。推理强度对两种情况都按本场景取。",
       "requires_search": true,
-      "code_paths": ["backend/app/domains/news/collector.py run_task → agent.chat"]
+      "status": "active",
+      "code_paths": ["backend/app/domains/news/collector.py run_task → agent.chat"],
+      "recommended": [
+        {"preset": "openai", "model": "gpt-6-luna", "reasoning_effort": "high", "why": "Responses 接口托管 web_search，每次必搜；高频低成本档（输入 $0.1 / 输出 $0.5 每百万 token）。原来的 max 对每天 6 个批次太慢，high 足够筛选与去重。"},
+        {"preset": "openai", "model": "gpt-6.1-sol", "reasoning_effort": "medium", "why": "定向公司任务（targeted）需要更强的公告甄别时用；价格约为 luna 的 20 倍。"}
+      ],
+      "not_allowed_note": "DeepSeek、Gemini（兼容接口）、MiniMax 没有联网搜索，不能用于本场景。",
+      "cost_note": "每个定时器每次执行 1 次调用（含若干次服务端搜索，搜索另计费）；6 个预置定时器每天约 6 次。"
     },
     {
-      "key": "news_analysis",
-      "label": "资讯研判打分",
-      "description": "给资讯事件关联公司并打关联度、影响分（Excel/RSS 导入后、采集完成后、或在资讯雷达点“AI 打分”时）。",
+      "key": "news_extract",
+      "aliases": ["news_analysis"],
+      "label": "资讯识别与研判",
+      "description": "从每条资讯事件里抽取全部提及的公司（关注与否都抽），给出关联度、影响分、要点与原文证据；再按关注列表确定性匹配公司（Excel/RSS 导入后、采集完成后、或在资讯雷达点“AI 打分”时）。原“资讯研判打分”（news_analysis）改名为本场景。",
       "requires_search": false,
-      "code_paths": ["backend/app/domains/news/service.py score_events → llm.propose_links"]
+      "status": "active",
+      "code_paths": [
+        "backend/app/domains/news/service.py score_events → llm.propose_links",
+        "backend/app/domains/news/matching/extract.py extract_mentions（R10b）"
+      ],
+      "recommended": [
+        {"preset": "deepseek", "model": "deepseek-flash", "reasoning_effort": "low", "why": "DeepSeek-V4.1-Flash：JSON 输出、低价（缓存未命中输入 $0.15–0.3 / 输出 $0.6–1.2 每百万 token，错峰半价），抽取是结构化任务，low 足够且快。"},
+        {"preset": "openai", "model": "gpt-6-luna", "reasoning_effort": "low", "why": "不便使用 DeepSeek 时的同价位替代。"}
+      ],
+      "cost_note": "每个新事件 1 次调用；失败时退回规则抽取（rule:v1），不再调用。"
+    },
+    {
+      "key": "news_reassess",
+      "label": "批量重新研判",
+      "description": "对一个日期范围内的历史事件重新执行“识别与研判”（抽取 + 匹配），用于提示词或模型升级后回刷。执行前显示预计调用次数，需要“重新研判资讯”权限，后台任务异步执行并显示进度。",
+      "requires_search": false,
+      "status": "planned",
+      "planned_in": "R11",
+      "code_paths": ["backend/app/domains/news/matching/jobs.py run_job（R11）"],
+      "recommended": [
+        {"preset": "deepseek", "model": "deepseek-flash", "reasoning_effort": "high", "why": "批量回刷要兼顾质量与成本；Flash 并发上限高（2500），high 比日常抽取更稳。"},
+        {"preset": "deepseek", "model": "deepseek-v4-pro", "reasoning_effort": "high", "why": "对重点时间段要更高质量时用 Pro（价格约为 Flash 的 3–4 倍，并发上限 500）。"}
+      ],
+      "cost_note": "每个事件 1 次调用；预计调用次数 = 范围内事件数（见 config/news-matching-v1.json jobs.reassess_calls_per_event）。"
+    },
+    {
+      "key": "company_digest",
+      "label": "公司资讯摘要",
+      "description": "公司档案“近期要点”：把该公司近 30 天已关联（确认 + 待确认）的资讯汇总成几条要点。",
+      "requires_search": false,
+      "status": "planned",
+      "planned_in": "R12",
+      "code_paths": ["backend/app/domains/news/matching/stream.py company_digest（R12）"],
+      "recommended": [
+        {"preset": "deepseek", "model": "deepseek-v4-pro", "reasoning_effort": "high", "why": "长上下文归纳与取舍，Pro 质量更好；按需生成，调用量小。"},
+        {"preset": "openai", "model": "gpt-6.1-sol", "reasoning_effort": "high", "why": "替代选择，接近旗舰的归纳质量。"}
+      ],
+      "cost_note": "用户打开或刷新时每个公司 1 次调用（可缓存）。"
+    },
+    {
+      "key": "zone_review",
+      "label": "击球区复核说明",
+      "description": "公司进入或接近击球区时，生成一段文字说明附在告警上（哪个条件差多少、近期资讯是否改变判断）；没有可用模型时跳过，不影响告警。",
+      "requires_search": false,
+      "status": "planned",
+      "planned_in": "R13",
+      "code_paths": ["backend/app/domains/strategy/zone_review.py （R13 新建）"],
+      "recommended": [
+        {"preset": "openai", "model": "gpt-6.1-sol", "reasoning_effort": "high", "why": "需要对估值数字与资讯做谨慎推理；调用量极小（只在进入/接近击球区时）。"},
+        {"preset": "deepseek", "model": "deepseek-v4-pro", "reasoning_effort": "max", "why": "替代选择，最大推理强度。"}
+      ],
+      "cost_note": "每次进入/接近击球区 1 次调用。"
     }
   ]
 }

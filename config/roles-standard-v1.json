@@ -19,7 +19,8 @@
       "notes.own",
       "notes.shared.edit",
       "analysis.override",
-      "template.edit"
+      "template.edit",
+      "watchlist.manage"
     ],
     "strategy_manager": [
       "research.read",
@@ -31,7 +32,8 @@
       "strategy.simulate",
       "strategy.publish",
       "strategy.rollback",
-      "scoring.binding.publish"
+      "scoring.binding.publish",
+      "watchlist.manage"
     ],
     "data_admin": [
       "research.read",
@@ -40,7 +42,9 @@
       "source.manage",
       "job.retry",
       "identity.manage",
-      "quality.correct"
+      "quality.correct",
+      "watchlist.manage",
+      "news.reassess"
     ],
     "system_admin": [
       "research.read",
@@ -64,7 +68,9 @@
       "system.configure",
       "model.configure",
       "audit.read",
-      "ops.read"
+      "ops.read",
+      "watchlist.manage",
+      "news.reassess"
     ]
   },
   "role_labels": {
@@ -103,6 +109,8 @@
     "system.configure": "系统配置",
     "model.configure": "模型配置",
     "audit.read": "查看审计日志",
-    "ops.read": "查看运维记录"
+    "ops.read": "查看运维记录",
+    "watchlist.manage": "维护关注公司与别名",
+    "news.reassess": "批量重新研判资讯"
   }
 }
