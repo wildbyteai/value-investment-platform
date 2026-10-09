@@ -147,6 +147,9 @@ fieldset { border: 1px solid var(--border); border-radius: var(--radius-lg); pad
 .form label.inline, label.inline { display: flex; align-items: center; gap: var(--sp-2); }
 .form .chips { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-6); }
 .form .chips label { margin: 0; }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.btn-row button { margin: 0; }
+select.scene-select { min-width: 240px; }
 summary { cursor: pointer; padding: var(--sp-1) 0; font-weight: var(--fw-strong); }
 pre {
   white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-sm); line-height: var(--lh-sm); max-height: 60vh; overflow: auto;
@@ -269,6 +272,7 @@ tbody tr:hover td { background: var(--bg-hover); }
 table input { min-width: 80px; max-width: 140px; margin-top: 0; }
 .table-scroll { overflow: auto; }
 td.actions { white-space: nowrap; text-align: right; }
+.nowrap { white-space: nowrap; }
 td.actions button { margin: 0 0 0 var(--sp-2); }
 tr.muted { font-size: var(--fs); line-height: var(--lh); }
 tr.muted td { color: var(--text-2); }

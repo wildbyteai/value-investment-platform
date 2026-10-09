@@ -125,16 +125,14 @@ def _event_text(db, event: NewsEvent) -> str:
 # ---------------------------------------------------------------- AI scoring
 
 def resolve_provider(db, workspace_id) -> llm.ProviderConfig:
-    row = db.scalar(select(LlmProvider).where(LlmProvider.workspace_id == workspace_id, LlmProvider.enabled.is_(True))
-                    .order_by(LlmProvider.is_default.desc(), LlmProvider.created_at).limit(1))
-    if row is None:
-        return llm.default_provider()
-    return provider_config(row)
+    """Model for 资讯研判打分 (scene ``news_analysis``): scene binding → workspace default → built-in."""
+    from app.domains.news import model_scenes
+    return model_scenes.resolve(db, workspace_id, model_scenes.NEWS_ANALYSIS)
 
 
 def provider_config(row: LlmProvider) -> llm.ProviderConfig:
-    return llm.ProviderConfig(row.provider_key, row.name, row.base_url, row.model, row.api_key_env,
-                              json.loads(row.options_json or '{}'), row.search_mode or 'none')
+    from app.domains.news import model_scenes
+    return model_scenes.provider_config(row)
 
 
 def _rule_links(index, text) -> list[llm.ProposedLink]:

@@ -2,6 +2,7 @@
 
 导入是幂等的：Skill 按 ``skill_key``、定时器按名称在本工作区里查，已存在的跳过，不覆盖管理员改过的内容。
 新建走 ``collector.save_skill`` / ``collector.save_task``，所以校验（周期、必须能联网的模型）和审计与手工新建一致。
+不指定模型时，新建的定时器不单独选模型，跟随场景“资讯采集”（模型配置 › 按场景配置模型）。
 
 Never commits.
 """
@@ -14,7 +15,7 @@ from sqlalchemy import select
 
 from app.core.errors import Invalid
 from app.core.paths import CONFIG_DIR
-from app.domains.news import collector
+from app.domains.news import collector, model_scenes
 from app.models.news import AgentSkill, CollectorTask
 from app.domains.platform.transactions import record
 
@@ -53,8 +54,10 @@ def list_presets(db, workspace_id) -> dict:
             'items': items}
 
 
-def install(db, workspace_id, actor_id, provider_id, keys: list[str] | None = None) -> dict:
-    """Create the shared skill and the selected collectors that are missing; skip the rest."""
+def install(db, workspace_id, actor_id, provider_id: str | None = None, keys: list[str] | None = None) -> dict:
+    """Create the shared skill and the selected collectors that are missing; skip the rest.
+
+    ``provider_id`` empty: the collectors leave their model empty and follow the 资讯采集 scene."""
     cfg = presets()
     known = [t['key'] for t in cfg['tasks']]
     wanted = known if not keys else list(dict.fromkeys(keys))
@@ -62,9 +65,14 @@ def install(db, workspace_id, actor_id, provider_id, keys: list[str] | None = No
     if unknown:
         raise Invalid(f"没有这些预置任务：{'、'.join(unknown)}")
     # Check the model up front, so a non-search model is rejected even when everything is already installed.
-    provider = collector._provider_row(db, workspace_id, provider_id)
-    if (provider.search_mode or 'none') == 'none':
-        raise Invalid('采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi / OpenAI）')
+    if provider_id:
+        provider = collector._provider_row(db, workspace_id, provider_id)
+        if (provider.search_mode or 'none') == 'none':
+            raise Invalid(model_scenes.NEEDS_SEARCH)
+        task_provider = provider.id
+    else:
+        provider = model_scenes.search_row_for_collect(db, workspace_id)
+        task_provider = None
 
     skill, existing = _installed(db, workspace_id)
     skill_created = False
@@ -85,11 +93,13 @@ def install(db, workspace_id, actor_id, provider_id, keys: list[str] | None = No
             skipped.append({'key': t['key'], 'name': t['name'], 'task_id': existing[t['name']]})
             continue
         row = collector.save_task(db, workspace_id, actor_id, {
-            'name': t['name'], 'prompt': t['prompt'], 'provider_id': provider.id, 'skill_id': skill_id,
+            'name': t['name'], 'prompt': t['prompt'], 'provider_id': task_provider, 'skill_id': skill_id,
             'schedule': t['schedule'], 'enabled': True})
         created.append({'key': t['key'], 'name': t['name'], 'task_id': row['id']})
     record(db, workspace_id, actor_id, 'admin.collector.presets_installed', 'collector_preset', cfg['policy_key'],
-           {'version': cfg['version'], 'provider_id': provider.id, 'skill_created': skill_created,
+           {'version': cfg['version'], 'provider_id': task_provider, 'follows_scene': task_provider is None,
+            'effective_provider_id': provider.id, 'skill_created': skill_created,
             'created': [c['key'] for c in created], 'skipped': [s['key'] for s in skipped]})
     return {'version': cfg['version'], 'skill_id': skill_id, 'skill_created': skill_created,
+            'provider_id': task_provider, 'follows_scene': task_provider is None,
             'created': created, 'skipped': skipped}

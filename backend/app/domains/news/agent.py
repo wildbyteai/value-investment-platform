@@ -11,8 +11,8 @@ Each search mode uses the vendor's own search with the same API key as the chat:
                           ``web_search`` 工具，搜索由 OpenAI 服务端执行
 * ``none``                不联网
 
-The key is read from the environment variable named on the provider; it never reaches
-the database, the logs or the run record.
+The key comes from ``ProviderConfig.api_key`` (page-saved encrypted key, else the environment
+variable); it never reaches the logs or the run record.
 """
 from __future__ import annotations
 
@@ -131,7 +131,7 @@ def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTr
     if provider.blocked:
         raise LlmError(f'模型配置未通过安全检查：{provider.blocked}')
     if not provider.configured:
-        raise LlmError(f'未配置模型密钥（环境变量 {provider.api_key_env}）')
+        raise LlmError(provider.missing_key_message)
     mode = provider.search_mode or 'none'
     if mode not in SEARCH_MODES:
         raise LlmError(f'不支持的联网方式：{mode}')

@@ -373,7 +373,7 @@
           "后台任务"
         ],
         "summary": "Read Audit",
-        "description": "Only system_admin has audit.read.",
+        "description": "Needs audit.read (system_admin, which holds every permission).",
         "operationId": "read_audit_api_demo_audit_get",
         "responses": {
           "200": {
@@ -1830,6 +1830,109 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/llm-providers/{provider_id}/api-key": {
+      "delete": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Clear Provider Key",
+        "description": "清除页面保存的 API Key（之后如设置了环境变量则改用环境变量）。",
+        "operationId": "clear_provider_key_api_admin_llm_providers__provider_id__api_key_delete",
+        "parameters": [
+          {
+            "name": "provider_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/model-scenes": {
+      "get": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Model Scene List",
+        "description": "每个调用大模型的场景用哪个模型，以及当前实际生效的模型（不含任何密钥）。",
+        "operationId": "model_scene_list_api_admin_model_scenes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenesOut"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Model Scene Save",
+        "description": "整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。",
+        "operationId": "model_scene_save_api_admin_model_scenes_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SceneBindingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenesOut"
+                }
               }
             }
           },
@@ -3421,10 +3524,17 @@
             "title": "Prompt"
           },
           "provider_id": {
-            "type": "string",
-            "maxLength": 36,
-            "minLength": 1,
-            "title": "Provider Id"
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 36
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Id",
+            "description": "单独指定模型；不填则跟随场景“资讯采集”的模型"
           },
           "skill_id": {
             "anyOf": [
@@ -3451,7 +3561,6 @@
         "required": [
           "name",
           "prompt",
-          "provider_id",
           "schedule"
         ],
         "title": "CollectorIn"
@@ -4260,11 +4369,17 @@
       "PresetInstallIn": {
         "properties": {
           "provider_id": {
-            "type": "string",
-            "maxLength": 36,
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 36
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Provider Id",
-            "description": "用哪个能联网的模型执行这些定时器"
+            "description": "给这些定时器单独指定的能联网模型；不填则定时器跟随场景“资讯采集”的模型"
           },
           "keys": {
             "anyOf": [
@@ -4284,9 +4399,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "provider_id"
-        ],
         "title": "PresetInstallIn"
       },
       "PresetInstallOut": {
@@ -4302,6 +4414,21 @@
           "skill_created": {
             "type": "boolean",
             "title": "Skill Created"
+          },
+          "provider_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Id"
+          },
+          "follows_scene": {
+            "type": "boolean",
+            "title": "Follows Scene"
           },
           "created": {
             "items": {
@@ -4323,6 +4450,8 @@
           "version",
           "skill_id",
           "skill_created",
+          "provider_id",
+          "follows_scene",
           "created",
           "skipped"
         ],
@@ -4692,11 +4821,34 @@
             "title": "Model"
           },
           "api_key_env": {
-            "type": "string",
-            "maxLength": 120,
-            "minLength": 1,
-            "pattern": "^[A-Z][A-Z0-9_]*$",
-            "title": "Api Key Env"
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "pattern": "^([A-Z][A-Z0-9_]*)?$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Key Env",
+            "description": "可选：密钥所在的环境变量名（页面保存的 Key 优先）"
+          },
+          "api_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "format": "password",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Key",
+            "description": "只写：在页面填写的 API Key，加密后入库，任何接口都不再返回；留空表示不修改",
+            "writeOnly": true
           },
           "is_default": {
             "type": "boolean",
@@ -4727,8 +4879,7 @@
           "provider_key",
           "name",
           "base_url",
-          "model",
-          "api_key_env"
+          "model"
         ],
         "title": "ProviderIn"
       },
@@ -4921,6 +5072,179 @@
           "created_at"
         ],
         "title": "RunSummary"
+      },
+      "SceneBindingIn": {
+        "properties": {
+          "scene": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Scene"
+          },
+          "provider_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 36
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Id",
+            "description": "不填 = 使用默认模型"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scene"
+        ],
+        "title": "SceneBindingIn"
+      },
+      "SceneBindingsIn": {
+        "properties": {
+          "bindings": {
+            "items": {
+              "$ref": "#/components/schemas/SceneBindingIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Bindings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bindings"
+        ],
+        "title": "SceneBindingsIn"
+      },
+      "SceneModelOut": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "search_mode": {
+            "type": "string",
+            "title": "Search Mode"
+          },
+          "key_configured": {
+            "type": "boolean",
+            "title": "Key Configured"
+          },
+          "key_source": {
+            "type": "string",
+            "title": "Key Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "model",
+          "search_mode",
+          "key_configured",
+          "key_source"
+        ],
+        "title": "SceneModelOut"
+      },
+      "SceneOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "requires_search": {
+            "type": "boolean",
+            "title": "Requires Search"
+          },
+          "provider_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "scene=场景绑定 | workspace_default=工作区默认模型 | builtin=内置默认"
+          },
+          "effective": {
+            "$ref": "#/components/schemas/SceneModelOut"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "description",
+          "requires_search",
+          "provider_id",
+          "source",
+          "effective",
+          "problem"
+        ],
+        "title": "SceneOut"
+      },
+      "ScenesOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SceneOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "items"
+        ],
+        "title": "ScenesOut"
       },
       "ScheduleIn": {
         "properties": {

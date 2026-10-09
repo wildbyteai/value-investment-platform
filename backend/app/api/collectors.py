@@ -31,14 +31,15 @@ class ScheduleIn(BaseModel):
 class CollectorIn(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     prompt: str = Field(min_length=1, max_length=20000)
-    provider_id: str = Field(min_length=1, max_length=36)
+    provider_id: str | None = Field(None, max_length=36, description='单独指定模型；不填则跟随场景“资讯采集”的模型')
     skill_id: str | None = Field(None, max_length=36)
     schedule: ScheduleIn
     enabled: bool = True
 
 
 class PresetInstallIn(BaseModel):
-    provider_id: str = Field(min_length=1, max_length=36, description='用哪个能联网的模型执行这些定时器')
+    provider_id: str | None = Field(None, max_length=36,
+                                    description='给这些定时器单独指定的能联网模型；不填则定时器跟随场景“资讯采集”的模型')
     keys: list[str] | None = Field(None, max_length=50, description='只导入这些预置任务（不填则全部）')
 
 
@@ -89,6 +90,8 @@ class PresetInstallOut(BaseModel):
     version: int
     skill_id: str
     skill_created: bool
+    provider_id: str | None
+    follows_scene: bool
     created: list[PresetRef]
     skipped: list[PresetRef]
 
@@ -135,10 +138,17 @@ def collector_options(principal: Principal = Depends(require_any(*ADMIN)), db=De
     from app.models.news import LlmProvider
     rows = db.scalars(select(LlmProvider).where(LlmProvider.workspace_id == principal.workspace.id,
                                                 LlmProvider.enabled.is_(True)).order_by(LlmProvider.name)).all()
+    from app.domains.news import model_scenes
     labels = {k: v['label'] for k, v in policy()['search_modes'].items()}
+    scene_row, scene_source = model_scenes.resolve_row(db, principal.workspace.id, model_scenes.NEWS_COLLECT)
     return {'providers': [{'id': p.id, 'name': p.name, 'model': p.model, 'search_mode': p.search_mode or 'none',
                            'search_label': labels.get(p.search_mode or 'none'),
                            'key_configured': service.provider_config(p).configured} for p in rows],
+            'scene': {'key': model_scenes.NEWS_COLLECT, 'label': model_scenes.scene(model_scenes.NEWS_COLLECT)['label'],
+                      'source': scene_source, 'provider_id': scene_row.id if scene_row else None,
+                      'provider': f'{scene_row.name} · {scene_row.model}' if scene_row else None,
+                      'search_mode': (scene_row.search_mode or 'none') if scene_row else 'none',
+                      'key_configured': service.provider_config(scene_row).configured if scene_row else False},
             'skills': [{'id': s['id'], 'name': s['name'], 'enabled': s['enabled']} for s in collector.list_skills(db, principal.workspace.id)],
             'min_interval_minutes': policy()['min_interval_minutes'], 'timezone': policy()['timezone']}
 

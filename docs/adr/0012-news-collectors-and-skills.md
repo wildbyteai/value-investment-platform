@@ -63,3 +63,7 @@
 - designed：本节。
 - implemented：`config/collector-presets-v1.json`、`backend/app/domains/news/collector_presets.py`、`backend/app/api/collectors.py`（两个预置接口）、`backend/app/admin_cli.py`（`install-collector-presets`）、前端 `pages/settings.tsx` 的导入面板；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建。
 - verified：`tests/test_r7_collector_presets.py`（配置合法、6 个周期都过 `validate_schedule` 且错开在 06:00–06:50、提示词不含本机路径/Excel/飞书/lark-cli、公司代码、权限 403、拒绝不联网或不存在的模型与未知 key 且不落库、分批导入与重复导入幂等、审计、Skill 进入系统提示词、命令行导入）；本机隔离 PostgreSQL 全量后端测试与前端构建通过，CI 结果见对应 PR。**未用真实厂商 Key 实际跑过这 6 个提示词**，导入后建议先对每个定时器点一次“立即执行”，看执行记录里的模型原始输出再调整提示词。页面未在浏览器里截图检查（本机无可用浏览器），只做了类型检查与构建。
+
+## 补充（2026-10-09）：模型可按场景配置
+
+见 ADR 0015：定时器的“模型”改为可选，不选则跟随场景“资讯采集”（后台设置 › 模型配置 › 按场景配置模型）；导入预置包也可以不指定模型。定时器单独选的模型仍优先。
