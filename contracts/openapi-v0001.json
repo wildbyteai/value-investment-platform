@@ -3108,6 +3108,109 @@
         }
       }
     },
+    "/api/admin/collectors/presets": {
+      "get": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Collector Presets List",
+        "description": "预置采集定时器包（config/collector-presets-v1.json）及本工作区是否已导入。",
+        "operationId": "collector_presets_list_api_admin_collectors_presets_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "每页条数",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "每页条数"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "跳过条数",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "跳过条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresetListOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collectors/presets/install": {
+      "post": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Collector Presets Install",
+        "description": "导入预置采集定时器：缺的创建、已有的跳过（按 Skill 标识和定时器名称判断），可重复执行。",
+        "operationId": "collector_presets_install_api_admin_collectors_presets_install_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresetInstallIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresetInstallOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/collectors/{task_id}": {
       "put": {
         "tags": [
@@ -4153,6 +4256,299 @@
         },
         "type": "object",
         "title": "PasswordReset"
+      },
+      "PresetInstallIn": {
+        "properties": {
+          "provider_id": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Provider Id",
+            "description": "用哪个能联网的模型执行这些定时器"
+          },
+          "keys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Keys",
+            "description": "只导入这些预置任务（不填则全部）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider_id"
+        ],
+        "title": "PresetInstallIn"
+      },
+      "PresetInstallOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "skill_id": {
+            "type": "string",
+            "title": "Skill Id"
+          },
+          "skill_created": {
+            "type": "boolean",
+            "title": "Skill Created"
+          },
+          "created": {
+            "items": {
+              "$ref": "#/components/schemas/PresetRef"
+            },
+            "type": "array",
+            "title": "Created"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/PresetRef"
+            },
+            "type": "array",
+            "title": "Skipped"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "skill_id",
+          "skill_created",
+          "created",
+          "skipped"
+        ],
+        "title": "PresetInstallOut"
+      },
+      "PresetListOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "skill": {
+            "$ref": "#/components/schemas/PresetSkillOut"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PresetTaskOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "name",
+          "description",
+          "skill",
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "PresetListOut"
+      },
+      "PresetRef": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "task_id"
+        ],
+        "title": "PresetRef"
+      },
+      "PresetScheduleOut": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "times": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Times"
+          },
+          "weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekdays"
+          },
+          "minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "PresetScheduleOut"
+      },
+      "PresetSkillOut": {
+        "properties": {
+          "skill_key": {
+            "type": "string",
+            "title": "Skill Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "installed": {
+            "type": "boolean",
+            "title": "Installed"
+          },
+          "skill_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "skill_key",
+          "name",
+          "description",
+          "installed",
+          "skill_id"
+        ],
+        "title": "PresetSkillOut"
+      },
+      "PresetTaskOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt"
+          },
+          "merged_from": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Merged From"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/PresetScheduleOut"
+          },
+          "schedule_text": {
+            "type": "string",
+            "title": "Schedule Text"
+          },
+          "installed": {
+            "type": "boolean",
+            "title": "Installed"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "prompt",
+          "merged_from",
+          "schedule",
+          "schedule_text",
+          "installed",
+          "task_id"
+        ],
+        "title": "PresetTaskOut"
       },
       "ProposalIn": {
         "properties": {

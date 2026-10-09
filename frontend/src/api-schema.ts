@@ -1321,6 +1321,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/collectors/presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Collector Presets List
+         * @description 预置采集定时器包（config/collector-presets-v1.json）及本工作区是否已导入。
+         */
+        get: operations["collector_presets_list_api_admin_collectors_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collectors/presets/install": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Collector Presets Install
+         * @description 导入预置采集定时器：缺的创建、已有的跳过（按 Skill 标识和定时器名称判断），可重复执行。
+         */
+        post: operations["collector_presets_install_api_admin_collectors_presets_install_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/collectors/{task_id}": {
         parameters: {
             query?: never;
@@ -1684,6 +1724,101 @@ export interface components {
              * @description 留空则生成一次性密码
              */
             password?: string | null;
+        };
+        /** PresetInstallIn */
+        PresetInstallIn: {
+            /**
+             * Provider Id
+             * @description 用哪个能联网的模型执行这些定时器
+             */
+            provider_id: string;
+            /**
+             * Keys
+             * @description 只导入这些预置任务（不填则全部）
+             */
+            keys?: string[] | null;
+        };
+        /** PresetInstallOut */
+        PresetInstallOut: {
+            /** Version */
+            version: number;
+            /** Skill Id */
+            skill_id: string;
+            /** Skill Created */
+            skill_created: boolean;
+            /** Created */
+            created: components["schemas"]["PresetRef"][];
+            /** Skipped */
+            skipped: components["schemas"]["PresetRef"][];
+        };
+        /** PresetListOut */
+        PresetListOut: {
+            /** Version */
+            version: number;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            skill: components["schemas"]["PresetSkillOut"];
+            /** Items */
+            items: components["schemas"]["PresetTaskOut"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** PresetRef */
+        PresetRef: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Task Id */
+            task_id: string;
+        };
+        /** PresetScheduleOut */
+        PresetScheduleOut: {
+            /** Type */
+            type: string;
+            /** Times */
+            times?: string[] | null;
+            /** Weekdays */
+            weekdays?: number[] | null;
+            /** Minutes */
+            minutes?: number | null;
+        };
+        /** PresetSkillOut */
+        PresetSkillOut: {
+            /** Skill Key */
+            skill_key: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Installed */
+            installed: boolean;
+            /** Skill Id */
+            skill_id: string | null;
+        };
+        /** PresetTaskOut */
+        PresetTaskOut: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Prompt */
+            prompt: string;
+            /** Merged From */
+            merged_from: string[];
+            schedule: components["schemas"]["PresetScheduleOut"];
+            /** Schedule Text */
+            schedule_text: string;
+            /** Installed */
+            installed: boolean;
+            /** Task Id */
+            task_id: string | null;
         };
         /** ProposalIn */
         ProposalIn: {
@@ -4439,6 +4574,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    collector_presets_list_api_admin_collectors_presets_get: {
+        parameters: {
+            query?: {
+                /** @description 每页条数 */
+                limit?: number;
+                /** @description 跳过条数 */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PresetListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    collector_presets_install_api_admin_collectors_presets_install_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PresetInstallIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PresetInstallOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
