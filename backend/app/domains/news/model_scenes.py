@@ -23,7 +23,7 @@ from app.models.news import LlmProvider, LlmSceneBinding
 CONFIG = CONFIG_DIR / 'model-scenes-v1.json'
 NEWS_COLLECT = 'news_collect'
 NEWS_ANALYSIS = 'news_analysis'
-NEEDS_SEARCH = '采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi / OpenAI）'
+NEEDS_SEARCH = '采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi / OpenAI / Claude / 豆包）'
 
 
 @lru_cache

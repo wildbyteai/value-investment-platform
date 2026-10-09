@@ -53,6 +53,6 @@ backend/app/
 ## 运行
 
 - 资讯导入：后台上传每日 Excel（`POST /api/news/import`），或登记 RSS 源后由 cron 执行 `python -m app.jobs news`（建议每天 08:30 北京时间）。
-- 资讯采集定时器：后台设置 › 采集定时器 填提示词、选能联网的模型（通义 / 智谱 / Kimi，用厂商自带搜索）和可选 Skill；cron 每 5 分钟执行 `python -m app.jobs collect`，到期的定时器各自执行。见 ADR 0012。
+- 资讯采集定时器：后台设置 › 采集定时器 填提示词、选能联网的模型（通义 / 智谱 / Kimi / OpenAI / Claude / 豆包，用厂商自带搜索）和可选 Skill；cron 每 5 分钟执行 `python -m app.jobs collect`，到期的定时器各自执行。见 ADR 0012。
 - 模型：后台设置 › 模型配置 登记模型并可直接填写 API Key（`VIP_SECRET_KEY` 加密入库），在“按场景配置模型”里分别指定 资讯采集 / 资讯研判打分 用哪个；场景定义 `config/model-scenes-v1.json`，取用逻辑 `domains/news/model_scenes.py`。见 ADR 0015。没有可用 Key 时资讯关联退回规则匹配。
 - 告警：cron 执行 `python -m app.jobs alerts`（建议交易时段每 30 分钟 + 收盘后一次）；研究员确认资讯关联时也会立即检查。邮件需配置 `VIP_SMTP_*`，发件人 admin@bytewatcher.xyz；每人在“监控告警 › 通知设置”填写收件邮箱。

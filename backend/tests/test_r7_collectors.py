@@ -213,7 +213,8 @@ def test_collector_requires_search_model(env):
     opts = c.get('/api/admin/collectors/options', headers=h(ws, 'data@demo')).json()
     assert [p['search_mode'] for p in opts['providers']] == ['none'] and opts['min_interval_minutes'] == 60
     listing = c.get('/api/admin/llm-providers', headers=h(ws, 'admin@demo')).json()
-    assert 'kimi_search' in listing['search_modes'] and listing['presets'][0]['search_mode'] == 'qwen_enable_search'
+    assert 'kimi_search' in listing['search_modes'] and 'anthropic_web_search' in listing['search_modes']
+    assert {p['provider_key']: p['search_mode'] for p in listing['presets']}['qwen'] == 'qwen_enable_search'
 
 
 def test_collector_run_ingests_scores_and_records(env, monkeypatch):

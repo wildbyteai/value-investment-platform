@@ -8,7 +8,7 @@ encrypted, app/core/secret_box.py) or names the environment variable that holds 
 * the variable must look like a model key (``VIP_…_KEY``) and never be another secret
   (in particular not the master key ``VIP_SECRET_KEY`` / ``VIP_SECRET_KEY_PREVIOUS``);
 * the URL must be HTTPS and its host must be on the allowlist: the vendor hosts in
-  ``config/*.json`` plus whatever the server operator adds in ``VIP_LLM_ALLOWED_HOSTS``.
+  ``config/model-presets-v1.json`` and ``config/news-radar-v1.json`` plus whatever the server operator adds in ``VIP_LLM_ALLOWED_HOSTS``.
   Only someone who can edit the server environment can widen it, not the web admin.
 
 The same check runs when a key is read (page-saved or env), so a row saved before this guard
@@ -33,12 +33,12 @@ FORBIDDEN_PREFIXES = ('VIP_DB', 'VIP_SMTP', 'VIP_SESSION', 'VIP_AUTH', 'VIP_ADMI
 
 def _config_hosts() -> set[str]:
     hosts: set[str] = set()
-    for name in ('news-collector-v1.json', 'news-radar-v1.json'):
+    for name in ('model-presets-v1.json', 'news-radar-v1.json'):
         try:
             data = json.loads((ROOT / 'config' / name).read_text(encoding='utf-8'))
         except (OSError, ValueError):
             continue
-        rows = list(data.get('provider_presets') or [])
+        rows = list(data.get('presets') or [])
         if data.get('default_llm_provider'):
             rows.append(data['default_llm_provider'])
         for row in rows:

@@ -77,14 +77,9 @@ export function Feeds({ allow, busy, execute }: Ctx) {
     </>
   );
 }
-export const PRESETS = [
-  { provider_key: "deepseek", name: "DeepSeek", base_url: "https://api.deepseek.com", model: "deepseek-chat", api_key_env: "VIP_DEEPSEEK_API_KEY", search_mode: "none" },
-  { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY", search_mode: "qwen_enable_search" },
-  { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-air", api_key_env: "VIP_ZHIPU_API_KEY", search_mode: "zhipu_web_search" },
-  { provider_key: "kimi", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "kimi-k3", api_key_env: "VIP_MOONSHOT_API_KEY", search_mode: "kimi_search" },
-  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-6-luna", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
-];
-export const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索", openai_web_search: "OpenAI · web_search" };
+// 内置模型预设与联网方式名称都来自服务器（config/model-presets-v1.json、news-collector-v1.json），这里不再硬编码。
+const PRESET_FIELDS = ["provider_key", "name", "base_url", "model", "api_key_env", "search_mode"] as const;
+function presetForm(p: any) { return Object.fromEntries(PRESET_FIELDS.map((k) => [k, p?.[k] ?? (k === "search_mode" ? "none" : "")])); }
 const KEY_SOURCE: Record<string, string> = { page: "页面保存", env: "环境变量", none: "未配置" };
 function keyText(p: any) {
   if (p.key_source === "page") return `页面保存 ${p.key_hint || ""}`;
@@ -138,12 +133,17 @@ function ModelScenes({ busy, execute, providers, version }: Pick<Ctx, "busy" | "
 }
 export function Models({ busy, execute }: Ctx) {
   const list = useLoad<any>("/api/admin/llm-providers");
-  const blank = { ...PRESETS[0], is_default: true, enabled: true, temperature: 0, api_key: "" };
+  const presetList = useLoad<any>("/api/admin/llm-presets");
+  const presets: any[] = presetList.value?.items || [];
+  const blank = { ...presetForm(presets[0]), is_default: true, enabled: true, temperature: 0, api_key: "" };
   const [form, setForm] = useState<any>(blank);
   const [editing, setEditing] = useState<any | null>(null);
+  const [preset, setPreset] = useState<any | null>(null);
   const [version, setVersion] = useState(0);
   const v = list.value;
-  function reset() { setEditing(null); setForm(blank); }
+  const searchLabel: Record<string, string> = v?.search_modes || presetList.value?.search_modes || {};
+  useEffect(() => { if (presets.length && !editing && !preset) { setPreset(presets[0]); setForm((f: any) => ({ ...f, ...presetForm(presets[0]) })); } }, [presetList.value]);
+  function reset() { setEditing(null); setPreset(presets[0] || null); setForm(blank); }
   async function save(e: any) {
     e.preventDefault();
     const { api_key, ...rest } = form;
@@ -174,7 +174,7 @@ export function Models({ busy, execute }: Ctx) {
                   <tr key={p.id}><td>{p.name}<div className="muted">{p.model}</div></td><td>{p.base_url}</td>
                     <td>{keyText(p)}{p.key_saved && p.key_source !== "page" && p.key_problem && <div className="muted danger">已保存的 Key 不可用：{p.key_problem}</div>}
                       {p.blocked && <div className="muted danger">{p.blocked}</div>}</td>
-                    <td>{SEARCH_LABEL[p.search_mode] || p.search_mode}</td>
+                    <td>{searchLabel[p.search_mode] || p.search_mode}</td>
                     <td>{p.enabled ? (p.is_default ? "默认" : "可用") : "停用"}</td>
                     <td className="actions">
                       <button className="small" onClick={() => { setEditing(p); setForm({ ...p, api_key_env: p.api_key_env || "", api_key: "", temperature: p.options?.temperature ?? 0 }); }}>编辑</button>
@@ -188,7 +188,11 @@ export function Models({ busy, execute }: Ctx) {
       )}
       <form className="form" onSubmit={save}>
         <h4>{editing ? `编辑模型：${editing.name}` : "添加模型"}</h4>
-        {!editing && <label>预设<select onChange={(e) => setForm({ ...form, ...PRESETS[Number(e.target.value)] })}>{PRESETS.map((p, i) => <option key={p.provider_key} value={i}>{p.name}</option>)}</select></label>}
+        {!editing && <label>预设<select aria-label="预设" value={preset?.provider_key || ""} onChange={(e) => { const p = presets.find((x) => x.provider_key === e.target.value); setPreset(p || null); if (p) setForm({ ...form, ...presetForm(p) }); }}>
+          {presets.map((p) => <option key={p.provider_key} value={p.provider_key}>{p.name} · {p.model}{p.search_mode === "none" ? "" : " · 可联网"}</option>)}
+        </select></label>}
+        {!editing && preset && <p className="muted">{preset.note} <a href={preset.doc_url} target="_blank" rel="noreferrer">官方文档</a>{presetList.value?.verified_on ? `（按官方文档核对于 ${presetList.value.verified_on}）` : ""}</p>}
+        <Failed error={presetList.error} />
         {["provider_key", "name", "base_url", "model"].map((k) => (
           <label key={k}>{{ provider_key: "标识", name: "名称", base_url: "接口地址", model: "模型名" }[k]}<input required value={form[k] || ""} disabled={k === "provider_key" && !!editing} onChange={(e) => setForm({ ...form, [k]: e.target.value })} /></label>
         ))}
@@ -198,7 +202,7 @@ export function Models({ busy, execute }: Ctx) {
         <label>密钥环境变量（可选）<input value={form.api_key_env || ""} placeholder="VIP_QWEN_API_KEY" onChange={(e) => setForm({ ...form, api_key_env: e.target.value.trim() })} /></label>
         <p className="muted">页面保存的 Key 优先；没有时读取这个环境变量。Key 只会发往该模型的接口域名，更换域名需要重新填写。</p>
         <label>联网方式<select value={form.search_mode || "none"} onChange={(e) => setForm({ ...form, search_mode: e.target.value })}>
-          {Object.entries((v?.search_modes as Record<string, string>) || SEARCH_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          {Object.entries(searchLabel).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
         </select></label>
         <p className="muted">“资讯采集”场景和采集定时器只能用能联网的模型。联网用的是厂商自带的搜索，和对话共用同一个 Key，不需要另配搜索服务。</p>
         <label>温度<input type="number" min={0} max={2} step={0.1} value={form.temperature} onChange={(e) => setForm({ ...form, temperature: Number(e.target.value) })} /></label>

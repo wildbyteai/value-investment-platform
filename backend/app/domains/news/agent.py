@@ -9,6 +9,11 @@ Each search mode uses the vendor's own search with the same API key as the chat:
                           （``$web_search`` 内置工具预计 2026-10-20 下线，因此不用它）
 * ``openai_web_search``   OpenAI Responses 接口（``POST {base_url}/responses``）的托管
                           ``web_search`` 工具，搜索由 OpenAI 服务端执行
+* ``doubao_web_search``   火山方舟（豆包）Responses 接口的 ``web_search`` 工具（豆包搜索
+                          Custom 版）；请求/响应与 OpenAI Responses 同形，复用同一段解析
+* ``anthropic_web_search`` Anthropic 原生 Messages 接口（``POST {base_url}/messages``，
+                          头 ``x-api-key`` + ``anthropic-version``）的服务端 ``web_search``
+                          工具；遇到 ``pause_turn`` 把已返回的内容原样回传继续
 * ``none``                不联网
 
 The key comes from ``ProviderConfig.api_key`` (page-saved encrypted key, else the environment
@@ -24,7 +29,9 @@ import httpx
 from app.domains.news.collector_policy import policy
 from app.domains.news.llm import LlmError, ProviderConfig
 
-SEARCH_MODES = ('none', 'qwen_enable_search', 'zhipu_web_search', 'kimi_search', 'openai_web_search')
+SEARCH_MODES = ('none', 'qwen_enable_search', 'zhipu_web_search', 'kimi_search', 'openai_web_search',
+                'doubao_web_search', 'anthropic_web_search')
+RESPONSES_MODES = ('openai_web_search', 'doubao_web_search')
 
 KIMI_TOOL = {
     'type': 'function',
@@ -52,9 +59,9 @@ class ChatResult:
     rounds: int = 0
 
 
-def _post(client: httpx.Client, url: str, key: str, body: dict) -> dict:
+def _post(client: httpx.Client, url: str, key: str, body: dict, headers: dict | None = None) -> dict:
     try:
-        r = client.post(url, json=body, headers={'Authorization': f'Bearer {key}'})
+        r = client.post(url, json=body, headers=headers or {'Authorization': f'Bearer {key}'})
     except httpx.HTTPError as exc:
         raise LlmError(f'模型请求失败：{type(exc).__name__}')
     if r.status_code != 200:
@@ -96,13 +103,20 @@ def _kimi_search(client: httpx.Client, provider: ProviderConfig, args: dict) -> 
     return {'results': out}
 
 
-def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: list[dict]) -> ChatResult:
-    cfg = policy()['search_modes']['openai_web_search']
+def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: list[dict], mode: str) -> ChatResult:
+    """OpenAI Responses-shaped call; used by OpenAI and by 火山方舟 (same request/response shape)."""
+    cfg = policy()['search_modes'][mode]
     system = '\n\n'.join(m['content'] for m in messages if m['role'] == 'system')
-    body: dict = {'model': provider.model, 'tools': [dict(cfg['tool'])], 'tool_choice': cfg['tool_choice'],
-                  'input': [{'role': m['role'], 'content': m['content']} for m in messages if m['role'] != 'system']}
-    if system:
+    as_instructions = cfg.get('system_as_instructions', True)
+    body: dict = {'model': provider.model, 'tools': [dict(cfg['tool'])],
+                  'input': [{'role': m['role'], 'content': m['content']} for m in messages
+                            if m['role'] != 'system' or not as_instructions]}
+    if system and as_instructions:
         body['instructions'] = system
+    if cfg.get('tool_choice'):
+        body['tool_choice'] = cfg['tool_choice']
+    if cfg.get('max_tool_calls'):
+        body['max_tool_calls'] = cfg['max_tool_calls']
     effort = (provider.options or {}).get('reasoning_effort') or cfg.get('reasoning_effort')
     if effort:
         body['reasoning'] = {'effort': effort}
@@ -117,13 +131,57 @@ def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: 
     for item in data.get('output') or []:
         if item.get('type') == 'web_search_call':
             action = item.get('action') or {}
-            result.searches.extend([q for q in ([action.get('query')] + list(action.get('queries') or [])) if q])
+            for q in [action.get('query')] + list(action.get('queries') or []):
+                if q and q not in result.searches:
+                    result.searches.append(q)
         elif item.get('type') == 'message':
             texts.extend(c.get('text', '') for c in item.get('content') or [] if c.get('type') == 'output_text')
     result.content = ''.join(texts) or str(data.get('output_text') or '')
     if not result.content:
         raise LlmError('模型没有返回文本' + ('（输出被截断）' if data.get('status') == 'incomplete' else ''))
     return result
+
+
+def _anthropic_messages(client: httpx.Client, provider: ProviderConfig, messages: list[dict], max_rounds: int) -> ChatResult:
+    """Claude via the native Messages API with Anthropic's server-side web_search tool.
+
+    The key goes in ``x-api-key`` (never in a URL or log). Searches run on Anthropic's side; a
+    long turn may stop with ``pause_turn`` and is continued by sending the assistant content back
+    unchanged. The answer is the text after the last tool block (earlier text is "I'll search…").
+    """
+    cfg = policy()['search_modes']['anthropic_web_search']
+    system = '\n\n'.join(m['content'] for m in messages if m['role'] == 'system')
+    convo = [{'role': m['role'], 'content': m['content']} for m in messages if m['role'] != 'system']
+    body: dict = {'model': provider.model, 'max_tokens': cfg['max_tokens'], 'tools': [dict(cfg['tool'])], 'messages': convo}
+    if system:
+        body['system'] = system
+    temperature = (provider.options or {}).get('temperature')
+    if temperature:
+        body['temperature'] = min(float(temperature), 1.0)   # Claude accepts 0..1
+    headers = {'x-api-key': provider.api_key, 'anthropic-version': cfg['anthropic_version']}
+    url = provider.base_url.rstrip('/') + cfg['endpoint']
+    result = ChatResult(content='')
+    blocks: list[dict] = []
+    for _ in range(max_rounds):
+        result.rounds += 1
+        data = _post(client, url, '', body, headers=headers)
+        content = list(data.get('content') or [])
+        blocks.extend(content)
+        for b in content:
+            if b.get('type') == 'server_tool_use' and b.get('name') == 'web_search':
+                q = str((b.get('input') or {}).get('query') or '')
+                if q:
+                    result.searches.append(q)
+        if data.get('stop_reason') == 'pause_turn':
+            body['messages'] = convo + [{'role': 'assistant', 'content': blocks}]
+            continue
+        last_tool = max((i for i, b in enumerate(blocks) if b.get('type') != 'text'), default=-1)
+        result.content = ''.join(b.get('text', '') for b in blocks[last_tool + 1:] if b.get('type') == 'text') \
+            or ''.join(b.get('text', '') for b in blocks if b.get('type') == 'text')
+        if not result.content:
+            raise LlmError('模型没有返回文本' + ('（输出被截断）' if data.get('stop_reason') == 'max_tokens' else ''))
+        return result
+    raise LlmError(f'模型在 {max_rounds} 轮内没有给出结果')
 
 
 def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTransport | None = None,
@@ -136,10 +194,12 @@ def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTr
     if mode not in SEARCH_MODES:
         raise LlmError(f'不支持的联网方式：{mode}')
     cfg = policy()
-    if mode == 'openai_web_search':
+    if mode in RESPONSES_MODES or mode == 'anthropic_web_search':
         mode_timeout = cfg['search_modes'][mode].get('request_timeout_seconds') or cfg['request_timeout_seconds']
         with httpx.Client(transport=transport, timeout=timeout or mode_timeout) as client:
-            return _openai_responses(client, provider, messages)
+            if mode == 'anthropic_web_search':
+                return _anthropic_messages(client, provider, messages, cfg['max_tool_rounds'])
+            return _openai_responses(client, provider, messages, mode)
     url = provider.base_url.rstrip('/') + '/chat/completions'
     body: dict = {'model': provider.model, 'messages': list(messages)}
     temperature = (provider.options or {}).get('temperature')

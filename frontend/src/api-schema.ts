@@ -844,6 +844,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/llm-presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Llm Presets
+         * @description 内置模型预设（config/model-presets-v1.json）：添加模型时用来预填表单，不含任何密钥。
+         */
+        get: operations["llm_presets_api_admin_llm_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/llm-providers/{provider_id}": {
         parameters: {
             query?: never;
@@ -1737,6 +1757,43 @@ export interface components {
             login: string;
             /** Password */
             password: string;
+        };
+        /** ModelPresetOut */
+        ModelPresetOut: {
+            /** Provider Key */
+            provider_key: string;
+            /** Name */
+            name: string;
+            /** Vendor */
+            vendor: string;
+            /** Base Url */
+            base_url: string;
+            /** Model */
+            model: string;
+            /** Api Key Env */
+            api_key_env: string;
+            /** Search Mode */
+            search_mode: string;
+            /** Note */
+            note: string;
+            /** Doc Url */
+            doc_url: string;
+        };
+        /** ModelPresetsOut */
+        ModelPresetsOut: {
+            /** Version */
+            version: number;
+            /** Verified On */
+            verified_on: string;
+            /** Items */
+            items: components["schemas"]["ModelPresetOut"][];
+            /**
+             * Search Modes
+             * @description 联网方式 → 中文名
+             */
+            search_modes: {
+                [key: string]: string;
+            };
         };
         /** NoteIn */
         NoteIn: {
@@ -3716,6 +3773,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    llm_presets_api_admin_llm_presets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelPresetsOut"];
                 };
             };
         };

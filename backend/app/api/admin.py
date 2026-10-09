@@ -10,7 +10,8 @@ from app.api.deps import Principal, require, require_any
 from app.core.errors import Conflict, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
-from app.domains.news import llm, model_scenes
+from app.domains.news import llm, model_presets, model_scenes
+from app.domains.news.agent import SEARCH_MODES
 from app.domains.news.collector_policy import policy as collector_policy
 from app.models.news import LlmProvider, NewsFeed
 from app.domains.platform.transactions import canonical, record
@@ -87,7 +88,7 @@ class ProviderIn(BaseModel):
     is_default: bool = False
     enabled: bool = True
     temperature: float = Field(0, ge=0, le=2)
-    search_mode: str = Field('none', pattern='^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search)$')
+    search_mode: str = Field('none', pattern='^(' + '|'.join(SEARCH_MODES) + ')$')
 
 
 def _provider(p: LlmProvider) -> dict:
@@ -109,9 +110,36 @@ def list_providers(principal: Principal = Depends(require('model.configure')), d
             'builtin_default': {'provider_key': default.provider_key, 'name': default.name, 'base_url': default.base_url,
                                 'model': default.model, 'api_key_env': default.api_key_env, 'key_configured': default.configured},
             'search_modes': {k: v['label'] for k, v in collector_policy()['search_modes'].items()},
-            'presets': collector_policy()['provider_presets'],
+            'presets': model_presets.presets(),
             'secret_key_ready': secret_box.available(), 'secret_key_problem': secret_box.problem(),
             'active': active.provider_key if active else None}
+
+
+class ModelPresetOut(BaseModel):
+    provider_key: str
+    name: str
+    vendor: str
+    base_url: str
+    model: str
+    api_key_env: str
+    search_mode: str
+    note: str
+    doc_url: str
+
+
+class ModelPresetsOut(BaseModel):
+    version: int
+    verified_on: str
+    items: list[ModelPresetOut]
+    search_modes: dict[str, str] = Field(description='联网方式 → 中文名')
+
+
+@router.get('/llm-presets', response_model=ModelPresetsOut)
+def llm_presets(principal: Principal = Depends(require('model.configure'))):
+    """内置模型预设（config/model-presets-v1.json）：添加模型时用来预填表单，不含任何密钥。"""
+    cfg = model_presets.config()
+    return {'version': cfg['version'], 'verified_on': cfg['verified_on'], 'items': model_presets.presets(),
+            'search_modes': {k: v['label'] for k, v in collector_policy()['search_modes'].items()}}
 
 
 def _host(url: str | None) -> str:

@@ -65,7 +65,7 @@ docker compose run --rm api python -m app.admin_cli install-collector-presets --
 | 页面或接口返回密钥 | Key 只写不读：接口只返回来源（`key_source`：page / env / none）和末 4 位提示；审计、执行记录、错误信息、日志和 OpenAPI 示例都不含 Key（测试保证） |
 | 数据库备份泄露 | **只有数据库备份解不开模型 Key**：主密钥不在库里。反过来，**恢复时必须同时有 `VIP_SECRET_KEY`**，否则页面保存的 Key 无法解密（页面会提示，需要重新填写；环境变量密钥不受影响）。主密钥与数据库备份分开保存 |
 | 主密钥轮换 | 旧值移到 `VIP_SECRET_KEY_PREVIOUS`、设置新的 `VIP_SECRET_KEY`、重启，执行 `python -m app.admin_cli rotate-secret-key` 用新主密钥重新加密全部 Key，确认后删掉 `_PREVIOUS`。怀疑主密钥泄露时：轮换主密钥**并**在厂商控制台重建各模型 Key |
-| **后台把密钥发到别处**（最大的口子） | 管理员可改模型的接口地址和密钥变量名。现在：变量名必须形如 `VIP_*_KEY`，且不能是数据库/SMTP/会话类变量；接口必须 https，域名必须在白名单（config 里各厂商官方域名 + 服务器环境变量 `VIP_LLM_ALLOWED_HOSTS`）。保存时校验，**每次取密钥时再校验**（页面保存的 Key 同样受限），旧数据也无法绕过。已保存 Key 的模型更换接口域名时必须重新填写 Key。只有能登录服务器的人才能扩大白名单 |
+| **后台把密钥发到别处**（最大的口子） | 管理员可改模型的接口地址和密钥变量名。现在：变量名必须形如 `VIP_*_KEY`，且不能是数据库/SMTP/会话类变量；接口必须 https，域名必须在白名单（`config/model-presets-v1.json` 各预设的官方域名 + `news-radar-v1.json` 内置默认模型的域名 + 服务器环境变量 `VIP_LLM_ALLOWED_HOSTS`；2026-10-09 起为 api.openai.com、api.anthropic.com、generativelanguage.googleapis.com、api.deepseek.com、dashscope.aliyuncs.com、open.bigmodel.cn、api.moonshot.cn、ark.cn-beijing.volces.com、api.minimax.cn）。保存时校验，**每次取密钥时再校验**（页面保存的 Key 同样受限），旧数据也无法绕过。已保存 Key 的模型更换接口域名时必须重新填写 Key。只有能登录服务器的人才能扩大白名单 |
 | 冒充身份 | 删除了"请求头即身份"的 mock 登录（仅本机开发 `VIP_AUTH_MODE=dev` 保留）；匿名身份列表接口在生产返回 404 |
 | 会话被偷 | 会话 cookie：HttpOnly（脚本读不到）、Secure（只走 HTTPS）、SameSite=Strict；数据库只存 token 的 SHA-256，备份泄露也无法登录；空闲 12 小时 / 最长 7 天过期；改密码会踢掉其他浏览器 |
 | 暴力猜密码 | scrypt 哈希；同一账号 15 分钟内失败 5 次、同一 IP 失败 20 次即锁定 15 分钟 |

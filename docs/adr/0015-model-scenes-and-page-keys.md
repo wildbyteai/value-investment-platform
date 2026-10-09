@@ -50,3 +50,35 @@
 - designed：本 ADR（2026-10-09）。
 - implemented：`config/model-scenes-v1.json`、`backend/app/core/secret_box.py`、`backend/app/domains/news/model_scenes.py`、`llm.py`（ProviderConfig 的 Key 来源与优先级）、`service.py` / `collector.py` / `collector_presets.py`（按场景取模型）、`backend/app/api/admin.py`（模型 Key 只写、清除 Key、场景接口）、`backend/app/api/collectors.py`（模型可选、options 带场景）、`backend/app/admin_cli.py`（`--provider` 可选、`rotate-secret-key`）、迁移 `0015_model_scenes_and_page_keys.py`、前端 `pages/settings.tsx`（按场景配置模型、Key 输入与清除、定时器/预置导入“跟随场景”）；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建；`deploy/secrets-example/app.env` 增加 `VIP_SECRET_KEY`。
 - verified：`tests/test_r8_model_scenes.py`（场景配置与代码位置、加解密往返/行绑定/换主密钥/轮换、缺主密钥 422 且不落库而环境变量 Key 可用、主密钥不能当模型变量名、Key 不出现在任何接口响应/审计/outbox/OpenAPI、实际请求用页面 Key、短 Key 与换域名、场景校验与 requires_search、取用顺序与停用回退、权限 403、定时器不选模型时跟随场景并在场景不可联网时记失败、预置包页面/命令行不带模型导入、清除 Key、`rotate-secret-key`）；`tests/test_migrations.py::test_0015_model_scenes_up_and_down`（升级/回退/再升级，模型与迁移无漂移）。本机隔离 PostgreSQL 16 全量后端测试通过，前端类型检查与构建通过，CI 结果见对应 PR。模型配置页白天/黑夜用 jsdom + WeasyPrint 静态渲染检查过版式（假数据）。**未用真实厂商 Key 联调**；上线前须在服务器设置 `VIP_SECRET_KEY` 并在页面保存一次 Key、对一个定时器点“立即执行”确认。
+
+## 补充（2026-10-09）：内置模型预设集中到一个配置
+
+**背景**：预设原来分在两处——`config/news-collector-v1.json` 的 `provider_presets`（通义/智谱/Kimi/OpenAI）和前端 `settings.tsx` 硬编码的 `PRESETS`（多一个 DeepSeek），用户要求补齐 OpenAI、DeepSeek、Claude 等主流厂商。
+
+**决定**
+
+1. 唯一来源 `config/model-presets-v1.json`（`presets[]`：provider_key、name、vendor、base_url、model、api_key_env、search_mode、note、doc_url，加 `verified_on`）。删除 `news-collector-v1.json` 的 `provider_presets` 与前端硬编码列表。
+2. 接口 `GET /api/admin/llm-presets`（权限 `model.configure`，返回 version、verified_on、items、search_modes 名称），页面“添加模型 › 预设”从它读取并显示说明与官方文档链接；`GET /api/admin/llm-providers` 的 `presets` 字段读同一配置。
+3. API Key 白名单（`app/core/secret_guard.py`）改为读这份配置的域名（加 `news-radar-v1.json` 的内置默认），新增预设即自动放行其官方域名。
+4. 预设（2026-10-09 按官方文档核对，**未用真实 Key 实测**）：
+
+| 厂商 | base_url | 模型 | 联网方式 | 核对来源 |
+|---|---|---|---|---|
+| OpenAI | https://api.openai.com/v1 | gpt-6-luna | openai_web_search | https://developers.openai.com/api/docs/models |
+| Claude（Anthropic） | https://api.anthropic.com/v1 | claude-sonnet-5-5 | anthropic_web_search（新） | https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool 、https://docs.claude.com/en/api/openai-sdk |
+| Google Gemini | https://generativelanguage.googleapis.com/v1beta/openai | gemini-3.8-flash | none | https://ai.google.dev/gemini-api/docs/openai |
+| DeepSeek | https://api.deepseek.com | deepseek-v4-pro | none | https://api-docs.deepseek.com/ |
+| 通义千问 | https://dashscope.aliyuncs.com/compatible-mode/v1 | qwen3.7-plus | qwen_enable_search | https://help.aliyun.com/zh/model-studio/web-search |
+| 智谱 GLM | https://open.bigmodel.cn/api/paas/v4 | glm-5.3 | zhipu_web_search | https://docs.bigmodel.cn/cn/guide/start/quick-start |
+| Kimi | https://api.moonshot.cn/v1 | kimi-k3 | kimi_search | https://platform.moonshot.cn/docs/introduction |
+| 豆包（火山方舟） | https://ark.cn-beijing.volces.com/api/v3 | doubao-seed-2-1-pro-260628 | doubao_web_search（新） | https://docs.volcengine.com/docs/ark/web-search?lang=zh |
+| MiniMax | https://api.minimax.cn/v1 | MiniMax-M3 | none | https://platform.minimaxi.com/docs/api-reference/text-openai-api |
+
+5. Claude 不联网的场景（资讯研判打分）走 Anthropic 官方 OpenAI 兼容接口 `/v1/chat/completions`（同一 base_url；官方说明该兼容层主要用于测试对比、`response_format` 被忽略——我们的打分解析本来就从文本里取 JSON）；联网场景走原生 Messages 接口（ADR 0012 补充）。
+6. 已登记的模型不受影响（预设只预填表单）。硅基流动未加入：官方快速上手示例模型过旧，无法确认当前可用的模型 ID。
+
+**记录**
+
+- designed：本节。
+- implemented：`config/model-presets-v1.json`、`backend/app/domains/news/model_presets.py`、`backend/app/api/admin.py`（`/llm-presets`、`search_mode` 校验改由 `agent.SEARCH_MODES` 生成）、`backend/app/core/secret_guard.py`、前端 `pages/settings.tsx`；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建；`deploy/secrets-example/app.env` 增加各厂商变量名示例。
+- verified：`tests/test_r9_model_presets.py`（配置字段齐全、provider_key 唯一、search_mode 与代码一致、每个域名在白名单、需联网场景有可联网预设、前端无硬编码、接口权限与内容、每个预设可原样保存且不被拦截）；本机无 PostgreSQL，非数据库测试本机通过，数据库相关测试以 CI 为准。**未用真实厂商 Key 联调。**

@@ -1796,6 +1796,28 @@
         }
       }
     },
+    "/api/admin/llm-presets": {
+      "get": {
+        "tags": [
+          "后台设置"
+        ],
+        "summary": "Llm Presets",
+        "description": "内置模型预设（config/model-presets-v1.json）：添加模型时用来预填表单，不含任何密钥。",
+        "operationId": "llm_presets_api_admin_llm_presets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelPresetsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/llm-providers/{provider_id}": {
       "put": {
         "tags": [
@@ -4288,6 +4310,94 @@
         ],
         "title": "LoginIn"
       },
+      "ModelPresetOut": {
+        "properties": {
+          "provider_key": {
+            "type": "string",
+            "title": "Provider Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "vendor": {
+            "type": "string",
+            "title": "Vendor"
+          },
+          "base_url": {
+            "type": "string",
+            "title": "Base Url"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "api_key_env": {
+            "type": "string",
+            "title": "Api Key Env"
+          },
+          "search_mode": {
+            "type": "string",
+            "title": "Search Mode"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "doc_url": {
+            "type": "string",
+            "title": "Doc Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider_key",
+          "name",
+          "vendor",
+          "base_url",
+          "model",
+          "api_key_env",
+          "search_mode",
+          "note",
+          "doc_url"
+        ],
+        "title": "ModelPresetOut"
+      },
+      "ModelPresetsOut": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "verified_on": {
+            "type": "string",
+            "title": "Verified On"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ModelPresetOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "search_modes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Search Modes",
+            "description": "联网方式 → 中文名"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "verified_on",
+          "items",
+          "search_modes"
+        ],
+        "title": "ModelPresetsOut"
+      },
       "NoteIn": {
         "properties": {
           "company_id": {
@@ -4869,7 +4979,7 @@
           },
           "search_mode": {
             "type": "string",
-            "pattern": "^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search)$",
+            "pattern": "^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search|doubao_web_search|anthropic_web_search)$",
             "title": "Search Mode",
             "default": "none"
           }

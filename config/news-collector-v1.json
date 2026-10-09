@@ -47,42 +47,37 @@
       },
       "tool_choice": "required",
       "reasoning_effort": "max",
-      "request_timeout_seconds": 900
+      "request_timeout_seconds": 900,
+      "system_as_instructions": true
+    },
+    "anthropic_web_search": {
+      "label": "Claude · Messages 接口 web_search 工具",
+      "endpoint": "/messages",
+      "anthropic_version": "2023-06-01",
+      "tool": {
+        "type": "web_search_20260318",
+        "name": "web_search",
+        "max_uses": 8,
+        "allowed_callers": [
+          "direct"
+        ]
+      },
+      "max_tokens": 16000,
+      "request_timeout_seconds": 600
+    },
+    "doubao_web_search": {
+      "label": "豆包（火山方舟）· Responses 接口 web_search 工具",
+      "endpoint": "/responses",
+      "tool": {
+        "type": "web_search",
+        "sources": [
+          "doubao"
+        ]
+      },
+      "max_tool_calls": 10,
+      "system_as_instructions": false,
+      "request_timeout_seconds": 600
     }
   },
-  "provider_presets": [
-    {
-      "provider_key": "qwen",
-      "name": "通义千问",
-      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-      "model": "qwen-plus",
-      "api_key_env": "VIP_QWEN_API_KEY",
-      "search_mode": "qwen_enable_search"
-    },
-    {
-      "provider_key": "zhipu",
-      "name": "智谱 GLM",
-      "base_url": "https://open.bigmodel.cn/api/paas/v4",
-      "model": "glm-4-air",
-      "api_key_env": "VIP_ZHIPU_API_KEY",
-      "search_mode": "zhipu_web_search"
-    },
-    {
-      "provider_key": "kimi",
-      "name": "Kimi",
-      "base_url": "https://api.moonshot.cn/v1",
-      "model": "kimi-k3",
-      "api_key_env": "VIP_MOONSHOT_API_KEY",
-      "search_mode": "kimi_search"
-    },
-    {
-      "provider_key": "openai",
-      "name": "OpenAI",
-      "base_url": "https://api.openai.com/v1",
-      "model": "gpt-6-luna",
-      "api_key_env": "VIP_OPENAI_API_KEY",
-      "search_mode": "openai_web_search"
-    }
-  ],
-  "notes": "Kimi 的 $web_search 内置工具预计 2026-10-20 下线，所以 kimi_search 用 Kimi 官方 /v1/tools/search_pro 接口（与对话同一个 Key）以函数调用方式接入。"
+  "notes": "Kimi 的 $web_search 内置工具预计 2026-10-20 下线，所以 kimi_search 用 Kimi 官方 /v1/tools/search_pro 接口（与对话同一个 Key）以函数调用方式接入。 模型预设已移到 config/model-presets-v1.json。anthropic_web_search 用 Anthropic 原生 Messages 接口的服务端 web_search 工具（allowed_callers=[\"direct\"] 关闭动态过滤，输出更可预测；去掉该项即启用动态过滤）。doubao_web_search 复用 Responses 接口解析（与 openai_web_search 同一段代码），工具为豆包搜索 Custom 版。"
 }

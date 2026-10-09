@@ -117,7 +117,7 @@ class LlmProvider(Base):
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     options_json: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
-    # How the model reaches the web: none | qwen_enable_search | zhipu_web_search | kimi_search
+    # How the model reaches the web: one of app.domains.news.agent.SEARCH_MODES (none, qwen_enable_search, …)
     search_mode: Mapped[str] = mapped_column(String(30), nullable=False, default='none', server_default='none')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
 
