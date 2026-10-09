@@ -3,9 +3,10 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.api.deps import Principal, require_any
+from app.core.paging import PageParams, page, page_params
 from app.core.uow import unit_of_work
 from app.db import get_db
-from app.domains.news import collector
+from app.domains.news import collector, collector_presets
 
 router = APIRouter(prefix='/api/admin', tags=['后台设置'])
 
@@ -34,6 +35,62 @@ class CollectorIn(BaseModel):
     skill_id: str | None = Field(None, max_length=36)
     schedule: ScheduleIn
     enabled: bool = True
+
+
+class PresetInstallIn(BaseModel):
+    provider_id: str = Field(min_length=1, max_length=36, description='用哪个能联网的模型执行这些定时器')
+    keys: list[str] | None = Field(None, max_length=50, description='只导入这些预置任务（不填则全部）')
+
+
+class PresetScheduleOut(BaseModel):
+    type: str
+    times: list[str] | None = None
+    weekdays: list[int] | None = None
+    minutes: int | None = None
+
+
+class PresetTaskOut(BaseModel):
+    key: str
+    name: str
+    prompt: str
+    merged_from: list[str]
+    schedule: PresetScheduleOut
+    schedule_text: str
+    installed: bool
+    task_id: str | None
+
+
+class PresetSkillOut(BaseModel):
+    skill_key: str
+    name: str
+    description: str
+    installed: bool
+    skill_id: str | None
+
+
+class PresetListOut(BaseModel):
+    version: int
+    name: str
+    description: str
+    skill: PresetSkillOut
+    items: list[PresetTaskOut]
+    total: int
+    limit: int
+    offset: int
+
+
+class PresetRef(BaseModel):
+    key: str
+    name: str
+    task_id: str
+
+
+class PresetInstallOut(BaseModel):
+    version: int
+    skill_id: str
+    skill_created: bool
+    created: list[PresetRef]
+    skipped: list[PresetRef]
 
 
 # ------------------------------------------------------------------ Skill
@@ -84,6 +141,22 @@ def collector_options(principal: Principal = Depends(require_any(*ADMIN)), db=De
                            'key_configured': service.provider_config(p).configured} for p in rows],
             'skills': [{'id': s['id'], 'name': s['name'], 'enabled': s['enabled']} for s in collector.list_skills(db, principal.workspace.id)],
             'min_interval_minutes': policy()['min_interval_minutes'], 'timezone': policy()['timezone']}
+
+
+@router.get('/collectors/presets', response_model=PresetListOut)
+def collector_presets_list(params: PageParams = Depends(page_params), principal: Principal = Depends(require_any(*ADMIN)),
+                           db=Depends(get_db)):
+    """预置采集定时器包（config/collector-presets-v1.json）及本工作区是否已导入。"""
+    data = collector_presets.list_presets(db, principal.workspace.id)
+    items = data.pop('items')
+    return {**data, **page(items[params.offset:params.offset + params.limit], len(items), params)}
+
+
+@router.post('/collectors/presets/install', response_model=PresetInstallOut)
+def collector_presets_install(body: PresetInstallIn, principal: Principal = Depends(require_any(*ADMIN)), db=Depends(get_db)):
+    """导入预置采集定时器：缺的创建、已有的跳过（按 Skill 标识和定时器名称判断），可重复执行。"""
+    with unit_of_work(db):
+        return collector_presets.install(db, principal.workspace.id, principal.user.id, body.provider_id, body.keys)
 
 
 @router.post('/collectors')

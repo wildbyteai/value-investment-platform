@@ -5,6 +5,7 @@
     python -m app.admin_cli set-password alice@example.com          # prompts twice, never echoes
     python -m app.admin_cli disable-user alice@example.com          # also signs out every browser
     python -m app.admin_cli list-users
+    python -m app.admin_cli install-collector-presets --workspace "价值投资研究" --provider qwen   # 预置采集定时器，可重复执行
 
 Passwords are read with getpass (or one line from stdin with --stdin), never from argv, so they
 do not end up in shell history or the process list.
@@ -15,9 +16,11 @@ import sys
 
 from sqlalchemy import select
 
+from app.core.errors import DomainError
 from app.domains.identity import passwords, sessions
 from app.db import SessionLocal
 from app.models.identity import Membership, User, Workspace
+from app.models.news import LlmProvider
 from app.domains.identity.permissions import VALID_ROLES
 
 
@@ -48,6 +51,32 @@ def _read_password(stdin: bool) -> str:
     return pw
 
 
+def _provider(db, ws: Workspace, ref: str) -> LlmProvider:
+    row = db.get(LlmProvider, ref) if len(ref) == 36 else None
+    row = row or db.scalar(select(LlmProvider).where(LlmProvider.workspace_id == ws.id, LlmProvider.provider_key == ref))
+    if row is None or row.workspace_id != ws.id:
+        sys.exit(f'工作区 {ws.name} 里没有模型：{ref}（先在 后台设置 › 模型配置 添加，可用 id 或标识）')
+    return row
+
+
+def _install_presets(db, args) -> None:
+    from app.domains.news import collector_presets
+    ws = _workspace(db, args.workspace)
+    provider = _provider(db, ws, args.provider)
+    actor = _user(db, args.actor).id if args.actor else None
+    try:
+        result = collector_presets.install(db, ws.id, actor, provider.id, args.only or None)
+    except DomainError as exc:
+        db.rollback()
+        sys.exit(exc.detail)
+    db.commit()
+    print(f"Skill「{collector_presets.presets()['skill']['name']}」：{'新建' if result['skill_created'] else '已存在'}")
+    for c in result['created']:
+        print(f"新建：{c['name']}")
+    for c in result['skipped']:
+        print(f"已存在，跳过：{c['name']}")
+
+
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(prog='python -m app.admin_cli')
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -58,9 +87,14 @@ def main(argv=None) -> None:
     d = sub.add_parser('disable-user'); d.add_argument('login')
     e = sub.add_parser('enable-user'); e.add_argument('login')
     sub.add_parser('list-users')
+    ip = sub.add_parser('install-collector-presets', help='导入预置采集定时器（config/collector-presets-v1.json），已有的跳过')
+    ip.add_argument('--workspace', required=True); ip.add_argument('--provider', required=True, help='能联网的模型：id 或标识（如 qwen）')
+    ip.add_argument('--only', action='append', help='只导入某个预置任务的 key，可多次'); ip.add_argument('--actor', help='记在审计里的账号')
     args = p.parse_args(argv)
     with SessionLocal() as db:
-        if args.cmd == 'create-workspace':
+        if args.cmd == 'install-collector-presets':
+            _install_presets(db, args)
+        elif args.cmd == 'create-workspace':
             ws = Workspace(name=args.name); db.add(ws); db.commit(); print(ws.id)
         elif args.cmd == 'create-user':
             ws = _workspace(db, args.workspace)
