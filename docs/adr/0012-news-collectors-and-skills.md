@@ -63,3 +63,16 @@
 - designed：本节。
 - implemented：`config/collector-presets-v1.json`、`backend/app/domains/news/collector_presets.py`、`backend/app/api/collectors.py`（两个预置接口）、`backend/app/admin_cli.py`（`install-collector-presets`）、前端 `pages/settings.tsx` 的导入面板；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建。
 - verified：`tests/test_r7_collector_presets.py`（配置合法、6 个周期都过 `validate_schedule` 且错开在 06:00–06:50、提示词不含本机路径/Excel/飞书/lark-cli、公司代码、权限 403、拒绝不联网或不存在的模型与未知 key 且不落库、分批导入与重复导入幂等、审计、Skill 进入系统提示词、命令行导入）；本机隔离 PostgreSQL 全量后端测试与前端构建通过，CI 结果见对应 PR。**未用真实厂商 Key 实际跑过这 6 个提示词**，导入后建议先对每个定时器点一次“立即执行”，看执行记录里的模型原始输出再调整提示词。页面未在浏览器里截图检查（本机无可用浏览器），只做了类型检查与构建。
+
+## 补充（2026-10-09）：模型可按场景配置
+
+见 ADR 0015：定时器的“模型”改为可选，不选则跟随场景“资讯采集”（后台设置 › 模型配置 › 按场景配置模型）；导入预置包也可以不指定模型。定时器单独选的模型仍优先。
+
+## 补充（2026-10-09）：Claude 与豆包的联网方式
+
+- `anthropic_web_search`：Claude 用 Anthropic 原生 Messages 接口 `POST {base_url}/messages`（预设 base_url `https://api.anthropic.com/v1`），请求头 `x-api-key` + `anthropic-version: 2023-06-01`，工具 `{"type": "web_search_20260318", "name": "web_search", "max_uses": 8, "allowed_callers": ["direct"]}`（搜索由 Anthropic 服务端执行；`allowed_callers: ["direct"]` 关闭“动态过滤”，输出只有文字/搜索块，更可预测，去掉即启用），`max_tokens` 16000，超时 600 秒。`stop_reason: pause_turn` 时把已返回内容作为 assistant 消息原样回传继续（最多 `max_tool_rounds` 轮）；答案取最后一个工具块之后的文字（之前的“我先搜一下”丢弃），搜索词记入执行记录。Key 只放在 `x-api-key` 头，不进 URL、日志或错误信息。
+- `doubao_web_search`：火山方舟 Responses 接口 `POST {base_url}/responses`（`https://ark.cn-beijing.volces.com/api/v3`），工具 `{"type": "web_search", "sources": ["doubao"]}`（豆包搜索 Custom 版，需先在方舟控制台开通），`max_tool_calls` 10；请求与响应同 OpenAI Responses，复用 `openai_web_search` 的解析代码（系统提示放在 input 的 system 消息里，不用 instructions；不发 tool_choice / reasoning）。
+- Gemini（OpenAI 兼容接口）、DeepSeek、MiniMax 的兼容接口不带联网搜索，预设为 `none`，只能用于“资讯研判打分”等不联网场景。
+- 配置：`config/news-collector-v1.json` `search_modes`；预设见 ADR 0015 补充。
+
+**记录**：designed 本节；implemented `backend/app/domains/news/agent.py`（`_anthropic_messages`、`_openai_responses` 按模式取配置）、`config/news-collector-v1.json`；verified `tests/test_r9_model_presets.py`（模拟传输：路径、请求头、工具定义、pause_turn 续传、答案截取、401 错误不含 Key、白名单外地址不发请求；豆包请求形状与解析）。**未用真实厂商 Key 联调。**

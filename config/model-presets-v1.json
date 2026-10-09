@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "model-presets",
+  "version": 1,
+  "name": "内置模型预设 v1",
+  "verified_on": "2026-10-09",
+  "note": "模型配置页“添加模型”里的预设，唯一来源（前端不再硬编码）。每条预设的接口地址、模型名、联网方式都按厂商官方文档核对（doc_url），核对日期见 verified_on；尚未用真实 Key 实测。接口域名会自动进入 API Key 的允许列表（app/core/secret_guard.py）。search_mode 必须是 config/news-collector-v1.json search_modes 里的一项；none 表示该模型只能用于不需要联网的场景（如“资讯研判打分”）。",
+  "presets": [
+    {
+      "provider_key": "openai",
+      "name": "OpenAI",
+      "vendor": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-6-luna",
+      "api_key_env": "VIP_OPENAI_API_KEY",
+      "search_mode": "openai_web_search",
+      "note": "联网走 Responses 接口的 web_search 工具。gpt-6-luna 为高频低成本档；需要更强推理可改 gpt-6.1-sol 或旗舰 gpt-6-astra。",
+      "doc_url": "https://developers.openai.com/api/docs/models"
+    },
+    {
+      "provider_key": "claude",
+      "name": "Claude（Anthropic）",
+      "vendor": "Anthropic",
+      "base_url": "https://api.anthropic.com/v1",
+      "model": "claude-sonnet-5-5",
+      "api_key_env": "VIP_ANTHROPIC_API_KEY",
+      "search_mode": "anthropic_web_search",
+      "note": "联网走 Anthropic 原生 Messages 接口（POST /v1/messages）的服务端 web_search 工具；不联网的场景走官方 OpenAI 兼容接口（/v1/chat/completions，官方称主要用于测试对比）。旗舰可改 claude-opus-5-5。",
+      "doc_url": "https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool"
+    },
+    {
+      "provider_key": "gemini",
+      "name": "Google Gemini",
+      "vendor": "Google",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "model": "gemini-3.8-flash",
+      "api_key_env": "VIP_GEMINI_API_KEY",
+      "search_mode": "none",
+      "note": "官方 OpenAI 兼容接口（Beta）。该兼容接口的对话不提供 Google 搜索，只用于不联网的场景。",
+      "doc_url": "https://ai.google.dev/gemini-api/docs/openai"
+    },
+    {
+      "provider_key": "deepseek",
+      "name": "DeepSeek",
+      "vendor": "DeepSeek",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-v4-pro",
+      "api_key_env": "VIP_DEEPSEEK_API_KEY",
+      "search_mode": "none",
+      "note": "OpenAI 兼容接口，接口本身不带联网搜索，只用于不联网的场景。低成本可改 deepseek-flash。",
+      "doc_url": "https://api-docs.deepseek.com/"
+    },
+    {
+      "provider_key": "qwen",
+      "name": "通义千问",
+      "vendor": "阿里云百炼",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen3.7-plus",
+      "api_key_env": "VIP_QWEN_API_KEY",
+      "search_mode": "qwen_enable_search",
+      "note": "OpenAI 兼容接口 + enable_search 联网（华北2 北京地域）。旗舰可改 qwen3.8-max。",
+      "doc_url": "https://help.aliyun.com/zh/model-studio/web-search"
+    },
+    {
+      "provider_key": "zhipu",
+      "name": "智谱 GLM",
+      "vendor": "智谱",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "glm-5.3",
+      "api_key_env": "VIP_ZHIPU_API_KEY",
+      "search_mode": "zhipu_web_search",
+      "note": "对话接口 tools 里的 web_search 工具（文本模型支持）。",
+      "doc_url": "https://docs.bigmodel.cn/cn/guide/start/quick-start"
+    },
+    {
+      "provider_key": "kimi",
+      "name": "Kimi",
+      "vendor": "月之暗面",
+      "base_url": "https://api.moonshot.cn/v1",
+      "model": "kimi-k3",
+      "api_key_env": "VIP_MOONSHOT_API_KEY",
+      "search_mode": "kimi_search",
+      "note": "模型以函数调用发起搜索，平台用同一个 Key 调 Kimi 官方 /v1/tools/search_pro。",
+      "doc_url": "https://platform.moonshot.cn/docs/introduction"
+    },
+    {
+      "provider_key": "doubao",
+      "name": "豆包（火山方舟）",
+      "vendor": "字节跳动 · 火山方舟",
+      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+      "model": "doubao-seed-2-1-pro-260628",
+      "api_key_env": "VIP_ARK_API_KEY",
+      "search_mode": "doubao_web_search",
+      "note": "联网走方舟 Responses 接口的 web_search 工具（豆包搜索 Custom 版，需先在方舟控制台“应用组件库 > 豆包搜索”开通）。模型名也可以填控制台里的推理接入点 ID。",
+      "doc_url": "https://docs.volcengine.com/docs/ark/web-search?lang=zh"
+    },
+    {
+      "provider_key": "minimax",
+      "name": "MiniMax",
+      "vendor": "MiniMax",
+      "base_url": "https://api.minimax.cn/v1",
+      "model": "MiniMax-M3",
+      "api_key_env": "VIP_MINIMAX_API_KEY",
+      "search_mode": "none",
+      "note": "国内站 OpenAI 兼容接口，不带联网搜索，只用于不联网的场景。注意 M3 默认开启思考，回复里可能带 <think> 段。",
+      "doc_url": "https://platform.minimaxi.com/docs/api-reference/text-openai-api"
+    }
+  ]
+}

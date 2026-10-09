@@ -1,6 +1,6 @@
 // 后台设置：数据源、资讯源、采集定时器、Skill、模型配置、告警发送。
 import React, { useEffect, useRef, useState } from "react";
-import { api, post, session, ApiError, authHeaders } from "../core/client";
+import { api, post, send, session, ApiError, authHeaders } from "../core/client";
 import { Ctx, ZONE, pct, num, signed, time, any, useLoad, Failed, ZoneBadge, Check, short, tone, Kpi } from "../components/common";
 import { Diagnostic, GapList, FinancialSummary, ResearchResult, ReferenceQuality, ReferenceValuation, CompareRuns, Dialog, dimensionName, criterionName, human, when } from "../components/ui";
 export function Sources(_: Ctx) {
@@ -77,60 +77,141 @@ export function Feeds({ allow, busy, execute }: Ctx) {
     </>
   );
 }
-export const PRESETS = [
-  { provider_key: "deepseek", name: "DeepSeek", base_url: "https://api.deepseek.com", model: "deepseek-chat", api_key_env: "VIP_DEEPSEEK_API_KEY", search_mode: "none" },
-  { provider_key: "qwen", name: "通义千问", base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1", model: "qwen-plus", api_key_env: "VIP_QWEN_API_KEY", search_mode: "qwen_enable_search" },
-  { provider_key: "zhipu", name: "智谱 GLM", base_url: "https://open.bigmodel.cn/api/paas/v4", model: "glm-4-air", api_key_env: "VIP_ZHIPU_API_KEY", search_mode: "zhipu_web_search" },
-  { provider_key: "kimi", name: "Kimi", base_url: "https://api.moonshot.cn/v1", model: "kimi-k3", api_key_env: "VIP_MOONSHOT_API_KEY", search_mode: "kimi_search" },
-  { provider_key: "openai", name: "OpenAI", base_url: "https://api.openai.com/v1", model: "gpt-6-luna", api_key_env: "VIP_OPENAI_API_KEY", search_mode: "openai_web_search" },
-];
-export const SEARCH_LABEL: Record<string, string> = { none: "不联网", qwen_enable_search: "通义 · 内置联网", zhipu_web_search: "智谱 · web_search", kimi_search: "Kimi · 官方搜索", openai_web_search: "OpenAI · web_search" };
+// 内置模型预设与联网方式名称都来自服务器（config/model-presets-v1.json、news-collector-v1.json），这里不再硬编码。
+const PRESET_FIELDS = ["provider_key", "name", "base_url", "model", "api_key_env", "search_mode"] as const;
+function presetForm(p: any) { return Object.fromEntries(PRESET_FIELDS.map((k) => [k, p?.[k] ?? (k === "search_mode" ? "none" : "")])); }
+const KEY_SOURCE: Record<string, string> = { page: "页面保存", env: "环境变量", none: "未配置" };
+function keyText(p: any) {
+  if (p.key_source === "page") return `页面保存 ${p.key_hint || ""}`;
+  if (p.key_source === "env") return `环境变量 ${p.api_key_env}`;
+  return "✗ 未配置";
+}
+// 按场景配置模型：每个调用大模型的地方（config/model-scenes-v1.json）选一个模型，不选则用默认模型。
+function ModelScenes({ busy, execute, providers, version }: Pick<Ctx, "busy" | "execute"> & { providers: any[]; version: number }) {
+  const scenes = useLoad<any>("/api/admin/model-scenes", [version]);
+  const [draft, setDraft] = useState<Record<string, string> | null>(null);
+  const items: any[] = scenes.value?.items || [];
+  const current = draft ?? Object.fromEntries(items.map((i) => [i.key, i.provider_id || ""]));
+  const dirty = draft !== null && items.some((i) => (draft[i.key] || "") !== (i.provider_id || ""));
+  async function save() {
+    const bindings = items.map((i) => ({ scene: i.key, provider_id: current[i.key] || null }));
+    const r = await execute(() => send("/api/admin/model-scenes", "PUT", { bindings }), "场景模型已保存。", false);
+    if (r !== undefined) { setDraft(null); scenes.reload(); }
+  }
+  return (
+    <section className="panel">
+      <div className="panel-head"><h3>按场景配置模型</h3><span className="right">不单独选择时使用默认模型</span></div>
+      <Failed error={scenes.error} />
+      <div className="table-scroll">
+        <table>
+          <thead><tr><th>场景</th><th>使用模型</th><th>当前生效</th><th>API Key</th></tr></thead>
+          <tbody>
+            {items.map((i) => {
+              const choices = providers.filter((p) => p.enabled && (!i.requires_search || p.search_mode !== "none"));
+              return (
+                <tr key={i.key}>
+                  <td><strong>{i.label}</strong>{i.requires_search && <> <span className="pill pill-wait">需联网</span></>}<div className="muted">{i.description}</div></td>
+                  <td><select className="scene-select" aria-label={`${i.label}使用的模型`} value={current[i.key] || ""} onChange={(e) => setDraft({ ...current, [i.key]: e.target.value })}>
+                    <option value="">使用默认模型</option>
+                    {choices.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.model}{!i.requires_search && p.search_mode !== "none" ? " · 可联网" : ""}{p.key_configured ? "" : " · 未配 Key"}</option>)}
+                  </select></td>
+                  <td><span className="nowrap">{i.effective.name} · {i.effective.model}</span><div className="muted">{{ scene: "本场景指定", workspace_default: "默认模型", builtin: "内置默认" }[i.source as string] || i.source}</div>
+                    {i.problem && <div className="muted danger">{i.problem}</div>}</td>
+                  <td className="nowrap">{i.effective.key_configured ? `✓ ${KEY_SOURCE[i.effective.key_source] || ""}` : "✗ 未配置"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="panel-body">
+        <button className="primary" disabled={busy || !dirty} onClick={save}>保存场景设置</button>
+        {dirty && <button type="button" onClick={() => setDraft(null)}>取消</button>}
+      </div>
+    </section>
+  );
+}
 export function Models({ busy, execute }: Ctx) {
   const list = useLoad<any>("/api/admin/llm-providers");
-  const blank = { ...PRESETS[0], is_default: true, enabled: true, temperature: 0 };
+  const presetList = useLoad<any>("/api/admin/llm-presets");
+  const presets: any[] = presetList.value?.items || [];
+  const blank = { ...presetForm(presets[0]), is_default: true, enabled: true, temperature: 0, api_key: "" };
   const [form, setForm] = useState<any>(blank);
-  const [editing, setEditing] = useState<string | null>(null);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [preset, setPreset] = useState<any | null>(null);
+  const [version, setVersion] = useState(0);
   const v = list.value;
+  const searchLabel: Record<string, string> = v?.search_modes || presetList.value?.search_modes || {};
+  useEffect(() => { if (presets.length && !editing && !preset) { setPreset(presets[0]); setForm((f: any) => ({ ...f, ...presetForm(presets[0]) })); } }, [presetList.value]);
+  function reset() { setEditing(null); setPreset(presets[0] || null); setForm(blank); }
   async function save(e: any) {
     e.preventDefault();
-    const r = await execute(() => (editing ? api(`/api/admin/llm-providers/${editing}`, { method: "PUT", body: JSON.stringify(form) }) : post("/api/admin/llm-providers", form)), "模型配置已保存。", false);
-    if (r !== undefined) { setEditing(null); setForm(blank); list.reload(); }
+    const { api_key, ...rest } = form;
+    const payload = { ...rest, api_key_env: rest.api_key_env || null, ...(api_key ? { api_key } : {}) };
+    const r = await execute(() => (editing ? send(`/api/admin/llm-providers/${editing.id}`, "PUT", payload) : post("/api/admin/llm-providers", payload)), "模型配置已保存。", false);
+    if (r !== undefined) { reset(); list.reload(); setVersion((x) => x + 1); }
+  }
+  async function clearKey(p: any) {
+    if (!confirm(`清除「${p.name}」在页面保存的 API Key？${p.api_key_env ? `之后改用环境变量 ${p.api_key_env}（如已设置）。` : "清除后该模型没有可用的 Key。"}`)) return;
+    const r = await execute(() => send(`/api/admin/llm-providers/${p.id}/api-key`, "DELETE"), "已清除保存的 API Key。", false);
+    if (r !== undefined) { list.reload(); setVersion((x) => x + 1); }
   }
   return (
     <>
-      <p className="intro">资讯关联打分使用 OpenAI 兼容接口的大模型，默认 DeepSeek。这里只登记“密钥放在哪个环境变量”，密钥本身由服务器环境注入，不进数据库。</p>
+      <p className="intro">登记可用的大模型（OpenAI 兼容接口），再按场景指定用哪个。API Key 可以直接在页面填写：加密后存入数据库，保存后任何页面和接口都不再显示；也可以继续用服务器环境变量，页面保存的 Key 优先。</p>
       <Failed error={list.error} />
+      {v && !v.secret_key_ready && <p className="notice">{v.secret_key_problem || "服务器未设置 VIP_SECRET_KEY"} 暂时只能使用环境变量里的密钥。</p>}
+      {v && <ModelScenes busy={busy} execute={execute} providers={v.providers} version={version} />}
       {v && (
-        <>
-          <p>当前使用：<strong>{v.active || `${v.builtin_default.name}（内置默认）`}</strong>{!v.providers.length && !v.builtin_default.key_configured && <span className="notice"> 服务器尚未设置 {v.builtin_default.api_key_env}，资讯关联暂用规则匹配。</span>}</p>
-          <table>
-            <thead><tr><th>模型</th><th>地址</th><th>密钥变量</th><th>联网</th><th>状态</th><th></th></tr></thead>
-            <tbody>
-              {v.providers.map((p: any) => (
-                <tr key={p.id}><td>{p.name}<div className="muted">{p.model}</div></td><td>{p.base_url}</td><td>{p.api_key_env} {p.key_configured ? "✓ 已设置" : "✗ 未设置"}</td>
-                  <td>{SEARCH_LABEL[p.search_mode] || p.search_mode}</td>
-                  <td>{p.enabled ? (p.is_default ? "默认" : "可用") : "停用"}</td>
-                  <td><button onClick={() => { setEditing(p.id); setForm({ ...p, temperature: p.options?.temperature ?? 0 }); }}>编辑</button></td></tr>
-              ))}
-            </tbody>
-          </table>
-        </>
+        <section className="panel">
+          <div className="panel-head"><h3>模型</h3><span className="right">默认模型：{v.active || `${v.builtin_default.name}（内置默认）`}</span></div>
+          {!v.providers.length && !v.builtin_default.key_configured && <p className="panel-body muted">还没有登记模型，服务器也未设置 {v.builtin_default.api_key_env}，资讯关联暂用规则匹配。</p>}
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>模型</th><th>地址</th><th>API Key</th><th>联网</th><th>状态</th><th></th></tr></thead>
+              <tbody>
+                {v.providers.map((p: any) => (
+                  <tr key={p.id}><td>{p.name}<div className="muted">{p.model}</div></td><td>{p.base_url}</td>
+                    <td>{keyText(p)}{p.key_saved && p.key_source !== "page" && p.key_problem && <div className="muted danger">已保存的 Key 不可用：{p.key_problem}</div>}
+                      {p.blocked && <div className="muted danger">{p.blocked}</div>}</td>
+                    <td>{searchLabel[p.search_mode] || p.search_mode}</td>
+                    <td>{p.enabled ? (p.is_default ? "默认" : "可用") : "停用"}</td>
+                    <td className="actions">
+                      <button className="small" onClick={() => { setEditing(p); setForm({ ...p, api_key_env: p.api_key_env || "", api_key: "", temperature: p.options?.temperature ?? 0 }); }}>编辑</button>
+                      {p.key_saved && <button className="small danger" disabled={busy} onClick={() => clearKey(p)}>清除已保存的 Key</button>}
+                    </td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
       <form className="form" onSubmit={save}>
-        <h4>{editing ? "编辑模型" : "添加模型"}</h4>
-        {!editing && <label>预设<select onChange={(e) => setForm({ ...form, ...PRESETS[Number(e.target.value)] })}>{PRESETS.map((p, i) => <option key={p.provider_key} value={i}>{p.name}</option>)}</select></label>}
-        {["provider_key", "name", "base_url", "model", "api_key_env"].map((k) => (
-          <label key={k}>{{ provider_key: "标识", name: "名称", base_url: "接口地址", model: "模型名", api_key_env: "密钥环境变量" }[k]}<input required value={form[k] || ""} disabled={k === "provider_key" && !!editing} onChange={(e) => setForm({ ...form, [k]: e.target.value })} /></label>
+        <h4>{editing ? `编辑模型：${editing.name}` : "添加模型"}</h4>
+        {!editing && <label>预设<select aria-label="预设" value={preset?.provider_key || ""} onChange={(e) => { const p = presets.find((x) => x.provider_key === e.target.value); setPreset(p || null); if (p) setForm({ ...form, ...presetForm(p) }); }}>
+          {presets.map((p) => <option key={p.provider_key} value={p.provider_key}>{p.name} · {p.model}{p.search_mode === "none" ? "" : " · 可联网"}</option>)}
+        </select></label>}
+        {!editing && preset && <p className="muted">{preset.note} <a href={preset.doc_url} target="_blank" rel="noreferrer">官方文档</a>{presetList.value?.verified_on ? `（按官方文档核对于 ${presetList.value.verified_on}）` : ""}</p>}
+        <Failed error={presetList.error} />
+        {["provider_key", "name", "base_url", "model"].map((k) => (
+          <label key={k}>{{ provider_key: "标识", name: "名称", base_url: "接口地址", model: "模型名" }[k]}<input required value={form[k] || ""} disabled={k === "provider_key" && !!editing} onChange={(e) => setForm({ ...form, [k]: e.target.value })} /></label>
         ))}
+        <label>API Key（保存后不再显示）<input type="password" autoComplete="new-password" value={form.api_key} disabled={v && !v.secret_key_ready}
+          placeholder={editing?.key_saved ? `已保存 ${editing.key_hint || ""}，留空不修改` : v && !v.secret_key_ready ? "服务器未设置 VIP_SECRET_KEY，暂不能保存" : "粘贴 API Key"}
+          onChange={(e) => setForm({ ...form, api_key: e.target.value })} /></label>
+        <label>密钥环境变量（可选）<input value={form.api_key_env || ""} placeholder="VIP_QWEN_API_KEY" onChange={(e) => setForm({ ...form, api_key_env: e.target.value.trim() })} /></label>
+        <p className="muted">页面保存的 Key 优先；没有时读取这个环境变量。Key 只会发往该模型的接口域名，更换域名需要重新填写。</p>
         <label>联网方式<select value={form.search_mode || "none"} onChange={(e) => setForm({ ...form, search_mode: e.target.value })}>
-          {Object.entries((v?.search_modes as Record<string, string>) || SEARCH_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+          {Object.entries(searchLabel).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
         </select></label>
-        <p className="muted">采集定时器只能选能联网的模型。联网用的是厂商自带的搜索，和对话共用同一个密钥，不需要另配搜索服务。</p>
+        <p className="muted">“资讯采集”场景和采集定时器只能用能联网的模型。联网用的是厂商自带的搜索，和对话共用同一个 Key，不需要另配搜索服务。</p>
         <label>温度<input type="number" min={0} max={2} step={0.1} value={form.temperature} onChange={(e) => setForm({ ...form, temperature: Number(e.target.value) })} /></label>
-        <label className="inline"><input type="checkbox" checked={form.is_default} onChange={(e) => setForm({ ...form, is_default: e.target.checked })} /> 设为默认</label>
+        <label className="inline"><input type="checkbox" checked={form.is_default} onChange={(e) => setForm({ ...form, is_default: e.target.checked })} /> 设为默认模型</label>
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
-        <button className="primary" disabled={busy}>保存</button>
-        {editing && <button type="button" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+        <div className="btn-row">
+          <button className="primary" disabled={busy}>保存</button>
+          {editing && <button type="button" onClick={reset}>取消</button>}
+        </div>
       </form>
     </>
   );
@@ -140,16 +221,21 @@ export function Models({ busy, execute }: Ctx) {
 export const WEEK = ["一", "二", "三", "四", "五", "六", "日"];
 export const RUN_STATUS: Record<string, string> = { running: "执行中", succeeded: "成功", failed: "失败" };
 // 预置采集定时器包（config/collector-presets-v1.json）：选一个能联网的模型，一次导入；已导入的自动跳过。
-function CollectorPresets({ busy, execute, searchable, onInstalled }: Pick<Ctx, "busy" | "execute"> & { searchable: any[]; onInstalled: () => void }) {
+function sceneOption(scene: any) {
+  if (!scene) return "跟随场景“资讯采集”";
+  const ok = scene.provider && scene.search_mode !== "none";
+  return `跟随场景“${scene.label}”（${ok ? `当前：${scene.provider}` : "当前没有能联网的模型"}）`;
+}
+function CollectorPresets({ busy, execute, searchable, scene, onInstalled }: Pick<Ctx, "busy" | "execute"> & { searchable: any[]; scene: any; onInstalled: () => void }) {
   const presets = useLoad<any>("/api/admin/collectors/presets");
   const [provider, setProvider] = useState("");
   const [picked, setPicked] = useState<string[] | null>(null);
   const items: any[] = presets.value?.items || [];
   const missing = items.filter((i) => !i.installed).map((i) => i.key);
   const chosen = (picked ?? missing).filter((k) => missing.includes(k));
-  const providerId = provider || searchable[0]?.id || "";
+  const sceneReady = !!scene?.provider && scene.search_mode !== "none";
   async function install() {
-    const r = await execute(() => post("/api/admin/collectors/presets/install", { provider_id: providerId, keys: chosen }),
+    const r = await execute(() => post("/api/admin/collectors/presets/install", { provider_id: provider || null, keys: chosen }),
       (x: any) => `已导入 ${x.created.length} 个定时器${x.skipped.length ? `，${x.skipped.length} 个已存在跳过` : ""}${x.skill_created ? "，并新建共用 Skill" : ""}。`, false);
     if (r !== undefined) { setPicked(null); presets.reload(); onInstalled(); }
   }
@@ -176,11 +262,12 @@ function CollectorPresets({ busy, execute, searchable, onInstalled }: Pick<Ctx, 
       </table>
       {missing.length > 0 && (
         <div className="form">
-          <label>执行模型<select value={providerId} onChange={(e) => setProvider(e.target.value)} disabled={!searchable.length}>
-            {searchable.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
+          <label>执行模型<select value={provider} onChange={(e) => setProvider(e.target.value)}>
+            <option value="">{sceneOption(scene)}</option>
+            {searchable.map((p: any) => <option key={p.id} value={p.id}>单独指定：{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
           </select></label>
-          <button className="primary" disabled={busy || !providerId || !chosen.length} onClick={install}>导入选中的 {chosen.length} 个</button>
-          {!searchable.length && <p className="muted">需要先在 模型配置 添加一个能联网的模型。</p>}
+          <button className="primary" disabled={busy || (!provider && !sceneReady) || !chosen.length} onClick={install}>导入选中的 {chosen.length} 个</button>
+          {!provider && !sceneReady && <p className="muted">先在 模型配置 › 按场景配置模型 给“资讯采集”选一个能联网的模型，或在这里单独指定。</p>}
         </div>
       )}
     </details>
@@ -196,7 +283,7 @@ export function Collectors({ busy, execute }: Ctx) {
   const runs = useLoad<any[]>(runsOf ? `/api/admin/collectors/${runsOf}/runs` : "/api/admin/collectors", [runsOf]);
   const searchable = (opts.value?.providers || []).filter((p: any) => p.search_mode !== "none");
   const body = () => ({
-    name: form.name, prompt: form.prompt, provider_id: form.provider_id || searchable[0]?.id, skill_id: form.skill_id || null, enabled: form.enabled,
+    name: form.name, prompt: form.prompt, provider_id: form.provider_id || null, skill_id: form.skill_id || null, enabled: form.enabled,
     schedule: form.kind === "daily" ? { type: "daily", times: String(form.times).split(/[,，\s]+/).filter(Boolean), weekdays: form.weekdays } : { type: "interval", minutes: Number(form.minutes) },
   });
   async function save(e: any) {
@@ -214,14 +301,14 @@ export function Collectors({ busy, execute }: Ctx) {
       <p className="intro">像 Agent 定时任务一样采集资讯：写好提示词、选一个能联网的模型（可再选一个 Skill 让模型按流程走），到点自动执行。采到的资讯进入资讯雷达，和 Excel、RSS 一样去重、关联公司、等你确认。时间按北京时间。</p>
       <Failed error={list.error || opts.error} />
       {opts.value && !searchable.length && <p className="notice">还没有能联网的模型。先到 模型配置 添加通义、智谱、Kimi 或 OpenAI，并选择联网方式。</p>}
-      {opts.value && <CollectorPresets busy={busy} execute={execute} searchable={searchable} onInstalled={() => { list.reload(); opts.reload(); }} />}
+      {opts.value && <CollectorPresets busy={busy} execute={execute} searchable={searchable} scene={opts.value.scene} onInstalled={() => { list.reload(); opts.reload(); }} />}
       <table>
         <thead><tr><th>定时器</th><th>模型 / Skill</th><th>周期</th><th>下次执行</th><th>最近一次</th><th></th></tr></thead>
         <tbody>
           {list.value?.map((t) => (
             <tr key={t.id}>
               <td>{t.name}<div className="muted">{t.prompt.slice(0, 60)}{t.prompt.length > 60 ? "…" : ""}</div></td>
-              <td>{t.provider || "—"}<div className="muted">{t.skill ? `Skill：${t.skill}` : "不用 Skill"}</div></td>
+              <td>{t.provider || "—"}{t.follows_scene && <div className="muted">跟随场景“资讯采集”</div>}<div className="muted">{t.skill ? `Skill：${t.skill}` : "不用 Skill"}</div></td>
               <td>{t.enabled ? t.schedule_text : "已停用"}</td>
               <td>{t.enabled ? time(t.next_run_at) : "—"}</td>
               <td>{t.last_status || "尚未执行"}<div className="muted">{t.last_run_at ? time(t.last_run_at) : ""}</div></td>
@@ -255,7 +342,8 @@ export function Collectors({ busy, execute }: Ctx) {
         <h4>{editing ? "编辑采集定时器" : "新建采集定时器"}</h4>
         <label>名称<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="创新药重点公司早报" /></label>
         <label>提示词<textarea required value={form.prompt} onChange={(e) => setForm({ ...form, prompt: e.target.value })} placeholder="采集过去 24 小时内诺诚健华、百济神州、信达生物的公告、临床进展和重要新闻……" /></label>
-        <label>模型<select required value={form.provider_id || searchable[0]?.id || ""} onChange={(e) => setForm({ ...form, provider_id: e.target.value })}>
+        <label>模型<select value={form.provider_id || ""} onChange={(e) => setForm({ ...form, provider_id: e.target.value })}>
+          <option value="">{sceneOption(opts.value?.scene)}</option>
           {searchable.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
         </select></label>
         <label>Skill（可选）<select value={form.skill_id} onChange={(e) => setForm({ ...form, skill_id: e.target.value })}>
@@ -274,7 +362,7 @@ export function Collectors({ busy, execute }: Ctx) {
           <label>间隔分钟（不少于 {opts.value?.min_interval_minutes ?? 60}）<input type="number" min={opts.value?.min_interval_minutes ?? 60} step={30} value={form.minutes} onChange={(e) => setForm({ ...form, minutes: e.target.value })} /></label>
         )}
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
-        <button className="primary" disabled={busy || !searchable.length}>保存</button>
+        <button className="primary" disabled={busy}>保存</button>
         {editing && <button type="button" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
         <p className="muted">定时执行需要服务器每 5 分钟跑一次 python -m app.jobs collect。</p>
       </form>

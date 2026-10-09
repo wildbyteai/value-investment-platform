@@ -1,16 +1,18 @@
 """Keep model API keys from being sent anywhere but the vendor they belong to.
 
-An administrator chooses, per model, a base URL and the *name* of the environment variable
-that holds its key. Without limits, that admin (or anyone holding an admin session) could point
+An administrator chooses, per model, a base URL and either types the key on the page (stored
+encrypted, app/core/secret_box.py) or names the environment variable that holds it. Without limits, that admin (or anyone holding an admin session) could point
 ``base_url`` at their own server and pick ``VIP_OPENAI_API_KEY`` -- or even ``VIP_SMTP_PASSWORD``
 -- and the platform would send the secret there on the next call. So:
 
-* the variable must look like a model key (``VIP_…_KEY``) and never be another secret;
+* the variable must look like a model key (``VIP_…_KEY``) and never be another secret
+  (in particular not the master key ``VIP_SECRET_KEY`` / ``VIP_SECRET_KEY_PREVIOUS``);
 * the URL must be HTTPS and its host must be on the allowlist: the vendor hosts in
-  ``config/*.json`` plus whatever the server operator adds in ``VIP_LLM_ALLOWED_HOSTS``.
+  ``config/model-presets-v1.json`` and ``config/news-radar-v1.json`` plus whatever the server operator adds in ``VIP_LLM_ALLOWED_HOSTS``.
   Only someone who can edit the server environment can widen it, not the web admin.
 
-The same check runs when a key is read, so a row saved before this guard existed is inert.
+The same check runs when a key is read (page-saved or env), so a row saved before this guard
+existed is inert.
 """
 from __future__ import annotations
 
@@ -26,17 +28,17 @@ import httpx
 
 from app.core.paths import REPO_ROOT as ROOT
 KEY_ENV_RE = re.compile(r'^VIP_[A-Z0-9_]+_KEY$')
-FORBIDDEN_PREFIXES = ('VIP_DB', 'VIP_SMTP', 'VIP_SESSION', 'VIP_AUTH', 'VIP_ADMIN', 'VIP_POSTGRES')
+FORBIDDEN_PREFIXES = ('VIP_DB', 'VIP_SMTP', 'VIP_SESSION', 'VIP_AUTH', 'VIP_ADMIN', 'VIP_POSTGRES', 'VIP_SECRET')
 
 
 def _config_hosts() -> set[str]:
     hosts: set[str] = set()
-    for name in ('news-collector-v1.json', 'news-radar-v1.json'):
+    for name in ('model-presets-v1.json', 'news-radar-v1.json'):
         try:
             data = json.loads((ROOT / 'config' / name).read_text(encoding='utf-8'))
         except (OSError, ValueError):
             continue
-        rows = list(data.get('provider_presets') or [])
+        rows = list(data.get('presets') or [])
         if data.get('default_llm_provider'):
             rows.append(data['default_llm_provider'])
         for row in rows:

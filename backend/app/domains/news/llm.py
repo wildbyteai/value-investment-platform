@@ -1,14 +1,16 @@
 """OpenAI-compatible chat client used to link events to companies.
 
 Works with DeepSeek (default), OpenAI, Qwen/DashScope, Moonshot, Zhipu, local vLLM or
-Ollama: anything that serves ``POST {base_url}/chat/completions``. The key is read from
-the environment variable named on the provider; it never touches the database or logs.
+Ollama: anything that serves ``POST {base_url}/chat/completions``. The key is the one an
+administrator saved on the 模型配置 page (AES-GCM encrypted in the database, see
+app/core/secret_box.py) or, failing that, the environment variable named on the provider. It is
+decrypted only when a request is about to be sent and never reaches logs, audit or run records.
 """
 from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
 import httpx
@@ -29,23 +31,70 @@ class ProviderConfig:
     name: str
     base_url: str
     model: str
-    api_key_env: str
+    api_key_env: str | None
     options: dict | None = None
     search_mode: str = 'none'
+    # Page-saved key: ciphertext + the row it is bound to. Decrypted lazily, never kept in repr.
+    api_key_ciphertext: str | None = field(default=None, repr=False)
+    row_id: str | None = None
 
     @property
     def blocked(self) -> str | None:
-        from app.core.secret_guard import provider_problem
-        return provider_problem(self.base_url, self.api_key_env)
+        from app.core.secret_guard import base_url_problem, key_env_problem
+        if self.api_key_env:
+            env_problem = key_env_problem(self.api_key_env)
+            if env_problem and not self.api_key_ciphertext:
+                return env_problem
+        return base_url_problem(self.base_url)
+
+    def _page_key(self) -> tuple[str, str | None]:
+        """(key, problem) for the page-saved key; ('', None) when there is none."""
+        if not self.api_key_ciphertext:
+            return '', None
+        from app.core import secret_box
+        try:
+            return secret_box.decrypt(self.api_key_ciphertext, f'llm_provider:{self.row_id}'), None
+        except secret_box.SecretBoxError as exc:
+            return '', str(exc)
+
+    def _env_key(self) -> str:
+        from app.core.secret_guard import key_env_problem
+        if not self.api_key_env or key_env_problem(self.api_key_env):
+            return ''
+        return os.environ.get(self.api_key_env, '')
+
+    @property
+    def key_source(self) -> str:
+        """'page' (saved on the page, decryptable) > 'env' (environment variable) > 'none'."""
+        if self.blocked:
+            return 'none'
+        if self._page_key()[0]:
+            return 'page'
+        return 'env' if self._env_key() else 'none'
+
+    @property
+    def key_problem(self) -> str | None:
+        """Why a saved page key cannot be used (master key missing/changed); safe to show."""
+        return self._page_key()[1]
 
     @property
     def api_key(self) -> str:
         # Never hand a key to a URL or variable that fails the guard (see app/core/secret_guard.py).
-        return '' if self.blocked else os.environ.get(self.api_key_env, '')
+        if self.blocked:
+            return ''
+        return self._page_key()[0] or self._env_key()
 
     @property
     def configured(self) -> bool:
         return bool(self.api_key)
+
+    @property
+    def missing_key_message(self) -> str:
+        if self.key_problem:
+            return f'模型密钥不可用：{self.key_problem}'
+        if self.api_key_env:
+            return f'未配置模型密钥（页面未保存 Key，环境变量 {self.api_key_env} 也未设置）'
+        return '未配置模型密钥：请在 模型配置 里填写 API Key'
 
 
 @dataclass
@@ -105,7 +154,7 @@ def propose_links(provider: ProviderConfig, event_text: str, watchlist: list[str
     if provider.blocked:
         raise LlmError(f'模型配置未通过安全检查：{provider.blocked}')
     if not provider.configured:
-        raise LlmError(f'未配置模型密钥（环境变量 {provider.api_key_env}）')
+        raise LlmError(provider.missing_key_message)
     body = {
         'model': provider.model,
         'temperature': (provider.options or {}).get('temperature', 0),

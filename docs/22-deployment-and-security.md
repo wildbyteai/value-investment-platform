@@ -25,7 +25,7 @@
 git clone <仓库> /opt/vip && cd /opt/vip/deploy
 cp .env.example .env && chmod 600 .env            # 填域名、两个数据库密码（openssl rand -base64 32）
 mkdir -p secrets && cp secrets-example/app.env secrets/app.env && chmod 600 secrets/app.env
-#   ↑ 填模型密钥、SMTP；只填用到的
+#   ↑ 填 VIP_SECRET_KEY（openssl rand -base64 32）、SMTP；模型密钥可以填这里，也可以之后在页面 模型配置 填写
 # DNS：把域名 A 记录指向服务器公网 IP
 docker compose up -d --build                     # 自动执行 alembic upgrade head，再起 api/worker/scheduler/caddy
 docker compose ps && curl -I https://<你的域名>/api/health
@@ -43,10 +43,13 @@ docker compose run --rm -it api python -m app.admin_cli set-password you@example
 
 角色：viewer / researcher / strategy_manager / data_admin / system_admin，可多次 `--role`。停用账号：`disable-user`（同时踢下线）。
 
-预置每日资讯采集任务（6 个定时器 + 共用 Skill，见 ADR 0012 补充）：先在 **后台设置 › 模型配置** 添加一个能联网的模型，再在 **后台设置 › 采集定时器** 点“导入预置采集任务”，或在服务器上：
+模型：在 **后台设置 › 模型配置** 添加模型并直接填写 API Key（加密入库，见 ADR 0015），再在“按场景配置模型”里给 **资讯采集**（必须能联网）和 **资讯研判打分** 各选一个模型；不选的场景用默认模型。
+
+预置每日资讯采集任务（6 个定时器 + 共用 Skill，见 ADR 0012 补充）：在 **后台设置 › 采集定时器** 点“导入预置采集任务”（默认跟随场景“资讯采集”的模型），或在服务器上：
 
 ```bash
-docker compose run --rm api python -m app.admin_cli install-collector-presets --workspace "价值投资研究" --provider qwen   # 可重复执行，已有的跳过
+docker compose run --rm api python -m app.admin_cli install-collector-presets --workspace "价值投资研究"                 # 跟随场景“资讯采集”；可重复执行，已有的跳过
+docker compose run --rm api python -m app.admin_cli install-collector-presets --workspace "价值投资研究" --provider qwen  # 或给这些定时器单独指定模型
 ```
 
 升级：`git pull && docker compose up -d --build`（迁移自动先跑）。
@@ -57,9 +60,12 @@ docker compose run --rm api python -m app.admin_cli install-collector-presets --
 
 | 风险 | 措施 |
 |---|---|
-| 密钥进 Git / 镜像 | 密钥只在服务器 `deploy/secrets/app.env`（600 权限，`.gitignore` 与 `.dockerignore` 都排除）；镜像里没有任何密钥 |
-| 页面或接口返回密钥 | 后台只保存**环境变量名**，接口只返回"是否已配置"，从不返回值 |
-| **后台把密钥发到别处**（最大的口子） | 管理员可改模型的接口地址和密钥变量名。现在：变量名必须形如 `VIP_*_KEY`，且不能是数据库/SMTP/会话类变量；接口必须 https，域名必须在白名单（config 里各厂商官方域名 + 服务器环境变量 `VIP_LLM_ALLOWED_HOSTS`）。保存时校验，**每次取密钥时再校验**，旧数据也无法绕过。只有能登录服务器的人才能扩大白名单 |
+| 密钥进 Git / 镜像 | 主密钥 `VIP_SECRET_KEY`、SMTP 密码和（可选的）环境变量模型密钥只在服务器 `deploy/secrets/app.env`（600 权限，`.gitignore` 与 `.dockerignore` 都排除）；镜像里没有任何密钥 |
+| 模型密钥存在哪里（2026-10-09 用户决定改为可在页面填写，ADR 0015，取代此前“只用环境变量”） | 管理员可在 **模型配置** 页面填写 API Key：用服务器主密钥 `VIP_SECRET_KEY`（环境变量，不进数据库）做 **AES-256-GCM 加密**后存入 `llm_provider.api_key_ciphertext`，密文绑定所在行（复制到别的行无法解密）。页面保存的 Key 优先，其次环境变量 `api_key_env`。未设置 `VIP_SECRET_KEY` 时页面保存 Key 会被拒绝（提示“系统未配置 VIP_SECRET_KEY…”），环境变量密钥照常可用 |
+| 页面或接口返回密钥 | Key 只写不读：接口只返回来源（`key_source`：page / env / none）和末 4 位提示；审计、执行记录、错误信息、日志和 OpenAPI 示例都不含 Key（测试保证） |
+| 数据库备份泄露 | **只有数据库备份解不开模型 Key**：主密钥不在库里。反过来，**恢复时必须同时有 `VIP_SECRET_KEY`**，否则页面保存的 Key 无法解密（页面会提示，需要重新填写；环境变量密钥不受影响）。主密钥与数据库备份分开保存 |
+| 主密钥轮换 | 旧值移到 `VIP_SECRET_KEY_PREVIOUS`、设置新的 `VIP_SECRET_KEY`、重启，执行 `python -m app.admin_cli rotate-secret-key` 用新主密钥重新加密全部 Key，确认后删掉 `_PREVIOUS`。怀疑主密钥泄露时：轮换主密钥**并**在厂商控制台重建各模型 Key |
+| **后台把密钥发到别处**（最大的口子） | 管理员可改模型的接口地址和密钥变量名。现在：变量名必须形如 `VIP_*_KEY`，且不能是数据库/SMTP/会话类变量；接口必须 https，域名必须在白名单（`config/model-presets-v1.json` 各预设的官方域名 + `news-radar-v1.json` 内置默认模型的域名 + 服务器环境变量 `VIP_LLM_ALLOWED_HOSTS`；2026-10-09 起为 api.openai.com、api.anthropic.com、generativelanguage.googleapis.com、api.deepseek.com、dashscope.aliyuncs.com、open.bigmodel.cn、api.moonshot.cn、ark.cn-beijing.volces.com、api.minimax.cn）。保存时校验，**每次取密钥时再校验**（页面保存的 Key 同样受限），旧数据也无法绕过。已保存 Key 的模型更换接口域名时必须重新填写 Key。只有能登录服务器的人才能扩大白名单 |
 | 冒充身份 | 删除了"请求头即身份"的 mock 登录（仅本机开发 `VIP_AUTH_MODE=dev` 保留）；匿名身份列表接口在生产返回 404 |
 | 会话被偷 | 会话 cookie：HttpOnly（脚本读不到）、Secure（只走 HTTPS）、SameSite=Strict；数据库只存 token 的 SHA-256，备份泄露也无法登录；空闲 12 小时 / 最长 7 天过期；改密码会踢掉其他浏览器 |
 | 暴力猜密码 | scrypt 哈希；同一账号 15 分钟内失败 5 次、同一 IP 失败 20 次即锁定 15 分钟 |
@@ -72,11 +78,12 @@ docker compose run --rm api python -m app.admin_cli install-collector-presets --
 ## 5. 仍需你来做
 
 1. **每台服务器单独申请一套模型密钥**，在各厂商控制台设**月度消费上限**；OpenAI 推理 max 很贵。
-2. 发现泄露立刻在厂商控制台**作废并重建**密钥，再改 `secrets/app.env` 后 `docker compose up -d`。
+2. 发现泄露立刻在厂商控制台**作废并重建**密钥，再在 模型配置 页面重新填写（或改 `secrets/app.env` 后 `docker compose up -d`）。
 3. 仓库保持私有；不要把 `deploy/.env`、`deploy/secrets/` 发给任何人或贴到聊天里。
 4. SSH 只用密钥登录、关闭密码登录；服务器开自动安全更新。
 5. 发件域 bytewatcher.xyz 配 SPF/DKIM，否则告警邮件易进垃圾箱。
-6. 备份异机保存并做一次恢复演练。
+6. 备份异机保存并做一次恢复演练（恢复演练要包括 `VIP_SECRET_KEY`，确认页面保存的模型 Key 能解密）。
+7. `VIP_SECRET_KEY` 单独离线保存一份（如密码管理器），不要和数据库备份放在一起。
 
 ## 6. 本机开发
 

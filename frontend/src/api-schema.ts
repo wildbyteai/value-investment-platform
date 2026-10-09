@@ -207,7 +207,7 @@ export interface paths {
         };
         /**
          * Read Audit
-         * @description Only system_admin has audit.read.
+         * @description Needs audit.read (system_admin, which holds every permission).
          */
         get: operations["read_audit_api_demo_audit_get"];
         put?: never;
@@ -844,6 +844,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/llm-presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Llm Presets
+         * @description 内置模型预设（config/model-presets-v1.json）：添加模型时用来预填表单，不含任何密钥。
+         */
+        get: operations["llm_presets_api_admin_llm_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/llm-providers/{provider_id}": {
         parameters: {
             query?: never;
@@ -854,6 +874,50 @@ export interface paths {
         get?: never;
         /** Update Provider */
         put: operations["update_provider_api_admin_llm_providers__provider_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/llm-providers/{provider_id}/api-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Clear Provider Key
+         * @description 清除页面保存的 API Key（之后如设置了环境变量则改用环境变量）。
+         */
+        delete: operations["clear_provider_key_api_admin_llm_providers__provider_id__api_key_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/model-scenes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Model Scene List
+         * @description 每个调用大模型的场景用哪个模型，以及当前实际生效的模型（不含任何密钥）。
+         */
+        get: operations["model_scene_list_api_admin_model_scenes_get"];
+        /**
+         * Model Scene Save
+         * @description 整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。
+         */
+        put: operations["model_scene_save_api_admin_model_scenes_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1459,8 +1523,11 @@ export interface components {
             name: string;
             /** Prompt */
             prompt: string;
-            /** Provider Id */
-            provider_id: string;
+            /**
+             * Provider Id
+             * @description 单独指定模型；不填则跟随场景“资讯采集”的模型
+             */
+            provider_id?: string | null;
             /** Skill Id */
             skill_id?: string | null;
             schedule: components["schemas"]["ScheduleIn"];
@@ -1691,6 +1758,43 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** ModelPresetOut */
+        ModelPresetOut: {
+            /** Provider Key */
+            provider_key: string;
+            /** Name */
+            name: string;
+            /** Vendor */
+            vendor: string;
+            /** Base Url */
+            base_url: string;
+            /** Model */
+            model: string;
+            /** Api Key Env */
+            api_key_env: string;
+            /** Search Mode */
+            search_mode: string;
+            /** Note */
+            note: string;
+            /** Doc Url */
+            doc_url: string;
+        };
+        /** ModelPresetsOut */
+        ModelPresetsOut: {
+            /** Version */
+            version: number;
+            /** Verified On */
+            verified_on: string;
+            /** Items */
+            items: components["schemas"]["ModelPresetOut"][];
+            /**
+             * Search Modes
+             * @description 联网方式 → 中文名
+             */
+            search_modes: {
+                [key: string]: string;
+            };
+        };
         /** NoteIn */
         NoteIn: {
             /** Company Id */
@@ -1729,9 +1833,9 @@ export interface components {
         PresetInstallIn: {
             /**
              * Provider Id
-             * @description 用哪个能联网的模型执行这些定时器
+             * @description 给这些定时器单独指定的能联网模型；不填则定时器跟随场景“资讯采集”的模型
              */
-            provider_id: string;
+            provider_id?: string | null;
             /**
              * Keys
              * @description 只导入这些预置任务（不填则全部）
@@ -1746,6 +1850,10 @@ export interface components {
             skill_id: string;
             /** Skill Created */
             skill_created: boolean;
+            /** Provider Id */
+            provider_id: string | null;
+            /** Follows Scene */
+            follows_scene: boolean;
             /** Created */
             created: components["schemas"]["PresetRef"][];
             /** Skipped */
@@ -1879,8 +1987,16 @@ export interface components {
             base_url: string;
             /** Model */
             model: string;
-            /** Api Key Env */
-            api_key_env: string;
+            /**
+             * Api Key Env
+             * @description 可选：密钥所在的环境变量名（页面保存的 Key 优先）
+             */
+            api_key_env?: string | null;
+            /**
+             * Api Key
+             * @description 只写：在页面填写的 API Key，加密后入库，任何接口都不再返回；留空表示不修改
+             */
+            api_key?: string | null;
             /**
              * Is Default
              * @default false
@@ -1975,6 +2091,64 @@ export interface components {
             manifest_hash: string;
             /** Created At */
             created_at: string;
+        };
+        /** SceneBindingIn */
+        SceneBindingIn: {
+            /** Scene */
+            scene: string;
+            /**
+             * Provider Id
+             * @description 不填 = 使用默认模型
+             */
+            provider_id?: string | null;
+        };
+        /** SceneBindingsIn */
+        SceneBindingsIn: {
+            /** Bindings */
+            bindings: components["schemas"]["SceneBindingIn"][];
+        };
+        /** SceneModelOut */
+        SceneModelOut: {
+            /** Id */
+            id: string | null;
+            /** Name */
+            name: string;
+            /** Model */
+            model: string;
+            /** Search Mode */
+            search_mode: string;
+            /** Key Configured */
+            key_configured: boolean;
+            /** Key Source */
+            key_source: string;
+        };
+        /** SceneOut */
+        SceneOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /** Requires Search */
+            requires_search: boolean;
+            /** Provider Id */
+            provider_id: string | null;
+            /**
+             * Source
+             * @description scene=场景绑定 | workspace_default=工作区默认模型 | builtin=内置默认
+             */
+            source: string;
+            effective: components["schemas"]["SceneModelOut"];
+            /** Problem */
+            problem: string | null;
+        };
+        /** ScenesOut */
+        ScenesOut: {
+            /** Version */
+            version: number;
+            /** Items */
+            items: components["schemas"]["SceneOut"][];
         };
         /** ScheduleIn */
         ScheduleIn: {
@@ -3603,6 +3777,26 @@ export interface operations {
             };
         };
     };
+    llm_presets_api_admin_llm_presets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelPresetsOut"];
+                };
+            };
+        };
+    };
     update_provider_api_admin_llm_providers__provider_id__put: {
         parameters: {
             query?: never;
@@ -3625,6 +3819,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_provider_key_api_admin_llm_providers__provider_id__api_key_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    model_scene_list_api_admin_model_scenes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenesOut"];
+                };
+            };
+        };
+    };
+    model_scene_save_api_admin_model_scenes_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SceneBindingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenesOut"];
                 };
             };
             /** @description Validation Error */

@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 
 from app.core.errors import Conflict, Invalid, NotFound
-from app.domains.news import agent, llm, service
+from app.domains.news import agent, llm, model_scenes, service
 from app.domains.news.collector_policy import policy
 from app.models.news import AgentSkill, CollectorRun, CollectorTask, LlmProvider, NewsFeed
 from app.domains.news.normalize import Record, parse_published
@@ -163,9 +163,13 @@ def _provider_row(db, workspace_id, provider_id) -> LlmProvider:
 
 def task_dict(db, t: CollectorTask) -> dict:
     schedule = json.loads(t.schedule_json)
-    provider = db.get(LlmProvider, t.provider_id) if t.provider_id else None
+    if t.provider_id:
+        provider = db.get(LlmProvider, t.provider_id)
+    else:
+        provider, _ = model_scenes.resolve_row(db, t.workspace_id, model_scenes.NEWS_COLLECT)
     skill = db.get(AgentSkill, t.skill_id) if t.skill_id else None
     return {'id': t.id, 'name': t.name, 'prompt': t.prompt, 'provider_id': t.provider_id,
+            'follows_scene': not t.provider_id,
             'provider': f'{provider.name} · {provider.model}' if provider else None,
             'search_mode': provider.search_mode if provider else None,
             'skill_id': t.skill_id, 'skill': skill.name if skill else None, 'feed_id': t.feed_id,
@@ -182,9 +186,15 @@ def list_tasks(db, workspace_id) -> list[dict]:
 def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None, now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     schedule = validate_schedule(data['schedule'])
-    provider = _provider_row(db, workspace_id, data.get('provider_id'))
-    if (provider.search_mode or 'none') == 'none':
-        raise Invalid('采集需要能联网的模型：请在 模型配置 里给该模型选择联网方式（通义 / 智谱 / Kimi / OpenAI）')
+    # A collector's own model is an override; without one it follows the 资讯采集 scene.
+    if data.get('provider_id'):
+        provider = _provider_row(db, workspace_id, data['provider_id'])
+        if (provider.search_mode or 'none') == 'none':
+            raise Invalid(model_scenes.NEEDS_SEARCH)
+        provider_id = provider.id
+    else:
+        model_scenes.search_row_for_collect(db, workspace_id)
+        provider_id = None
     if data.get('skill_id'):
         _skill(db, workspace_id, data['skill_id'])
     if task_id is None:
@@ -199,7 +209,7 @@ def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None
         feed = db.get(NewsFeed, row.feed_id)
         feed.name = data['name']
     row.name, row.prompt = data['name'], data['prompt']
-    row.provider_id, row.skill_id = provider.id, data.get('skill_id') or None
+    row.provider_id, row.skill_id = provider_id, data.get('skill_id') or None
     row.schedule_json, row.enabled = canonical(schedule), data.get('enabled', True)
     row.next_run_at = next_run(schedule, now) if row.enabled else None
     row.updated_at = now
@@ -281,7 +291,12 @@ def run_task(db, workspace_id, task: CollectorTask, trigger='manual', actor_id=N
     """Execute once. Failures are recorded on the run and the task, never raised."""
     now = now or datetime.now(timezone.utc)
     cfg = policy()
-    provider_row = db.get(LlmProvider, task.provider_id) if task.provider_id else None
+    if task.provider_id:
+        provider_row = db.get(LlmProvider, task.provider_id)
+        missing = '定时器选择的模型不存在或已停用'
+    else:  # follow the 资讯采集 scene
+        provider_row, _ = model_scenes.resolve_row(db, workspace_id, model_scenes.NEWS_COLLECT)
+        missing = '定时器没有单独选模型，场景“资讯采集”也没有可用的模型：请在 模型配置 › 按场景配置模型 里设置'
     skill = db.get(AgentSkill, task.skill_id) if task.skill_id else None
     run = CollectorRun(workspace_id=workspace_id, task_id=task.id, trigger=trigger, status='running', started_at=now,
                        skill_key=skill.skill_key if skill else None, skill_version=skill.version if skill else None,
@@ -291,9 +306,11 @@ def run_task(db, workspace_id, task: CollectorTask, trigger='manual', actor_id=N
     stats: dict = {}
     try:
         if provider_row is None or not provider_row.enabled:
-            raise llm.LlmError('定时器选择的模型不存在或已停用')
+            raise llm.LlmError(missing)
         provider = service.provider_config(provider_row)
         run.model, run.search_mode = f'{provider.name}/{provider.model}', provider.search_mode
+        if provider.search_mode == 'none':
+            raise llm.LlmError(model_scenes.NEEDS_SEARCH)
         result = agent.chat(provider, build_messages(task, skill, now), transport=transport)
         run.output_excerpt = result.content[:cfg['output_excerpt_chars']]
         records = parse_items(result.content)

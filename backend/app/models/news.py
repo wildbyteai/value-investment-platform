@@ -99,8 +99,9 @@ class NewsEventCompany(Base):
 
 
 class LlmProvider(Base):
-    """An OpenAI-compatible chat model. The API key is read from an environment variable,
-    never stored in the database."""
+    """An OpenAI-compatible chat model. The API key is either saved on the page (AES-GCM
+    ciphertext under the server master key ``VIP_SECRET_KEY``, never returned by the API) or
+    read from the environment variable ``api_key_env``; the page-saved key wins."""
     __tablename__ = 'llm_provider'
     __table_args__ = (UniqueConstraint('workspace_id', 'provider_key', name='uq_llm_provider_key'),)
 
@@ -110,13 +111,29 @@ class LlmProvider(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     base_url: Mapped[str] = mapped_column(String(500), nullable=False)
     model: Mapped[str] = mapped_column(String(120), nullable=False)
-    api_key_env: Mapped[str] = mapped_column(String(120), nullable=False)
+    api_key_env: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    api_key_ciphertext: Mapped[str | None] = mapped_column(Text, nullable=True)
+    api_key_hint: Mapped[str | None] = mapped_column(String(8), nullable=True)  # last 4 characters only
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     options_json: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
-    # How the model reaches the web: none | qwen_enable_search | zhipu_web_search | kimi_search
+    # How the model reaches the web: one of app.domains.news.agent.SEARCH_MODES (none, qwen_enable_search, …)
     search_mode: Mapped[str] = mapped_column(String(30), nullable=False, default='none', server_default='none')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
+
+
+class LlmSceneBinding(Base):
+    """Which model a workspace uses for one scene (config/model-scenes-v1.json). No row means
+    the scene follows the workspace default model, then the built-in default."""
+    __tablename__ = 'llm_scene_binding'
+    __table_args__ = (UniqueConstraint('workspace_id', 'scene_key', name='uq_llm_scene_binding'),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    workspace_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    scene_key: Mapped[str] = mapped_column(String(60), nullable=False)
+    provider_id: Mapped[str] = mapped_column(ForeignKey('llm_provider.id'), nullable=False)
+    updated_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, server_default=func.now())
 
 
 class AgentSkill(Base):

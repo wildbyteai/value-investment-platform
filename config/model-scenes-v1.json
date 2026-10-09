@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "policy_key": "model-scenes",
+  "version": 1,
+  "name": "按场景配置模型 v1",
+  "note": "每个场景对应后端一处真实调用大模型的代码。取用顺序：场景绑定的模型 → 工作区默认模型 → 内置默认（config/news-radar-v1.json default_llm_provider，环境变量密钥）。requires_search=true 的场景只能绑定能联网的模型。新增场景须先有调用它的代码。",
+  "scenes": [
+    {
+      "key": "news_collect",
+      "label": "资讯采集",
+      "description": "采集定时器到点让模型联网搜索并整理当天资讯。定时器自己选了模型时以定时器为准；没选则用这里的模型。",
+      "requires_search": true,
+      "code_paths": ["backend/app/domains/news/collector.py run_task → agent.chat"]
+    },
+    {
+      "key": "news_analysis",
+      "label": "资讯研判打分",
+      "description": "给资讯事件关联公司并打关联度、影响分（Excel/RSS 导入后、采集完成后、或在资讯雷达点“AI 打分”时）。",
+      "requires_search": false,
+      "code_paths": ["backend/app/domains/news/service.py score_events → llm.propose_links"]
+    }
+  ]
+}

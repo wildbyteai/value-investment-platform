@@ -1,15 +1,17 @@
 """后台设置 API: 数据源、资讯源、模型配置、告警发送."""
 import json
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 from sqlalchemy import select, update
 
 from app.api.deps import Principal, require, require_any
 from app.core.errors import Conflict, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
-from app.domains.news import llm
+from app.domains.news import llm, model_presets, model_scenes
+from app.domains.news.agent import SEARCH_MODES
 from app.domains.news.collector_policy import policy as collector_policy
 from app.models.news import LlmProvider, NewsFeed
 from app.domains.platform.transactions import canonical, record
@@ -79,39 +81,93 @@ class ProviderIn(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     base_url: str = Field(min_length=8, max_length=500, pattern=r'^https?://')
     model: str = Field(min_length=1, max_length=120)
-    api_key_env: str = Field(min_length=1, max_length=120, pattern=r'^[A-Z][A-Z0-9_]*$')
+    api_key_env: str | None = Field(None, max_length=120, pattern=r'^([A-Z][A-Z0-9_]*)?$',
+                                    description='可选：密钥所在的环境变量名（页面保存的 Key 优先）')
+    api_key: SecretStr | None = Field(None, max_length=500, json_schema_extra={'writeOnly': True},
+                                      description='只写：在页面填写的 API Key，加密后入库，任何接口都不再返回；留空表示不修改')
     is_default: bool = False
     enabled: bool = True
     temperature: float = Field(0, ge=0, le=2)
-    search_mode: str = Field('none', pattern='^(none|qwen_enable_search|zhipu_web_search|kimi_search|openai_web_search)$')
+    search_mode: str = Field('none', pattern='^(' + '|'.join(SEARCH_MODES) + ')$')
 
 
 def _provider(p: LlmProvider) -> dict:
-    cfg = llm.ProviderConfig(p.provider_key, p.name, p.base_url, p.model, p.api_key_env)
+    cfg = model_scenes.provider_config(p)
     return {'id': p.id, 'provider_key': p.provider_key, 'name': p.name, 'base_url': p.base_url, 'model': p.model,
-            'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'blocked': cfg.blocked, 'is_default': p.is_default,
+            'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'key_source': cfg.key_source,
+            'key_saved': bool(p.api_key_ciphertext), 'key_hint': f'••••{p.api_key_hint}' if p.api_key_hint else None,
+            'key_problem': cfg.key_problem, 'blocked': cfg.blocked, 'is_default': p.is_default,
             'enabled': p.enabled, 'options': json.loads(p.options_json or '{}'), 'search_mode': p.search_mode or 'none'}
 
 
 @router.get('/llm-providers')
 def list_providers(principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
+    from app.core import secret_box
     rows = db.scalars(select(LlmProvider).where(LlmProvider.workspace_id == principal.workspace.id).order_by(LlmProvider.provider_key)).all()
     default = llm.default_provider()
+    active = model_scenes.workspace_default(db, principal.workspace.id)
     return {'providers': [_provider(p) for p in rows],
             'builtin_default': {'provider_key': default.provider_key, 'name': default.name, 'base_url': default.base_url,
                                 'model': default.model, 'api_key_env': default.api_key_env, 'key_configured': default.configured},
             'search_modes': {k: v['label'] for k, v in collector_policy()['search_modes'].items()},
-            'presets': collector_policy()['provider_presets'],
-            'active': None if not rows else next((p.provider_key for p in sorted(rows, key=lambda r: (not r.is_default, r.created_at)) if p.enabled), None)}
+            'presets': model_presets.presets(),
+            'secret_key_ready': secret_box.available(), 'secret_key_problem': secret_box.problem(),
+            'active': active.provider_key if active else None}
+
+
+class ModelPresetOut(BaseModel):
+    provider_key: str
+    name: str
+    vendor: str
+    base_url: str
+    model: str
+    api_key_env: str
+    search_mode: str
+    note: str
+    doc_url: str
+
+
+class ModelPresetsOut(BaseModel):
+    version: int
+    verified_on: str
+    items: list[ModelPresetOut]
+    search_modes: dict[str, str] = Field(description='联网方式 → 中文名')
+
+
+@router.get('/llm-presets', response_model=ModelPresetsOut)
+def llm_presets(principal: Principal = Depends(require('model.configure'))):
+    """内置模型预设（config/model-presets-v1.json）：添加模型时用来预填表单，不含任何密钥。"""
+    cfg = model_presets.config()
+    return {'version': cfg['version'], 'verified_on': cfg['verified_on'], 'items': model_presets.presets(),
+            'search_modes': {k: v['label'] for k, v in collector_policy()['search_modes'].items()}}
+
+
+def _host(url: str | None) -> str:
+    return (urlsplit(url or '').hostname or '').lower()
 
 
 def _save_provider(db, principal, body: ProviderIn, row: LlmProvider | None):
-    from app.core.secret_guard import provider_problem
-    problem = provider_problem(body.base_url, body.api_key_env)
+    from app.core import secret_box
+    from app.core.secret_guard import base_url_problem, key_env_problem
+    problem = base_url_problem(body.base_url) or (key_env_problem(body.api_key_env) if body.api_key_env else None)
     if problem:
         raise Invalid(problem)
-    data = body.model_dump()
+    new_key = body.api_key.get_secret_value().strip() if body.api_key is not None else ''
+    if body.api_key is not None and new_key and len(new_key) < 8:
+        raise Invalid('API Key 太短，请检查是否粘贴完整')
+    data = body.model_dump(exclude={'api_key'})
+    data['api_key_env'] = data['api_key_env'] or None
     temperature = data.pop('temperature')
+    if row is not None and row.api_key_ciphertext and not new_key and _host(row.base_url) != _host(body.base_url):
+        raise Invalid('更换接口域名时请重新填写 API Key（已保存的 Key 只发往原来的域名），或先清除已保存的 Key')
+    if row is not None and (not body.enabled or body.search_mode == 'none'):
+        for s in model_scenes.scenes_using(db, principal.workspace.id, row.id):
+            if not body.enabled:
+                raise Invalid(f"场景“{s['label']}”正在使用这个模型，先在 按场景配置模型 里换掉再停用")
+            if s['requires_search']:
+                raise Invalid(f"场景“{s['label']}”需要联网，正在使用这个模型；先换掉场景的模型再取消联网方式")
+    if new_key and not secret_box.available():
+        raise Invalid(secret_box.problem() or secret_box.MISSING)
     if body.is_default:
         db.execute(update(LlmProvider).where(LlmProvider.workspace_id == principal.workspace.id).values(is_default=False))
     if row is None:
@@ -119,13 +175,18 @@ def _save_provider(db, principal, body: ProviderIn, row: LlmProvider | None):
             raise Conflict('模型标识已存在')
         row = LlmProvider(workspace_id=principal.workspace.id, **data, options_json='{}')
         db.add(row)
+        db.flush()  # the row id is bound into the ciphertext
     else:
         for k, v in data.items():
             setattr(row, k, v)
+    if new_key:
+        row.api_key_ciphertext = secret_box.encrypt(new_key, f'llm_provider:{row.id}')
+        row.api_key_hint = new_key[-4:]
     row.options_json = canonical({'temperature': temperature})
     db.flush()
+    # The key itself never goes into the audit record; only whether it was replaced.
     record(db, principal.workspace.id, principal.user.id, 'admin.llm_provider.saved', 'llm_provider', row.id,
-           {**data, 'temperature': temperature})
+           {**data, 'temperature': temperature, 'api_key_replaced': bool(new_key)})
     return _provider(row)
 
 
@@ -138,10 +199,80 @@ def create_provider(body: ProviderIn, principal: Principal = Depends(require('mo
 @router.put('/llm-providers/{provider_id}')
 def update_provider(provider_id: str, body: ProviderIn, principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
     with unit_of_work(db):
-        row = db.get(LlmProvider, provider_id)
-        if row is None or row.workspace_id != principal.workspace.id:
-            raise NotFound('没有该模型配置')
-        return _save_provider(db, principal, body, row)
+        return _save_provider(db, principal, body, _provider_in_ws(db, principal, provider_id))
+
+
+def _provider_in_ws(db, principal, provider_id) -> LlmProvider:
+    row = db.get(LlmProvider, provider_id)
+    if row is None or row.workspace_id != principal.workspace.id:
+        raise NotFound('没有该模型配置')
+    return row
+
+
+@router.delete('/llm-providers/{provider_id}/api-key')
+def clear_provider_key(provider_id: str, principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
+    """清除页面保存的 API Key（之后如设置了环境变量则改用环境变量）。"""
+    with unit_of_work(db):
+        row = _provider_in_ws(db, principal, provider_id)
+        had = bool(row.api_key_ciphertext)
+        row.api_key_ciphertext, row.api_key_hint = None, None
+        db.flush()
+        record(db, principal.workspace.id, principal.user.id, 'admin.llm_provider.key_cleared', 'llm_provider', row.id,
+               {'provider_key': row.provider_key, 'had_saved_key': had})
+        return _provider(row)
+
+
+# ------------------------------------------------------------------ 按场景配置模型
+
+class SceneBindingIn(BaseModel):
+    scene: str = Field(min_length=1, max_length=60)
+    provider_id: str | None = Field(None, max_length=36, description='不填 = 使用默认模型')
+
+
+class SceneBindingsIn(BaseModel):
+    bindings: list[SceneBindingIn] = Field(max_length=50)
+
+
+class SceneModelOut(BaseModel):
+    id: str | None
+    name: str
+    model: str
+    search_mode: str
+    key_configured: bool
+    key_source: str
+
+
+class SceneOut(BaseModel):
+    key: str
+    label: str
+    description: str
+    requires_search: bool
+    provider_id: str | None
+    source: str = Field(description='scene=场景绑定 | workspace_default=工作区默认模型 | builtin=内置默认')
+    effective: SceneModelOut
+    problem: str | None
+
+
+class ScenesOut(BaseModel):
+    version: int
+    items: list[SceneOut]
+
+
+@router.get('/model-scenes', response_model=ScenesOut)
+def model_scene_list(principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
+    """每个调用大模型的场景用哪个模型，以及当前实际生效的模型（不含任何密钥）。"""
+    return model_scenes.view(db, principal.workspace.id)
+
+
+@router.put('/model-scenes', response_model=ScenesOut)
+def model_scene_save(body: SceneBindingsIn, principal: Principal = Depends(require('model.configure')), db=Depends(get_db)):
+    """整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。"""
+    keys = [b.scene for b in body.bindings]
+    if len(set(keys)) != len(keys):
+        raise Invalid('同一个场景只能出现一次')
+    with unit_of_work(db):
+        return model_scenes.save(db, principal.workspace.id, principal.user.id,
+                                 {b.scene: b.provider_id for b in body.bindings})
 
 
 # ------------------------------------------------------------------ 告警发送

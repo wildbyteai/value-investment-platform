@@ -18,6 +18,7 @@ dependencies = [
     "openpyxl>=3.1.5",
     "python-multipart>=0.0.32",
     "httpx>=0.28.1",
+    "cryptography>=44",  # AES-GCM for model API keys saved on the page (app/core/secret_box.py)
 ]
 
 [project.optional-dependencies]
