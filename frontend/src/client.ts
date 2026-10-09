@@ -8,14 +8,21 @@ export class ApiError extends Error {
     super(message);
   }
 }
-export const session = { login: "research@demo", workspace: "" };
+// mode "session": identity comes from the HttpOnly cookie; only the workspace is sent.
+// mode "dev": local mock identities via X-Vip-Login (the server refuses it in production).
+export const session = { login: "research@demo", workspace: "", mode: "session" as "session" | "dev" };
+export function authHeaders(): Record<string, string> {
+  const h: Record<string, string> = { "X-Requested-With": "vip", "X-Vip-Workspace": session.workspace };
+  if (session.mode === "dev") h["X-Vip-Login"] = session.login;
+  return h;
+}
 export async function api(path: Path | string, options: RequestInit = {}) {
   const response = await fetch(path, {
+    credentials: "same-origin",
     ...options,
     headers: {
       "Content-Type": "application/json",
-      "X-Vip-Login": session.login,
-      "X-Vip-Workspace": session.workspace,
+      ...authHeaders(),
       ...options.headers,
     },
   }).catch(() => {

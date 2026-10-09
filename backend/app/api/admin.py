@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select, update
 
 from app.api.deps import Principal, require, require_any
-from app.core.errors import Conflict, NotFound
+from app.core.errors import Conflict, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
 from app.domains.news import llm
@@ -89,7 +89,7 @@ class ProviderIn(BaseModel):
 def _provider(p: LlmProvider) -> dict:
     cfg = llm.ProviderConfig(p.provider_key, p.name, p.base_url, p.model, p.api_key_env)
     return {'id': p.id, 'provider_key': p.provider_key, 'name': p.name, 'base_url': p.base_url, 'model': p.model,
-            'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'is_default': p.is_default,
+            'api_key_env': p.api_key_env, 'key_configured': cfg.configured, 'blocked': cfg.blocked, 'is_default': p.is_default,
             'enabled': p.enabled, 'options': json.loads(p.options_json or '{}'), 'search_mode': p.search_mode or 'none'}
 
 
@@ -106,6 +106,10 @@ def list_providers(principal: Principal = Depends(require('model.configure')), d
 
 
 def _save_provider(db, principal, body: ProviderIn, row: LlmProvider | None):
+    from app.core.secret_guard import provider_problem
+    problem = provider_problem(body.base_url, body.api_key_env)
+    if problem:
+        raise Invalid(problem)
     data = body.model_dump()
     temperature = data.pop('temperature')
     if body.is_default:

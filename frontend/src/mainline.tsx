@@ -1,7 +1,7 @@
 // 四层主线界面：资讯雷达 / 公司档案补充 / 击球区 / 监控告警 / 后台设置。
 // Each view loads its own data; legacy research views stay in app.tsx.
 import React, { useEffect, useState } from "react";
-import { api, post, session, ApiError } from "./client";
+import { api, post, session, ApiError, authHeaders } from "./client";
 
 type Ctx = { allow: (p: string) => boolean; busy: boolean; execute: any };
 
@@ -563,7 +563,7 @@ async function upload(files: FileList) {
   const form = new FormData();
   Array.from(files).forEach((f) => form.append("files", f));
   form.append("score", "true");
-  const r = await fetch("/api/news/import", { method: "POST", body: form, headers: { "X-Vip-Login": session.login, "X-Vip-Workspace": session.workspace } });
+  const r = await fetch("/api/news/import", { method: "POST", body: form, headers: authHeaders(), credentials: "same-origin" });
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new ApiError(r.status, typeof data.detail === "string" ? data.detail : "上传未完成");
   return data;

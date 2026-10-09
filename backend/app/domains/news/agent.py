@@ -128,6 +128,8 @@ def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: 
 
 def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTransport | None = None,
          timeout: float | None = None, json_mode: bool = False) -> ChatResult:
+    if provider.blocked:
+        raise LlmError(f'模型配置未通过安全检查：{provider.blocked}')
     if not provider.configured:
         raise LlmError(f'未配置模型密钥（环境变量 {provider.api_key_env}）')
     mode = provider.search_mode or 'none'

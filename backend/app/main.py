@@ -6,11 +6,20 @@ from app.api import admin, alerts, collectors, news, strike_zone
 from app.api import sealing, research, templates, auth, collab, companies, demo, health, intake, judgments, scoring, strategy
 from app.config import get_settings
 from app.core import errors
+from app.core.http_security import SecurityMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 settings = get_settings()
 
-app = FastAPI(title="Value Investment Platform API", version="0.0.1")
+_docs = settings.docs_enabled or settings.auth_mode == "dev"
+app = FastAPI(title="Value Investment Platform API", version="0.0.1",
+              docs_url="/docs" if _docs else None, redoc_url="/redoc" if _docs else None,
+              openapi_url="/openapi.json" if _docs else None)
 errors.install(app)
+app.add_middleware(SecurityMiddleware)
+_hosts = [h.strip() for h in settings.allowed_hosts.split(",") if h.strip()]
+if _hosts and _hosts != ["*"]:
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=_hosts)
 app.include_router(health.router)
 app.include_router(sealing.router)
 app.include_router(research.router)

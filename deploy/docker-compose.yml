@@ -1,0 +1,92 @@
+# 价投宝 production stack.  cd deploy && docker compose up -d --build
+# See docs/22-deployment-and-security.md. Public ports: 80/443 (Caddy) only.
+name: vip
+
+x-app: &app
+  build:
+    context: ..
+  image: vip-app:latest
+  restart: unless-stopped
+  env_file:
+    - ./secrets/app.env            # model keys, SMTP password — chmod 600, never in Git
+  environment:
+    VIP_DB_URL: postgresql+psycopg2://vip_app:${VIP_DB_PASSWORD:?set in deploy/.env}@db:5432/vip
+    VIP_AUTH_MODE: session
+    VIP_COOKIE_SECURE: "true"
+    VIP_DEMO_MODE: "false"
+    VIP_DOCS_ENABLED: "false"
+    VIP_ALLOWED_HOSTS: ${VIP_DOMAIN:?set in deploy/.env}
+  volumes:
+    - raw-data:/app/raw-data
+  networks: [dbnet, egress]
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+
+services:
+  db:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in deploy/.env}
+      VIP_DB_PASSWORD: ${VIP_DB_PASSWORD:?set in deploy/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/10-vip.sh:ro
+    networks: [dbnet]               # internal network: no port on the host, no internet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d vip"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    shm_size: 256mb
+
+  migrate:                          # runs once per `up`, then exits
+    <<: *app
+    restart: "no"
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *app
+
+  worker:
+    <<: *app
+    command: ["python", "-m", "app.worker"]
+    healthcheck: {disable: true}
+
+  scheduler:                        # collect every 5 min, alerts every 15 min, news daily 08:30
+    <<: *app
+    command: ["python", "-m", "app.scheduler"]
+    healthcheck: {disable: true}
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      VIP_DOMAIN: ${VIP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [egress]
+    depends_on: [api]
+
+networks:
+  dbnet:
+    internal: true
+  egress: {}
+
+volumes:
+  pgdata:
+  raw-data:
+  caddy-data:
+  caddy-config:

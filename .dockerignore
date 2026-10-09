@@ -1,0 +1,27 @@
+# Keep secrets, local data and dev tooling out of the build context and the image.
+.git
+**/.env
+**/.env.*
+deploy/secrets
+secrets
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+raw-data
+local-data
+local-evidence
+output
+tmp
+.runtime
+backend/tests
+frontend
+docs
+reports
+research
+review
+prototype
+design
+versions
+tools
+contracts

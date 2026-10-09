@@ -30,6 +30,8 @@ def database(test=False):
             if any(k!='local-fixture' for k in c.execute(text('SELECT source_key FROM source_registry')).scalars()):
                 raise SystemExit('Non-synthetic test sources; refusing write')
     env=os.environ.copy();env['VIP_DB_URL']=url.render_as_string(hide_password=False)
+    # Local machine only: mock identities on plain http (production uses VIP_AUTH_MODE=session, see docs/22).
+    env.setdefault('VIP_AUTH_MODE','dev');env.setdefault('VIP_COOKIE_SECURE','false')
     return url,env
 
 

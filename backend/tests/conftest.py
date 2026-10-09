@@ -9,6 +9,9 @@ target=make_url(os.environ.get('VIP_TEST_DB_URL') or str(original.set(database='
 if target.host not in ('127.0.0.1','localhost') or target.database!='vip_v0001_test':
     raise RuntimeError('Tests require this project local synthetic database; refusing destructive fixtures')
 os.environ['VIP_DEMO_MODE']='true'
+# Most tests use the header mock identities; test_auth.py switches to real sessions itself.
+os.environ['VIP_AUTH_MODE']='dev'
+os.environ['VIP_LLM_ALLOWED_HOSTS']='api.example.com'
 os.environ['VIP_DB_URL']=target.render_as_string(hide_password=False)
 get_settings.cache_clear()
 

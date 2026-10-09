@@ -304,7 +304,8 @@ def run_feed(db, workspace_id, feed: NewsFeed, transport=None, actor_id=None) ->
     if feed.kind != 'rss' or not feed.url:
         raise Invalid('只有配置了地址的 RSS 源可以自动抓取；Excel 源请上传文件')
     try:
-        with httpx.Client(transport=transport, timeout=30, follow_redirects=True) as client:
+        from app.core.secret_guard import PublicOnlyTransport
+        with httpx.Client(transport=transport or PublicOnlyTransport(), timeout=30, follow_redirects=True, max_redirects=5) as client:
             r = client.get(feed.url, headers={'User-Agent': 'value-investment-platform/1.0'})
             r.raise_for_status()
     except httpx.HTTPError as exc:
