@@ -134,7 +134,9 @@ def test_strike_zone_board_judges_a_and_h_separately(client):
 def test_strike_zone_company_404_uses_domain_error(client):
     c, ws = client
     r = c.get('/api/strike-zone/companies/missing', headers=h(ws, 'viewer@demo'))
-    assert r.status_code == 404 and r.json() == {'detail': '当前研究模式和工作区没有该公司'}
+    assert r.status_code == 404
+    assert r.json()['error'] == {'code': 'not_found', 'message': '当前研究模式和工作区没有该公司'}
+    assert r.json()['request_id'] == r.headers['x-request-id']
 
 
 def test_admin_sources_requires_admin(client):

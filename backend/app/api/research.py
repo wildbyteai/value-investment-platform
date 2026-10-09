@@ -7,7 +7,7 @@ from app.api.deps import Principal, require
 from app.db import get_db
 from app.models.runtime import ResearchRun
 from app.domains.companies.research_pipeline import start_run, readable_run, response
-router=APIRouter(prefix='/api/research',tags=['research'])
+router=APIRouter(prefix='/api/research',tags=['公司档案'])
 
 class RunSummary(BaseModel):
     id: str

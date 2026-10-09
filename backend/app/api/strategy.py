@@ -15,7 +15,7 @@ from app.domains.platform.transactions import record, canonical, digest
 from app.domains.strategy.strategy_service import gates, apply_evaluation
 from app.domains.companies.scoring_service import config, score_company, score_security
 
-router=APIRouter(prefix='/api/strategy',tags=['strategy'])
+router=APIRouter(prefix='/api/strategy',tags=['策略'])
 
 
 def latest(db,ws):

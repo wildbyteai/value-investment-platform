@@ -15,7 +15,7 @@ from app.models.news import LlmProvider, NewsFeed
 from app.domains.platform.transactions import canonical, record
 from app.domains.market_data import registry
 
-router = APIRouter(prefix='/api/admin', tags=['admin'])
+router = APIRouter(prefix='/api/admin', tags=['后台设置'])
 
 ADMIN = ('source.manage', 'system.configure')
 

@@ -11,7 +11,7 @@ from app.models.audit import Outbox
 from app.models.collab import Note, Watchlist
 from app.models.company import Company, Security
 
-router = APIRouter(prefix="/api/me", tags=["collab"])
+router = APIRouter(prefix="/api/me", tags=['我的自选与笔记'])
 
 
 @router.post("/watchlist/{security_id}")
@@ -100,7 +100,7 @@ def list_notes(
 
 
 # --- Worker: idempotent claim/dispatch (fencing by generation) ---
-worker_router = APIRouter(prefix="/api/worker", tags=["worker"])
+worker_router = APIRouter(prefix="/api/worker", tags=['后台任务'])
 
 
 @worker_router.post("/outbox/{outbox_id}/claim")

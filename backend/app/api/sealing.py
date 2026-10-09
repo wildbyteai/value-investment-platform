@@ -13,7 +13,7 @@ from app.models.strategy import SecurityState
 from app.models.intake import SourceRegistry
 from app.domains.platform import data_mode
 from app.domains.platform.transactions import digest
-router=APIRouter(prefix='/api/strategy',tags=['strategy'])
+router=APIRouter(prefix='/api/strategy',tags=['策略'])
 
 class FormalRow(BaseModel):
     seal_id:str

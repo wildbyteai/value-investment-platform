@@ -8,7 +8,7 @@ from app.domains.platform import data_mode
 from app.models.company import Company, ItemCompanyLink, Security
 from app.models.intake import InformationItem, SourceRegistry
 
-router = APIRouter(prefix="/api/companies", tags=["companies"])
+router = APIRouter(prefix="/api/companies", tags=['公司档案'])
 
 
 @router.get("")

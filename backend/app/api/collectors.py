@@ -7,7 +7,7 @@ from app.core.uow import unit_of_work
 from app.db import get_db
 from app.domains.news import collector
 
-router = APIRouter(prefix='/api/admin', tags=['collectors'])
+router = APIRouter(prefix='/api/admin', tags=['后台设置'])
 
 ADMIN = ('source.manage', 'system.configure')
 

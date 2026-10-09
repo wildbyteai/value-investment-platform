@@ -11,7 +11,7 @@ from app.domains.platform import data_mode
 from app.models.intake import InformationItem, ItemSourceRef, SourceRegistry
 from app.domains.news.intake_service import import_fixture
 
-router = APIRouter(prefix="/api/intake", tags=["intake"])
+router = APIRouter(prefix="/api/intake", tags=['资讯雷达'])
 
 
 @router.post("/synthetic")

@@ -13,7 +13,7 @@ from app.models.strategy import StrategyVersion
 from app.domains.companies.reference_research import quality_reference, valuation_reference, strategy_reference
 import json
 
-router = APIRouter(prefix="/api/companies", tags=["scoring"])
+router = APIRouter(prefix="/api/companies", tags=['公司档案'])
 
 
 @router.get("/{company_id}/score")

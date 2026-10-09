@@ -11,7 +11,7 @@ from app.domains.news import service
 from app.models.news import NewsFeed
 from app.domains.news.normalize import feed_key_from_filename, records_from_excel
 
-router = APIRouter(prefix='/api/news', tags=['news'])
+router = APIRouter(prefix='/api/news', tags=['资讯雷达'])
 
 WRITE = ('source.manage', 'analysis.override')
 REVIEW = ('analysis.override', 'quality.correct')

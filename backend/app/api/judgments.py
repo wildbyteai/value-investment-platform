@@ -14,7 +14,7 @@ from app.domains.platform import data_mode
 from app.models.judgment import JudgmentRevision, JudgmentSlot
 from app.domains.companies.decision_service import auto_decide, effective_value, human_override
 
-router = APIRouter(prefix="/api/judgments", tags=["judgments"])
+router = APIRouter(prefix="/api/judgments", tags=['公司档案'])
 
 
 class OverrideIn(BaseModel):

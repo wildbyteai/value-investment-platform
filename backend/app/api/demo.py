@@ -11,7 +11,7 @@ from app.db import get_db
 from app.domains.platform import data_mode
 from app.models.audit import AuditLog, IngestionRun, Outbox
 
-router = APIRouter(prefix="/api", tags=["demo"])
+router = APIRouter(prefix="/api", tags=['后台任务'])
 
 
 class RunIn(BaseModel):

@@ -1,0 +1,36 @@
+{
+  "policy_key": "menus-v1",
+  "note": "左侧菜单与页签。一个页签只要求 permissions 中任意一个；没写 permissions 的页签要求 research.read。菜单下没有可见页签时整个菜单隐藏。",
+  "menus": [
+    {"key": "radar", "label": "资讯雷达", "icon": "◉", "tabs": [
+      {"key": "events", "label": "事件与关联"},
+      {"key": "news", "label": "原始资料与研判"}
+    ]},
+    {"key": "company", "label": "公司档案", "icon": "▤", "tabs": [
+      {"key": "companies", "label": "公司"},
+      {"key": "today", "label": "今日概览"},
+      {"key": "research", "label": "研究快照"},
+      {"key": "mine", "label": "我的自选与笔记", "permissions": ["watchlist.own"]}
+    ]},
+    {"key": "strategy", "label": "策略（击球区）", "icon": "◎", "tabs": [
+      {"key": "zone", "label": "击球区"},
+      {"key": "strategy", "label": "策略规则"}
+    ]},
+    {"key": "monitor", "label": "监控告警", "icon": "◬", "tabs": [
+      {"key": "inbox", "label": "我的通知"},
+      {"key": "alerts", "label": "全部告警"},
+      {"key": "notify-settings", "label": "通知设置"}
+    ]},
+    {"key": "settings", "label": "后台设置", "icon": "⚙", "tabs": [
+      {"key": "users", "label": "账号与角色", "permissions": ["user.manage", "role.assign"]},
+      {"key": "sources", "label": "数据源", "permissions": ["source.manage", "system.configure"]},
+      {"key": "feeds", "label": "资讯源与导入", "permissions": ["source.manage", "analysis.override", "system.configure"]},
+      {"key": "collectors", "label": "采集定时器", "permissions": ["source.manage", "system.configure"]},
+      {"key": "skills", "label": "Skill", "permissions": ["source.manage", "system.configure"]},
+      {"key": "models", "label": "模型配置", "permissions": ["model.configure"]},
+      {"key": "notify", "label": "告警发送", "permissions": ["system.configure"]},
+      {"key": "audit", "label": "审计日志", "permissions": ["audit.read"]},
+      {"key": "tasks", "label": "后台任务", "permissions": ["ops.read"]}
+    ]}
+  ]
+}

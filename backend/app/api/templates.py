@@ -10,7 +10,7 @@ from app.models.runtime import TemplateRelease
 from app.domains.companies.scoring_service import resolve_template,apply_patches
 from app.domains.platform.transactions import record,canonical,digest
 
-router=APIRouter(prefix='/api/templates',tags=['templates'])
+router=APIRouter(prefix='/api/templates',tags=['公司档案'])
 
 
 class TemplateIn(BaseModel):
