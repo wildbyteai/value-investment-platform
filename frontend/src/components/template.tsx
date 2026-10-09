@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api, post } from "./client";
+import { api, post } from "../core/client";
 import { Diagnostic, dimensionName } from "./ui";
 export function TemplateEditor({ company, template, allow, execute }: any) {
   const [draft, setDraft] = useState("[]");

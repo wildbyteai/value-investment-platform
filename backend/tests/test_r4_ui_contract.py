@@ -12,16 +12,22 @@ STATIC = Path(__file__).resolve().parents[1] / 'static'
 SRC = Path(__file__).resolve().parents[2] / 'frontend' / 'src'
 
 
-def test_bundle_contains_four_menus_and_settings():
-    js = (STATIC / 'app.js').read_text(encoding='utf-8')
-    for label in ['资讯雷达', '公司档案', '策略（击球区）', '监控告警', '后台设置']:
-        assert label in js
+def test_four_menus_and_settings():
+    # Menus are served by the API (config/menus-v1.json), not baked into the bundle.
+    from app.domains.identity import menus
+    from app.domains.identity.permissions import VALID_ROLES, permissions_for
+    labels = [m['label'] for m in menus.visible_menus(permissions_for(VALID_ROLES))]
+    assert labels == ['资讯雷达', '公司档案', '策略（击球区）', '监控告警', '后台设置']
+    assert (STATIC / 'app.js').exists()
 
 
-def test_every_mainline_endpoint_is_routed():
+def test_every_endpoint_the_ui_calls_is_routed():
     from app.main import app
     routes = set(app.openapi()['paths'])
-    called = set(re.findall(r'"(/api/[a-z\-/]+)', (SRC / 'mainline.tsx').read_text(encoding='utf-8')))
+    called = set()
+    for path in SRC.rglob('*.ts*'):
+        if path.name != 'api-schema.ts':
+            called |= set(re.findall(r'["`](/api/[a-z\-/]+)', path.read_text(encoding='utf-8')))
     normalized = {c.rstrip('/') for c in called}
     missing = [c for c in normalized if not any(r == c or r.startswith(c + '/') for r in routes)]
     assert missing == []
@@ -68,3 +74,11 @@ def test_index_served(client):
     c, _ = client
     r = c.get('/')
     assert r.status_code == 200 and 'app.js' in r.text
+
+
+def test_every_menu_tab_has_a_page():
+    """config/menus-v1.json and frontend/src/pages/index.tsx must name the same tabs."""
+    from app.domains.identity import menus
+    registry = (SRC / 'pages' / 'index.tsx').read_text(encoding='utf-8')
+    pages = set(re.findall(r'^  "?([a-z\-]+)"?: \(p\) =>', registry, re.M))
+    assert pages == set(menus.tab_keys())

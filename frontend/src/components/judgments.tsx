@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { post } from "./client";
+import { post } from "../core/client";
 import { Dialog, Diagnostic, dimensionName, criterionName } from "./ui";
 const dateInput = (d: Date) => d.toLocaleDateString("sv-SE");
 export function AuthorJudgment({

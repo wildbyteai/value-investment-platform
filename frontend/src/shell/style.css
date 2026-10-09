@@ -351,3 +351,12 @@ td details pre { max-height: 240px; overflow: auto; white-space: pre-wrap; font-
 .login-card label { display: grid; gap: 6px; font-size: 13px; }
 .login-card button { min-height: 38px; }
 .identity form { display: grid; gap: 4px; margin-top: 6px; }
+
+/* 账号与角色、审计日志 */
+.pager { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--line); }
+td.actions { white-space: nowrap; text-align: right; }
+td.actions button + button { margin-left: 6px; }
+tr.muted td { color: var(--muted); }
+label.check { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
+label.check input { width: auto; margin: 0; }
+section.panel + section.panel, section.panel + form.panel, form.panel + section.panel { margin-top: 16px; }

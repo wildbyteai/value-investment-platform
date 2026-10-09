@@ -1,9 +1,12 @@
-import type { paths } from "./api-schema";
+import type { paths } from "../api-schema";
 type Path = keyof paths;
+// Every API error has the same body: {error: {code, message, details?}, detail, request_id}.
 export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    public code = "",
+    public requestId = "",
   ) {
     super(message);
   }
@@ -29,19 +32,20 @@ export async function api(path: Path | string, options: RequestInit = {}) {
     throw new ApiError(0, "无法连接本地服务，请检查服务后重试");
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok)
+  if (!response.ok) {
+    const err = data.error || {};
+    const message =
+      err.message ||
+      (typeof data.detail === "string" ? data.detail : "") ||
+      (response.status >= 500 ? "服务出错了，请稍后重试" : "请求未完成，请检查输入后重试");
+    const requestId = data.request_id || response.headers.get("X-Request-Id") || "";
     throw new ApiError(
       response.status,
-      typeof data.detail === "string"
-        ? data.detail
-        : Array.isArray(data.detail)
-          ? data.detail
-              .map(
-                (e: any) => `${e.loc?.slice(1).join(".") || "输入"}：${e.msg}`,
-              )
-              .join("；")
-          : "请求未完成，请检查输入后重试",
+      response.status >= 500 && requestId ? `${message}（请求编号 ${requestId}）` : message,
+      err.code || "",
+      requestId,
     );
+  }
   return data;
 }
 export const post = (
@@ -49,3 +53,5 @@ export const post = (
   data: unknown,
   headers?: Record<string, string>,
 ) => api(path, { method: "POST", body: JSON.stringify(data), headers });
+export const send = (path: Path | string, method: "PUT" | "PATCH" | "DELETE", data?: unknown) =>
+  api(path, { method, body: data === undefined ? undefined : JSON.stringify(data) });

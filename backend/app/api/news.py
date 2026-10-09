@@ -162,7 +162,7 @@ def run_feed(feed_id: str, principal: Principal = Depends(require_any(*WRITE)), 
 
 
 @router.get('/feeds')
-def feeds(principal: Principal = Depends(require('research.read')), db=Depends(get_db)):
+def feeds(principal: Principal = Depends(require_any('research.read', 'source.manage', 'system.configure')), db=Depends(get_db)):
     rows = db.scalars(select(NewsFeed).where(NewsFeed.workspace_id == principal.workspace.id).order_by(NewsFeed.name)).all()
     return [{'id': f.id, 'feed_key': f.feed_key, 'name': f.name, 'kind': f.kind, 'url': f.url, 'schedule': f.schedule,
              'enabled': f.enabled, 'last_run_at': f.last_run_at.isoformat() if f.last_run_at else None,
