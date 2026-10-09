@@ -62,6 +62,7 @@ UX18阶段已运行（2026-10-06）：81项后端测试、TS构建与OpenAPI生�
 | [19 生产资源与配置清单](./docs/19-production-resources-and-configuration.md) | 现有组件、域名/HTTPS、资源估算、上线缺口及 Java 差异；尚未部署 |
 | [22 部署与安全](./docs/22-deployment-and-security.md) | Docker 部署步骤、账号开通、密钥防泄露措施、备份；代码与 CI 已验证，尚未真实部署 |
 | [23 工程规范](./docs/23-engineering-conventions.md) | 账号与角色管理、按权限下发菜单、统一错误格式/分页/请求编号、前后端目录约定；已实现并测试，尚未真实部署 |
+| [24 资讯→公司匹配](./docs/24-news-company-matching.md) | 两段式匹配（识别全部提及公司 → 按关注列表确定性匹配）、数据结构与迁移 0016、重新匹配/重新研判、模型场景推荐与推理强度、R10–R14 计划；R10a 地基已实现，其余分 PR 进行 |
 | [20 需求方图文报告](./docs/20-stakeholder-report-design.md) | [可直接阅读的报告源稿](./reports/stakeholder/business-narrative.md)与[源码维护入口](./reports/stakeholder/README.md)；业务沙盘、角色工作流、合成图示、框架与费用依据；含实拍的本机PDF/Word不入Git |
 | [范围变更决策](./docs/adr/0002-v02-confirmed-scope.md) | 用户确认与技术修订，保留旧决策历史 |
 | [标准策略](./config/strategy-standard-v1.json) | 人可维护的初始版本；与策略 JSON Schema 对照 |

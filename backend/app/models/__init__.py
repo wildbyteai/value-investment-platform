@@ -10,7 +10,7 @@ from app.models.runtime import CommandReceipt, WorkEffect, ResearchInput, Evalua
 
 from app.models.runtime import ResearchRun  # noqa: F401
 from app.models.sealing import KnowledgeEntry, SafetyGeneration, InstalledArtifact, PrimaryListing, MarketSession, EvaluationSeal, FrozenManifest  # noqa: F401
-from app.models.news import NewsFeed, NewsEvent, NewsItem, NewsEventCompany, LlmProvider, LlmSceneBinding, AgentSkill, CollectorTask, CollectorRun  # noqa: F401
+from app.models.news import NewsFeed, NewsEvent, NewsItem, NewsEventCompany, LlmProvider, LlmSceneBinding, AgentSkill, CollectorTask, CollectorRun, NewsMention, WatchCompany, CompanyAlias, MatchJob  # noqa: F401
 from app.models.monitoring import StrikeZoneState, Alert, Notification, NotificationSetting  # noqa: F401
 from app.domains.strategy.knowledge_clock import register_metadata_triggers
 register_metadata_triggers(Base.metadata)

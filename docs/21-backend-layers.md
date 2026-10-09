@@ -4,8 +4,8 @@
 
 | 层 | 菜单 | 包 | 负责 | 主要 API |
 |---|---|---|---|---|
-| 资讯 | 资讯雷达 | `app/domains/news` | 抓取/导入资讯 → 标准化 → 去重成事件 → 关联公司、关联度、影响分（AI 预判，人确认） | `/api/news/*`（R5，见 ADR 0008） |
-| 公司 | 公司档案 | `app/domains/companies` | 公司与证券、财务、关联资讯、经营/财务评分 | `/api/companies/*`、`/api/scoring/*` |
+| 资讯 | 资讯雷达 | `app/domains/news` | 抓取/导入资讯 → 标准化 → 去重成事件 → ① 识别全部提及公司 ② 按关注列表确定性匹配 → 关联度、影响分（AI 预判，人确认）；匹配在 `domains/news/matching/`（ADR 0016、[24](./24-news-company-matching.md)） | `/api/news/*`（R5，见 ADR 0008）、`/api/news/match-jobs*`、`/api/news/suggested-companies*` |
+| 公司 | 公司档案 | `app/domains/companies` | 公司与证券、财务、关联资讯、经营/财务评分；关注列表与别名（`domains/news/matching/watchlist.py`） | `/api/companies/*`、`/api/watchlist/*`、`/api/scoring/*` |
 | 策略 | 策略（划击球区） | `app/domains/strategy` | 价值策略门槛、击球区三条件、入池状态 | `/api/strategy/*`、`/api/strike-zone/*` |
 | 告警 | 监控告警 | `app/domains/monitoring` | 只盯落进击球区的球，站内通知 + 邮件 | `/api/alerts`、`/api/notifications/*`（R6，见 ADR 0009） |
 | 账号 | 后台设置 › 账号与角色 | `app/domains/identity` | 用户、工作区、五种固定角色、按权限下发菜单、密码与会话 | `/api/auth/*`、`/api/me`、`/api/admin/users*`、`/api/admin/roles` |
@@ -26,6 +26,20 @@ backend/app/
 ```
 
 `app/services/` 与 `app/sources/` 已于 2026-10-09 全部迁入 `app/domains/`，旧路径不再存在；历史文档里的 `services/...` 路径按下表对应。
+
+## 表（`app/models/`）
+
+| 文件 | 表 |
+|---|---|
+| `news.py` | `news_feed`、`news_item`、`news_event`、`news_mention`（R10a 新）、`news_event_company`、`watch_company`（R10a 新）、`company_alias`（R10a 新）、`match_job`（R10a 新）、`llm_provider`、`llm_scene_binding`、`agent_skill`、`collector_task`、`collector_run` |
+| `company.py` | `company`、`security`、`item_company_link`、`economic_fact` |
+| `strategy.py` | `strategy_version`、`security_state`、`change_record` |
+| `monitoring.py` | `strike_zone_state`、`alert`、`notification`、`notification_setting` |
+| `identity.py` | `workspace`、`app_user`、`membership`、`auth_session`、`login_attempt` |
+| `audit.py` | `audit_log`、`outbox`、`ingestion_run` |
+| `intake.py`、`judgment.py`、`collab.py`、`runtime.py`、`sealing.py` | 资料接入、研究判断、个人自选与笔记、运行时（任务/评估/模板）、封存 |
+
+资讯匹配相关表的字段、关系与迁移说明见 [24 §4](./24-news-company-matching.md#4-数据结构迁移-0016_news_company_matching)。
 
 ## 规则
 
@@ -54,5 +68,5 @@ backend/app/
 
 - 资讯导入：后台上传每日 Excel（`POST /api/news/import`），或登记 RSS 源后由 cron 执行 `python -m app.jobs news`（建议每天 08:30 北京时间）。
 - 资讯采集定时器：后台设置 › 采集定时器 填提示词、选能联网的模型（通义 / 智谱 / Kimi / OpenAI / Claude / 豆包，用厂商自带搜索）和可选 Skill；cron 每 5 分钟执行 `python -m app.jobs collect`，到期的定时器各自执行。见 ADR 0012。
-- 模型：后台设置 › 模型配置 登记模型并可直接填写 API Key（`VIP_SECRET_KEY` 加密入库），在“按场景配置模型”里分别指定 资讯采集 / 资讯研判打分 用哪个；场景定义 `config/model-scenes-v1.json`，取用逻辑 `domains/news/model_scenes.py`。见 ADR 0015。没有可用 Key 时资讯关联退回规则匹配。
+- 模型：后台设置 › 模型配置 登记模型并可直接填写 API Key（`VIP_SECRET_KEY` 加密入库），在“按场景配置模型”里分别指定 资讯采集 / 资讯识别与研判 / 批量重新研判 / 公司资讯摘要 / 击球区复核说明 用哪个模型和推理强度（推荐值见 ADR 0016）；场景定义 `config/model-scenes-v1.json`，取用逻辑 `domains/news/model_scenes.py`。见 ADR 0015。没有可用 Key 时资讯关联退回规则匹配。
 - 告警：cron 执行 `python -m app.jobs alerts`（建议交易时段每 30 分钟 + 收盘后一次）；研究员确认资讯关联时也会立即检查。邮件需配置 `VIP_SMTP_*`，发件人 admin@bytewatcher.xyz；每人在“监控告警 › 通知设置”填写收件邮箱。

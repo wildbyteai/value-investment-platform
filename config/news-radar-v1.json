@@ -22,7 +22,7 @@
     "provider_key": "deepseek",
     "name": "DeepSeek",
     "base_url": "https://api.deepseek.com",
-    "model": "deepseek-chat",
+    "model": "deepseek-flash",
     "api_key_env": "VIP_DEEPSEEK_API_KEY"
   },
   "column_synonyms": {

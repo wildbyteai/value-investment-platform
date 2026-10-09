@@ -1935,7 +1935,7 @@
           "后台设置"
         ],
         "summary": "Model Scene Save",
-        "description": "整体替换本工作区的场景绑定；没列出的场景改为使用默认模型。",
+        "description": "整体替换本工作区的场景绑定（模型 + 推理强度）；没列出的场景改为使用默认模型与推荐强度。",
         "operationId": "model_scene_save_api_admin_model_scenes_put",
         "requestBody": {
           "content": {
@@ -3467,6 +3467,860 @@
         }
       }
     },
+    "/api/watchlist/companies": {
+      "get": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Watch List",
+        "description": "本工作区关注的公司（只有 active 的参与第二段匹配）。",
+        "operationId": "watch_list_api_watchlist_companies_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "active",
+                    "archived"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "每页条数",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "每页条数"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "跳过条数",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "跳过条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchCompanyPage"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Watch Add",
+        "description": "关注一家公司（公司档案里没有就按名称新建，并写入别名）。",
+        "operationId": "watch_add_api_watchlist_companies_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchCompanyIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchCompanyOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/watchlist/companies/{watch_id}": {
+      "patch": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Watch Update",
+        "description": "改状态（active / archived）或备注。",
+        "operationId": "watch_update_api_watchlist_companies__watch_id__patch",
+        "parameters": [
+          {
+            "name": "watch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Watch Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchCompanyPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchCompanyOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Watch Delete",
+        "description": "取消关注（已有关联保留）。",
+        "operationId": "watch_delete_api_watchlist_companies__watch_id__delete",
+        "parameters": [
+          {
+            "name": "watch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Watch Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/aliases": {
+      "get": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Alias List",
+        "operationId": "alias_list_api_companies__company_id__aliases_get",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AliasListOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Alias Add",
+        "operationId": "alias_add_api_companies__company_id__aliases_post",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AliasIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AliasOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/aliases/{alias_id}": {
+      "delete": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Alias Delete",
+        "operationId": "alias_delete_api_companies__company_id__aliases__alias_id__delete",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "alias_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Alias Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/news": {
+      "get": {
+        "tags": [
+          "公司档案"
+        ],
+        "summary": "Company News",
+        "description": "公司资讯流：已确认 + 待确认的关联，按时间倒序，游标分页。",
+        "operationId": "company_news_api_companies__company_id__news_get",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyNewsOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/events/{event_id}/mentions": {
+      "get": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Event Mentions",
+        "description": "第一段抽取出的全部公司提及（关注与否），及第二段匹配结果。",
+        "operationId": "event_mentions_api_news_events__event_id__mentions_get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentionListOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/suggested-companies": {
+      "get": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Suggested",
+        "description": "建议关注：近期被多条资讯提及、但本工作区未关注的公司。",
+        "operationId": "suggested_api_news_suggested_companies_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "每页条数",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "每页条数"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "跳过条数",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "跳过条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestedCompanyPage"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/suggested-companies/add": {
+      "post": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Suggested Add",
+        "description": "一键关注（没有就新建公司并写入别名）。",
+        "operationId": "suggested_add_api_news_suggested_companies_add_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestedAddIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestedAddOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/match-jobs/estimate": {
+      "post": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Match Estimate",
+        "description": "执行前预估：涉及事件数与预计大模型调用次数。",
+        "operationId": "match_estimate_api_news_match_jobs_estimate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchJobIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchEstimateOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/match-jobs": {
+      "post": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Match Job Create",
+        "description": "排队一个 重新匹配（rematch）或 重新研判（reassess，需 news.reassess）任务，后台执行。",
+        "operationId": "match_job_create_api_news_match_jobs_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchJobIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchJobOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Match Jobs",
+        "operationId": "match_jobs_api_news_match_jobs_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "每页条数",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "每页条数"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "跳过条数",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "跳过条数"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchJobPage"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/match-jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Match Job",
+        "operationId": "match_job_api_news_match_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchJobOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/news/match-jobs/{job_id}/cancel": {
+      "post": {
+        "tags": [
+          "资讯雷达"
+        ],
+        "summary": "Match Job Cancel",
+        "description": "取消排队中或执行中的任务（已处理的部分保留）。",
+        "operationId": "match_job_cancel_api_news_match_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchJobOut"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "契约已发布、实现尚未合入（错误码 not_implemented）"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api": {
       "get": {
         "summary": "Api Root",
@@ -3486,6 +4340,148 @@
   },
   "components": {
     "schemas": {
+      "AliasIn": {
+        "properties": {
+          "alias": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Alias"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "name",
+              "short",
+              "en",
+              "former",
+              "ticker"
+            ],
+            "title": "Kind",
+            "default": "short"
+          },
+          "market": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SH",
+                  "SZ",
+                  "BJ",
+                  "HK",
+                  "US"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market",
+            "description": "kind=ticker 时可指明市场；不填按代码形状推断"
+          }
+        },
+        "type": "object",
+        "required": [
+          "alias"
+        ],
+        "title": "AliasIn"
+      },
+      "AliasListOut": {
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AliasOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_id",
+          "items"
+        ],
+        "title": "AliasListOut"
+      },
+      "AliasOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "alias": {
+            "type": "string",
+            "title": "Alias"
+          },
+          "alias_norm": {
+            "type": "string",
+            "title": "Alias Norm",
+            "description": "归一化结果（matching/normalize.py），匹配时比较的就是它"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "name",
+              "short",
+              "en",
+              "former",
+              "ticker"
+            ],
+            "title": "Kind"
+          },
+          "market": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SH",
+                  "SZ",
+                  "BJ",
+                  "HK",
+                  "US"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "seed",
+              "manual",
+              "suggested"
+            ],
+            "title": "Source"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_id",
+          "alias",
+          "alias_norm",
+          "kind",
+          "market",
+          "source",
+          "created_at"
+        ],
+        "title": "AliasOut"
+      },
       "BatchReviewIn": {
         "properties": {
           "action": {
@@ -3577,6 +4573,51 @@
             "type": "boolean",
             "title": "Enabled",
             "default": true
+          },
+          "scope_kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "general",
+                  "targeted"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Kind",
+            "description": "general=行业/主题采集；targeted=定向公司采集（目标公司作为识别提示，ADR 0016）。不填：新建为 general，修改时保持原值"
+          },
+          "target_company_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Company Ids",
+            "description": "scope_kind=targeted 时的目标公司（公司档案 id），至少一个；不填保持原值"
+          },
+          "industry": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Industry",
+            "description": "行业/主题，可选；不填保持原值"
           }
         },
         "type": "object",
@@ -3586,6 +4627,153 @@
           "schedule"
         ],
         "title": "CollectorIn"
+      },
+      "CompanyNewsItemOut": {
+        "properties": {
+          "link_id": {
+            "type": "string",
+            "title": "Link Id"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "confirmed"
+            ],
+            "title": "Status"
+          },
+          "relevance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relevance"
+          },
+          "impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Impact"
+          },
+          "key_point": {
+            "type": "string",
+            "title": "Key Point"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          },
+          "match_method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ticker",
+                  "alias",
+                  "contains"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Method"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url",
+            "description": "代表性原文链接"
+          }
+        },
+        "type": "object",
+        "required": [
+          "link_id",
+          "event_id",
+          "title",
+          "summary",
+          "published_at",
+          "status",
+          "relevance",
+          "impact",
+          "key_point",
+          "evidence",
+          "match_method",
+          "url"
+        ],
+        "title": "CompanyNewsItemOut"
+      },
+      "CompanyNewsOut": {
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyNewsItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "下一页游标；null = 没有更多"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_id",
+          "items",
+          "next_cursor"
+        ],
+        "title": "CompanyNewsOut"
       },
       "CreateIn": {
         "properties": {
@@ -4310,6 +5498,478 @@
         ],
         "title": "LoginIn"
       },
+      "MatchEstimateOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "rematch",
+              "reassess"
+            ],
+            "title": "Kind"
+          },
+          "events": {
+            "type": "integer",
+            "title": "Events"
+          },
+          "estimated_calls": {
+            "type": "integer",
+            "title": "Estimated Calls",
+            "description": "预计调用大模型次数；rematch 为 0"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "events",
+          "estimated_calls"
+        ],
+        "title": "MatchEstimateOut"
+      },
+      "MatchJobIn": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "rematch",
+              "reassess"
+            ],
+            "title": "Kind"
+          },
+          "date_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date From",
+            "description": "按事件最后发布时间筛选（北京时间日期，含）"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date To",
+            "description": "含当天"
+          },
+          "event_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Ids",
+            "description": "只处理这些事件；与日期范围可同时给出（取交集）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "MatchJobIn"
+      },
+      "MatchJobOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "rematch",
+              "reassess"
+            ],
+            "title": "Kind"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "processed": {
+            "type": "integer",
+            "title": "Processed"
+          },
+          "links_added": {
+            "type": "integer",
+            "title": "Links Added"
+          },
+          "links_updated": {
+            "type": "integer",
+            "title": "Links Updated"
+          },
+          "estimated_calls": {
+            "type": "integer",
+            "title": "Estimated Calls"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "params",
+          "status",
+          "total",
+          "processed",
+          "links_added",
+          "links_updated",
+          "estimated_calls",
+          "error",
+          "created_by",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "title": "MatchJobOut"
+      },
+      "MatchJobPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchJobOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "MatchJobPage"
+      },
+      "MentionListOut": {
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "extract_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "done",
+              "rule_only",
+              "failed"
+            ],
+            "title": "Extract Status"
+          },
+          "extract_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extract Version"
+          },
+          "extracted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extracted At"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MentionOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "extract_status",
+          "extract_version",
+          "extracted_at",
+          "items"
+        ],
+        "title": "MentionListOut"
+      },
+      "MentionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "原文写法"
+          },
+          "name_norm": {
+            "type": "string",
+            "title": "Name Norm"
+          },
+          "ticker_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ticker Raw"
+          },
+          "ticker_norm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ticker Norm"
+          },
+          "market": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SH",
+                  "SZ",
+                  "BJ",
+                  "HK",
+                  "US"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market"
+          },
+          "relevance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relevance",
+            "description": "0..1"
+          },
+          "impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Impact",
+            "description": "-1..1"
+          },
+          "key_point": {
+            "type": "string",
+            "title": "Key Point",
+            "description": "≤80 字要点"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence",
+            "description": "原文证据（短引文）"
+          },
+          "extractor": {
+            "type": "string",
+            "title": "Extractor",
+            "description": "llm:<provider>/<model>@news-extract:v1 | rule:v1"
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id",
+            "description": "第二段匹配到的关注公司；null = 未关注或未匹配"
+          },
+          "link_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Id"
+          },
+          "link_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "proposed",
+                  "confirmed",
+                  "rejected"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Status"
+          },
+          "match_method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ticker",
+                  "alias",
+                  "contains"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Method"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "event_id",
+          "name",
+          "name_norm",
+          "ticker_raw",
+          "ticker_norm",
+          "market",
+          "relevance",
+          "impact",
+          "key_point",
+          "evidence",
+          "extractor",
+          "company_id",
+          "link_id",
+          "link_status",
+          "match_method",
+          "created_at"
+        ],
+        "title": "MentionOut"
+      },
       "ModelPresetOut": {
         "properties": {
           "provider_key": {
@@ -4347,6 +6007,37 @@
           "doc_url": {
             "type": "string",
             "title": "Doc Url"
+          },
+          "reasoning_style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Style",
+            "description": "openai | deepseek；空 = 不发送推理强度"
+          },
+          "reasoning_efforts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasoning Efforts",
+            "description": "该预设允许的推理强度"
+          },
+          "model_reasoning_efforts": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Model Reasoning Efforts",
+            "description": "按模型名覆盖允许的推理强度"
           }
         },
         "type": "object",
@@ -5189,7 +6880,8 @@
             "type": "string",
             "maxLength": 60,
             "minLength": 1,
-            "title": "Scene"
+            "title": "Scene",
+            "description": "场景键；旧键 news_analysis 等同 news_extract"
           },
           "provider_id": {
             "anyOf": [
@@ -5203,6 +6895,26 @@
             ],
             "title": "Provider Id",
             "description": "不填 = 使用默认模型"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh",
+                  "max"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort",
+            "description": "推理强度；不填 = 场景推荐强度。须在所选模型允许的强度内（allowed_efforts_by_provider），且需要指定模型"
           }
         },
         "type": "object",
@@ -5287,6 +6999,30 @@
             "type": "string",
             "title": "Description"
           },
+          "aliases": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Aliases",
+            "description": "旧场景键，读取与保存时自动换成 key"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "active=已有调用代码 | planned=接口已定、调用代码在 planned_in 的 PR 落地"
+          },
+          "planned_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned In"
+          },
           "requires_search": {
             "type": "boolean",
             "title": "Requires Search"
@@ -5301,6 +7037,55 @@
               }
             ],
             "title": "Provider Id"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort",
+            "description": "场景绑定里填的推理强度；null = 按推荐"
+          },
+          "effective_reasoning_effort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Reasoning Effort",
+            "description": "实际会发送的强度（已按厂商映射并过滤）；null = 不发送"
+          },
+          "effort_source": {
+            "type": "string",
+            "title": "Effort Source",
+            "description": "scene=场景绑定 | provider_options=模型自身配置 | recommended=场景推荐 | none"
+          },
+          "allowed_efforts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Efforts",
+            "description": "当前生效模型允许的推理强度"
+          },
+          "recommended": {
+            "items": {
+              "$ref": "#/components/schemas/SceneRecommendationOut"
+            },
+            "type": "array",
+            "title": "Recommended",
+            "description": "推荐模型与强度，第一项为首选"
+          },
+          "cost_note": {
+            "type": "string",
+            "title": "Cost Note"
           },
           "source": {
             "type": "string",
@@ -5327,19 +7112,88 @@
           "key",
           "label",
           "description",
+          "aliases",
+          "status",
+          "planned_in",
           "requires_search",
           "provider_id",
+          "reasoning_effort",
+          "effective_reasoning_effort",
+          "effort_source",
+          "allowed_efforts",
+          "recommended",
+          "cost_note",
           "source",
           "effective",
           "problem"
         ],
         "title": "SceneOut"
       },
+      "SceneRecommendationOut": {
+        "properties": {
+          "preset": {
+            "type": "string",
+            "title": "Preset",
+            "description": "config/model-presets-v1.json 的 provider_key"
+          },
+          "preset_name": {
+            "type": "string",
+            "title": "Preset Name"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort"
+          },
+          "why": {
+            "type": "string",
+            "title": "Why"
+          }
+        },
+        "type": "object",
+        "required": [
+          "preset",
+          "preset_name",
+          "model",
+          "reasoning_effort",
+          "why"
+        ],
+        "title": "SceneRecommendationOut"
+      },
       "ScenesOut": {
         "properties": {
           "version": {
             "type": "integer",
             "title": "Version"
+          },
+          "efforts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Efforts",
+            "description": "全部推理强度取值"
+          },
+          "allowed_efforts_by_provider": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Allowed Efforts By Provider",
+            "description": "本工作区每个模型（id）允许的推理强度；空列表 = 该模型不发送推理强度"
           },
           "items": {
             "items": {
@@ -5352,6 +7206,8 @@
         "type": "object",
         "required": [
           "version",
+          "efforts",
+          "allowed_efforts_by_provider",
           "items"
         ],
         "title": "ScenesOut"
@@ -5436,6 +7292,24 @@
         "type": "object",
         "title": "ScoreIn"
       },
+      "SecurityRef": {
+        "properties": {
+          "market": {
+            "type": "string",
+            "title": "Market"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          }
+        },
+        "type": "object",
+        "required": [
+          "market",
+          "ticker"
+        ],
+        "title": "SecurityRef"
+      },
       "SettingIn": {
         "properties": {
           "email": {
@@ -5505,6 +7379,197 @@
           "body"
         ],
         "title": "SkillIn"
+      },
+      "SuggestedAddIn": {
+        "properties": {
+          "name_norm": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name Norm"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "新建公司时用的名称；不填取最常见写法"
+          },
+          "ticker": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ticker"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name_norm"
+        ],
+        "title": "SuggestedAddIn"
+      },
+      "SuggestedAddOut": {
+        "properties": {
+          "watch": {
+            "$ref": "#/components/schemas/WatchCompanyOut"
+          },
+          "company_created": {
+            "type": "boolean",
+            "title": "Company Created"
+          },
+          "aliases_added": {
+            "type": "integer",
+            "title": "Aliases Added"
+          }
+        },
+        "type": "object",
+        "required": [
+          "watch",
+          "company_created",
+          "aliases_added"
+        ],
+        "title": "SuggestedAddOut"
+      },
+      "SuggestedCompanyOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "name_norm": {
+            "type": "string",
+            "title": "Name Norm"
+          },
+          "ticker_norm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ticker Norm"
+          },
+          "market": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "SH",
+                  "SZ",
+                  "BJ",
+                  "HK",
+                  "US"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market"
+          },
+          "events": {
+            "type": "integer",
+            "title": "Events",
+            "description": "近 days 天内提及它的事件数"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "sample_event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sample Event Ids"
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id",
+            "description": "公司档案里已有（但本工作区未关注）时的公司 id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "name_norm",
+          "ticker_norm",
+          "market",
+          "events",
+          "last_seen_at",
+          "sample_event_ids",
+          "company_id"
+        ],
+        "title": "SuggestedCompanyOut"
+      },
+      "SuggestedCompanyPage": {
+        "properties": {
+          "min_events": {
+            "type": "integer",
+            "title": "Min Events"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SuggestedCompanyOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min_events",
+          "days",
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "SuggestedCompanyPage"
       },
       "TemplateIn": {
         "properties": {
@@ -5649,6 +7714,200 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WatchCompanyIn": {
+        "properties": {
+          "company_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 36
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id",
+            "description": "关注已有公司；与 name 二选一"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "公司档案里没有时按名称新建"
+          },
+          "tickers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Tickers",
+            "description": "新建公司时的证券代码，如 688428.SH、09969.HK"
+          },
+          "aliases": {
+            "items": {
+              "$ref": "#/components/schemas/AliasIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Aliases"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "WatchCompanyIn"
+      },
+      "WatchCompanyOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "company": {
+            "type": "string",
+            "title": "Company",
+            "description": "公司名"
+          },
+          "securities": {
+            "items": {
+              "$ref": "#/components/schemas/SecurityRef"
+            },
+            "type": "array",
+            "title": "Securities"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "archived"
+            ],
+            "title": "Status"
+          },
+          "note": {
+            "type": "string",
+            "title": "Note"
+          },
+          "alias_count": {
+            "type": "integer",
+            "title": "Alias Count"
+          },
+          "links_30d": {
+            "type": "integer",
+            "title": "Links 30D",
+            "description": "近 30 天关联（确认 + 待确认）的事件数"
+          },
+          "added_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By"
+          },
+          "added_at": {
+            "type": "string",
+            "title": "Added At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_id",
+          "company",
+          "securities",
+          "status",
+          "note",
+          "alias_count",
+          "links_30d",
+          "added_by",
+          "added_at"
+        ],
+        "title": "WatchCompanyOut"
+      },
+      "WatchCompanyPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/WatchCompanyOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "WatchCompanyPage"
+      },
+      "WatchCompanyPatch": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "archived"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "WatchCompanyPatch"
       },
       "ZoneBoard": {
         "properties": {

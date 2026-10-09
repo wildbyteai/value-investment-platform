@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
+from app.domains.news import reasoning
 from app.domains.news.collector_policy import policy
 from app.domains.news.llm import LlmError, ProviderConfig
 
@@ -117,9 +118,9 @@ def _openai_responses(client: httpx.Client, provider: ProviderConfig, messages: 
         body['tool_choice'] = cfg['tool_choice']
     if cfg.get('max_tool_calls'):
         body['max_tool_calls'] = cfg['max_tool_calls']
-    effort = (provider.options or {}).get('reasoning_effort') or cfg.get('reasoning_effort')
-    if effort:
-        body['reasoning'] = {'effort': effort}
+    # Effort follows the scene (news_collect recommends high; ADR 0016), else the model's options.
+    body.update(reasoning.responses_params(provider.base_url, provider.model, provider.effort,
+                                           assume_openai=(mode == 'openai_web_search')))
     temperature = (provider.options or {}).get('temperature')
     if temperature:  # reasoning models reject temperature; only send a non-default value
         body['temperature'] = temperature
@@ -207,6 +208,7 @@ def chat(provider: ProviderConfig, messages: list[dict], transport: httpx.BaseTr
         body['temperature'] = temperature
     if json_mode and mode in ('none',):
         body['response_format'] = {'type': 'json_object'}
+    body.update(reasoning.chat_params(provider.base_url, provider.model, provider.effort))
     if mode == 'qwen_enable_search':
         body['enable_search'] = True
         body['search_options'] = dict(cfg['search_modes'][mode]['search_options'])

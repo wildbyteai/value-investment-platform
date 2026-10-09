@@ -46,7 +46,6 @@
         "type": "web_search"
       },
       "tool_choice": "required",
-      "reasoning_effort": "max",
       "request_timeout_seconds": 900,
       "system_as_instructions": true
     },

@@ -1,4 +1,6 @@
 """采集定时器与 Skill 维护 API (后台设置)."""
+from typing import Literal
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
@@ -35,6 +37,10 @@ class CollectorIn(BaseModel):
     skill_id: str | None = Field(None, max_length=36)
     schedule: ScheduleIn
     enabled: bool = True
+    scope_kind: Literal['general', 'targeted'] | None = Field(
+        None, description='general=行业/主题采集；targeted=定向公司采集（目标公司作为识别提示，ADR 0016）。不填：新建为 general，修改时保持原值')
+    target_company_ids: list[str] | None = Field(None, max_length=50, description='scope_kind=targeted 时的目标公司（公司档案 id），至少一个；不填保持原值')
+    industry: str | None = Field(None, max_length=80, description='行业/主题，可选；不填保持原值')
 
 
 class PresetInstallIn(BaseModel):

@@ -90,7 +90,7 @@ def test_parse_links_clamps_and_filters():
 
 def test_default_provider_is_deepseek_and_needs_key(monkeypatch):
     p = llm.default_provider()
-    assert (p.provider_key, p.base_url, p.model) == ('deepseek', 'https://api.deepseek.com', 'deepseek-chat')
+    assert (p.provider_key, p.base_url, p.model) == ('deepseek', 'https://api.deepseek.com', 'deepseek-flash')
     monkeypatch.delenv(p.api_key_env, raising=False)
     with pytest.raises(llm.LlmError, match='未配置模型密钥'):
         llm.propose_links(p, 'x', [])
@@ -164,9 +164,11 @@ def test_ai_scoring_through_openai_compatible_api(env, monkeypatch):
         ids = [e.id for e in s.scalars(select(NewsEvent).where(NewsEvent.item_count == 2)).all()]
         stats = service.score_events(s, ws, event_ids=ids, transport=httpx.MockTransport(handler))
         s.commit()
-    assert stats['ai_scored'] == 1 and stats['model'] == 'DeepSeek/deepseek-chat'
+    assert stats['ai_scored'] == 1 and stats['model'] == 'DeepSeek/deepseek-flash'
     assert seen['url'] == 'https://api.deepseek.com/chat/completions' and seen['auth'] == 'Bearer test-key'
-    assert seen['body']['model'] == 'deepseek-chat' and '合成甲制造（600001.SH / 0001.HK）' in seen['body']['messages'][1]['content']
+    # scene news_extract recommends deepseek-flash at effort low (ADR 0016)
+    assert seen['body']['reasoning_effort'] == 'low' and 'thinking' not in seen['body']
+    assert seen['body']['model'] == 'deepseek-flash' and '合成甲制造（600001.SH / 0001.HK）' in seen['body']['messages'][1]['content']
     event = c.get(f'/api/news/events/{ids[0]}', headers=h(ws, 'viewer@demo')).json()
     links = {l['company_label']: l for l in event['links']}
     assert links['合成甲制造']['relevance'] == 0.95 and links['合成甲制造']['impact'] == 0.6

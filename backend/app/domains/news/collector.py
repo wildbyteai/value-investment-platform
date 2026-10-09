@@ -173,6 +173,8 @@ def task_dict(db, t: CollectorTask) -> dict:
             'provider': f'{provider.name} · {provider.model}' if provider else None,
             'search_mode': provider.search_mode if provider else None,
             'skill_id': t.skill_id, 'skill': skill.name if skill else None, 'feed_id': t.feed_id,
+            'scope_kind': t.scope_kind or 'general', 'target_company_ids': json.loads(t.target_company_ids or '[]'),
+            'industry': t.industry,
             'schedule': schedule, 'schedule_text': describe_schedule(schedule), 'enabled': t.enabled,
             'next_run_at': t.next_run_at.isoformat() if t.next_run_at else None,
             'last_run_at': t.last_run_at.isoformat() if t.last_run_at else None, 'last_status': t.last_status}
@@ -197,6 +199,7 @@ def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None
         provider_id = None
     if data.get('skill_id'):
         _skill(db, workspace_id, data['skill_id'])
+    scope_kind, targets, industry = _scope(db, data, _task(db, workspace_id, task_id) if task_id else None)
     if task_id is None:
         feed = NewsFeed(workspace_id=workspace_id, feed_key=f"agent-{now.strftime('%Y%m%d%H%M%S%f')}",
                         name=data['name'], kind='agent', enabled=True, config_json='{}')
@@ -211,6 +214,7 @@ def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None
     row.name, row.prompt = data['name'], data['prompt']
     row.provider_id, row.skill_id = provider_id, data.get('skill_id') or None
     row.schedule_json, row.enabled = canonical(schedule), data.get('enabled', True)
+    row.scope_kind, row.target_company_ids, row.industry = scope_kind, json.dumps(targets), industry
     row.next_run_at = next_run(schedule, now) if row.enabled else None
     row.updated_at = now
     feed.enabled = row.enabled
@@ -218,8 +222,36 @@ def save_task(db, workspace_id, actor_id, data: dict, task_id: str | None = None
     db.flush()
     record(db, workspace_id, actor_id, 'admin.collector.saved', 'collector_task', row.id,
            {'name': row.name, 'provider_id': row.provider_id, 'skill_id': row.skill_id, 'schedule': schedule,
-            'enabled': row.enabled})
+            'enabled': row.enabled, 'scope_kind': scope_kind, 'target_company_ids': targets, 'industry': industry})
     return task_dict(db, row)
+
+
+SCOPE_KINDS = ('general', 'targeted')
+
+
+def _scope(db, data: dict, existing: CollectorTask | None = None) -> tuple[str, list[str], str | None]:
+    """(scope_kind, target_company_ids, industry). A field left out (None) keeps the existing task's
+    value (older clients do not send them). targeted needs ≥1 existing company; general keeps no
+    targets. The targets become hints for news_extract (R11, ADR 0016)."""
+    from app.models.company import Company
+    kind = data.get('scope_kind') or (existing.scope_kind if existing else None) or 'general'
+    if kind not in SCOPE_KINDS:
+        raise Invalid('采集范围只能是 general（行业/主题）或 targeted（定向公司）')
+    industry = data.get('industry') if data.get('industry') is not None else (existing.industry if existing else None)
+    industry = (industry or '').strip()[:80] or None
+    if kind == 'general':
+        return kind, [], industry
+    raw = data.get('target_company_ids')
+    if raw is None and existing is not None:
+        raw = json.loads(existing.target_company_ids or '[]')
+    targets = list(dict.fromkeys(t for t in (raw or []) if t))
+    if not targets:
+        raise Invalid('定向公司采集至少选择一家目标公司')
+    found = set(db.scalars(select(Company.id).where(Company.id.in_(targets))).all())
+    missing = [t for t in targets if t not in found]
+    if missing:
+        raise Invalid(f'目标公司不存在：{"、".join(missing[:5])}')
+    return kind, targets, industry
 
 
 def _task(db, workspace_id, task_id) -> CollectorTask:
@@ -307,7 +339,7 @@ def run_task(db, workspace_id, task: CollectorTask, trigger='manual', actor_id=N
     try:
         if provider_row is None or not provider_row.enabled:
             raise llm.LlmError(missing)
-        provider = service.provider_config(provider_row)
+        provider = model_scenes.provider_config_for_scene(db, workspace_id, model_scenes.NEWS_COLLECT, provider_row)
         run.model, run.search_mode = f'{provider.name}/{provider.model}', provider.search_mode
         if provider.search_mode == 'none':
             raise llm.LlmError(model_scenes.NEEDS_SEARCH)

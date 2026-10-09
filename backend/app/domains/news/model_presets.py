@@ -19,5 +19,8 @@ def config() -> dict:
     return json.loads(CONFIG.read_text(encoding='utf-8'))
 
 
+OPTIONAL = {'reasoning_style': None, 'reasoning_efforts': [], 'model_reasoning_efforts': {}}
+
+
 def presets() -> list[dict]:
-    return [{k: p.get(k) for k in FIELDS} for p in config()['presets']]
+    return [{**{k: p.get(k) for k in FIELDS}, **{k: p.get(k, d) for k, d in OPTIONAL.items()}} for p in config()['presets']]

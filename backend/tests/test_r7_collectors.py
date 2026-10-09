@@ -114,12 +114,13 @@ def test_openai_responses_web_search(monkeypatch):
             {'type': 'web_search_call', 'status': 'completed', 'action': {'type': 'search', 'query': '合成甲制造 订单'}},
             {'type': 'message', 'role': 'assistant', 'content': [{'type': 'output_text', 'text': '{"items":', 'annotations': []},
                                                                  {'type': 'output_text', 'text': '[]}'}]}]})
-    r = agent.chat(provider('openai_web_search', 'https://api.openai.com/v1'),
-                   [{'role': 'system', 'content': 'S'}, {'role': 'user', 'content': 'U'}], transport=httpx.MockTransport(handler))
+    p = provider('openai_web_search', 'https://api.openai.com/v1')
+    p.model, p.reasoning_effort = 'gpt-6-luna', 'high'   # resolved by the news_collect scene (ADR 0016)
+    r = agent.chat(p, [{'role': 'system', 'content': 'S'}, {'role': 'user', 'content': 'U'}], transport=httpx.MockTransport(handler))
     assert seen['path'] == '/v1/responses' and seen['auth'] == 'Bearer oa-key'
     assert seen['body']['tools'] == [{'type': 'web_search'}] and seen['body']['tool_choice'] == 'required'
     assert seen['body']['instructions'] == 'S' and seen['body']['input'] == [{'role': 'user', 'content': 'U'}]
-    assert 'temperature' not in seen['body'] and seen['body']['reasoning'] == {'effort': 'max'}
+    assert 'temperature' not in seen['body'] and seen['body']['reasoning'] == {'effort': 'high'}
     assert r.content == '{"items":[]}' and r.searches == ['合成甲制造 订单']
     empty = lambda req: httpx.Response(200, json={'status': 'incomplete', 'output': []})
     with pytest.raises(llm.LlmError, match='截断'):
