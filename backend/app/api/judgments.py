@@ -10,11 +10,11 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.judgment import JudgmentRevision, JudgmentSlot
-from app.services.decision_service import auto_decide, effective_value, human_override
+from app.domains.companies.decision_service import auto_decide, effective_value, human_override
 
-router = APIRouter(prefix="/api/judgments", tags=["judgments"])
+router = APIRouter(prefix="/api/judgments", tags=['公司档案'])
 
 
 class OverrideIn(BaseModel):
@@ -39,7 +39,7 @@ def list_effective(
     db: Session = Depends(get_db),
 ):
     slots = db.scalars(select(JudgmentSlot).where(JudgmentSlot.workspace_id == principal.workspace.id).order_by(JudgmentSlot.kind, JudgmentSlot.slot_key)).all()
-    from app.services.scoring_service import current_decisions
+    from app.domains.companies.scoring_service import current_decisions
     now = datetime.now(timezone.utc)
     effective = {s.id:r for company in data_mode.companies(db,principal.workspace.id)
                  for s,r,v in current_decisions(db,company.id,principal.workspace.id,now,now)}
@@ -94,7 +94,7 @@ class ProposalIn(CreateIn):
 @router.post('/proposals',status_code=201)
 def propose_judgment(body: ProposalIn, principal: Principal = Depends(require('analysis.override')),
                      db: Session = Depends(get_db), command_key: str = Header(alias='Idempotency-Key',min_length=1,max_length=240)):
-    from app.services.judgment_authoring import create
+    from app.domains.companies.judgment_authoring import create
     result=create(db,principal,body,command_key,proposal=True)
     db.commit()
     return result
@@ -102,7 +102,7 @@ def propose_judgment(body: ProposalIn, principal: Principal = Depends(require('a
 
 @router.get('/catalog/{company_id}')
 def rubric_catalog(company_id: str, principal: Principal = Depends(require('research.read')), db: Session = Depends(get_db)):
-    from app.services.judgment_authoring import catalog
+    from app.domains.companies.judgment_authoring import catalog
     company=data_mode.require_company(db,company_id,principal.workspace.id)
     return catalog(db,company,principal.workspace.id)
 
@@ -110,7 +110,7 @@ def rubric_catalog(company_id: str, principal: Principal = Depends(require('rese
 @router.post('',status_code=201)
 def create_judgment(body: CreateIn, principal: Principal = Depends(require('analysis.override')),
                     db: Session = Depends(get_db), command_key: str = Header(alias='Idempotency-Key',min_length=1,max_length=240)):
-    from app.services.judgment_authoring import create
+    from app.domains.companies.judgment_authoring import create
     result=create(db,principal,body,command_key)
     db.commit()
     return result

@@ -8,7 +8,7 @@ from app.db import get_db
 from app.domains.monitoring import service
 from app.domains.monitoring.mailer import SmtpMailer
 
-router = APIRouter(prefix='/api', tags=['monitoring'])
+router = APIRouter(prefix='/api', tags=['监控告警'])
 
 SCAN = ('source.manage', 'strategy.publish', 'system.configure')
 

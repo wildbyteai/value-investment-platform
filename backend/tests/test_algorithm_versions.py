@@ -1,6 +1,8 @@
 """R1 guardrail: algorithm identity is an explicit release, not live file bytes."""
-from app.services import algorithm_versions, sealing_service, reference_research
-from app.services.transactions import digest
+from app.domains.platform import algorithm_versions
+from app.domains.strategy import sealing_service
+from app.domains.companies import reference_research
+from app.domains.platform.transactions import digest
 import importlib.util
 from pathlib import Path
 
@@ -36,7 +38,7 @@ def test_every_sealed_algorithm_has_an_explicit_release():
 def test_migration_0010_freezes_the_knowledge_clock_it_was_released_with():
     # Tests build schema with create_all + knowledge_clock.install; real databases use
     # the migration copy. They must stay identical until a new migration changes both.
-    from app.services import knowledge_clock
+    from app.domains.strategy import knowledge_clock
     path = Path(__file__).resolve().parents[1] / 'alembic/versions/0010_formal_sealing.py'
     spec = importlib.util.spec_from_file_location('m0010', path)
     m0010 = importlib.util.module_from_spec(spec)

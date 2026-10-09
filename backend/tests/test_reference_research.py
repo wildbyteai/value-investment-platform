@@ -5,10 +5,10 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 import pytest
 
-from app.services.reference_research import valuation_reference, quality_reference, strategy_reference
-from app.services.scoring_service import config
-from app.services.strategy_service import gates
-from app.services.transactions import digest
+from app.domains.companies.reference_research import valuation_reference, quality_reference, strategy_reference
+from app.domains.companies.scoring_service import config
+from app.domains.strategy.strategy_service import gates
+from app.domains.platform.transactions import digest
 
 AT = datetime(2026, 10, 6, tzinfo=timezone.utc)
 SEC = SimpleNamespace(ticker='TEST.HK', currency='HKD')

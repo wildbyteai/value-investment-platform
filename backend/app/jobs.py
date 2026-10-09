@@ -16,7 +16,7 @@ from app.db import SessionLocal
 
 def news() -> list[dict]:
     from app.domains.news import service
-    from app.domains.news.models import NewsFeed
+    from app.models.news import NewsFeed
     out = []
     with SessionLocal() as db:
         feeds = db.scalars(select(NewsFeed).where(NewsFeed.enabled.is_(True), NewsFeed.kind == 'rss')).all()

@@ -70,12 +70,12 @@ def seed() -> None:
 
 
 if __name__ == "__main__":
-    from app.services.data_mode import require_fixture
+    from app.domains.platform.data_mode import require_fixture
     require_fixture()
     seed()
     from services_companies import seed_companies, link_items
-    from app.services.intake_service import import_fixture
-    from app.services.decision_service import auto_decide
+    from app.domains.news.intake_service import import_fixture
+    from app.domains.companies.decision_service import auto_decide
     with SessionLocal() as db:
         ws = db.scalar(select(Workspace.id).where(Workspace.name == WORKSPACES[0][1]))
         seed_companies(db, ws)

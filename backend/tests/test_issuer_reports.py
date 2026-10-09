@@ -2,7 +2,7 @@
 from copy import deepcopy
 from datetime import datetime,timezone
 import pytest
-from app.services.issuer_reports import validate,analysis
+from app.domains.companies.issuer_reports import validate,analysis
 
 def bundle():
     line='合并净利润 1,234.56 2,345.67'
@@ -31,7 +31,7 @@ def test_explicit_unit_colon_layout_variants(label):
     with pytest.raises(ValueError,match='单位原文'):validate(b)
 
 def test_hk_company_financials_remain_cny_with_separate_security_currency():
-    from app.services.issuer_reports import SECURITY_CURRENCIES
+    from app.domains.companies.issuer_reports import SECURITY_CURRENCIES
     b=bundle();b['ticker']='09969.HK';b['issuer']='诺诚健华医药有限公司'
     b['documents'][0]['pages'][0]['text']=b['documents'][0]['pages'][0]['text'].replace('珠海格力电器股份有限公司',b['issuer'])
     validate(b)

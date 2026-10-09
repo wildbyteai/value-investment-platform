@@ -3,7 +3,7 @@ import argparse
 import json
 from datetime import date
 from pathlib import Path
-from app.services.futu_source import (ROOT, SourceError, connection_ready, capture,
+from app.domains.market_data.futu_source import (ROOT, SourceError, connection_ready, capture,
                                       validate, import_snapshot)
 
 

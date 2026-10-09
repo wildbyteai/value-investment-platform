@@ -4,13 +4,13 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from app.api.deps import Principal,require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.company import Company
 from app.models.runtime import TemplateRelease
-from app.services.scoring_service import resolve_template,apply_patches
-from app.services.transactions import record,canonical,digest
+from app.domains.companies.scoring_service import resolve_template,apply_patches
+from app.domains.platform.transactions import record,canonical,digest
 
-router=APIRouter(prefix='/api/templates',tags=['templates'])
+router=APIRouter(prefix='/api/templates',tags=['公司档案'])
 
 
 class TemplateIn(BaseModel):

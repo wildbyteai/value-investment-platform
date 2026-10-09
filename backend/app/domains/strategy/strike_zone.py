@@ -14,6 +14,7 @@ Pure function: no database, no clock, so it is trivially testable. All numbers c
 from config/strike-zone-v1.json.
 """
 from __future__ import annotations
+from app.core.paths import CONFIG_DIR
 
 import json
 from dataclasses import dataclass, field
@@ -21,7 +22,7 @@ from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
-CONFIG = Path(__file__).resolve().parents[4] / 'config' / 'strike-zone-v1.json'
+CONFIG = CONFIG_DIR / 'strike-zone-v1.json'
 
 SWEET, EDGE, OUTSIDE = 'sweet', 'edge', 'outside'
 LABELS = {SWEET: '甜区', EDGE: '边角球', OUTSIDE: '区外'}

@@ -3,7 +3,7 @@ import argparse,json,hashlib
 from pathlib import Path
 from pypdf import PdfReader
 from app.db import SessionLocal
-from app.services.issuer_reports import validate,import_bundle
+from app.domains.companies.issuer_reports import validate,import_bundle
 ROOT=Path(__file__).resolve().parents[1]
 
 def main():

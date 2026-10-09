@@ -1,6 +1,5 @@
-"""资讯雷达: feeds → normalized items → deduplicated events → company links with
-relevance (0..1) and impact (-1..1). AI proposes, a human confirms.
+"""资讯雷达: 资讯源 → 规范化资讯 → 去重事件 → 公司关联（关联度 0..1，影响分 -1..1）。
+AI 预判，人工确认。原始资料导入（intake）与公告披露也在这里。
 
-Legacy modules that belong here: services/intake_service.py, services/item_history.py,
-services/issuer_disclosures.py (disclosure feed), models/intake.py.
+表定义在 app/models/news.py、intake.py。
 """

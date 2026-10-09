@@ -64,7 +64,7 @@ def test_reimport_is_idempotent(client):
 
 def test_partial_failure_keeps_good_items(client):
     # inject a failure via a second run flag: directly call service with extra_fail_keys
-    from app.services.intake_service import import_fixture
+    from app.domains.news.intake_service import import_fixture
     engine = create_engine(os.environ["VIP_DB_URL"], future=True)
     Session = sessionmaker(bind=engine, future=True)
     with Session() as s:

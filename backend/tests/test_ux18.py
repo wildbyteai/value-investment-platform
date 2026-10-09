@@ -7,11 +7,11 @@ from app.models.company import Company, Security
 from app.models.judgment import JudgmentRevision, JudgmentSlot
 from app.models.runtime import ItemRevision, ResearchRun
 from app.models.intake import InformationItem, SourceRegistry
-from app.services.scoring_service import config, resolve_template, apply_patches, score_company
-from app.services.strategy_service import gates
-from app.services.item_history import observe
-from app.services.transactions import canonical, digest
-from app.services.decision_service import human_override
+from app.domains.companies.scoring_service import config, resolve_template, apply_patches, score_company
+from app.domains.strategy.strategy_service import gates
+from app.domains.news.item_history import observe
+from app.domains.platform.transactions import canonical, digest
+from app.domains.companies.decision_service import human_override
 from test_remediation import prepared, headers, Session
 from test_real_data import real_mode
 
@@ -221,7 +221,7 @@ def test_score_stage_partial_when_company_ready_but_security_unknown(real_mode):
 
 def test_release_worker_revalidates_fixed_cutoff_and_creates_new_revision(prepared):
     from app.models.audit import Outbox
-    from app.services.worker_service import claim,complete
+    from app.domains.platform.worker_service import claim,complete
     _,ws,_=prepared
     with Session() as db:
         slot=db.scalar(select(JudgmentSlot).where(JudgmentSlot.kind=='impact'))
@@ -238,7 +238,7 @@ def test_release_worker_revalidates_fixed_cutoff_and_creates_new_revision(prepar
 
 def test_release_worker_does_not_accept_expired_proposal(prepared):
     from app.models.audit import Outbox
-    from app.services.worker_service import claim,complete
+    from app.domains.platform.worker_service import claim,complete
     _,ws,_=prepared
     with Session() as db:
         slot=db.scalar(select(JudgmentSlot).where(JudgmentSlot.kind=='impact'))

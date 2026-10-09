@@ -39,6 +39,8 @@ docker compose run --rm api python -m app.admin_cli create-user you@example.com 
 docker compose run --rm -it api python -m app.admin_cli set-password you@example.com     # 交互输入，不进 shell 历史
 ```
 
+第一个系统管理员登录后，其他人的账号在网页 **后台设置 › 账号与角色** 开通、分配角色、重置密码和停用，不必再上服务器（见 docs/23）。
+
 角色：viewer / researcher / strategy_manager / data_admin / system_admin，可多次 `--role`。停用账号：`disable-user`（同时踢下线）。
 
 升级：`git pull && docker compose up -d --build`（迁移自动先跑）。

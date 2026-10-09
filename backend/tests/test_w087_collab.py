@@ -11,7 +11,7 @@ from app.db import Base  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.audit import Outbox  # noqa: E402
 from app.models.company import Company, Security  # noqa: E402
-from app.services.intake_service import import_fixture  # noqa: E402
+from app.domains.news.intake_service import import_fixture  # noqa: E402
 from services_companies import link_items, seed_companies  # noqa: E402
 
 
@@ -65,7 +65,7 @@ def test_outbox_claim_idempotent(client):
     c, engine = client
     Session = sessionmaker(bind=engine, future=True)
     with Session() as s:
-        from app.services.transactions import workspace
+        from app.domains.platform.transactions import workspace
         ob = Outbox(workspace_id=workspace(s), aggregate_type="ingestion_run", aggregate_id="x",
                     event_type="ingestion_run.created", payload_json="{}")
         s.add(ob)

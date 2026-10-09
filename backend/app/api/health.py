@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 
-router = APIRouter(tags=["health"])
+router = APIRouter(tags=['运行状态'])
 
 
 @router.get("/api/health")

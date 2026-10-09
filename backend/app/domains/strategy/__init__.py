@@ -1,7 +1,4 @@
-"""策略: value strategy rules and the strike zone (击球区).
+"""策略: 价值投资策略规则、证券状态机、决策输入固化（sealing）与击球区。
 
-Legacy modules that belong here: services/strategy_service.py (gates + state application),
-services/state_machine.py, services/sealing_service.py and services/seal_worker.py
-(fixing the inputs a decision used), models/strategy.py, models/sealing.py.
-New: strike_zone.py.
+表定义在 app/models/strategy.py、sealing.py。
 """

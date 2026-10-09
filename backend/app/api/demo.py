@@ -8,10 +8,10 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.audit import AuditLog, IngestionRun, Outbox
 
-router = APIRouter(prefix="/api", tags=["demo"])
+router = APIRouter(prefix="/api", tags=['后台任务'])
 
 
 class RunIn(BaseModel):
@@ -113,7 +113,7 @@ def mark_dispatched(
     row = db.get(Outbox, outbox_id)
     if row is None or row.workspace_id != principal.workspace.id:
         raise HTTPException(status_code=404, detail="outbox row not found")
-    from app.services.worker_service import claim, complete
+    from app.domains.platform.worker_service import claim, complete
     if row.dispatched:
         return {"id": row.id, "dispatched": True}
     token = claim(db, "api-demo-" + principal.user.id, outbox_id, principal.workspace.id)

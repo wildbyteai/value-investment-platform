@@ -20,12 +20,12 @@ from decimal import Decimal
 from sqlalchemy import func, select
 
 from app.core.errors import NotFound
-from app.domains.monitoring.models import Alert, Notification, NotificationSetting, StrikeZoneState
+from app.models.monitoring import Alert, Notification, NotificationSetting, StrikeZoneState
 from app.domains.monitoring.policy import policy
-from app.domains.news.models import NewsEvent, NewsEventCompany
+from app.models.news import NewsEvent, NewsEventCompany
 from app.domains.strategy import strike_zone, zone_service
 from app.models.identity import Membership, User
-from app.services.transactions import canonical, record
+from app.domains.platform.transactions import canonical, record
 
 ZONE_LABEL = strike_zone.LABELS
 

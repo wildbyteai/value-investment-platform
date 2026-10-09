@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from app.api import admin, alerts, collectors, news, strike_zone
+from app.api import admin, alerts, collectors, news, strike_zone, users
 from app.api import sealing, research, templates, auth, collab, companies, demo, health, intake, judgments, scoring, strategy
 from app.config import get_settings
 from app.core import errors
@@ -35,6 +35,7 @@ app.include_router(collab.router)
 app.include_router(collab.worker_router)
 app.include_router(strike_zone.router)
 app.include_router(admin.router)
+app.include_router(users.router)
 app.include_router(news.router)
 app.include_router(alerts.router)
 app.include_router(collectors.router)

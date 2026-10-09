@@ -3,7 +3,7 @@ import argparse
 import time
 import uuid
 from app.db import SessionLocal
-from app.services.worker_service import claim, complete
+from app.domains.platform.worker_service import claim, complete
 
 
 def run(once=False):

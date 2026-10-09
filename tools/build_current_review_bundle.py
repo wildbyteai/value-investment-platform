@@ -43,7 +43,7 @@ def main():
     revision = git("rev-parse", "HEAD").decode().strip()
     names = sorted(n for n in git("ls-tree", "-r", "--name-only", "HEAD").decode().splitlines() if allowed(n))
     required = {"review/CURRENT-HANDOFF.md", "review/CURRENT-REVIEW-PROMPT.md",
-                "frontend/src/app.tsx", "backend/app/services/research_pipeline.py"}
+                "frontend/src/app.tsx", "backend/app/domains/companies/research_pipeline.py"}
     if not required.issubset(names):
         raise SystemExit("Missing current review inputs in HEAD.")
     contents = {n: git("show", f"HEAD:{n}") for n in names}

@@ -3,9 +3,9 @@ import uuid
 from decimal import Decimal
 from copy import deepcopy
 import pytest
-from app.services.original_financials import normalize,FinancialGap
-from app.services.hk_market import normalize_quote,MarketGap
-from app.services.scoring_service import metrics_from_financials
+from app.domains.companies.original_financials import normalize,FinancialGap
+from app.domains.market_data.hk_market import normalize_quote,MarketGap
+from app.domains.companies.scoring_service import metrics_from_financials
 
 def evidence():return [{'synthetic':False,'source_revision_id':str(uuid.uuid4()),'hash':'a'*64,'locator':'reviewed original fixture page 1 table A'}]
 
@@ -89,8 +89,8 @@ def test_component_conversion_rejects_mismatched_or_ambiguous_inputs(defect):
 def test_known_share_change_expires_only_valuation_at_exact_boundary():
     from types import SimpleNamespace
     from datetime import datetime,timezone,timedelta
-    from app.services.scoring_service import score_security
-    from app.services.transactions import canonical
+    from app.domains.companies.scoring_service import score_security
+    from app.domains.platform.transactions import canonical
     b=bundle();b['ordinary_shares_valid_until']='2026-08-18T00:00:00+08:00';b['share_change_evidence']=evidence()
     f=normalize(b);original_metrics=metrics_from_financials(f)
     s=SimpleNamespace(id='test-security',company_id='test-company',ticker='TEST',market='CN_A',currency='CNY')
@@ -111,8 +111,8 @@ def test_share_change_requires_original_evidence_and_later_zoned_time(deadline,r
 def test_share_verified_day_only_keeps_financial_metrics_after_it():
     from types import SimpleNamespace
     from datetime import datetime
-    from app.services.scoring_service import score_security
-    from app.services.transactions import canonical
+    from app.domains.companies.scoring_service import score_security
+    from app.domains.platform.transactions import canonical
     b=bundle();b['ordinary_shares_verified_through']='2026-06-30';b['share_basis_evidence']=evidence()
     f=normalize(b);metrics=metrics_from_financials(f)
     s=SimpleNamespace(id='test',company_id='c',ticker='TEST',market='CN_A',currency='CNY')

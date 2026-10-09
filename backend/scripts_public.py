@@ -5,7 +5,7 @@ import os
 from sqlalchemy import select
 from app.db import SessionLocal
 from app.models.identity import Workspace
-from app.services.real_source import import_public
+from app.domains.companies.real_source import import_public
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()

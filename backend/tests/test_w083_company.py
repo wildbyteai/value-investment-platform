@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db import Base  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.company import Company, ItemCompanyLink, Security  # noqa: E402
-from app.services.intake_service import import_fixture  # noqa: E402
+from app.domains.news.intake_service import import_fixture  # noqa: E402
 from services_companies import link_items, seed_companies  # noqa: E402
 
 

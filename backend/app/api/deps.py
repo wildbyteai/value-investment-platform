@@ -1,21 +1,27 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core import sessions
+from app.domains.identity import sessions
 from app.db import get_db
 from app.models.identity import Membership, User, Workspace
-from app.security import role_has, VALID_ROLES
+from app.domains.identity.permissions import permissions_for
 
 
 @dataclass
 class Principal:
+    """The signed-in user, the workspace they are working in, and every role they hold there."""
     user: User
     workspace: Workspace
-    role: str
+    role: str                      # primary role (first held), kept for older call sites
+    roles: list[str] = field(default_factory=list)
+    permissions: list[str] = field(default_factory=list)
+
+    def can(self, permission: str) -> bool:
+        return permission in self.permissions
 
 
 def get_current_principal(
@@ -46,24 +52,26 @@ def get_current_principal(
     if ws is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="unknown workspace")
 
-    membership = db.scalar(
-        select(Membership).where(
+    if user.disabled:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="账号已停用")
+    roles = list(db.scalars(
+        select(Membership.role).where(
             Membership.user_id == user.id,
             Membership.workspace_id == ws.id,
-        )
-    )
-    if membership is None:
+        ).order_by(Membership.created_at, Membership.role)
+    ).all())
+    if not roles:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not a member of this workspace")
 
-    return Principal(user=user, workspace=ws, role=membership.role)
+    return Principal(user=user, workspace=ws, role=roles[0], roles=roles, permissions=permissions_for(roles))
 
 
 def require(permission: str):
     def _dep(principal: Principal = Depends(get_current_principal)) -> Principal:
-        if not role_has(principal.role, permission):
+        if not principal.can(permission):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"role '{principal.role}' lacks permission '{permission}'",
+                detail=f"role '{'+'.join(principal.roles)}' lacks permission '{permission}'",
             )
         return principal
 
@@ -73,10 +81,10 @@ def require(permission: str):
 def require_any(*permissions: str):
     """Allow the call when the role holds at least one of ``permissions``."""
     def _dep(principal: Principal = Depends(get_current_principal)) -> Principal:
-        if not any(role_has(principal.role, p) for p in permissions):
+        if not any(principal.can(p) for p in permissions):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"role '{principal.role}' lacks any of {', '.join(permissions)}",
+                detail=f"role '{'+'.join(principal.roles)}' lacks any of {', '.join(permissions)}",
             )
         return principal
 

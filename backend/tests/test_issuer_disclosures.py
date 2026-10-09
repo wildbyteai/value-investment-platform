@@ -3,12 +3,12 @@ import copy,json
 from datetime import datetime,timezone
 import pytest
 from sqlalchemy import select,func
-from app.services.issuer_disclosures import validate,import_snapshot
+from app.domains.news.issuer_disclosures import validate,import_snapshot
 from app.models.company import Company,Security
 from app.models.runtime import ItemRevision
 from app.models.intake import SourceRegistry
 from app.models.audit import AuditLog
-from app.services.transactions import canonical
+from app.domains.platform.transactions import canonical
 from test_remediation import prepared,Session
 
 def snapshot():

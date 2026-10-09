@@ -6,16 +6,17 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core import passwords, sessions
-from app.services.transactions import record
+from app.domains.identity import menus, passwords, sessions
+from app.domains.identity.permissions import role_label
+from app.domains.platform.transactions import record
 
 from app.api.deps import Principal, get_current_principal
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.identity import Membership, User, Workspace
 from app.models.intake import InformationItem
 
-router = APIRouter(prefix="/api", tags=["auth"])
+router = APIRouter(prefix="/api", tags=['账号与登录'])
 
 
 @router.get("/identities")
@@ -54,7 +55,9 @@ def me(principal: Principal = Depends(get_current_principal)):
         "workspace": {"id": principal.workspace.id, "name": principal.workspace.name if data_mode.fixture_mode() else "真实公开资料研究"},
         "data_mode":"synthetic_test" if data_mode.fixture_mode() else "real_public",
         "role": principal.role,
-        "permissions": __import__("app.security", fromlist=["role_permissions"]).role_permissions().get(principal.role, []),
+        "roles": [{"key": r, "label": role_label(r)} for r in principal.roles],
+        "permissions": principal.permissions,
+        "menus": menus.visible_menus(principal.permissions),
     }
 
 

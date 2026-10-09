@@ -3,7 +3,7 @@ import argparse
 import json
 from pathlib import Path
 from app.db import SessionLocal
-from app.services.eodhd_source import (ROOT, SourceError, capture, capture_fx,
+from app.domains.market_data.eodhd_source import (ROOT, SourceError, capture, capture_fx,
                                       import_snapshot, validate, validate_fx)
 
 

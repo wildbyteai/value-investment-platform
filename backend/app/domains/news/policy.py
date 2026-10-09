@@ -1,8 +1,9 @@
+from app.core.paths import CONFIG_DIR
 import json
 from functools import lru_cache
 from pathlib import Path
 
-CONFIG = Path(__file__).resolve().parents[4] / 'config' / 'news-radar-v1.json'
+CONFIG = CONFIG_DIR / 'news-radar-v1.json'
 
 
 @lru_cache

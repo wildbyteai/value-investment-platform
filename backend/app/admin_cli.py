@@ -15,10 +15,10 @@ import sys
 
 from sqlalchemy import select
 
-from app.core import passwords, sessions
+from app.domains.identity import passwords, sessions
 from app.db import SessionLocal
 from app.models.identity import Membership, User, Workspace
-from app.security import VALID_ROLES
+from app.domains.identity.permissions import VALID_ROLES
 
 
 def _workspace(db, ref: str) -> Workspace:

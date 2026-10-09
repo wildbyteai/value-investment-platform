@@ -49,5 +49,43 @@
       "audit.read",
       "ops.read"
     ]
+  },
+  "role_labels": {
+    "viewer": "只读访客",
+    "researcher": "研究员",
+    "strategy_manager": "策略负责人",
+    "data_admin": "数据管理员",
+    "system_admin": "系统管理员"
+  },
+  "role_descriptions": {
+    "viewer": "阅读研究资料，管理自己的自选与笔记",
+    "researcher": "研判资讯、修订研究判断与模板",
+    "strategy_manager": "编辑、模拟、发布与回滚策略",
+    "data_admin": "管理数据源、采集与资讯源，处理数据质量",
+    "system_admin": "管理账号与角色、模型与系统配置，查看审计"
+  },
+  "permission_labels": {
+    "research.read": "阅读研究资料",
+    "watchlist.own": "个人自选",
+    "notes.own": "个人笔记",
+    "notes.shared.edit": "编辑共享笔记",
+    "analysis.override": "研判与修订分析",
+    "template.edit": "编辑研究模板",
+    "template.publish": "发布研究模板",
+    "strategy.edit": "编辑策略",
+    "strategy.simulate": "模拟策略",
+    "strategy.publish": "发布策略",
+    "strategy.rollback": "回滚策略",
+    "scoring.binding.publish": "发布评分绑定",
+    "source.manage": "管理数据源与采集",
+    "job.retry": "重试后台任务",
+    "identity.manage": "维护公司与证券标识",
+    "quality.correct": "数据质量更正",
+    "user.manage": "管理账号",
+    "role.assign": "分配角色",
+    "system.configure": "系统配置",
+    "model.configure": "模型配置",
+    "audit.read": "查看审计日志",
+    "ops.read": "查看运维记录"
   }
 }

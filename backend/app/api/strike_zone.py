@@ -8,7 +8,7 @@ from app.api.deps import Principal, require
 from app.db import get_db
 from app.domains.strategy import strike_zone, zone_service
 
-router = APIRouter(prefix='/api/strike-zone', tags=['strategy'])
+router = APIRouter(prefix='/api/strike-zone', tags=['策略'])
 
 
 class ZoneCheck(BaseModel):

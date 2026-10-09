@@ -14,11 +14,11 @@ from sqlalchemy import select
 from app.core.errors import Conflict, Invalid, NotFound
 from app.domains.news import llm
 from app.domains.news.dedupe import same_event
-from app.domains.news.models import LlmProvider, NewsEvent, NewsEventCompany, NewsFeed, NewsItem
+from app.models.news import LlmProvider, NewsEvent, NewsEventCompany, NewsFeed, NewsItem
 from app.domains.news.normalize import Record
 from app.domains.news.policy import policy
 from app.models.company import Company, Security
-from app.services.transactions import canonical, record
+from app.domains.platform.transactions import canonical, record
 
 # ---------------------------------------------------------------- feeds & ingest
 

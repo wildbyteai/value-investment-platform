@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import sessionmaker
 
 from app.domains.monitoring import service
-from app.domains.monitoring.models import Alert, Notification
+from app.models.monitoring import Alert, Notification
 from app.domains.monitoring.policy import sender_address
 from app.domains.strategy import zone_service
 

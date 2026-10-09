@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import sessionmaker
 
-from app.core import passwords, secret_guard
+from app.core import secret_guard
+from app.domains.identity import passwords
 from app.domains.news import llm
 
 PW = 'correct horse battery'

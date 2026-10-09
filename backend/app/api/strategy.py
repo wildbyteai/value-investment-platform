@@ -6,16 +6,16 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select, func
 from app.api.deps import Principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.company import Company, Security
 from app.models.strategy import ChangeRecord, SecurityState, StrategyVersion
 from app.models.runtime import Evaluation, CommandReceipt
-from app.services.state_machine import GOLDEN
-from app.services.transactions import record, canonical, digest
-from app.services.strategy_service import gates, apply_evaluation
-from app.services.scoring_service import config, score_company, score_security
+from app.domains.strategy.state_machine import GOLDEN
+from app.domains.platform.transactions import record, canonical, digest
+from app.domains.strategy.strategy_service import gates, apply_evaluation
+from app.domains.companies.scoring_service import config, score_company, score_security
 
-router=APIRouter(prefix='/api/strategy',tags=['strategy'])
+router=APIRouter(prefix='/api/strategy',tags=['策略'])
 
 
 def latest(db,ws):

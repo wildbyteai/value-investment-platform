@@ -7,8 +7,8 @@ from sqlalchemy import select
 from app.db import SessionLocal
 from app.models.identity import Workspace
 from app.models.intake import InformationItem
-from app.services.data_mode import real_item
-from app.services.baostock_financial import ROOT,capture,validate,import_snapshots
+from app.domains.platform.data_mode import real_item
+from app.domains.companies.baostock_financial import ROOT,capture,validate,import_snapshots
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()

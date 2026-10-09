@@ -3,7 +3,7 @@ import argparse,hashlib,json
 from pathlib import Path
 from pypdf import PdfReader
 from app.db import SessionLocal
-from app.services.issuer_disclosures import validate,import_snapshot
+from app.domains.news.issuer_disclosures import validate,import_snapshot
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--snapshot',required=True);p.add_argument('--workspace',required=True);p.add_argument('--write',action='store_true');a=p.parse_args()
