@@ -68,7 +68,7 @@ export function CompanyPanel({
         <ReferenceQuality value={c.score.reference_quality} />
         <GapList values={c.score.missing_data.slice(0, 2)} />
         {allow("analysis.override") && (
-          <button disabled={busy || !c.catalog.length} onClick={startAuthor}>
+          <button className="primary" disabled={busy || !c.catalog.length} onClick={startAuthor}>
             补充一项真实研判
           </button>
         )}
@@ -100,7 +100,6 @@ export function CompanyPanel({
               <p className="muted">正式状态：暂不提供，封存评估尚未就绪。</p>
               {allow("watchlist.own") && (
                 <button
-                  className="quiet"
                   disabled={busy || watchIds === null}
                   onClick={() => toggle(s)}
                 >
@@ -217,7 +216,7 @@ export function CompanyPanel({
               <p>尚无保存的财务字段比较。</p>
             )}
             <GapList values={c.score.missing_data} />
-            <button className="quiet" onClick={research}>
+            <button onClick={research}>
               查看 / 生成研究预览
             </button>
           </>
@@ -228,7 +227,7 @@ export function CompanyPanel({
             {c.timeline.items.map((it: any) => (
               <p key={it.id}>
                 <button
-                  className="quiet"
+                  className="link"
                   disabled={busy}
                   onClick={() => read(it.id)}
                 >
@@ -250,14 +249,14 @@ export function CompanyPanel({
               <p>尚无可用研判。先阅读固定原文，再按评价项补充。</p>
             )}
             {allow("analysis.override") && (
-              <button
+              <button className="primary"
                 disabled={busy || !c.catalog.length}
                 onClick={startAuthor}
               >
                 补充真实研判
               </button>
             )}
-            <button className="quiet" onClick={research}>
+            <button onClick={research}>
               生成新的研究预览
             </button>
           </>
@@ -302,7 +301,7 @@ export function ResearchPage({
         根据已取得资料生成新的研究预览，记录当次输入与口径。预览不改变正式入选状态。
       </p>
       {allow("analysis.override") && (
-        <button
+        <button className="primary"
           disabled={busy}
           onClick={async () => {
             const r = await execute(
@@ -368,7 +367,6 @@ export function ResearchPage({
             </select>
           </label>
           <button
-            className="quiet"
             disabled={!compareId || busy}
             onClick={async () => {
               const d = await execute(
@@ -427,13 +425,11 @@ export function Mine({ data, busy, execute, openCompany }: any) {
                     <td>暂不提供正式入选状态</td>
                     <td>
                       <button
-                        className="quiet"
                         onClick={() => openCompany(w.company_id)}
                       >
                         查看公司与参考报价
                       </button>
                       <button
-                        className="quiet"
                         disabled={busy}
                         onClick={() =>
                           execute(
@@ -473,7 +469,7 @@ export function Mine({ data, busy, execute, openCompany }: any) {
           笔记内容
           <textarea value={note} onChange={(e) => setNote(e.target.value)} />
         </label>
-        <button
+        <button className="primary"
           disabled={busy || !note.trim() || !id}
           onClick={async () => {
             const r = await execute(
@@ -558,7 +554,7 @@ export function TodayPage({ data, busy, openCompany, navigate }: any) {
                     </p>
                     {c.score.reference_quality?.score_exact != null && <p>已覆盖经营分 {human(c.score.reference_quality.score_exact)} · 覆盖 {(c.score.coverage * 100).toFixed(0)}%</p>}
                     <GapList values={c.score.missing_data.slice(0, 2)} />
-                    <button
+                    <button className="primary"
                       disabled={busy}
                       onClick={() => {
                         openCompany(c.id);
@@ -582,7 +578,6 @@ export function TodayPage({ data, busy, openCompany, navigate }: any) {
                     ? "待补依据"
                     : "本次计算完成"}{" "}
                   <button
-                    className="quiet"
                     onClick={() => navigate("research")}
                   >
                     查看快照

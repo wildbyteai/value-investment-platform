@@ -81,7 +81,7 @@ export function StrategyPage({ data, allow, busy, execute }: any) {
               }}
             />
           </label>
-          <button
+          <button className={preview ? undefined : "primary"}
             disabled={busy || threshold === ""}
             onClick={async () => {
               const r = await execute(
@@ -149,7 +149,7 @@ export function StrategyPage({ data, allow, busy, execute }: any) {
                     <p className="notice">
                       发布所见草稿与模拟输入。新版本发布后仍需正式评估，模拟满足不代表入选。
                     </p>
-                    <button
+                    <button className="primary"
                       disabled={busy}
                       onClick={async () => {
                         const r = await execute(
@@ -169,12 +169,12 @@ export function StrategyPage({ data, allow, busy, execute }: any) {
                     >
                       确认发布策略
                     </button>
-                    <button className="quiet" onClick={() => setConfirm(false)}>
+                    <button onClick={() => setConfirm(false)}>
                       取消
                     </button>
                   </>
                 ) : (
-                  <button disabled={busy} onClick={() => setConfirm(true)}>
+                  <button className="primary" disabled={busy} onClick={() => setConfirm(true)}>
                     发布策略新版本
                   </button>
                 ))}
@@ -193,7 +193,7 @@ export function StrategyPage({ data, allow, busy, execute }: any) {
           {r.application === "superseded" ? " · 历史结果，未应用" : r.membership ? ` · 当前版本状态 ${r.membership}` : ""}</p>
         <p>资料截止：{new Date(r.knowledge_cutoff).toLocaleString()}；{r.generated_at ? `生成：${new Date(r.generated_at).toLocaleString()}` : "尚未生成"}</p>
         {r.gaps.length > 0 && <ul>{r.gaps.map((g:string) => <li key={g}>{g}</li>)}</ul>}
-        {r.evaluation_id && <button className="quiet" onClick={async () => {
+        {r.evaluation_id && <button onClick={async () => {
           const d=await execute(() => api(`/api/strategy/evaluations/${r.evaluation_id}`),undefined,false);
           if(d)setHistorical(d);
         }}>查看固定依据与解释</button>}
@@ -205,7 +205,6 @@ export function StrategyPage({ data, allow, busy, execute }: any) {
             {t.session}：{t.from} → {t.to}（{t.reason}）
           </p>
           <button
-            className="quiet"
             onClick={async () => {
               const d = await execute(
                 () => api(`/api/strategy/evaluations/${t.evaluation_id}`),
@@ -301,7 +300,7 @@ export function StrikeZone(_: Ctx) {
       {b && (
         <>
           <div className="kpis">
-            <Kpi label="甜区" value={<span style={{ color: "var(--accent)" }}>{b.counts.sweet ?? 0}</span>} hint={`安全边际 ≥ ${pct(m?.sweet_minimum)} 且三项都过`} />
+            <Kpi label="甜区" value={<span style={{ color: "var(--primary)" }}>{b.counts.sweet ?? 0}</span>} hint={`安全边际 ≥ ${pct(m?.sweet_minimum)} 且三项都过`} />
             <Kpi label="边角球" value={b.counts.edge ?? 0} hint={`${pct(m?.edge_minimum)}–${pct(m?.sweet_minimum)} 或依据不全，只观察`} />
             <Kpi label="区外" value={b.counts.outside ?? 0} hint="只记录，不处理" />
             <Kpi label="证券总数" value={b.rows.length} hint="A 股、H 股分别计" />

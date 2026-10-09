@@ -6,6 +6,7 @@
     "strategy"
   ],
   "multiple_roles_allowed": true,
+  "system_admin_note": "系统管理员为全权限（用户 2026-10-09 决定），权限列表须等于 permission_labels 的全部键；见 ADR 0014。",
   "roles": {
     "viewer": [
       "research.read",
@@ -42,6 +43,22 @@
       "quality.correct"
     ],
     "system_admin": [
+      "research.read",
+      "watchlist.own",
+      "notes.own",
+      "notes.shared.edit",
+      "analysis.override",
+      "template.edit",
+      "template.publish",
+      "strategy.edit",
+      "strategy.simulate",
+      "strategy.publish",
+      "strategy.rollback",
+      "scoring.binding.publish",
+      "source.manage",
+      "job.retry",
+      "identity.manage",
+      "quality.correct",
       "user.manage",
       "role.assign",
       "system.configure",
@@ -62,7 +79,7 @@
     "researcher": "研判资讯、修订研究判断与模板",
     "strategy_manager": "编辑、模拟、发布与回滚策略",
     "data_admin": "管理数据源、采集与资讯源，处理数据质量",
-    "system_admin": "管理账号与角色、模型与系统配置，查看审计"
+    "system_admin": "全权限"
   },
   "permission_labels": {
     "research.read": "阅读研究资料",

@@ -33,7 +33,7 @@ export function LoginForm({ onDone }: { onDone: (r: any) => void }) {
           密码
           <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
-        <button type="submit" disabled={busy || !login || !password}>{busy ? "登录中…" : "登录"}</button>
+        <button className="primary" type="submit" disabled={busy || !login || !password}>{busy ? "登录中…" : "登录"}</button>
       </form>
     </main>
   );
@@ -69,10 +69,10 @@ export function AccountPanel({ workspaces, workspace, setWorkspace }: any) {
       <form onSubmit={change}>
         <label>当前密码<input type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} /></label>
         <label>新密码（至少 12 位）<input type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} /></label>
-        <button type="submit" className="quiet" disabled={!pw.current || !pw.next}>修改密码</button>
+        <button type="submit"  disabled={!pw.current || !pw.next}>修改密码</button>
       </form>
       {note && <p className="muted">{note}</p>}
-      <button className="quiet" onClick={logout}>退出登录</button>
+      <button onClick={logout}>退出登录</button>
     </details>
   );
 }
@@ -85,7 +85,7 @@ export function ThemeToggle() {
   }, [theme]);
   const dark = theme === "dark";
   return (
-    <button className="quiet small theme-toggle" aria-label={dark ? "切换到白天模式" : "切换到黑夜模式"} title={dark ? "白天模式" : "黑夜模式"} onClick={() => setTheme(dark ? "light" : "dark")}>
+    <button className="small theme-toggle" aria-label={dark ? "切换到白天模式" : "切换到黑夜模式"} title={dark ? "白天模式" : "黑夜模式"} onClick={() => setTheme(dark ? "light" : "dark")}>
       {dark ? "☀ 白天" : "☾ 黑夜"}
     </button>
   );

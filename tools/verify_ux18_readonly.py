@@ -55,8 +55,9 @@ def main():
         hashes.append({'status': detail['status'], 'manifest_hash': detail['manifest_hash']})
     ops_status, tasks = read('/api/worker/tasks', ws, 'admin@demo')
     source_status, sources = read('/api/worker/sources', ws, 'admin@demo')
+    # 系统管理员为全权限（用户 2026-10-09 决定，ADR 0014），研究资料也可读。
     forbidden, _ = read('/api/intake/items', ws, 'admin@demo')
-    assert ops_status == source_status == 200 and forbidden == 403
+    assert ops_status == source_status == 200 and forbidden == 200
     assert all(set(s) == {'id', 'source_key', 'status'} for s in sources)
     empty = next(w['id'] for w in identities['workspaces'] if not w['has_real_data'])
     status, empty_companies = read('/api/companies', empty)

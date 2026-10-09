@@ -78,12 +78,12 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               {canReview && picked.size > 0 && (
                 <>
                   <span className="muted small">已选 {picked.size} 个事件</span>{" "}
-                  <button className="small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "confirm")}>批量确认 AI 结果</button>{" "}
-                  <button className="quiet small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "reject")}>批量驳回</button>{" "}
+                  <button className="primary small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "confirm")}>批量确认 AI 结果</button>{" "}
+                  <button className="small" disabled={busy} onClick={() => batch(waitingIds(pickedEvents), "reject")}>批量驳回</button>{" "}
                 </>
               )}
               {canScore && (
-                <button className="quiet small" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
+                <button className="small" disabled={busy} onClick={() => act(() => post("/api/news/score", {}), "已对待处理事件重新打分。")}>
                   AI 打分待处理事件
                 </button>
               )}
@@ -156,7 +156,7 @@ export function NewsRadar({ allow, busy, execute }: Ctx) {
               <div className="sec-label">
                 关联公司
                 {canReview && waitingIds([sel]).length > 1 && (
-                  <button className="small" style={{ float: "right" }} disabled={busy} onClick={() => batch(waitingIds([sel]), "confirm")}>
+                  <button className="primary small" style={{ float: "right" }} disabled={busy} onClick={() => batch(waitingIds([sel]), "confirm")}>
                     全部确认 AI 结果
                   </button>
                 )}
@@ -236,10 +236,10 @@ export function LinkCard({ l, canReview, busy, review, companies }: any) {
       {canReview && (
         <div style={{ marginTop: 8 }}>
           {l.status !== "confirmed" && (
-            <button disabled={busy} onClick={() => review({ action: "confirm", impact, relevance, company_id: company || null }, "已确认关联；落进击球区会立即告警。")}>确认关联</button>
+            <button className="primary" disabled={busy} onClick={() => review({ action: "confirm", impact, relevance, company_id: company || null }, "已确认关联；落进击球区会立即告警。")}>确认关联</button>
           )}
           {l.status !== "rejected" && (
-            <button className="quiet" disabled={busy} onClick={() => review({ action: "reject" }, "已驳回该关联。")}>驳回</button>
+            <button disabled={busy} onClick={() => review({ action: "reject" }, "已驳回该关联。")}>驳回</button>
           )}
         </div>
       )}
@@ -266,7 +266,6 @@ export function RawNewsPage({ data, busy, read, allow, execute, navigate }: any)
                   <p>{it.summary_text || "暂无摘要"}</p>
                   <p className="muted">系统取得 {when(it.observed_at)}</p>
                   <button
-                    className="quiet"
                     disabled={busy}
                     onClick={() => read(it.id)}
                   >
@@ -288,7 +287,7 @@ export function RawNewsPage({ data, busy, read, allow, execute, navigate }: any)
                   execute={execute}
                 />
               ))}
-              <button className="quiet" onClick={() => navigate("companies")}>
+              <button onClick={() => navigate("companies")}>
                 到公司页核对评价项并补充研判
               </button>
             </>

@@ -27,9 +27,19 @@ def test_menus_follow_permissions():
     keys = {t['key'] for m in viewer for t in m['tabs']}
     assert 'users' not in keys and 'models' not in keys and 'events' in keys and 'mine' in keys
     assert 'settings' not in {m['key'] for m in viewer}
+    # 系统管理员为全权限（用户 2026-10-09 决定，ADR 0014）：五个菜单、全部页面都可见。
     admin = menus.visible_menus(permissions_for(['system_admin']))
-    assert [m['key'] for m in admin] == ['settings']
-    assert {'users', 'models', 'audit', 'tasks'} <= {t['key'] for t in admin[0]['tabs']}
+    assert [m['key'] for m in admin] == ['radar', 'company', 'strategy', 'monitor', 'settings']
+    assert [t['key'] for m in admin for t in m['tabs']] == menus.tab_keys()
+
+
+def test_system_admin_holds_every_permission():
+    from app.domains.identity.permissions import role_permissions
+    cat = catalog()
+    every = {p['key'] for p in cat['permissions']}
+    granted = {p for perms in role_permissions().values() for p in perms}
+    assert set(role_permissions()['system_admin']) == every == granted
+    assert next(r for r in cat['roles'] if r['key'] == 'system_admin')['description'] == '全权限'
 
 
 def test_tab_keys_are_unique():

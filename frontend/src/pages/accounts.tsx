@@ -41,11 +41,11 @@ function Pager({ page, offset, setOffset }: { page: Page<any> | null; offset: nu
   const last = Math.max(0, Math.floor((page.total - 1) / page.limit) * page.limit);
   return (
     <div className="pager">
-      <button className="quiet small" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - page.limit))}>上一页</button>
+      <button className="small" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - page.limit))}>上一页</button>
       <span className="muted">
         第 {offset / page.limit + 1} / {last / page.limit + 1} 页 · 共 {page.total} 条
       </span>
-      <button className="quiet small" disabled={offset >= last} onClick={() => setOffset(offset + page.limit)}>下一页</button>
+      <button className="small" disabled={offset >= last} onClick={() => setOffset(offset + page.limit)}>下一页</button>
     </div>
   );
 }
@@ -75,7 +75,7 @@ export function Users({ allow, busy, execute }: Ctx) {
       {secret && (
         <p className="notice" role="status">
           {secret.login} 的一次性密码：<code>{secret.password}</code>（只显示这一次）
-          <button className="quiet small" onClick={() => setSecret(null)}>我已记下</button>
+          <button className="small" onClick={() => setSecret(null)}>我已记下</button>
         </p>
       )}
       <section className="panel">
@@ -100,7 +100,7 @@ export function Users({ allow, busy, execute }: Ctx) {
                     <td colSpan={3}>{canAssign ? <RolePicker roles={roles} value={editing.roles} onChange={(v) => setEditing({ ...editing, roles: v })} /> : u.role_labels.join("、")}</td>
                     <td className="actions">
                       <button
-                        className="small"
+                        className="primary small"
                         disabled={busy || !editing.roles.length}
                         onClick={async () => {
                           if (canManage && editing.name.trim() && editing.name !== u.display_name)
@@ -112,7 +112,7 @@ export function Users({ allow, busy, execute }: Ctx) {
                       >
                         保存
                       </button>
-                      <button className="quiet small" onClick={() => setEditing(null)}>取消</button>
+                      <button className="small" onClick={() => setEditing(null)}>取消</button>
                     </td>
                   </tr>
                 ) : (
@@ -124,11 +124,11 @@ export function Users({ allow, busy, execute }: Ctx) {
                     <td>{u.last_seen_at ? time(u.last_seen_at) : "—"}{u.active_sessions ? ` · ${u.active_sessions} 处登录` : ""}</td>
                     {(canManage || canAssign) && (
                       <td className="actions">
-                        <button className="quiet small" disabled={busy} onClick={() => setEditing({ id: u.id, roles: u.roles, name: u.display_name })}>编辑</button>
+                        <button className="small" disabled={busy} onClick={() => setEditing({ id: u.id, roles: u.roles, name: u.display_name })}>编辑</button>
                         {canManage && (
                           <>
                             <button
-                              className="quiet small"
+                              className="small danger"
                               disabled={busy}
                               onClick={async () => {
                                 if (!confirm(`给 ${u.display_name} 生成新的一次性密码？对方所有已登录的浏览器会退出。`)) return;
@@ -139,12 +139,12 @@ export function Users({ allow, busy, execute }: Ctx) {
                               重置密码
                             </button>
                             {!!u.active_sessions && (
-                              <button className="quiet small" disabled={busy} onClick={() => act(() => post(`/api/admin/users/${u.id}/sign-out`, {}), "已让该账号在所有浏览器退出。")}>
+                              <button className="small danger" disabled={busy} onClick={() => act(() => post(`/api/admin/users/${u.id}/sign-out`, {}), "已让该账号在所有浏览器退出。")}>
                                 强制退出
                               </button>
                             )}
                             <button
-                              className="quiet small"
+                              className={u.disabled ? "small" : "small danger"}
                               disabled={busy}
                               onClick={() => {
                                 if (!u.disabled && !confirm(`停用 ${u.display_name}？对方将无法登录。`)) return;
@@ -183,7 +183,7 @@ export function Users({ allow, busy, execute }: Ctx) {
           <label>登录名（一般用邮箱）<input required autoComplete="off" value={draft.login} onChange={(e) => setDraft({ ...draft, login: e.target.value })} /></label>
           <label>姓名<input required value={draft.display_name} onChange={(e) => setDraft({ ...draft, display_name: e.target.value })} /></label>
           <RolePicker roles={roles} value={draft.roles} onChange={(v) => setDraft({ ...draft, roles: v })} />
-          <button disabled={busy || !draft.roles.length}>开通并生成初始密码</button>
+          <button className="primary" disabled={busy || !draft.roles.length}>开通并生成初始密码</button>
         </form>
       )}
 

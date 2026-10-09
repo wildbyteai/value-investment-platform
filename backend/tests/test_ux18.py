@@ -186,11 +186,12 @@ def test_quality_gates_risk_scope_suspend_and_numeric_and():
     assert gates(rules,c,s)['passes'] is None
 
 
-def test_system_admin_ops_without_research_access(prepared):
+def test_system_admin_ops_and_full_access(prepared):
+    # 系统管理员为全权限（用户 2026-10-09 决定，ADR 0014）：运维与研究资料都可读；其他角色的边界不变。
     c,ws,_=prepared;h=headers(ws,'admin@demo')
     assert c.get('/api/worker/tasks',headers=h).status_code==200
     assert c.get('/api/worker/sources',headers=h).status_code==200
-    assert c.get('/api/intake/items',headers=h).status_code==403
+    assert c.get('/api/intake/items',headers=h).status_code==200
     assert c.get('/api/worker/tasks',headers=headers(ws)).status_code==403
     assert c.post('/api/strategy/simulate',headers=headers(ws),json={'quality_threshold':'70'}).status_code==403
 

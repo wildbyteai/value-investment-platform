@@ -1,8 +1,10 @@
-// 工作台外壳：左侧菜单与顶部页签（由服务器按角色下发），页面数据读取，统一的忙碌/错误/提示状态。
+// 工作台外壳：左侧两级导航（菜单 → 页面，由服务器按角色下发），右侧内容区；页面数据读取，统一的忙碌/错误/提示状态。
+// 没有顶部页签：所有页面切换都在左侧导航里完成，内容区顶部只显示“菜单 › 页面”标题。
 import React, { useEffect, useRef, useState } from "react";
 import { api, post, session, ApiError } from "../core/client";
 import { Diagnostic, when } from "../components/ui";
 import { ThemeToggle } from "./account";
+import { SideNav } from "./sidenav";
 import { PAGES, SELF_LOADING } from "../pages";
 import { useUnread } from "../pages/monitor";
 
@@ -15,7 +17,7 @@ export function Workspace({ identity, identityPanel }: any) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [more, setMore] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [selected, setSelected] = useState("");
   const [reader, setReader] = useState<any>();
   const [returnTo, setReturnTo] = useState<any>();
@@ -188,7 +190,7 @@ export function Workspace({ identity, identityPanel }: any) {
     setReturnTo(null);
     setTab(t);
     route.current = t;
-    setMore(false);
+    setNavOpen(false);
     try {
       await load(t);
     } catch {}
@@ -228,41 +230,49 @@ export function Workspace({ identity, identityPanel }: any) {
   }
   return (
     <div className="shell">
-      <nav aria-label="业务导航" className="sidebar">
-        <div className="brand">价投<span>宝</span></div>
-        {menus.map((m) => (
-          <button
-            key={m.key}
-            className="nav-item"
-            disabled={busy}
-            aria-current={current?.key === m.key ? "page" : undefined}
-            onClick={() => navigate(m.tabs[0].key)}
-          >
-            <span className="nav-icon" aria-hidden="true">{m.icon}</span>
-            {m.label}
-            {m.key === "monitor" && !!unread && <span className="unread">{unread}</span>}
-          </button>
-        ))}
-        <div className="nav-foot">
-          <strong>{me?.user?.display_name}</strong>
-          <p className="muted">
-            {(me?.roles || []).map((r: any) => r.label).join("、")}
-          </p>
-          {identityPanel}
-        </div>
-      </nav>
+      <SideNav
+        menus={menus}
+        active={tab}
+        busy={busy}
+        unread={unread}
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        onNavigate={navigate}
+        foot={
+          <div className="nav-foot">
+            <strong>{me?.user?.display_name}</strong>
+            <p className="muted">
+              {(me?.roles || []).map((r: any) => r.label).join("、")}
+            </p>
+            {identityPanel}
+          </div>
+        }
+      />
       <div className="main-col">
         <div className="topbar">
-          <div className="crumb">{reader ? "固定原文" : current?.label}</div>
-          <div className="subtabs" role="tablist" aria-label={current?.label}>
-            {current?.tabs.map((t) => (
-              <button key={t.key} role="tab" aria-selected={tab === t.key} disabled={busy} onClick={() => navigate(t.key)}>
-                {t.label}
-              </button>
-            ))}
+          <button
+            className="small nav-toggle"
+            aria-label="打开导航菜单"
+            aria-expanded={navOpen}
+            aria-controls="side-nav"
+            onClick={() => setNavOpen(true)}
+          >
+            ☰ 菜单
+          </button>
+          <div className="page-head">
+            {current && (
+              <nav className="breadcrumb" aria-label="当前位置">
+                <span>{current.label}</span>
+                {(current.tabs.length > 1 || reader) && <span className="crumb-sep" aria-hidden="true">/</span>}
+                {current.tabs.length > 1 && <span>{labelOf(tab)}</span>}
+                {current.tabs.length > 1 && reader && <span className="crumb-sep" aria-hidden="true">/</span>}
+                {reader && <span>固定原文</span>}
+              </nav>
+            )}
+            <h1 className="page-title">{reader ? "固定原文" : current?.tabs.length === 1 ? current.label : labelOf(tab)}</h1>
           </div>
           <div className="top-actions">
-            <button className="quiet small" disabled={busy} onClick={() => load().catch(() => {})}>
+            <button className="small" disabled={busy} onClick={() => load().catch(() => {})}>
               刷新
             </button>
             <ThemeToggle />
@@ -289,7 +299,7 @@ export function Workspace({ identity, identityPanel }: any) {
         {reader && (
           <article>
             <button
-              className="quiet"
+              className="link"
               onClick={() => {
                 setReader(null);
                 if (returnTo) {
