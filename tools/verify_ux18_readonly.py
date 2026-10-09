@@ -61,10 +61,10 @@ def main():
     empty = next(w['id'] for w in identities['workspaces'] if not w['has_real_data'])
     status, empty_companies = read('/api/companies', empty)
     assert status == 200 and empty_companies == []
-    files = ['backend/app/services/judgment_authoring.py', 'backend/app/services/scoring_service.py',
-             'backend/app/services/strategy_service.py', 'backend/app/services/decision_service.py',
-             'backend/app/services/worker_service.py', 'backend/app/services/item_history.py',
-             'backend/app/services/research_pipeline.py', 'backend/app/api/intake.py',
+    files = ['backend/app/domains/companies/judgment_authoring.py', 'backend/app/domains/companies/scoring_service.py',
+             'backend/app/domains/strategy/strategy_service.py', 'backend/app/domains/companies/decision_service.py',
+             'backend/app/domains/platform/worker_service.py', 'backend/app/domains/news/item_history.py',
+             'backend/app/domains/companies/research_pipeline.py', 'backend/app/api/intake.py',
              'backend/app/api/judgments.py', 'backend/app/api/strategy.py', 'backend/app/api/collab.py',
              'frontend/src/app.tsx', 'frontend/src/judgments.tsx', 'frontend/src/template.tsx',
              'frontend/src/ui.tsx', 'frontend/src/client.ts', 'frontend/src/style.css',

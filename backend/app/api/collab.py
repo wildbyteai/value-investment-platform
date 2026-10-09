@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.audit import Outbox
 from app.models.collab import Note, Watchlist
 from app.models.company import Company, Security
@@ -34,7 +34,7 @@ def add_watch(
         if db.get(Security, security_id) is None:
             raise HTTPException(status_code=404, detail="security not found")
         db.add(Watchlist(workspace_id=principal.workspace.id, user_id=principal.user.id, security_id=security_id))
-        from app.services.transactions import record
+        from app.domains.platform.transactions import record
         record(db,principal.workspace.id,principal.user.id,'watchlist.added','security',security_id)
         db.commit()
     return {"security_id": security_id, "watching": True}
@@ -60,7 +60,7 @@ def remove_watch(security_id: str, principal: Principal = Depends(require('watch
         Watchlist.workspace_id == principal.workspace.id, Watchlist.security_id == security_id).with_for_update())
     if row:
         db.delete(row)
-        from app.services.transactions import record
+        from app.domains.platform.transactions import record
         record(db, principal.workspace.id, principal.user.id, 'watchlist.removed', 'security', security_id)
         db.commit()
     return {'security_id': security_id, 'watching': False}
@@ -83,7 +83,7 @@ def add_note(
     n = Note(workspace_id=principal.workspace.id, user_id=principal.user.id, company_id=body.company_id, body=body.body)
     db.add(n)
     db.flush()
-    from app.services.transactions import record
+    from app.domains.platform.transactions import record
     record(db,principal.workspace.id,principal.user.id,'note.added','note',n.id)
     db.commit()
     return {"id": n.id}
@@ -109,7 +109,7 @@ def claim_outbox(
     principal: Principal = Depends(require("ops.read")),
     db: Session = Depends(get_db),
 ):
-    from app.services.worker_service import claim, complete
+    from app.domains.platform.worker_service import claim, complete
     row = db.get(Outbox, outbox_id)
     if row is None or row.workspace_id != principal.workspace.id:
         raise HTTPException(status_code=404, detail="not found")
@@ -155,7 +155,7 @@ def tasks(principal: Principal = Depends(require('ops.read')), db: Session = Dep
 @worker_router.post('/outbox/{outbox_id}/retry')
 def retry(outbox_id: str, principal: Principal = Depends(require('job.retry')), db: Session = Depends(get_db)):
     from sqlalchemy import func
-    from app.services.transactions import record
+    from app.domains.platform.transactions import record
     row = db.scalar(select(Outbox).where(Outbox.id == outbox_id, Outbox.workspace_id == principal.workspace.id)
                     .with_for_update().execution_options(populate_existing=True))
     if row is None:

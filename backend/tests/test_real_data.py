@@ -8,9 +8,9 @@ from app.models.company import Company, ItemCompanyLink, Security
 from app.models.intake import InformationItem, SourceRegistry
 from app.models.runtime import ResearchInput
 from app.models.judgment import JudgmentSlot
-from app.services.item_history import observe
-from app.services.scoring_service import score_company, score_security
-from app.services.transactions import canonical, digest
+from app.domains.news.item_history import observe
+from app.domains.companies.scoring_service import score_company, score_security
+from app.domains.platform.transactions import canonical, digest
 from test_remediation import prepared, headers, Session
 
 @pytest.fixture()
@@ -31,7 +31,7 @@ def real_mode(prepared, monkeypatch):
 
 def test_default_and_fixture_target_guard(monkeypatch):
     from app.config import Settings
-    from app.services.data_mode import fixture_mode
+    from app.domains.platform.data_mode import fixture_mode
     assert Settings.model_fields['demo_mode'].default is False
     monkeypatch.setattr(get_settings(),'demo_mode',True)
     monkeypatch.setattr(get_settings(),'db_url','postgresql://example@127.0.0.1/vip_v0001_local')
@@ -64,7 +64,7 @@ def test_real_routes_exclude_fixture_and_block_direct_ids(real_mode):
 def test_flag_alone_cannot_turn_fixture_into_real_financials(real_mode):
     _,ws,_,ids=real_mode
     from app.models.runtime import ItemRevision
-    from app.services.data_mode import real_evidence
+    from app.domains.platform.data_mode import real_evidence
     with Session() as db:
         financial=db.scalar(select(ResearchInput).where(ResearchInput.kind=='financials'))
         copied={**json.loads(financial.payload_json),"test_lineage":"flag-alone"}
@@ -86,8 +86,8 @@ def test_flag_alone_cannot_turn_fixture_into_real_financials(real_mode):
 
 
 def test_missing_strategy_input_has_priority_over_failed_coverage():
-    from app.services.strategy_service import gates
-    from app.services.scoring_service import config
+    from app.domains.strategy.strategy_service import gates
+    from app.domains.companies.scoring_service import config
     rules=config('strategy-standard-v1.json')
     result=gates(rules,{'quality_exact':None,'coverage_exact':'0','metrics':{}},{})
     assert result['passes'] is None

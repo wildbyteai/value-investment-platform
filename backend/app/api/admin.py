@@ -11,9 +11,9 @@ from app.core.uow import unit_of_work
 from app.db import get_db
 from app.domains.news import llm
 from app.domains.news.collector_policy import policy as collector_policy
-from app.domains.news.models import LlmProvider, NewsFeed
-from app.services.transactions import canonical, record
-from app.sources import registry
+from app.models.news import LlmProvider, NewsFeed
+from app.domains.platform.transactions import canonical, record
+from app.domains.market_data import registry
 
 router = APIRouter(prefix='/api/admin', tags=['admin'])
 
@@ -150,7 +150,7 @@ def update_provider(provider_id: str, body: ProviderIn, principal: Principal = D
 def notify_settings(principal: Principal = Depends(require('system.configure')), db=Depends(get_db)):
     from sqlalchemy import func
     from app.config import get_settings
-    from app.domains.monitoring.models import Notification
+    from app.models.monitoring import Notification
     from app.domains.monitoring.policy import policy as alert_policy, sender_address
     from app.domains.monitoring.service import recipients
     s = get_settings()

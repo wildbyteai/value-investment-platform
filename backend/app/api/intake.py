@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.intake import InformationItem, ItemSourceRef, SourceRegistry
-from app.services.intake_service import import_fixture
+from app.domains.news.intake_service import import_fixture
 
 router = APIRouter(prefix="/api/intake", tags=["intake"])
 

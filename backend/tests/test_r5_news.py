@@ -149,7 +149,7 @@ def test_import_dedupes_and_rule_links_without_key(env, monkeypatch):
 def test_ai_scoring_through_openai_compatible_api(env, monkeypatch):
     c, ws, Session = env
     from app.domains.news import service
-    from app.domains.news.models import NewsEvent
+    from app.models.news import NewsEvent
     monkeypatch.setenv('VIP_DEEPSEEK_API_KEY', 'test-key')
     seen = {}
 
@@ -240,7 +240,7 @@ def test_admin_models_and_feeds(env):
 
 def test_batch_review_accepts_ai_results(env):
     c, ws, Session = env
-    from app.domains.news.models import NewsEvent, NewsEventCompany
+    from app.models.news import NewsEvent, NewsEventCompany
     with Session() as s:
         e = NewsEvent(workspace_id=ws, title='批量确认测试事件', fingerprint='批量确认测试事件', item_count=1, ai_status='scored')
         s.add(e); s.flush()

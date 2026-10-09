@@ -9,9 +9,9 @@ from app.config import get_settings
 from app.models.company import Company,Security
 from app.models.runtime import ResearchInput,ResearchRun,ItemRevision
 from app.models.intake import SourceRegistry
-from app.services.baostock_source import SourceError,TARGETS
-from app.services.baostock_financial import FIELDS,periods,validate,import_snapshots
-from app.services.transactions import canonical,digest
+from app.domains.market_data.baostock_source import SourceError,TARGETS
+from app.domains.companies.baostock_financial import FIELDS,periods,validate,import_snapshots
+from app.domains.platform.transactions import canonical,digest
 from test_remediation import prepared,headers,Session
 
 
@@ -106,7 +106,7 @@ def test_empty_field_retained_and_does_not_make_comparison():
     p=original()
     for r in p['reports']:
         if r['kind']=='profit':r['rows'][0][r['fields'].index('netProfit')]=''
-    from app.services.baostock_financial import analysis
+    from app.domains.companies.baostock_financial import analysis
     result=analysis(p,{'item_id':'original','source_revision_id':'original'})
     assert result['annual_net_profit_field_change_pct'] is None
     assert result['periods'][0]['values']['netProfit'] is None

@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.api.deps import Principal, require
 from app.db import get_db
 from app.models.runtime import ResearchRun
-from app.services.research_pipeline import start_run, readable_run, response
+from app.domains.companies.research_pipeline import start_run, readable_run, response
 router=APIRouter(prefix='/api/research',tags=['research'])
 
 class RunSummary(BaseModel):

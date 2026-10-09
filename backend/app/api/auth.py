@@ -6,12 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core import passwords, sessions
-from app.services.transactions import record
+from app.domains.identity import passwords, sessions
+from app.domains.platform.transactions import record
 
 from app.api.deps import Principal, get_current_principal
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.identity import Membership, User, Workspace
 from app.models.intake import InformationItem
 
@@ -54,7 +54,7 @@ def me(principal: Principal = Depends(get_current_principal)):
         "workspace": {"id": principal.workspace.id, "name": principal.workspace.name if data_mode.fixture_mode() else "真实公开资料研究"},
         "data_mode":"synthetic_test" if data_mode.fixture_mode() else "real_public",
         "role": principal.role,
-        "permissions": __import__("app.security", fromlist=["role_permissions"]).role_permissions().get(principal.role, []),
+        "permissions": __import__("app.domains.identity.permissions", fromlist=["role_permissions"]).role_permissions().get(principal.role, []),
     }
 
 

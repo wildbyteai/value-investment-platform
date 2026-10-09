@@ -10,14 +10,13 @@ from sqlalchemy.orm import sessionmaker
 from app.core.errors import Conflict, DomainError, Forbidden, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.domains.strategy import strike_zone as sz
-from app.sources import registry
+from app.domains.market_data import registry
 
 APP = Path(__file__).resolve().parents[1] / 'app'
 
 
 def test_services_do_not_import_fastapi():
-    offenders = [p.name for p in (APP / 'services').glob('*.py') if 'fastapi' in p.read_text(encoding='utf-8')]
-    offenders += [str(p.relative_to(APP)) for p in (APP / 'domains').rglob('*.py') if 'fastapi' in p.read_text(encoding='utf-8')]
+    offenders = [str(p.relative_to(APP)) for p in (APP / 'domains').rglob('*.py') if 'fastapi' in p.read_text(encoding='utf-8')]
     assert offenders == []
 
 
@@ -45,7 +44,7 @@ def test_unit_of_work_commits_or_rolls_back():
 def test_registry_lists_every_layer_and_resolves_prefixes():
     keys = {s.key for s in registry.all_sources()}
     assert {'baostock-a-daily', 'ecb-reference-fx', 'cninfo-bounded-issuer-disclosures'} <= keys
-    assert registry.get('eodhd-hk-daily').module == 'app.services.eodhd_source'
+    assert registry.get('eodhd-hk-daily').module == 'app.domains.market_data.eodhd_source'
     assert registry.get('cninfo-bounded-issuer-disclosures').layer == 'news'
     assert registry.get('nope') is None
     with pytest.raises(ValueError):
@@ -101,7 +100,7 @@ def test_policy_numbers_live_in_config():
 def client():
     from app.db import Base
     from app.main import app
-    from app.services.intake_service import import_fixture
+    from app.domains.news.intake_service import import_fixture
     from services_companies import link_items, seed_companies
     engine = create_engine(os.environ['VIP_DB_URL'], future=True)
     Base.metadata.drop_all(bind=engine)

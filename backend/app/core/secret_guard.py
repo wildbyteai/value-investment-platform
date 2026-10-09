@@ -24,7 +24,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
-ROOT = Path(__file__).resolve().parents[3]
+from app.core.paths import REPO_ROOT as ROOT
 KEY_ENV_RE = re.compile(r'^VIP_[A-Z0-9_]+_KEY$')
 FORBIDDEN_PREFIXES = ('VIP_DB', 'VIP_SMTP', 'VIP_SESSION', 'VIP_AUTH', 'VIP_ADMIN', 'VIP_POSTGRES')
 

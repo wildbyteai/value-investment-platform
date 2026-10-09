@@ -17,13 +17,13 @@ from app.models.audit import AuditLog,Outbox
 from app.models.judgment import JudgmentSlot,JudgmentRevision
 from app.models.runtime import WorkEffect,ItemRevision,ItemObservation
 from app.models.company import Company,Security
-from app.services.transactions import workspace
-from app.services.intake_service import import_fixture
-from app.services.decision_service import auto_decide,human_override
-from app.services.worker_service import claim,complete
-from app.services.state_machine import Eval,GOLDEN,apply_session
-from app.services.scoring_service import score_company,score_security,resolve_template,apply_patches
-from app.services.item_history import observe
+from app.domains.platform.transactions import workspace
+from app.domains.news.intake_service import import_fixture
+from app.domains.companies.decision_service import auto_decide,human_override
+from app.domains.platform.worker_service import claim,complete
+from app.domains.strategy.state_machine import Eval,GOLDEN,apply_session
+from app.domains.companies.scoring_service import score_company,score_security,resolve_template,apply_patches
+from app.domains.news.item_history import observe
 Session=sessionmaker(bind=engine)
 
 @pytest.fixture()

@@ -11,8 +11,8 @@ from app.models.runtime import Evaluation
 from app.models.company import Security
 from app.models.strategy import SecurityState
 from app.models.intake import SourceRegistry
-from app.services import data_mode
-from app.services.transactions import digest
+from app.domains.platform import data_mode
+from app.domains.platform.transactions import digest
 router=APIRouter(prefix='/api/strategy',tags=['strategy'])
 
 class FormalRow(BaseModel):

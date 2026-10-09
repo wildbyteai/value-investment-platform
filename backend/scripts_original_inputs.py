@@ -4,11 +4,11 @@ from pathlib import Path
 from sqlalchemy import select,text
 from app.db import SessionLocal
 from app.models.runtime import ResearchInput
-from app.services import data_mode
-from app.services.original_financials import normalize as financials
-from app.services.hk_market import normalize_quote
-from app.services.share_capital import normalize as share_capital, verify_originals
-from app.services.transactions import canonical,digest,record
+from app.domains.platform import data_mode
+from app.domains.companies.original_financials import normalize as financials
+from app.domains.market_data.hk_market import normalize_quote
+from app.domains.companies.share_capital import normalize as share_capital, verify_originals
+from app.domains.platform.transactions import canonical,digest,record
 from datetime import datetime,timezone
 
 

@@ -6,14 +6,14 @@ from decimal import Decimal
 from types import SimpleNamespace
 import pytest
 from sqlalchemy import select,func
-from app.services.ecb_fx import validate,import_snapshot,URL
-from app.services.scoring_service import score_security
-from app.services.transactions import canonical
+from app.domains.market_data.ecb_fx import validate,import_snapshot,URL
+from app.domains.companies.scoring_service import score_security
+from app.domains.platform.transactions import canonical
 from app.models.audit import AuditLog
 from app.models.company import Company
 from test_remediation import prepared,Session
 from test_original_inputs import bundle
-from app.services.original_financials import normalize
+from app.domains.companies.original_financials import normalize
 
 FIELDS=['KEY','FREQ','CURRENCY','CURRENCY_DENOM','EXR_TYPE','EXR_SUFFIX','TIME_PERIOD','OBS_VALUE','OBS_STATUS','UNIT','UNIT_MULT']
 def snapshot(change=None):

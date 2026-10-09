@@ -19,9 +19,9 @@ from app.models.strategy import StrategyVersion,SecurityState,ChangeRecord
 from app.models.sealing import PrimaryListing,MarketSession,KnowledgeEntry,FrozenManifest,EvaluationSeal
 from app.models.judgment import JudgmentSlot,JudgmentRevision
 from app.models.audit import AuditLog,Outbox
-from app.services.transactions import canonical,digest
-from app.services.scoring_service import config,ROOT
-from app.services import sealing_service as seal
+from app.domains.platform.transactions import canonical,digest
+from app.domains.companies.scoring_service import config,ROOT
+from app.domains.strategy import sealing_service as seal
 CLOSE=datetime(2026,10,7,8,tzinfo=timezone.utc)
 CTX=seal.WorkerContext('seal-a',frozenset({'strategy.seal'}))
 # Fixture seeding must be known before the fixed CLOSE cutoff. Without this, seeding
@@ -116,7 +116,7 @@ def test_t43_cutoff_and_publication_no_backfill(prepared):
 def test_daily_quote_after_close_grace_period_shared_by_preview_and_seal(prepared,minute):
     _,ws,_=prepared;id,_,_=arrange(ws)
     usable=price(ws,minute,published=minute)
-    from app.services.scoring_service import inputs
+    from app.domains.companies.scoring_service import inputs
     with Session() as db:
         chosen=inputs(db,'00000000-0000-4000-8000-000000000001',ws,CLOSE,CLOSE+timedelta(minutes=60))
         assert usable in {r.id for r in chosen}
@@ -142,9 +142,9 @@ def test_after_close_approval_before_cutoff_is_a_known_decision(prepared):
 
 def test_real_after_close_disclosure_not_legalized_by_early_approval(prepared,monkeypatch):
     _,ws,_=prepared;_,item,ref=real_branch_fixture(ws)
-    from app.services.scoring_service import decision_evidence_published_by
+    from app.domains.companies.scoring_service import decision_evidence_published_by
     from app.models.runtime import ItemRevision
-    from app.services import data_mode
+    from app.domains.platform import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     with Session() as db:
         source=db.get(ItemRevision,ref['source_revision_id'])
@@ -158,7 +158,7 @@ def test_real_after_close_disclosure_not_legalized_by_early_approval(prepared,mo
 def test_independent_share_balance_frozen_with_original_reference(prepared):
     _,ws,_=prepared;id,_,_=arrange(ws)
     from test_share_capital import bundle
-    from app.services.share_capital import normalize
+    from app.domains.companies.share_capital import normalize
     b=bundle();b.update(shares_as_of='2026-10-07',ordinary_shares_verified_through='2026-10-07')
     value=normalize(b)
     with Session() as db:
@@ -271,7 +271,7 @@ def test_frozen_crash_reclaim_reuses_manifest(prepared):
 def test_template_changes_block_application(prepared):
     _,ws,_=prepared;id,_,_=arrange(ws);token=claim(id);f=freeze(token)
     from app.models.runtime import TemplateRelease
-    from app.services.scoring_service import resolve_template
+    from app.domains.companies.scoring_service import resolve_template
     with Session() as db:
         at(db,66);company=db.get(Company,'00000000-0000-4000-8000-000000000001');template=resolve_template(company)
         template['baseline_max_age_days']=100
@@ -280,7 +280,7 @@ def test_template_changes_block_application(prepared):
 
 def test_worker_orchestration_calls_real_snapshot_transactions(prepared):
     _,ws,_=prepared;id,_,_=arrange(ws)
-    from app.services.seal_worker import run_one
+    from app.domains.strategy.seal_worker import run_one
     # Arrange all worker connections at a synthetic clock beyond the fixed cutoff.
     from sqlalchemy import event
     def clock_conn(connection):connection.exec_driver_sql("SELECT set_config('vip.test_clock','2026-10-07T09:05:00+00:00',true)")
@@ -352,7 +352,7 @@ def add_original_fixture_input(ws,ref):
 
 def test_real_evidence_branch_and_source_revocation(prepared,monkeypatch):
     _,ws,_=prepared;source,item,ref=real_branch_fixture(ws);id,_,_=arrange(ws,evidence_refs=[ref]);add_original_fixture_input(ws,ref)
-    from app.services import data_mode
+    from app.domains.platform import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     token=claim(id);f=freeze(token)
     assert f[2]['inputs']['financials']['quality']=='valid'
@@ -367,7 +367,7 @@ def test_new_permission_cannot_be_backfilled_to_frozen_cutoff(prepared,monkeypat
     from app.models.intake import SourceRegistry
     with Session() as db:
         at(db,61);row=db.get(SourceRegistry,source);row.policy_json=canonical({**json.loads(row.policy_json),'new_permission_scope':'changed after cutoff'});db.commit()
-    from app.services import data_mode
+    from app.domains.platform import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     token=claim(id)
     with pytest.raises(DomainError,match='新许可'):freeze(token)
@@ -381,7 +381,7 @@ def test_late_link_does_not_make_old_input_known_at_cutoff(prepared,monkeypatch)
         db.commit();at(db,61)
         for link in links:link.status='accepted'
         db.commit()
-    from app.services import data_mode
+    from app.domains.platform import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     token=claim(id);f=freeze(token)
     assert f[2]['inputs']['financials']['quality']=='missing'
@@ -399,7 +399,7 @@ def test_late_source_revision_does_not_make_financials_eligible(prepared,monkeyp
     with Session() as db:
         at(db,50);original=db.scalar(select(ResearchInput).where(ResearchInput.kind=='financials'));payload={**json.loads(original.payload_json),'evidence':[late_ref]}
         db.add(ResearchInput(workspace_id=ws,company_id=original.company_id,input_key='financials',kind='financials',payload_json=canonical(payload),content_hash=digest(payload),effective_at=original.effective_at,published_at=original.published_at,known_at=CLOSE+timedelta(minutes=50),synthetic=False));db.commit()
-    from app.services import data_mode
+    from app.domains.platform import data_mode
     monkeypatch.setattr(data_mode,'fixture_mode',lambda:False)
     token=claim(id);f=freeze(token)
     assert f[2]['inputs']['financials']['quality']=='missing'

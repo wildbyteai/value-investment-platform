@@ -33,7 +33,7 @@ COMPANIES = [
 
 
 def seed_companies(db: Session, workspace_id=None) -> None:
-    from app.services.data_mode import require_fixture
+    from app.domains.platform.data_mode import require_fixture
     require_fixture()
     for c in COMPANIES:
         company = db.scalar(select(Company).where(Company.name == c["name"]))
@@ -52,7 +52,7 @@ def seed_companies(db: Session, workspace_id=None) -> None:
             if exists is None:
                 db.add(Security(company_id=company.id, **s))
     db.flush()
-    from app.services.research_seed import seed_inputs
+    from app.domains.companies.research_seed import seed_inputs
     for company in db.scalars(select(Company)).all():
         seed_inputs(db, company, workspace_id)
 
@@ -63,7 +63,7 @@ def link_items(db: Session, workspace_id=None) -> dict:
     Policy (auto-review-standard-v1): accept if relevance>=0.50 and confidence>=0.90.
     Multiple matches -> ambiguous. No match -> no_link.
     """
-    from app.services.transactions import workspace
+    from app.domains.platform.transactions import workspace
     workspace_id = workspace(db, workspace_id)
     companies = db.scalars(select(Company)).all()
     items = db.scalars(select(InformationItem).where(InformationItem.workspace_id == workspace_id, InformationItem.source_id.in_(select(SourceRegistry.id).where(SourceRegistry.source_key=="local-fixture")))).all()

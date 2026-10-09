@@ -9,8 +9,8 @@ from app.models.company import Company, Security
 from app.models.intake import SourceRegistry
 from app.models.runtime import ResearchInput, ItemRevision, ResearchRun, Evaluation
 from app.models.audit import AuditLog, Outbox
-from app.services.baostock_source import FIELDS, SourceError, validate, import_snapshots
-from app.services.transactions import canonical, digest
+from app.domains.market_data.baostock_source import FIELDS, SourceError, validate, import_snapshots
+from app.domains.platform.transactions import canonical, digest
 from test_remediation import prepared, headers, Session
 
 
@@ -95,7 +95,7 @@ def test_real_run_computes_stats_and_preserves_unknown(market):
     score=c.get(f"/api/companies/{co['company_id']}/score",headers=headers(ws)).json()
     assert next(s for s in score['securities'] if s['market']=='CN_A')['latest_quote']['raw_close']=='11'
     from app.models.intake import InformationItem
-    from app.services.item_history import observe
+    from app.domains.news.item_history import observe
     with Session() as db:
         observe(db,db.get(InformationItem,entry['item_id']),{'readable_text':'原创后续修订'});db.commit()
     assert c.get(f"/api/intake/items/{entry['item_id']}",headers=headers(ws)).json()['original_text']=='原创后续修订'

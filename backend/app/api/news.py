@@ -8,7 +8,7 @@ from app.core.errors import Conflict, Invalid, NotFound
 from app.core.uow import unit_of_work
 from app.db import get_db
 from app.domains.news import service
-from app.domains.news.models import NewsFeed
+from app.models.news import NewsFeed
 from app.domains.news.normalize import feed_key_from_filename, records_from_excel
 
 router = APIRouter(prefix='/api/news', tags=['news'])

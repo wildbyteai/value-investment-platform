@@ -19,9 +19,9 @@ from sqlalchemy import select
 from app.core.errors import Conflict, Invalid, NotFound
 from app.domains.news import agent, llm, service
 from app.domains.news.collector_policy import policy
-from app.domains.news.models import AgentSkill, CollectorRun, CollectorTask, LlmProvider, NewsFeed
+from app.models.news import AgentSkill, CollectorRun, CollectorTask, LlmProvider, NewsFeed
 from app.domains.news.normalize import Record, parse_published
-from app.services.transactions import canonical, record
+from app.domains.platform.transactions import canonical, record
 
 OUTPUT_CONTRACT = """你是价值投资平台的资讯采集员。请用联网搜索完成用户交给你的采集任务。
 现在是 {now}（{tz}）。

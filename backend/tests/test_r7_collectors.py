@@ -149,7 +149,7 @@ def test_parse_items():
 
 
 def test_skill_goes_into_system_prompt():
-    from app.domains.news.models import AgentSkill, CollectorTask
+    from app.models.news import AgentSkill, CollectorTask
     task = CollectorTask(prompt='采集创新药公司动态')
     skill = AgentSkill(name='创新药日报', body='1. 先查港交所公告\n2. 再查医药魔方', enabled=True)
     msgs = collector.build_messages(task, skill, datetime(2026, 10, 8, 0, 30, tzinfo=UTC))
@@ -240,7 +240,7 @@ def test_collector_run_ingests_scores_and_records(env, monkeypatch):
         seen['body'] = body
         return ok(json.dumps(ITEMS, ensure_ascii=False))
     with Session() as s:
-        from app.domains.news.models import CollectorTask
+        from app.models.news import CollectorTask
         t = s.get(CollectorTask, task['id'])
         run = collector.run_task(s, ws, t, transport=httpx.MockTransport(handler))
         s.commit()
@@ -263,7 +263,7 @@ def test_failed_run_is_recorded_not_raised(env, monkeypatch):
     monkeypatch.setenv('VIP_TEST_LLM_KEY', 'k')
     task = c.get('/api/admin/collectors', headers=h(ws, 'data@demo')).json()[0]
     with Session() as s:
-        from app.domains.news.models import CollectorTask
+        from app.models.news import CollectorTask
         run = collector.run_task(s, ws, s.get(CollectorTask, task['id']),
                                  transport=httpx.MockTransport(lambda r: ok('今天没找到')))
         s.commit()
@@ -273,7 +273,7 @@ def test_failed_run_is_recorded_not_raised(env, monkeypatch):
 def test_run_due_claims_each_task_once(env, monkeypatch):
     c, ws, Session = env
     monkeypatch.setenv('VIP_TEST_LLM_KEY', 'k')
-    from app.domains.news.models import CollectorRun, CollectorTask
+    from app.models.news import CollectorRun, CollectorTask
     with Session() as s:
         t = s.scalars(select(CollectorTask)).first()
         t.next_run_at = datetime(2026, 10, 8, 0, 30, tzinfo=UTC)  # Thu 08:30 Shanghai

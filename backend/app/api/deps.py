@@ -5,10 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core import sessions
+from app.domains.identity import sessions
 from app.db import get_db
 from app.models.identity import Membership, User, Workspace
-from app.security import role_has, VALID_ROLES
+from app.domains.identity.permissions import role_has, VALID_ROLES
 
 
 @dataclass

@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 import json
 import pytest
-from app.services.scoring_service import score_security
-from app.services.reference_research import valuation_reference
+from app.domains.companies.scoring_service import score_security
+from app.domains.companies.reference_research import valuation_reference
 
 AS_OF = datetime(2026, 9, 30, 8, tzinfo=timezone.utc)
 EVID = [{'synthetic': True, 'locator': 'fixed regression fixture'}]

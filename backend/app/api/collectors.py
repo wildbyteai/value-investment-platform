@@ -75,7 +75,7 @@ def collector_options(principal: Principal = Depends(require_any(*ADMIN)), db=De
     from sqlalchemy import select
     from app.domains.news import service
     from app.domains.news.collector_policy import policy
-    from app.domains.news.models import LlmProvider
+    from app.models.news import LlmProvider
     rows = db.scalars(select(LlmProvider).where(LlmProvider.workspace_id == principal.workspace.id,
                                                 LlmProvider.enabled.is_(True)).order_by(LlmProvider.name)).all()
     labels = {k: v['label'] for k, v in policy()['search_modes'].items()}

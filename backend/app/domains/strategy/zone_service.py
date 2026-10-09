@@ -11,9 +11,9 @@ from app.core.errors import NotFound
 from app.domains.strategy import strike_zone
 from app.models.company import Company, Security
 from app.models.strategy import StrategyVersion
-from app.services import data_mode
-from app.services.scoring_service import config, score_company, score_security
-from app.services.strategy_service import gates
+from app.domains.platform import data_mode
+from app.domains.companies.scoring_service import config, score_company, score_security
+from app.domains.strategy.strategy_service import gates
 
 
 def strategy_rules(db, workspace_id) -> dict:

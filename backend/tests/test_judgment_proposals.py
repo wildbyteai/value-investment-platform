@@ -6,7 +6,7 @@ from app.models.runtime import ItemRevision
 from app.models.judgment import JudgmentSlot,JudgmentRevision
 from app.models.audit import AuditLog
 from app.models.intake import SourceRegistry
-from app.services.transactions import canonical
+from app.domains.platform.transactions import canonical
 from test_real_data import real_mode
 from test_remediation import Session,headers,prepared
 from test_ux18 import author_body

@@ -4,12 +4,12 @@ from datetime import datetime
 from copy import deepcopy
 from decimal import Decimal
 import pytest
-from app.services.share_capital import normalize
-from app.services.original_financials import FinancialGap
-from app.services.scoring_service import score_security,metrics_from_financials
-from app.services.transactions import canonical
+from app.domains.companies.share_capital import normalize
+from app.domains.companies.original_financials import FinancialGap
+from app.domains.companies.scoring_service import score_security,metrics_from_financials
+from app.domains.platform.transactions import canonical
 from test_original_inputs import bundle as financial_bundle,evidence
-from app.services.original_financials import normalize as financials
+from app.domains.companies.original_financials import normalize as financials
 
 
 def bundle():

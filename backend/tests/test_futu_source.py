@@ -10,11 +10,11 @@ from app.models.company import Company, Security, ItemCompanyLink
 from app.models.intake import SourceRegistry, InformationItem
 from app.models.runtime import ResearchInput
 from app.models.audit import AuditLog, Outbox
-from app.services.item_history import observe
-from app.services.transactions import digest, canonical
-from app.services.futu_source import (SourceError, REQUEST, ISSUERS, SDK_VERSION,
+from app.domains.news.item_history import observe
+from app.domains.platform.transactions import digest, canonical
+from app.domains.market_data.futu_source import (SourceError, REQUEST, ISSUERS, SDK_VERSION,
     validate, validate_rights, import_snapshot, capture)
-from app.services.research_pipeline import source_stats, evidence_for
+from app.domains.companies.research_pipeline import source_stats, evidence_for
 from test_remediation import prepared, Session
 
 
@@ -65,7 +65,7 @@ def test_unsafe_snapshot_rejected(defect):
 
 
 def install_fake_sdk(monkeypatch, snapshots, fail=False, pagination=False):
-    import app.services.futu_source as source
+    import app.domains.market_data.futu_source as source
     calls=[]
     class Frame:
         def __init__(self, rows):self.rows=rows
@@ -96,7 +96,7 @@ def install_fake_sdk(monkeypatch, snapshots, fail=False, pagination=False):
 
 
 def test_capture_explicit_unadjusted_two_symbols_and_no_trade(monkeypatch,tmp_path):
-    import app.services.futu_source as source
+    import app.domains.market_data.futu_source as source
     receipt=rights();snapshots=[snapshot(t,receipt) for t in ISSUERS]
     calls=install_fake_sdk(monkeypatch,snapshots)
     monkeypatch.setattr(source,'ROOT',tmp_path)
@@ -113,7 +113,7 @@ def test_capture_explicit_unadjusted_two_symbols_and_no_trade(monkeypatch,tmp_pa
 
 @pytest.mark.parametrize('failure',['login','pagination','offline','rights'])
 def test_capture_stops_without_outputting_secret_or_saving_partial(monkeypatch,tmp_path,failure):
-    import app.services.futu_source as source
+    import app.domains.market_data.futu_source as source
     receipt=rights();snapshots=[snapshot(t,receipt) for t in ISSUERS]
     calls=install_fake_sdk(monkeypatch,snapshots,fail=failure=='login',pagination=failure=='pagination')
     monkeypatch.setattr(source,'ROOT',tmp_path)

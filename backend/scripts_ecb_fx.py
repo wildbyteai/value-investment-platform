@@ -2,7 +2,7 @@
 import argparse,json
 from datetime import date
 from pathlib import Path
-from app.services.ecb_fx import capture,validate,import_snapshot
+from app.domains.market_data.ecb_fx import capture,validate,import_snapshot
 from app.db import SessionLocal
 
 def main():

@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.company import Company, Security
-from app.services.scoring_service import score_company, score_security
-from app.services.scoring_service import inputs, config
+from app.domains.companies.scoring_service import score_company, score_security
+from app.domains.companies.scoring_service import inputs, config
 from app.models.strategy import StrategyVersion
-from app.services.reference_research import quality_reference, valuation_reference, strategy_reference
+from app.domains.companies.reference_research import quality_reference, valuation_reference, strategy_reference
 import json
 
 router = APIRouter(prefix="/api/companies", tags=["scoring"])

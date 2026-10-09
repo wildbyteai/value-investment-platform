@@ -2,8 +2,8 @@
 import argparse,json
 from sqlalchemy import text
 from app.db import SessionLocal
-from app.services.sealing_service import WorkerContext,install_artifacts,schedule
-from app.services.seal_worker import run_one
+from app.domains.strategy.sealing_service import WorkerContext,install_artifacts,schedule
+from app.domains.strategy.seal_worker import run_one
 
 
 def main():

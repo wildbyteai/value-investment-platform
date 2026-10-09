@@ -9,9 +9,9 @@ from app.models.audit import AuditLog, Outbox
 from app.models.company import Company, Security
 from app.models.intake import SourceRegistry, InformationItem
 from app.models.runtime import ResearchInput
-from app.services.eodhd_source import (SourceError, validate, validate_fx, identity,
+from app.domains.market_data.eodhd_source import (SourceError, validate, validate_fx, identity,
     import_snapshot, POLICY, FX_URL, request_json)
-from app.services.transactions import canonical
+from app.domains.platform.transactions import canonical
 from test_remediation import prepared, Session
 
 
@@ -60,7 +60,7 @@ def test_ambiguous_identity_not_silently_selected():
 
 def test_provider_failure_never_exposes_authenticated_url(monkeypatch):
     from urllib.error import HTTPError
-    import app.services.eodhd_source as source
+    import app.domains.market_data.eodhd_source as source
     class Broken:
         def open(self,*args,**kwargs):raise HTTPError('https://eodhd.com/?api_token=LOCAL_TEST_SECRET',401,'bad',{},None)
     monkeypatch.setattr(source,'build_opener',lambda *args:Broken())
@@ -71,14 +71,14 @@ def test_provider_failure_never_exposes_authenticated_url(monkeypatch):
 
 def test_secret_settings_and_redirect_rejection():
     from app.config import Settings
-    from app.services.eodhd_source import NoRedirect
+    from app.domains.market_data.eodhd_source import NoRedirect
     s=Settings(_env_file=None,EODHD_API_TOKEN='LOCAL_TEST_SECRET')
     assert s.eodhd_api_token.get_secret_value()=='LOCAL_TEST_SECRET'
     assert 'LOCAL_TEST_SECRET' not in repr(s)
     assert NoRedirect().redirect_request(None,None,302,'redirect',{},'https://other.example') is None
 
 def test_absent_hk_exchange_stops_before_price_requests(monkeypatch,tmp_path):
-    import app.services.eodhd_source as source
+    import app.domains.market_data.eodhd_source as source
     from app.config import Settings
     calls=[]
     def request(url,params,token):
@@ -92,7 +92,7 @@ def test_absent_hk_exchange_stops_before_price_requests(monkeypatch,tmp_path):
 
 @pytest.mark.parametrize('code,retry',[('PROVIDER_HTTP_502',True),('PROVIDER_HTTP_403',False),('PROVIDER_HTTP_429',False)])
 def test_fx_direct_retry_only_for_transport_failures(monkeypatch,tmp_path,code,retry):
-    import app.services.eodhd_source as source
+    import app.domains.market_data.eodhd_source as source
     calls=[];day=(datetime.now(timezone.utc).date()-timedelta(days=1)).isoformat()
     def request(url,params,token=None,direct=False):
         calls.append(direct)

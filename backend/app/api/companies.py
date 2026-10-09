@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import Principal, get_current_principal, require
 from app.db import get_db
-from app.services import data_mode
+from app.domains.platform import data_mode
 from app.models.company import Company, ItemCompanyLink, Security
 from app.models.intake import InformationItem, SourceRegistry
 
