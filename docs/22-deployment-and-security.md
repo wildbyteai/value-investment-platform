@@ -43,6 +43,12 @@ docker compose run --rm -it api python -m app.admin_cli set-password you@example
 
 角色：viewer / researcher / strategy_manager / data_admin / system_admin，可多次 `--role`。停用账号：`disable-user`（同时踢下线）。
 
+预置每日资讯采集任务（6 个定时器 + 共用 Skill，见 ADR 0012 补充）：先在 **后台设置 › 模型配置** 添加一个能联网的模型，再在 **后台设置 › 采集定时器** 点“导入预置采集任务”，或在服务器上：
+
+```bash
+docker compose run --rm api python -m app.admin_cli install-collector-presets --workspace "价值投资研究" --provider qwen   # 可重复执行，已有的跳过
+```
+
 升级：`git pull && docker compose up -d --build`（迁移自动先跑）。
 
 备份：`crontab -e` 加 `0 3 * * * /opt/vip/deploy/backup.sh >> /var/log/vip-backup.log 2>&1`，并把 `/var/backups/vip` 同步到另一台机器或对象存储。

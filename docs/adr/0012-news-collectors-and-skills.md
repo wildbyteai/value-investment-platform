@@ -34,3 +34,32 @@
 - designed：本 ADR。
 - implemented：`backend/app/domains/news/{agent,collector,collector_policy}.py`、`backend/app/api/collectors.py`、迁移 `0013_collectors_skills`、前端 后台设置 › 采集定时器 / Skill、模型配置的联网方式。
 - verified：`tests/test_r7_collectors.py`（四种厂商联网请求格式、Kimi 工具循环与同 Key、调度时区与领取一次、执行入库与打分、失败记录、权限）；全量后端测试与前端构建在 CI 通过。**未用真实厂商 Key 做线上联调**，上线后先用“立即执行”试跑一次。
+
+## 补充（2026-10-09）：预置采集任务包
+
+用户原来在 workbubby（3 个）和豆包（5 个）里各跑一套每日资讯定时任务，产出是本机 Excel 文件和飞书消息。现在把它们收进本系统的采集定时器，作为一个可一键导入的预置包，结果直接进入资讯雷达。
+
+**合并（8 → 6）**
+
+| 新定时器 | 由哪些旧任务合并 | 条数 | 北京时间 |
+|---|---|---|---|
+| 全球政策要闻 | workbubby「全球政策与实政要闻」+ 豆包「全球要闻每日采集」（重复，取两者之长） | ≤5，按重要性；没有重要的就返回空 | 06:00 |
+| AI·芯片·存储行业动态 | workbubby「AI行业动态」+ 豆包「AI科技行业每日动态推送」（重复；去掉飞书推送） | ≤5 | 06:10 |
+| 创新药每日动态 | 豆包「创新药每日动态推送」（摘要须含 mOS/HR/P/ORR 等关键数据） | ≤5 | 06:20 |
+| 重点创新药公司动态 | workbubby「重点创新药公司每日高价值公告监控」（保留收录/剔除规则；没有动态的公司不出条目） | 不限（受全局上限） | 06:30 |
+| 新消费新娱乐趋势 | 豆包「新消费新娱乐趋势」 | 5–8 | 06:40 |
+| 企业家访谈 | 豆包「企业家访谈」（价值评级写进 note，如“价值：★★★★ 理由”） | ≤8 | 06:50 |
+
+**决定**
+
+1. 内容全部在 `config/collector-presets-v1.json`：一个共用 Skill（`daily-news-common`「每日资讯采集通用规则」：只看过去 24 小时、一手权威来源优先、不收传闻、不编造、必须有可访问原文链接、中文自写摘要、同事去重、宁缺毋滥）+ 6 个定时器（名称、提示词、周期）。每个提示词只保留自己的范围、筛选、条数和字段说明（company / category / note 的用法）。
+2. 旧提示词里的 Excel/openpyxl/pandas 生成、`D:\股票投资` 路径、文件命名、“执行完成后汇报”、lark-cli/飞书推送全部删除；存储、去重、公司关联和影响分由系统现有流程完成。
+3. 重点公司名单写在提示词里，管理员可在页面上直接改。旧提示词写“四家”但列了 7 家，已改为 7 家；英矽智能港股代码改为 03696.HK（旧的 02585 是错的）；百济神州已更名 BeOne Medicines，美股代码 ONC（2025-01-02 起，原 BGNE）。劲方医药 02595.HK、信达生物 01801.HK、中国生物制药 01177.HK、翰森制药 03692.HK、诺诚健华 688428.SH / 09969.HK、百济神州 688235.SH / 06160.HK 核对无误。
+4. 导入是幂等的：Skill 按 `skill_key`、定时器按名称在本工作区查，已存在就跳过，不覆盖管理员改过的内容；新建走现有 `save_skill` / `save_task`（同样校验周期、只接受能联网的模型、写审计），另记一条 `admin.collector.presets_installed` 审计。
+5. 入口：后台设置 › 采集定时器 顶部“导入预置采集任务”（选能联网的模型、勾选、导入，显示 已导入 / 未导入）；接口 `GET /api/admin/collectors/presets`（分页）和 `POST /api/admin/collectors/presets/install {provider_id, keys?}`（权限 `source.manage` 或 `system.configure`）；服务器上 `python -m app.admin_cli install-collector-presets --workspace <工作区> --provider <模型 id 或标识>`。
+
+**记录**
+
+- designed：本节。
+- implemented：`config/collector-presets-v1.json`、`backend/app/domains/news/collector_presets.py`、`backend/app/api/collectors.py`（两个预置接口）、`backend/app/admin_cli.py`（`install-collector-presets`）、前端 `pages/settings.tsx` 的导入面板；OpenAPI 与 `api-schema.ts` 重新生成，`backend/static` 重新构建。
+- verified：`tests/test_r7_collector_presets.py`（配置合法、6 个周期都过 `validate_schedule` 且错开在 06:00–06:50、提示词不含本机路径/Excel/飞书/lark-cli、公司代码、权限 403、拒绝不联网或不存在的模型与未知 key 且不落库、分批导入与重复导入幂等、审计、Skill 进入系统提示词、命令行导入）；本机隔离 PostgreSQL 全量后端测试与前端构建通过，CI 结果见对应 PR。**未用真实厂商 Key 实际跑过这 6 个提示词**，导入后建议先对每个定时器点一次“立即执行”，看执行记录里的模型原始输出再调整提示词。页面未在浏览器里截图检查（本机无可用浏览器），只做了类型检查与构建。
