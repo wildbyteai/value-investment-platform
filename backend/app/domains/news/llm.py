@@ -34,8 +34,14 @@ class ProviderConfig:
     search_mode: str = 'none'
 
     @property
+    def blocked(self) -> str | None:
+        from app.core.secret_guard import provider_problem
+        return provider_problem(self.base_url, self.api_key_env)
+
+    @property
     def api_key(self) -> str:
-        return os.environ.get(self.api_key_env, '')
+        # Never hand a key to a URL or variable that fails the guard (see app/core/secret_guard.py).
+        return '' if self.blocked else os.environ.get(self.api_key_env, '')
 
     @property
     def configured(self) -> bool:
@@ -96,6 +102,8 @@ def parse_links(content: str) -> list[ProposedLink]:
 
 def propose_links(provider: ProviderConfig, event_text: str, watchlist: list[str],
                   transport: httpx.BaseTransport | None = None, timeout: float = 60) -> list[ProposedLink]:
+    if provider.blocked:
+        raise LlmError(f'模型配置未通过安全检查：{provider.blocked}')
     if not provider.configured:
         raise LlmError(f'未配置模型密钥（环境变量 {provider.api_key_env}）')
     body = {

@@ -1,0 +1,18 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$VIP_DOMAIN} {
+	encode zstd gzip
+	# The app sets its own security headers (CSP, HSTS, nosniff…); just hide server banners.
+	header -Server
+	request_body {
+		max_size 10MB
+	}
+	reverse_proxy api:8766
+	log {
+		output stdout
+		format json
+		# never log cookies or auth headers
+	}
+}

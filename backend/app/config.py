@@ -19,6 +19,14 @@ class Settings(BaseSettings):
     smtp_password: SecretStr = Field(default=SecretStr(''))
     smtp_starttls: bool = False  # False = implicit TLS (465); True = STARTTLS (587)
     alert_sender: str = ''       # overrides config/alerts-v1.json sender.address
+    # Security (deployment). Fail closed: real login unless a developer explicitly opts into the
+    # header-based mock identities for local work and tests.
+    auth_mode: str = 'session'           # session | dev
+    cookie_secure: bool = True           # session cookie only over HTTPS; set false only for plain-http local runs
+    session_idle_minutes: int = 720      # sign out after 12 h without activity
+    session_max_hours: int = 168         # and at most 7 days after signing in
+    allowed_hosts: str = '*'             # comma list for TrustedHostMiddleware, e.g. research.example.com
+    docs_enabled: bool = False           # FastAPI /docs, /redoc, /openapi.json
 
 
 @lru_cache

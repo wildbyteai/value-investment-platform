@@ -31,6 +31,9 @@ jobs:
           sudo mv "$PGCONF.new" "$PGCONF"
           sudo systemctl reload postgresql.service
 
+      - name: libpq headers (psycopg2 builds from source)
+        run: sudo apt-get install -y --no-install-recommends libpq-dev
+
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
@@ -67,3 +70,22 @@ jobs:
           npm run build
       - name: Committed bundle matches source
         run: git diff --exit-code -- backend/static
+
+  docker-image:
+    # The deployment image must build, and the compose file must parse. Nothing is pushed.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t vip-app:ci .
+      - name: Image runs as non-root and imports the app
+        run: |
+          test "$(docker run --rm vip-app:ci id -u)" = "10001"
+          docker run --rm -e VIP_DB_URL=postgresql+psycopg2://x:y@127.0.0.1:1/x vip-app:ci python -c "import app.main, app.scheduler, app.admin_cli, psycopg2; print('ok')"
+      - name: Compose file is valid
+        working-directory: deploy
+        run: |
+          printf 'VIP_DOMAIN=ci.example.com\nPOSTGRES_PASSWORD=x\nVIP_DB_PASSWORD=y\n' > .env
+          mkdir -p secrets && cp secrets-example/app.env secrets/app.env
+          docker compose config -q

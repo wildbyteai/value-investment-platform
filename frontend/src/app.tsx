@@ -61,7 +61,108 @@ const companyTabs = [
   "资料与研判",
   "评分规则",
 ];
+function LoginForm({ onDone }: { onDone: (r: any) => void }) {
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      onDone(await post("/api/auth/login", { login, password }));
+    } catch (err) {
+      setError((err as Error).message);
+      setPassword("");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <main className="login-page">
+      <form className="panel login-card" onSubmit={submit}>
+        <h1>价投宝</h1>
+        <p className="muted">请用管理员为你开通的账号登录。</p>
+        {error && <p role="alert" className="notice danger">{error}</p>}
+        <label>
+          账号
+          <input autoComplete="username" value={login} onChange={(e) => setLogin(e.target.value)} required autoFocus />
+        </label>
+        <label>
+          密码
+          <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label>
+        <button type="submit" disabled={busy || !login || !password}>{busy ? "登录中…" : "登录"}</button>
+      </form>
+    </main>
+  );
+}
+function AccountPanel({ workspaces, workspace, setWorkspace }: any) {
+  const [pw, setPw] = useState({ current: "", next: "" });
+  const [note, setNote] = useState("");
+  async function logout() {
+    await post("/api/auth/logout", {}).catch(() => {});
+    location.reload();
+  }
+  async function change(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await post("/api/auth/password", { current: pw.current, new: pw.next });
+      setNote("密码已修改，其他浏览器已退出登录。");
+      setPw({ current: "", next: "" });
+    } catch (err) {
+      setNote((err as Error).message);
+    }
+  }
+  return (
+    <details className="identity">
+      <summary>账号与工作区</summary>
+      {workspaces.length > 1 && (
+        <label>
+          工作区
+          <select value={workspace} onChange={(e) => setWorkspace(e.target.value)}>
+            {workspaces.map((w: any) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </select>
+        </label>
+      )}
+      <form onSubmit={change}>
+        <label>当前密码<input type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} /></label>
+        <label>新密码（至少 12 位）<input type="password" autoComplete="new-password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} /></label>
+        <button type="submit" className="quiet" disabled={!pw.current || !pw.next}>修改密码</button>
+      </form>
+      {note && <p className="muted">{note}</p>}
+      <button className="quiet" onClick={logout}>退出登录</button>
+    </details>
+  );
+}
 function App() {
+  const [mode, setMode] = useState<"" | "dev" | "session">("");
+  const [account, setAccount] = useState<any>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    api("/api/auth/state")
+      .then((st) => {
+        session.mode = st.mode;
+        if (st.user) setAccount(st);
+        setMode(st.mode);
+      })
+      .catch((e) => setError(e.message));
+  }, []);
+  if (error) return <p role="alert" className="notice danger">{error}</p>;
+  if (mode === "dev") return <DevApp />;
+  if (mode !== "session") return null;
+  if (!account) return <LoginForm onDone={setAccount} />;
+  return <SessionApp account={account} />;
+}
+function SessionApp({ account }: any) {
+  const workspaces = account.workspaces || [];
+  const [workspace, setWorkspace] = useState(workspaces[0]?.id || "");
+  if (!workspaces.length) return <p role="alert" className="notice danger">这个账号还没有加入任何工作区，请联系管理员。</p>;
+  const panel = <AccountPanel workspaces={workspaces} workspace={workspace} setWorkspace={setWorkspace} />;
+  return <Workspace key={workspace} identity={{ login: account.user.login, workspace }} identityPanel={panel} />;
+}
+function DevApp() {
   const [ids, setIds] = useState<any>();
   const [error, setError] = useState("");
   const [login, setLogin] = useState("research@demo");

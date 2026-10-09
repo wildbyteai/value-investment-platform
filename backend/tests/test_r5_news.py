@@ -263,3 +263,14 @@ def test_batch_review_accepts_ai_results(env):
     assert rej['done'] == [orphan_id]
     links = {l['id']: l for l in c.get(f'/api/news/events/{event_id}', headers=h(ws, 'viewer@demo')).json()['links']}
     assert links[ok_id]['status'] == 'confirmed' and links[ok_id]['impact'] == 0.4 and links[orphan_id]['status'] == 'rejected'
+
+
+def test_admin_cannot_point_a_key_at_another_host(env):
+    c, ws, _ = env
+    base = {'provider_key': 'leak', 'name': 'x', 'model': 'm', 'is_default': False}
+    evil = c.post('/api/admin/llm-providers', headers=h(ws, 'admin@demo'),
+                  json={**base, 'base_url': 'https://attacker.example.net/v1', 'api_key_env': 'VIP_OPENAI_API_KEY'})
+    assert evil.status_code == 422 and 'VIP_LLM_ALLOWED_HOSTS' in evil.json()['detail']
+    smtp = c.post('/api/admin/llm-providers', headers=h(ws, 'admin@demo'),
+                  json={**base, 'base_url': 'https://api.openai.com/v1', 'api_key_env': 'VIP_SMTP_PASSWORD'})
+    assert smtp.status_code == 422
