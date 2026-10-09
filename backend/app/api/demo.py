@@ -78,7 +78,7 @@ def read_audit(
     principal: Principal = Depends(require("audit.read")),
     db: Session = Depends(get_db),
 ):
-    """Only system_admin has audit.read."""
+    """Needs audit.read (system_admin, which holds every permission)."""
     rows = db.scalars(select(AuditLog).where(AuditLog.workspace_id == principal.workspace.id).order_by(AuditLog.created_at.desc()).limit(100)).all()
     return [
         {

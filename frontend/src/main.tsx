@@ -77,7 +77,7 @@ export function DevApp() {
               ))}
             </select>
           </label>
-          <button
+          <button className="primary"
             onClick={() => setActive({ login, workspace })}
             disabled={!workspace}
           >

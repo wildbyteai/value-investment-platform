@@ -45,7 +45,7 @@ export function Feeds({ allow, busy, execute }: Ctx) {
           <h3>上传每日资讯 Excel</h3>
           <p className="muted">可一次选多个文件；按文件名识别资讯源（如“创新药每日动态_2026-09-30.xlsx”）。重复内容自动跳过，同一件事合并为一个事件。</p>
           <input type="file" accept=".xlsx" multiple onChange={(e) => setFiles(e.target.files)} />
-          <button disabled={busy || !files?.length} onClick={async () => (await execute(() => upload(files!), (r: any) => `导入完成：新增 ${r.files.reduce((s: number, f: any) => s + f.new_items, 0)} 条，重复 ${r.files.reduce((s: number, f: any) => s + f.duplicate_items, 0)} 条；${r.scoring ? `打分 ${r.scoring.events} 个事件` : ""}${r.scoring?.error ? `（${r.scoring.error}，已用规则匹配）` : ""}。`, false)) !== undefined && feeds.reload()}>
+          <button className="primary" disabled={busy || !files?.length} onClick={async () => (await execute(() => upload(files!), (r: any) => `导入完成：新增 ${r.files.reduce((s: number, f: any) => s + f.new_items, 0)} 条，重复 ${r.files.reduce((s: number, f: any) => s + f.duplicate_items, 0)} 条；${r.scoring ? `打分 ${r.scoring.events} 个事件` : ""}${r.scoring?.error ? `（${r.scoring.error}，已用规则匹配）` : ""}。`, false)) !== undefined && feeds.reload()}>
             导入并打分
           </button>
         </section>
@@ -58,7 +58,7 @@ export function Feeds({ allow, busy, execute }: Ctx) {
           {feeds.value?.map((f) => (
             <tr key={f.id}><td>{f.name}{f.url && <div className="muted">{f.url}</div>}</td><td>{f.kind === "rss" ? `RSS${f.schedule ? ` · ${f.schedule}` : ""}` : "Excel 上传"}</td>
               <td>{time(f.last_run_at)}</td><td>{f.last_status || "—"}</td>
-              {canWrite && <td>{f.kind === "rss" && <button className="quiet" disabled={busy} onClick={async () => (await execute(() => post(`/api/news/feeds/${f.id}/run`, {}), (r: any) => `抓取完成：新增 ${r.new_items} 条。`, false)) !== undefined && feeds.reload()}>立即抓取</button>}</td>}
+              {canWrite && <td>{f.kind === "rss" && <button disabled={busy} onClick={async () => (await execute(() => post(`/api/news/feeds/${f.id}/run`, {}), (r: any) => `抓取完成：新增 ${r.new_items} 条。`, false)) !== undefined && feeds.reload()}>立即抓取</button>}</td>}
             </tr>
           ))}
         </tbody>
@@ -70,7 +70,7 @@ export function Feeds({ allow, busy, execute }: Ctx) {
           <label>名称<input required value={rss.name} onChange={(e) => setRss({ ...rss, name: e.target.value })} /></label>
           <label>地址<input required type="url" value={rss.url} onChange={(e) => setRss({ ...rss, url: e.target.value })} /></label>
           <label>计划<input value={rss.schedule} onChange={(e) => setRss({ ...rss, schedule: e.target.value })} /></label>
-          <button disabled={busy}>登记</button>
+          <button className="primary" disabled={busy}>登记</button>
           <p className="muted">定时抓取由服务器 cron 执行 python -m app.jobs news。</p>
         </form>
       )}
@@ -110,7 +110,7 @@ export function Models({ busy, execute }: Ctx) {
                 <tr key={p.id}><td>{p.name}<div className="muted">{p.model}</div></td><td>{p.base_url}</td><td>{p.api_key_env} {p.key_configured ? "✓ 已设置" : "✗ 未设置"}</td>
                   <td>{SEARCH_LABEL[p.search_mode] || p.search_mode}</td>
                   <td>{p.enabled ? (p.is_default ? "默认" : "可用") : "停用"}</td>
-                  <td><button className="quiet" onClick={() => { setEditing(p.id); setForm({ ...p, temperature: p.options?.temperature ?? 0 }); }}>编辑</button></td></tr>
+                  <td><button onClick={() => { setEditing(p.id); setForm({ ...p, temperature: p.options?.temperature ?? 0 }); }}>编辑</button></td></tr>
               ))}
             </tbody>
           </table>
@@ -129,8 +129,8 @@ export function Models({ busy, execute }: Ctx) {
         <label>温度<input type="number" min={0} max={2} step={0.1} value={form.temperature} onChange={(e) => setForm({ ...form, temperature: Number(e.target.value) })} /></label>
         <label className="inline"><input type="checkbox" checked={form.is_default} onChange={(e) => setForm({ ...form, is_default: e.target.checked })} /> 设为默认</label>
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
-        <button disabled={busy}>保存</button>
-        {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+        <button className="primary" disabled={busy}>保存</button>
+        {editing && <button type="button" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
       </form>
     </>
   );
@@ -179,7 +179,7 @@ function CollectorPresets({ busy, execute, searchable, onInstalled }: Pick<Ctx, 
           <label>执行模型<select value={providerId} onChange={(e) => setProvider(e.target.value)} disabled={!searchable.length}>
             {searchable.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
           </select></label>
-          <button disabled={busy || !providerId || !chosen.length} onClick={install}>导入选中的 {chosen.length} 个</button>
+          <button className="primary" disabled={busy || !providerId || !chosen.length} onClick={install}>导入选中的 {chosen.length} 个</button>
           {!searchable.length && <p className="muted">需要先在 模型配置 添加一个能联网的模型。</p>}
         </div>
       )}
@@ -226,9 +226,9 @@ export function Collectors({ busy, execute }: Ctx) {
               <td>{t.enabled ? time(t.next_run_at) : "—"}</td>
               <td>{t.last_status || "尚未执行"}<div className="muted">{t.last_run_at ? time(t.last_run_at) : ""}</div></td>
               <td className="actions">
-                <button className="quiet" disabled={busy} onClick={async () => { const r = await execute(() => post(`/api/admin/collectors/${t.id}/run`, {}), (x: any) => (x.status === "succeeded" ? `采集完成：采到 ${x.items_found} 条，新增 ${x.stats.new_items} 条。` : `采集失败：${x.error}`), false); if (r !== undefined) { list.reload(); runs.reload(); } }}>立即执行</button>
-                <button className="quiet" onClick={() => edit(t)}>编辑</button>
-                <button className="quiet" onClick={() => setRunsOf(runsOf === t.id ? null : t.id)}>{runsOf === t.id ? "收起记录" : "执行记录"}</button>
+                <button disabled={busy} onClick={async () => { const r = await execute(() => post(`/api/admin/collectors/${t.id}/run`, {}), (x: any) => (x.status === "succeeded" ? `采集完成：采到 ${x.items_found} 条，新增 ${x.stats.new_items} 条。` : `采集失败：${x.error}`), false); if (r !== undefined) { list.reload(); runs.reload(); } }}>立即执行</button>
+                <button onClick={() => edit(t)}>编辑</button>
+                <button onClick={() => setRunsOf(runsOf === t.id ? null : t.id)}>{runsOf === t.id ? "收起记录" : "执行记录"}</button>
               </td>
             </tr>
           ))}
@@ -274,8 +274,8 @@ export function Collectors({ busy, execute }: Ctx) {
           <label>间隔分钟（不少于 {opts.value?.min_interval_minutes ?? 60}）<input type="number" min={opts.value?.min_interval_minutes ?? 60} step={30} value={form.minutes} onChange={(e) => setForm({ ...form, minutes: e.target.value })} /></label>
         )}
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
-        <button disabled={busy || !searchable.length}>保存</button>
-        {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+        <button className="primary" disabled={busy || !searchable.length}>保存</button>
+        {editing && <button type="button" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
         <p className="muted">定时执行需要服务器每 5 分钟跑一次 python -m app.jobs collect。</p>
       </form>
     </>
@@ -301,8 +301,8 @@ export function Skills({ busy, execute }: Ctx) {
           {list.value?.map((s) => (
             <tr key={s.id}><td>{s.name}<div className="muted">{s.skill_key}</div></td><td>{s.description || "—"}</td><td>v{s.version}</td>
               <td>{s.used_by} 个定时器</td><td>{s.enabled ? "启用" : "停用"}</td>
-              <td className="actions"><button className="quiet" onClick={() => { setEditing(s.id); setForm({ skill_key: s.skill_key, name: s.name, description: s.description, body: s.body, enabled: s.enabled }); }}>编辑</button>
-                <button className="quiet" disabled={busy || s.used_by > 0} title={s.used_by ? "还有定时器在用" : ""} onClick={async () => { if (!confirm(`删除 Skill「${s.name}」？`)) return; (await execute(() => api(`/api/admin/skills/${s.id}`, { method: "DELETE" }), "Skill 已删除。", false)) !== undefined && list.reload(); }}>删除</button></td></tr>
+              <td className="actions"><button onClick={() => { setEditing(s.id); setForm({ skill_key: s.skill_key, name: s.name, description: s.description, body: s.body, enabled: s.enabled }); }}>编辑</button>
+                <button className="danger" disabled={busy || s.used_by > 0} title={s.used_by ? "还有定时器在用" : ""} onClick={async () => { if (!confirm(`删除 Skill「${s.name}」？`)) return; (await execute(() => api(`/api/admin/skills/${s.id}`, { method: "DELETE" }), "Skill 已删除。", false)) !== undefined && list.reload(); }}>删除</button></td></tr>
           ))}
         </tbody>
       </table>
@@ -313,8 +313,8 @@ export function Skills({ busy, execute }: Ctx) {
         <label>说明<input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
         <label>执行流程（Markdown）<textarea required rows={12} value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} placeholder={"1. 逐个公司检索过去 24 小时的交易所公告\n2. 再检索临床试验、医保谈判、BD 授权新闻\n3. 只保留可能影响长期价值的事件，删掉股价异动类快讯\n4. 每条写清楚涉及的公司和代码"} /></label>
         <label className="inline"><input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> 启用</label>
-        <button disabled={busy}>保存</button>
-        {editing && <button type="button" className="quiet" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
+        <button className="primary" disabled={busy}>保存</button>
+        {editing && <button type="button" onClick={() => { setEditing(null); setForm(blank); }}>取消</button>}
       </form>
     </>
   );
@@ -370,7 +370,7 @@ export function TasksPage({ data, allow, busy, execute }: any) {
                     </p>
                     <p>{r.error}</p>
                     {r.status === "failed" && allow("job.retry") && (
-                      <button
+                      <button className="primary"
                         disabled={busy}
                         onClick={() =>
                           execute(

@@ -13,7 +13,7 @@
 | 财务 fundamentals | 财务/行情修订 | 报告义务、汇率、股本/公司行动、日历 | 固定时点规范事实和缺口 | 不能用今天数据回填过去 |
 | 评分 scoring | Template、ScoringBinding | 父链、registry、EffectiveConfig、Baseline、ContributionSlot、ScoreSnapshot | 公司经营分及解释 | 不计算证券价格、不发交易指令 |
 | 策略 strategy | StrategyRelease、Membership | Preview、EvaluationManifest、Seal、Evaluation、Transition、Correction | 证券候选状态及固定变化解释 | 不以重试改写封存历史 |
-| 治理 governance | Workspace、成员授权 | 能力、源/模型政策、审计、任务账本 | 权限及运行诊断 | system_admin不自动拥有业务发布权限 |
+| 治理 governance | Workspace、成员授权 | 能力、源/模型政策、审计、任务账本 | 权限及运行诊断 | system_admin为全权限（2026-10-09 决定，见 ADR 0014；原“不自动拥有业务发布权限”作废） |
 | 研究协作 research | 自选/笔记/保存视图 | owner、visibility、revision | 个人研究上下文 | 私人对象不默认组织共享 |
 
 这些是同一模块化单体中的责任边界，不是新增微服务。一个动作可在同一数据库事务调用公开应用服务，共同提交业务记录、审计及outbox。

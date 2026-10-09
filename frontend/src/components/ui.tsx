@@ -79,7 +79,7 @@ export function Dialog({ title, children, close }: any) {
     >
       <div className="toolbar">
         <h2>{title}</h2>
-        <button className="quiet" onClick={close}>
+        <button onClick={close}>
           关闭
         </button>
       </div>
@@ -91,7 +91,7 @@ export function Diagnostic({ value }: any) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button className="text-button" onClick={() => setOpen(true)}>
+      <button className="text" onClick={() => setOpen(true)}>
         技术诊断
       </button>
       {open && (
@@ -250,7 +250,6 @@ export function ResearchResult({ run, read }: any) {
                 </>
               )}
               <button
-                className="quiet"
                 onClick={() => read(a.source_item_id, a.source_revision_id)}
               >
                 阅读此次固定原文
@@ -268,7 +267,7 @@ export function ResearchResult({ run, read }: any) {
               <p>{p.value.reason}</p><p className="muted">局限与反证：{p.value.limitations}</p>
               {p.evidence.map((e: any, i: number) => <div key={i}>
                 <details><summary>{e.relation === "contradicts" ? "阅读反证或限制条件" : "阅读支持证据"}</summary><blockquote>{e.quote}</blockquote></details>
-                <button className="quiet" onClick={() => read(e.item_id,e.source_revision_id)}>阅读研判固定原文</button>
+                <button onClick={() => read(e.item_id,e.source_revision_id)}>阅读研判固定原文</button>
               </div>)}
             </section>)}
           </section>}

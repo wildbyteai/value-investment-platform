@@ -266,7 +266,7 @@ export function AuthorJudgment({
           {localError || error}
         </p>
       )}
-      <button
+      <button className="primary"
         disabled={
           saving ||
           grade === "" ||
@@ -406,7 +406,7 @@ export function Judgment({ j, catalog = [], execute, editable }: any) {
             />
           </label>
           {localError && <p role="alert">{localError}</p>}
-          <button
+          <button className="primary"
             disabled={saving || value === "" || !reason.trim()}
             onClick={() => save()}
           >
@@ -415,7 +415,7 @@ export function Judgment({ j, catalog = [], execute, editable }: any) {
           {j.author_type === "human" && (
             <button
               disabled={saving}
-              className="quiet"
+              
               onClick={() => save(true)}
             >
               解除人工覆盖

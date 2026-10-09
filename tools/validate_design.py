@@ -170,7 +170,7 @@ check(set(roles)=={'viewer','researcher','strategy_manager','data_admin','system
 check('analysis.override' in roles['researcher'] and 'strategy.publish' not in roles['researcher'],'Researcher override but no publish')
 check('template.publish' in roles['strategy_manager'] and 'source.manage' not in roles['strategy_manager'],'Strategy manager boundaries')
 check('role.assign' not in roles['data_admin'] and 'analysis.override' not in roles['viewer'],'Data admin / viewer boundaries')
-check('strategy.publish' not in roles['system_admin'] and 'analysis.override' not in roles['system_admin'],'System admin no implicit business authority')
+check(set(roles['system_admin'])=={p for r in roles.values() for p in r},'System admin holds every permission (user decision 2026-10-09, ADR 0014)')
 proposal=read('examples/analysis-proposal.json')
 for link in proposal['links']:check(bool(link['evidence_ids']) and 'approved' not in link,'Model proposal cannot self-approve')
 for impact in proposal['impact_proposals']:check(impact['company_id'] in {x['company_id'] for x in proposal['links']} and impact['dimension'] in scoring['dimension_weights'],'Impact link/dimension exists')

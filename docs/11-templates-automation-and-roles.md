@@ -54,7 +54,7 @@ DecisionService、有效判断指针、audit、outbox同事务提交。人工拒
 | researcher | viewer + analysis.override、template.edit、共享研究笔记 | 模板/策略发布、凭证、用户授权 |
 | strategy_manager | viewer + template.edit/publish、strategy.edit/simulate/publish/rollback、scoring.binding.publish | 数据源凭证、用户授权 |
 | data_admin | viewer + source.manage、job.retry、identity.manage、quality.correct | 模板/策略发布、用户授权 |
-| system_admin | user.manage、role.assign、system.configure、model.configure、audit.read、运行状态查看 | 业务覆盖/发布不隐式授予，可明确兼任其他角色 |
+| system_admin | 全权限：全部权限（user.manage、role.assign、system.configure、model.configure、audit.read、运行状态查看，以及上面所有业务权限） | 无（用户 2026-10-09 决定“管理员是全权限”，取代原“业务覆盖/发布不隐式授予”，见 ADR 0014） |
 
 RBAC以稳定capability检查，角色只是预置组合；同一用户可兼任。每项写入需同时满足role capability、workspace和对象visibility。组织研究对象默认workspace共享，私人笔记/策略由owner明确共享；无需逐家公司授权。公共市场主数据只读共享，私有判断不跨组织。服务端查询与写入统一检查，前端显示入口/按钮与PermissionNotice，不以按钮隐藏代替授权。
 

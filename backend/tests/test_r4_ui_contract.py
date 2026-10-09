@@ -82,3 +82,26 @@ def test_every_menu_tab_has_a_page():
     registry = (SRC / 'pages' / 'index.tsx').read_text(encoding='utf-8')
     pages = set(re.findall(r'^  "?([a-z\-]+)"?: \(p\) =>', registry, re.M))
     assert pages == set(menus.tab_keys())
+
+
+def test_navigation_is_a_left_sidebar_without_top_tabs():
+    """纯左右布局（docs/23 §2.1）：页面切换只在左侧两级导航里，外壳不再有顶部页签条。"""
+    shell = (SRC / 'shell' / 'workspace.tsx').read_text(encoding='utf-8')
+    nav = (SRC / 'shell' / 'sidenav.tsx').read_text(encoding='utf-8')
+    css = (SRC / 'shell' / 'style.css').read_text(encoding='utf-8')
+    assert 'subtabs' not in shell and 'role="tablist"' not in shell and '.subtabs' not in css
+    assert '<SideNav' in shell and 'aria-current' in nav and 'vip-nav-collapsed' in nav
+    assert 'role="tab"' not in nav
+    assert '.subtabs' not in (STATIC / 'app.css').read_text(encoding='utf-8')
+
+
+def test_style_uses_design_tokens():
+    """界面规范（docs/23 §6，基于 Ant Design）：令牌块之后只用令牌字号、字重与颜色。"""
+    css = (SRC / 'shell' / 'style.css').read_text(encoding='utf-8')
+    body = css[css.index('* { box-sizing'):]
+    assert ':root {' in css and ':root[data-theme="dark"] {' in css
+    sizes = set(re.findall(r'font-size:\s*([^;}]+)', body))
+    assert sizes <= {'var(--fs-sm)', 'var(--fs)', 'var(--fs-lg)', 'var(--fs-xl)', 'var(--fs-xxl)', '0'}, sizes
+    assert set(re.findall(r'font-weight:\s*([^;}]+)', body)) <= {'var(--fw)', 'var(--fw-strong)', 'var(--fw-num)'}
+    assert re.findall(r'#[0-9a-fA-F]{3,8}\b', body) == []
+    assert re.findall(r'rgba?\(', body) == []

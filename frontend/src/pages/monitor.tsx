@@ -21,11 +21,11 @@ export function Inbox({ busy, execute }: Ctx) {
       <Failed error={box.error} />
       {box.value && (
         <>
-          <p>未读 {box.value.unread} 条。 {box.value.unread > 0 && <button className="quiet" disabled={busy} onClick={() => act(() => post("/api/notifications/read-all", {}))}>全部标为已读</button>}</p>
+          <p>未读 {box.value.unread} 条。 {box.value.unread > 0 && <button disabled={busy} onClick={() => act(() => post("/api/notifications/read-all", {}))}>全部标为已读</button>}</p>
           {!box.value.items.length && <p>暂无告警。只有落进击球区的球才会提醒你。</p>}
           {box.value.items.map((n: any) => (
             <AlertCard key={n.id} a={n.alert}>
-              {n.status === "unread" ? <button className="quiet" disabled={busy} onClick={() => act(() => post(`/api/notifications/${n.id}/read`, {}))}>标为已读</button> : <p className="muted">已读 {time(n.read_at)}</p>}
+              {n.status === "unread" ? <button disabled={busy} onClick={() => act(() => post(`/api/notifications/${n.id}/read`, {}))}>标为已读</button> : <p className="muted">已读 {time(n.read_at)}</p>}
             </AlertCard>
           ))}
         </>
@@ -39,7 +39,7 @@ export function AlertsList({ allow, busy, execute }: Ctx) {
     <>
       <p className="intro">告警只来自两类球：击球区变化（进入/离开甜区、硬风险否决），以及已确认的资讯击中甜区公司（或边角球公司遇重大利空）。</p>
       {any(allow, "source.manage", "strategy.publish", "system.configure") && (
-        <button className="quiet" disabled={busy} onClick={async () => (await execute(() => post("/api/alerts/scan", {}), (r: any) => `扫描完成：新告警 ${r.zones.alerts + r.news.alerts} 条，邮件发出 ${r.email.sent} 封。`, false)) !== undefined && list.reload()}>
+        <button disabled={busy} onClick={async () => (await execute(() => post("/api/alerts/scan", {}), (r: any) => `扫描完成：新告警 ${r.zones.alerts + r.news.alerts} 条，邮件发出 ${r.email.sent} 封。`, false)) !== undefined && list.reload()}>
           立即扫描
         </button>
       )}
@@ -63,7 +63,7 @@ export function NotifySettings({ busy, execute }: Ctx) {
       <label>收件邮箱<input type="email" value={form.email || ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="name@example.com" /></label>
       <label className="inline"><input type="checkbox" checked={form.email_enabled} onChange={(e) => setForm({ ...form, email_enabled: e.target.checked })} /> 邮件提醒</label>
       <label className="inline"><input type="checkbox" checked={form.inapp_enabled} onChange={(e) => setForm({ ...form, inapp_enabled: e.target.checked })} /> 站内提醒</label>
-      <button disabled={busy}>保存</button>
+      <button className="primary" disabled={busy}>保存</button>
       <p className="muted">告警邮件由 admin@bytewatcher.xyz 发出。研究员、策略经理、系统管理员会收到告警。</p>
     </form>
   );

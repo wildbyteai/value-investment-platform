@@ -184,7 +184,7 @@ export function TemplateEditor({ company, template, allow, execute }: any) {
               {error}
             </p>
           )}
-          <button disabled={!valid} onClick={simulate}>
+          <button className={preview ? undefined : "primary"} disabled={!valid} onClick={simulate}>
             预览模板差异
           </button>
           {preview && (
@@ -207,13 +207,13 @@ export function TemplateEditor({ company, template, allow, execute }: any) {
                     <p className="notice">
                       确认发布这份已预览的配置？现有快照与策略版本保持原输入。
                     </p>
-                    <button onClick={publish}>确认发布模板</button>
-                    <button className="quiet" onClick={() => setConfirm(false)}>
+                    <button className="primary" onClick={publish}>确认发布模板</button>
+                    <button onClick={() => setConfirm(false)}>
                       取消
                     </button>
                   </>
                 ) : (
-                  <button onClick={() => setConfirm(true)}>
+                  <button className="primary" onClick={() => setConfirm(true)}>
                     发布模板新版本
                   </button>
                 ))}
