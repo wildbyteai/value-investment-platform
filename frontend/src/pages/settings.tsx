@@ -139,6 +139,53 @@ export function Models({ busy, execute }: Ctx) {
 // ------------------------------------------------------------------ 采集定时器 / Skill
 export const WEEK = ["一", "二", "三", "四", "五", "六", "日"];
 export const RUN_STATUS: Record<string, string> = { running: "执行中", succeeded: "成功", failed: "失败" };
+// 预置采集定时器包（config/collector-presets-v1.json）：选一个能联网的模型，一次导入；已导入的自动跳过。
+function CollectorPresets({ busy, execute, searchable, onInstalled }: Pick<Ctx, "busy" | "execute"> & { searchable: any[]; onInstalled: () => void }) {
+  const presets = useLoad<any>("/api/admin/collectors/presets");
+  const [provider, setProvider] = useState("");
+  const [picked, setPicked] = useState<string[] | null>(null);
+  const items: any[] = presets.value?.items || [];
+  const missing = items.filter((i) => !i.installed).map((i) => i.key);
+  const chosen = (picked ?? missing).filter((k) => missing.includes(k));
+  const providerId = provider || searchable[0]?.id || "";
+  async function install() {
+    const r = await execute(() => post("/api/admin/collectors/presets/install", { provider_id: providerId, keys: chosen }),
+      (x: any) => `已导入 ${x.created.length} 个定时器${x.skipped.length ? `，${x.skipped.length} 个已存在跳过` : ""}${x.skill_created ? "，并新建共用 Skill" : ""}。`, false);
+    if (r !== undefined) { setPicked(null); presets.reload(); onInstalled(); }
+  }
+  if (presets.error) return <Failed error={presets.error} />;
+  if (!presets.value) return null;
+  return (
+    <details className="panel presets" open={missing.length > 0}>
+      <summary><strong>导入预置采集任务</strong> <span className="muted">{missing.length ? `${items.length - missing.length}/${items.length} 已导入` : "全部已导入"}</span></summary>
+      <p className="muted">{presets.value.description} 共用 Skill「{presets.value.skill.name}」{presets.value.skill.installed ? "（已导入）" : "（导入时一并创建）"}。导入后可以在下方逐个编辑提示词或停用。</p>
+      <table>
+        <thead><tr><th></th><th>定时器</th><th>由哪些旧任务合并</th><th>周期</th><th>状态</th></tr></thead>
+        <tbody>
+          {items.map((i) => (
+            <tr key={i.key}>
+              <td><input type="checkbox" aria-label={`导入 ${i.name}`} disabled={i.installed} checked={i.installed || chosen.includes(i.key)}
+                onChange={(e) => setPicked(e.target.checked ? [...chosen, i.key] : chosen.filter((k) => k !== i.key))} /></td>
+              <td>{i.name}<details><summary className="muted">提示词</summary><pre>{i.prompt}</pre></details></td>
+              <td className="muted">{i.merged_from.join("；")}</td>
+              <td>{i.schedule_text}</td>
+              <td>{i.installed ? <span className="pill pill-ok">已导入</span> : <span className="pill pill-wait">未导入</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {missing.length > 0 && (
+        <div className="form">
+          <label>执行模型<select value={providerId} onChange={(e) => setProvider(e.target.value)} disabled={!searchable.length}>
+            {searchable.map((p: any) => <option key={p.id} value={p.id}>{p.name} · {p.model}（{p.search_label}）{p.key_configured ? "" : " · 密钥未设置"}</option>)}
+          </select></label>
+          <button disabled={busy || !providerId || !chosen.length} onClick={install}>导入选中的 {chosen.length} 个</button>
+          {!searchable.length && <p className="muted">需要先在 模型配置 添加一个能联网的模型。</p>}
+        </div>
+      )}
+    </details>
+  );
+}
 export function Collectors({ busy, execute }: Ctx) {
   const list = useLoad<any[]>("/api/admin/collectors");
   const opts = useLoad<any>("/api/admin/collectors/options");
@@ -167,6 +214,7 @@ export function Collectors({ busy, execute }: Ctx) {
       <p className="intro">像 Agent 定时任务一样采集资讯：写好提示词、选一个能联网的模型（可再选一个 Skill 让模型按流程走），到点自动执行。采到的资讯进入资讯雷达，和 Excel、RSS 一样去重、关联公司、等你确认。时间按北京时间。</p>
       <Failed error={list.error || opts.error} />
       {opts.value && !searchable.length && <p className="notice">还没有能联网的模型。先到 模型配置 添加通义、智谱、Kimi 或 OpenAI，并选择联网方式。</p>}
+      {opts.value && <CollectorPresets busy={busy} execute={execute} searchable={searchable} onInstalled={() => { list.reload(); opts.reload(); }} />}
       <table>
         <thead><tr><th>定时器</th><th>模型 / Skill</th><th>周期</th><th>下次执行</th><th>最近一次</th><th></th></tr></thead>
         <tbody>
